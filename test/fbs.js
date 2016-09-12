@@ -1,3 +1,7 @@
+/**
+ * @file
+ * Unit test setup of FBS plugin.
+ */
 
 /**
  * Setup the application plugin for FBS tests.
