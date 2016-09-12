@@ -24,7 +24,7 @@ var API = function (app, logger, options) {
    * Default get request.
    */
   app.get('/api', function (req, res) {
-    res.send('Please see documentation about using this api.');
+    res.status(501).send('Please see documentation about using this api.');
   });
 };
 

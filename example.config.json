@@ -4,7 +4,6 @@
     "all": "logs/messages.log",
     "info": "logs/info.log",
     "error": "logs/error.log",
-    "debug": "logs/debug.log",
-    "socket": "logs/socket.log"
+    "debug": "logs/debug.log"
   }
 }
