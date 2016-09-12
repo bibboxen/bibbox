@@ -1,0 +1,16 @@
+{
+  "name": "fbs",
+  "description": "Communication with FBS",
+  "version": "0.0.1",
+  "main": "fbs.js",
+  "private": true,
+  "plugin": {
+    "consumes": [
+      "bus",
+      "logger"
+    ],
+    "provides": [
+      "fbs"
+    ]
+  }
+}

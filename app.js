@@ -29,6 +29,12 @@ var plugins = [
   {
     "packagePath": "./plugins/api"
   },
+  {
+    "packagePath": "./plugins/barcode"
+  },
+  {
+    "packagePath": "./plugins/fbs"
+  },
 ];
 
 // User the configuration to start the application.

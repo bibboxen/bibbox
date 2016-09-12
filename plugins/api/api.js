@@ -3,8 +3,6 @@
  * Added API to send content into the search engine
  */
 
-var Q = require('q');
-
 /**
  * This object encapsulate the RESET API.
  *

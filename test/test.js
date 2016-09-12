@@ -7,23 +7,48 @@
 
 var supertest = require("supertest");
 var should = require("should");
+var assert = require('assert');
 
-var server = supertest.agent("http://localhost:3010");
+GLOBAL.server = supertest.agent("http://localhost:3010");
 
 /**
- * API authentication tests.
+ * Helper to setup to minial app with plugins.
  */
-describe('API basic test', function() {
+GLOBAL.setupArchitect = function setupArchitect(plugins, config) {
+		var Q = require('q');
+		var deferred = Q.defer();
 
-  it('Test /api exists (501)', function(done) {
-    server.get("/api")
-      .expect(501)
-      .end(function(err, res) {
+		var architect = require("architect");
 
-        res.status.should.equal(501);
+		// User the configuration to start the application.
+		config = architect.resolveConfig(plugins, __dirname);
+		architect.createApp(config, function (err, app) {
+			if (err) {
+				deferred.reject(err);
+			}
+			else {
+				deferred.resolve(app);
+			}
+		});
 
-        done();
-      });
+		return deferred.promise;
+}
+
+/**
+ * Wrapper to load test files.
+ */
+function importTest(name, path) {
+  describe(name, function () {
+    require(path);
   });
+}
 
-});
+/**
+ * API endpoint exists.
+ */
+importTest("API (UI)", './api.js');
+
+/**
+ *
+ */
+importTest("FBS", './fbs.js');
