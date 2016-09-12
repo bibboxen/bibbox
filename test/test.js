@@ -1,8 +1,8 @@
 /**
  * @file
- * API tests.
+ * Mocha tests.
  *
- * mocha tests.
+ * Mocks see http://sinonjs.org/
  */
 
 var supertest = require("supertest");
