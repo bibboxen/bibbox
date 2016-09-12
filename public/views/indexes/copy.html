@@ -1,0 +1,21 @@
+<!-- Header -->
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+  <h4 class="modal-title">{{ title }}</h4>
+</div>
+
+<!-- Content - edit form -->
+<div class="modal-body">
+	<p>{{ message }}</p>
+
+  <span>
+    <label class="control-label" for="field-name">Name of the new index</label>
+    <input type="text" class="form-control" id="field-name" data-ng-model="name">
+  </span>
+</div>
+
+<!-- Footer with action buttons -->
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+  <button type="button" class="btn btn-info" data-ng-click="confirmed()">{{ okText }}</button>
+</div>

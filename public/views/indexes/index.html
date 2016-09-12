@@ -1,0 +1,126 @@
+<!-- Navigation bar -->
+<ng-include src="'views/navigation.html'"></ng-include>
+
+<!-- Header -->
+<div class="page-header">
+  <h1>INDEXES <small>Search indexes</small></h1>
+</div>
+
+<!-- messages -->
+<div data-ng-show="message" class="alert {{ messageClass }}" role="alert">{{ message }}</div>
+
+<!-- Page content -->
+<div class="jumbotron">
+
+  <!-- Indexes -->
+	<div class="panel panel-success">
+    <div class="panel-heading">
+      <h4>Active</h4>
+    </div>
+  	<table class="table table-hover">
+  	<thead>
+			<tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Index</th>
+        <th>Pri</th>
+        <th>Rep</th>
+        <th>Docs</th>
+        <th>Deleted</th>
+        <th>Size</th>
+        <th>Actions</th>
+  		</tr>
+  	</thead>
+    <tr data-ng-class="getClass(index.health)" data-ng-repeat="index in activeIndexes">
+    	<td>{{ $index + 1 }}</td>
+      <td>{{ activeMappings[index.index].name }}</td>
+    	<td>{{ index.index }}</td>
+    	<td>{{ index.pri }}</td>
+    	<td>{{ index.rep }}</td>
+    	<td>{{ index.count }}</td>
+    	<td>{{ index.deleted }}</td>
+    	<td>{{ index.size }}</td>
+      <td>
+        <!-- Edit index -->
+        <button type="button" class="btn btn-success btn-xs" data-ng-click="edit(index.index)">
+          <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Edit
+        </button>
+
+        <!-- Flush index -->
+        <button type="button" class="btn btn-warning btn-xs" data-ng-click="flush(index.index)">
+          <span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Flush
+        </button>
+
+        <!-- Copy index -->
+        <button type="button" class="btn btn-info btn-xs" data-ng-click="copy(index.index)">
+          <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Copy
+        </button>
+
+        <!-- Remove index -->
+        <button type="button" class="btn btn-danger btn-xs" data-ng-click="deactivate(index.index)">
+          <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Deactivate
+        </button>
+
+        <!-- Remove index -->
+        <button type="button" class="btn btn-default btn-xs" data-ng-click="exportMapping(index.index)">
+          <span class="glyphicon glyphicon-export" aria-hidden="true"></span> Export
+        </button>
+
+      </td>
+    </tr>
+  	</table>
+	</div>
+</div>
+
+<div class="jumbotron">
+  <!-- Mapping without indexes -->
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <h4>Not active</h4>
+    </div>
+    <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Index</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tr data-ng-repeat="(index, mapping) in inActiveMappings">
+      <td>{{ $index + 1 }}</td>
+      <td>{{ mapping.name }}</td>
+      <td>{{ index }}</td>
+      <td>
+        <!-- Edit mapping -->
+        <button type="button" class="btn btn-success btn-xs" data-ng-click="edit(index)">
+          <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Edit
+        </button>
+
+        <!-- Activate mapping -->
+        <button type="button" class="btn btn-info btn-xs" data-ng-click="activate(index)">
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Activate
+        </button>
+
+        <!-- Remove mapping -->
+        <button type="button" class="btn btn-danger btn-xs" data-ng-click="removeMapping(index)">
+          <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+        </button>
+
+        <!-- Remove index -->
+        <button type="button" class="btn btn-default btn-xs" data-ng-click="exportMapping(index)">
+          <span class="glyphicon glyphicon-export" aria-hidden="true"></span> Export
+        </button>
+      </td>
+    </tr>
+    </table>
+  </div>
+
+  <!-- Add new mapping -->
+  <button type="button" class="btn btn-info" data-ng-click="addMapping()">
+    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add mapping
+  </button>
+  <button type="button" class="btn btn-warning" data-ng-click="importMapping()">
+    <span class="glyphicon glyphicon-import" aria-hidden="true"></span> Import mapping(s)
+  </button>
+</div>

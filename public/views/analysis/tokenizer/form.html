@@ -1,0 +1,54 @@
+<form role="form">
+
+  <!-- Name -->
+  <div class="form-group">
+    <label for="name">Name</label>
+    <input type="text" class="form-control" id="name" placeholder="Enter Name (Only A-z and '_')" data-ng-model="tokenizer.name">
+  </div>
+
+  <!-- Description -->
+  <div class="form-group">
+    <label for="description">Description</label>
+    <input type="text" class="form-control" id="description" placeholder="" data-ng-model="tokenizer.x_description">
+  </div>
+
+  <!-- Options -->
+
+  <fieldset class="form-border form-horizontal" data-ng-repeat="option in tokenizer.options track by $index">
+    <legend>Option ({{ $index + 1 }})</legend>
+
+    <div class="form-group">
+      <label class="control-label col-xs-2" for="field-key-{{ $index }}">Key</label>
+      <div class="col-xs-10">
+        <input type="text" class="form-control" id="field-key-{{ $index }}" placeholder="" data-ng-model="tokenizer.options[$index][0]">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label col-xs-2" for="field-values-{{ $index }}">Value</label>
+      <div class="col-xs-10">
+        <input type="text" class="form-control" id="field-values-{{ $index }}" placeholder="" data-ng-model="tokenizer.options[$index][1]">
+      </div>
+    </div>
+
+    <!-- Remove field  -->
+    <button type="button" class="btn btn-danger btn-xs" data-ng-click="removeOption($index)">
+      <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Remove option
+    </button>
+  </fieldset>
+
+  <!-- Add one more date -->
+  <button type="button" class="btn btn-success btn-xs" data-ng-click="addOption()">
+    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add option
+  </button>
+</form>
+
+
+<!--
+"alpha_nummeric_only": {
+  "x_description": "Alpha nummeric only",
+  "x_locked": true,
+  "pattern": "[^\\p{L}\\d]+",
+  "type": "pattern"
+}
+-->

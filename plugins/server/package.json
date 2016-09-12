@@ -1,0 +1,23 @@
+{
+  "name": "server",
+  "description": "Starts the http server using express",
+  "version": "0.0.1",
+  "main": "server.js",
+  "private": true,
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "4.14.x",
+    "hjs": "0.0.6",
+    "morgan": "^1.7.0",
+    "serve-favicon": "^2.3.0"
+  },
+  "plugin": {
+    "provides": [
+      "server",
+      "app"
+    ],
+    "consumes": [
+      "logger"
+    ]
+  }
+}
