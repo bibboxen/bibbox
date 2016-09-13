@@ -7,8 +7,6 @@
 var util = require('util');
 var eventEmitter = require('events').EventEmitter;
 
-var HID = require('node-hid');
-
 var Barcode = function Barcode(VID, PID) {
   "use strict";
 
@@ -29,20 +27,26 @@ util.inherits(Barcode, eventEmitter);
 Barcode.prototype.connect = function connect() {
   var self = this;
 
-  self.device = new HID.HID(self.VID, self.PID);
-  self.pause();
+  var HID = require('node-hid');
+  try {
+    self.device = new HID.HID(self.VID, self.PID);
+    self.pause();
 
-  self.device.on('data', function(data) {
-    var key = self.parseBuffer(data);
-    if (key !== "\n") {
-      if (key !== -1) {
-        self.code.push(key);
+    self.device.on('data', function(data) {
+      var key = self.parseBuffer(data);
+      if (key !== "\n") {
+        if (key !== -1) {
+          self.code.push(key);
+        }
       }
-    }
-    else {
-      self.emit('code', self.code);
-    }
-  });
+      else {
+        self.emit('code', self.code.join(''));
+      }
+    });
+  }
+  catch (err) {
+    self.emit('err', err);
+  }
 };
 
 /**
@@ -127,6 +131,9 @@ Barcode.prototype.resume = function resume() {
   if (this.device !== undefined) {
     this.device.resume();
   }
+  else {
+    self.emit('error', new Error('No barcode devices available.', -1));
+  }
 };
 
 /**
@@ -135,6 +142,9 @@ Barcode.prototype.resume = function resume() {
 Barcode.prototype.pause = function pause() {
   if (this.device !== undefined) {
     this.device.pause();
+  }
+  else {
+    self.emit('error', new Error('No barcode devices available.', -1));
   }
 };
 
@@ -153,21 +163,21 @@ module.exports = function (options, imports, register) {
   /**
    * Listen to list devices event.
    */
-  bus.on('barcodeList', function() {
-    bus.emit('barcodeDevices', barcode.list());
+  bus.on('barcode.list', function(callback) {
+    bus.emit(callback, barcode.list());
   });
 
   /**
    * Listen to barcode start event.
    */
-  bus.on('barcodeStart', function() {
+  bus.on('barcode.start', function() {
     barcode.resume();
   });
 
   /**
    * Listen to barcode stop event.
    */
-  bus.on('barcodeStop', function() {
+  bus.on('barcode.stop', function() {
     barcode.pause();
   });
 
@@ -175,7 +185,16 @@ module.exports = function (options, imports, register) {
    * Listen to barcode read and emit the code into the bus.
    */
   barcode.on('code', function(code) {
-    bus.emit('barcode', code);
+    bus.emit('barcode.data', code);
+  });
+
+  /**
+   * Listen to barcode errors and emit the error into the bus.
+   *
+   * @NOTE: Its call err an not error, because nodeJS catches "error" events.
+   */
+  barcode.on('err', function(err) {
+    bus.emit('barcode.err', err);
   });
 
   register(null, null);

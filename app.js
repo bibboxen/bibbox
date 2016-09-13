@@ -34,7 +34,7 @@ var plugins = [
   },
   {
     "packagePath": "./plugins/fbs"
-  },
+  }
 ];
 
 // User the configuration to start the application.
