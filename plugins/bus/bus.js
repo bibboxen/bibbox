@@ -17,7 +17,8 @@ module.exports = function (options, imports, register) {
     'bus': {
       emit: emitter.emit,
       on: emitter.on,
-      once: emitter.once
+      once: emitter.once,
+      removeListener: emitter.removeListener
     }
   });
 };
