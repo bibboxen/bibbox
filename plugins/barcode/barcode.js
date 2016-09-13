@@ -188,8 +188,12 @@ module.exports = function (options, imports, register) {
     bus.emit('barcode.data', code);
   });
 
-
-  barcode.on('error', function(err) {
+  /**
+   * Listen to barcode errors and emit the error into the bus.
+   *
+   * @NOTE: Its call err an not error, because nodeJS catches "error" events.
+   */
+  barcode.on('err', function(err) {
     bus.emit('barcode.err', err);
   });
 
