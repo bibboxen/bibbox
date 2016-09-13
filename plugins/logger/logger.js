@@ -154,7 +154,7 @@ module.exports = function (options, imports, register) {
 
   // Add event listeners to logging events on the bus.
   var bus = imports.bus;
-  bus.on('logger.error', logger.error);
+  bus.on('logger.err', logger.error);
   bus.on('logger.info', logger.info);
   bus.on('logger.debug', logger.debug);
 

@@ -12,12 +12,12 @@
     "serve-favicon": "^2.3.0"
   },
   "plugin": {
+    "consumes": [
+      "bus"
+    ],
     "provides": [
       "server",
       "app"
-    ],
-    "consumes": [
-      "logger"
     ]
   }
 }

@@ -7,16 +7,14 @@
  * This object encapsulate the RESET API.
  *
  * @param app
- * @param logger
  * @param options
  *
  * @constructor
  */
-var API = function (app, logger, options) {
+var API = function (app, options) {
   "use strict";
 
   var self = this;
-  this.logger = logger;
 
   /**
    * Default get request.
@@ -34,8 +32,10 @@ module.exports = function (options, imports, register) {
   "use strict";
 
   // Create the API routes using the API object.
-  var api = new API(imports.app, imports.logger, options);
+  var api = new API(imports.app, options);
 
   // This plugin extends the server plugin and do not provide new services.
-  register(null, null);
+  register(null, {
+    "api": api
+  });
 };

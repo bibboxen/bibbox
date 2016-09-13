@@ -5,8 +5,7 @@
 module.exports = function (options, imports, register) {
   "use strict";
 
-  // Get connected to the logger
-  var logger = imports.logger;
+  var bus = imports.bus;
 
   // Load modules required.
   var express = require('express');
@@ -26,7 +25,9 @@ module.exports = function (options, imports, register) {
   // Log express requests.
   app.use(morgan('combined', {
     "stream": {
-      "write": logger.info
+      "write": function (message) {
+        bus.emit('logger.info', message);
+      }
     }
   }));
 
@@ -49,14 +50,15 @@ module.exports = function (options, imports, register) {
 
   // Start the server.
   server.listen(app.get('port'), function () {
-    logger.debug('Express server with socket.io is listening on port ' + app.get('port'));
+    bus.emit('logger.info', 'Server is listening on port ' + app.get('port'));
   });
 
   // Register exposed function with architect.
   register(null, {
     onDestruct: function (callback) {
       server.close(callback);
-      logger.debug('Express server stopped');
+
+      bus.emit('logger.debug', 'Server stopped');
     },
     app: app,
     server: server

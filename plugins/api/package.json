@@ -10,7 +10,10 @@
   "plugin": {
     "consumes": [
       "app",
-      "logger"
+      "bus"
+    ],
+    "provides": [
+      "api"
     ]
   }
 }

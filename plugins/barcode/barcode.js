@@ -171,6 +171,7 @@ module.exports = function (options, imports, register) {
    * Listen to barcode start event.
    */
   bus.on('barcode.start', function() {
+    bus.emit('logger.debug', 'Barcode: started');
     barcode.resume();
   });
 
@@ -178,6 +179,7 @@ module.exports = function (options, imports, register) {
    * Listen to barcode stop event.
    */
   bus.on('barcode.stop', function() {
+    bus.emit('logger.debug', 'Barcode: stopped');
     barcode.pause();
   });
 
@@ -185,6 +187,7 @@ module.exports = function (options, imports, register) {
    * Listen to barcode read and emit the code into the bus.
    */
   barcode.on('code', function(code) {
+    bus.emit('logger.debug', 'Barcode: scanned - ' + code);
     bus.emit('barcode.data', code);
   });
 
@@ -194,6 +197,7 @@ module.exports = function (options, imports, register) {
    * @NOTE: Its call err an not error, because nodeJS catches "error" events.
    */
   barcode.on('err', function(err) {
+    bus.emit('logger.err', 'Barcode: ' + err);
     bus.emit('barcode.err', err);
   });
 
