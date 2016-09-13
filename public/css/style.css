@@ -20,3 +20,16 @@ body {
 .container {
     text-align: center;
 }
+
+.language-icon {
+    position: relative;
+    top: -2px;
+}
+
+.language-button {
+    height: 40px;
+    width: 120px;
+    font-size: 18px;
+    padding: .4em;
+    margin: 1em;
+}
