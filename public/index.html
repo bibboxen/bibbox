@@ -3,32 +3,35 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>BibBox</title>
 
-  <!-- Load angular -->
+  <script src="js/lib/jquery-1.11.1.min.js"></script>
   <script src="js/lib/angular.min.js"></script>
   <script src="js/lib/angular-route.min.js"></script>
   <script src="js/app.js"></script>
-
-  <!-- Controllers -->
-  <script src="js/controllers/mainControllers.js"></script>
-
-  <!-- Utils -->
+  <script src="js/routing.js"></script>
+  <script src="js/controllers/mainController.js"></script>
+  <script src="js/controllers/borrowController.js"></script>
   <script src="js/lib/md5.js"></script>
-
-  <!-- Load bootstrap theme -->
-  <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/bootstrap-theme.min.css">
-
-  <script src="js/lib/jquery-1.11.1.min.js"></script>
   <script src="js/lib/bootstrap.min.js"></script>
 
-  <!-- Local styles -->
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/bootstrap-theme.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-ng-app="BibBox">
+  <nav class="navbar navbar-default navbar-absolute-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <div class="logo-container">
+          <a href="/"><img src="img/aarhus.png" class="logo"></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
   <div class="container">
-    <!-- Placeholder for the route templets -->
     <div ng-view></div>
   </div>
 </body>

@@ -4,4 +4,4 @@
 */
 
 // Define the angular application.
-var app = angular.module('BibBox', [ 'ngRoute' ]);
+angular.module('BibBox', [ 'ngRoute' ]);

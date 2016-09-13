@@ -1,1 +1,10 @@
-body {}
+body {
+}
+
+.logo {
+    height: 60px;
+}
+
+.logo-container {
+    padding: .5em 0;
+}
