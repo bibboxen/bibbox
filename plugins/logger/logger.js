@@ -152,6 +152,12 @@ module.exports = function (options, imports, register) {
 
   var logger = new Logger(options.logs);
 
+  // Add event listeners to logging events on the bus.
+  var bus = imports.bus;
+  bus.on('logger.error', logger.error);
+  bus.on('logger.info', logger.info);
+  bus.on('logger.debug', logger.debug);
+
   // Register the plugin with the system.
   register(null, {
     "logger": logger
