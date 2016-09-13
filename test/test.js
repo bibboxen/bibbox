@@ -5,16 +5,17 @@
  * Mocks see http://sinonjs.org/
  */
 
-GLOBAL.supertest = require("supertest");
-GLOBAL.should = require("should");
-GLOBAL.assert = require('assert');
+global.supertest = require("supertest");
+global.should = require("should");
+global.assert = require('assert');
+global.sinon = require('sinon');
 
-GLOBAL.server = supertest.agent("http://localhost:3010");
+global.server = supertest.agent("http://localhost:3010");
 
 /**
  * Helper to setup to minial app with plugins.
  */
-GLOBAL.setupArchitect = function setupArchitect(plugins, config) {
+global.setupArchitect = function setupArchitect(plugins, config) {
 		var Q = require('q');
 		var deferred = Q.defer();
 
@@ -44,6 +45,8 @@ function importTest(name, path) {
 }
 
 // Load test cases.
+importTest("Bus", './bus.js');
+importTest("Logger", './logger.js');
 importTest("API (UI)", './api.js');
 importTest("BarCode", './barcode.js');
 importTest("FBS", './fbs.js');
