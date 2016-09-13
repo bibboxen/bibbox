@@ -26,11 +26,25 @@ var setup = function setup() {
 	return setupArchitect(plugins, config);
 };
 
-it('@TODO', function() {
+it('Test info event (@TODO: validate)', function() {
   return setup().then(function (app) {
+  	app.services.bus.emit('logger.info', 'Info message');
   	assert(true);
-  },
-  function (err) {
-  	assert(false);
+  });
+});
+
+it('Test debug event (@TODO: validate)', function() {
+	return setup().then(function (app) {
+		app.services.bus.emit('logger.info', 'Debug message');
+		assert(true);
 	});
 });
+
+it('Test error event (@TODO: validate)', function() {
+	return setup().then(function (app) {
+		app.services.bus.emit('logger.info', 'Error message');
+		assert(true);
+	});
+});
+
+

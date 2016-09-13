@@ -152,11 +152,20 @@ module.exports = function (options, imports, register) {
 
   var logger = new Logger(options.logs);
 
-  // Add event listeners to logging events on the bus.
+  // Add event listeners to logging events on the bus. For some reason they need
+  // to have a inner function to work!
   var bus = imports.bus;
-  bus.on('logger.err', logger.error);
-  bus.on('logger.info', logger.info);
-  bus.on('logger.debug', logger.debug);
+  bus.on('logger.err', function (message) {
+    logger.error(message);
+  });
+
+  bus.on('logger.info', function (message) {
+    logger.info(message);
+  });
+
+  bus.on('logger.debug', function (message) {
+    logger.debug(message);
+  });
 
   // Register the plugin with the system.
   register(null, {
