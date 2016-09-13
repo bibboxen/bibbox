@@ -32,7 +32,7 @@ GLOBAL.setupArchitect = function setupArchitect(plugins, config) {
 		});
 
 		return deferred.promise;
-}
+};
 
 /**
  * Wrapper to load test files.

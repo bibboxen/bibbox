@@ -23,11 +23,11 @@ var setup = function setup() {
 	  },
 	  {
 	    "packagePath": "./../plugins/fbs"
-	  },
+	  }
 	];
 
 	return setupArchitect(plugins, config);
-}
+};
 
 it('Example test (42)', function() {
   return setup().then(function (app) {
