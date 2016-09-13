@@ -41,3 +41,7 @@ body {
     width: 100%;
     left: 0;
 }
+
+.page-header {
+    margin-bottom: 80px;
+}
