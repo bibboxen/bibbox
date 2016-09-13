@@ -1,1 +1,22 @@
-body {}
+body {
+}
+
+.logo {
+    height: 60px;
+}
+
+.logo-container {
+    padding: .5em 0;
+}
+
+.button {
+    height: 50px;
+    width: 200px;
+    font-size: 20px;
+    padding: .5em;
+    margin: 1em;
+}
+
+.container {
+    text-align: center;
+}

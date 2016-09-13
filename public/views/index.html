@@ -1,0 +1,7 @@
+<div class="page-header">
+    <h1>Vælg ønsket funktion</h1>
+</div>
+
+<a type="button" data-ng-repeat="button in buttons" class="btn btn-default button" aria-label="Left Align" data-ng-href="{{ button.url }}">
+    <span class="glyphicon {{ button.icon }}" aria-hidden="true"></span> {{ button.text }}
+</a>
