@@ -8,7 +8,23 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
     $scope.buttons = [
       {
         "text": "Udlån",
-        "url": '/#/borrow'
+        "url": "/#/borrow",
+        "icon": "glyphicon-tasks"
+      },
+      {
+        "text": "Status/Forny",
+        "url": "/#/status",
+        "icon": "glyphicon-refresh"
+      },
+      {
+        "text": "Reservationer",
+        "url": "/#/reservations",
+        "icon": "glyphicon-list-alt"
+      },
+      {
+        "text": "Aflevering",
+        "url": "/#/return",
+        "icon": "glyphicon-time"
       }
     ];
   }
