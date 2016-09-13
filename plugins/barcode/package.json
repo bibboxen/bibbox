@@ -8,7 +8,9 @@
     "consumes": [
       "bus"
     ],
-    "provides": []
+    "provides": [
+      "barcode"
+    ]
   },
   "dependencies": {
     "node-hid": "^0.5.1"

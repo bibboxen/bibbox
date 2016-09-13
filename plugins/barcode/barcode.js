@@ -197,5 +197,7 @@ module.exports = function (options, imports, register) {
     bus.emit('barcode.err', err);
   });
 
-  register(null, null);
+  register(null, {
+    "barcode" : barcode
+  });
 };

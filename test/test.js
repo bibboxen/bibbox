@@ -5,9 +5,9 @@
  * Mocks see http://sinonjs.org/
  */
 
-var supertest = require("supertest");
-var should = require("should");
-var assert = require('assert');
+GLOBAL.supertest = require("supertest");
+GLOBAL.should = require("should");
+GLOBAL.assert = require('assert');
 
 GLOBAL.server = supertest.agent("http://localhost:3010");
 
@@ -43,12 +43,7 @@ function importTest(name, path) {
   });
 }
 
-/**
- * API endpoint exists.
- */
+// Load test cases.
 importTest("API (UI)", './api.js');
-
-/**
- *
- */
+importTest("BarCode", './barcode.js');
 importTest("FBS", './fbs.js');
