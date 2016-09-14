@@ -13,7 +13,7 @@ angular.module('BibBox').config(function ($routeProvider) {
   $routeProvider
     .when('/borrow', {
       controller: 'BorrowController',
-      templateUrl: 'views/udlaan.html'
+      templateUrl: 'views/borrow.html'
     })
 
     .otherwise({

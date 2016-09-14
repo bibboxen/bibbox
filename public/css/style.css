@@ -1,4 +1,5 @@
 body {
+    background-image: radial-gradient(circle at bottom center, #eee, #fff);
 }
 
 .logo {
