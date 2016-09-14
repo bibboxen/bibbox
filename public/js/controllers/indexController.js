@@ -1,5 +1,5 @@
 /**
- * Index page.
+ * Index page controller.
  */
 angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$window', '$location', '$translate',
   function($scope, $http, $window, $location, $translate) {
@@ -8,22 +8,22 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
     $scope.buttons = [
       {
         "text": "menu.borrow",
-        "url": "/#/borrow",
+        "url": "/#/login/borrow",
         "icon": "glyphicon-tasks"
       },
       {
         "text": "menu.status",
-        "url": "/#/status",
+        "url": "/#/login/status",
         "icon": "glyphicon-refresh"
       },
       {
         "text": "menu.reservations",
-        "url": "/#/reservations",
+        "url": "/#/login/reservations",
         "icon": "glyphicon-list-alt"
       },
       {
         "text": "menu.return",
-        "url": "/#/return",
+        "url": "/#/login/return",
         "icon": "glyphicon-time"
       }
     ];

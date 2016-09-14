@@ -1,0 +1,10 @@
+<div data-ng-if="!loggedIn">
+    <div class="page-header">
+        <h1>{{ 'login.heading' | translate }}</h1>
+    </div>
+
+    <a type="button" class="btn btn-default button" aria-label="Left Align" data-ng-click="login()">
+        <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> {{ 'login.button.login' | translate }}
+    </a>
+</div>
+

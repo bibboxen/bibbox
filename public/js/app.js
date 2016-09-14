@@ -8,7 +8,7 @@ angular.module('BibBox', [ 'ngRoute', 'pascalprecht.translate' ]);
 
 var enTranslations = {
   "menu.borrow": "Borrow",
-  "menu.status": "Status/Renew",
+  "menu.status": "Status / Renew",
   "menu.reservations": "Reservations",
   "menu.return": "Return",
 
@@ -20,7 +20,7 @@ var enTranslations = {
 
 var daTranslations = {
   "menu.borrow": "Udlån",
-  "menu.status": "Status/Forny",
+  "menu.status": "Status / Forny",
   "menu.reservations": "Reservationer",
   "menu.return": "Aflevering",
 
@@ -33,6 +33,7 @@ var daTranslations = {
 
 angular.module('BibBox').config(['$translateProvider', function ($translateProvider) {
   $translateProvider
+    .useSanitizeValueStrategy('escape')
     .translations('en', enTranslations)
     .translations('da', daTranslations)
     .preferredLanguage('en');

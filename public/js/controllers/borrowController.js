@@ -1,5 +1,5 @@
 /**
- * Index page.
+ * Borrow page controller.
  */
 angular.module('BibBox').controller('BorrowController', ['$scope', '$http', '$window', '$location',
   function($scope, $http, $window, $location) {
