@@ -43,6 +43,50 @@ body {
     left: 0;
 }
 
-.page-header {
+.page-header-frontpage {
     margin-bottom: 80px;
+}
+
+.numpad-key {
+    width: 60px;
+    height: 60px;
+    font-size: 20px;
+    padding: .7em;
+    margin: 5px;
+}
+
+.numpad-container {
+    text-align: center;
+    margin: 0 auto;
+    padding: 1em;
+    width: 380px;
+}
+
+.numpad-key-zero {
+    width: 210px;
+    height: 60px;
+    font-size: 20px;
+    padding: .7em;
+    margin: 5px;
+}
+
+.numpad-enter {
+    width: 120px;
+    height: 200px;
+    font-size: 20px;
+    padding: .7em;
+    padding-top: 3.8em;
+    margin: 5px;
+}
+
+.numpad-backspace {
+    width: 120px;
+    height: 60px;
+    font-size: 20px;
+    padding: .7em;
+    margin: 5px;
+}
+
+.numpad-float {
+    float: left;
 }

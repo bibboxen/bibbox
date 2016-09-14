@@ -36,6 +36,11 @@ var API = function (app, options, bus) {
 
     bus.emit('barcode.start');
   });
+
+  app.get('/api/barcode/stop', function stopBarcode(req, res) {
+    bus.off('barcode.data');
+    bus.emit('barcode.stop');
+  });
 };
 
 
