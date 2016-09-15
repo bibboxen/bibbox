@@ -6,6 +6,7 @@
 // Node core modules required.
 var util = require('util');
 var eventEmitter = require('events').EventEmitter;
+var HID = require('node-hid');
 
 var Barcode = function Barcode(VID, PID) {
   "use strict";
@@ -27,7 +28,6 @@ util.inherits(Barcode, eventEmitter);
 Barcode.prototype.connect = function connect() {
   var self = this;
 
-  var HID = require('node-hid');
   try {
     self.device = new HID.HID(self.VID, self.PID);
     self.pause();
