@@ -33,6 +33,9 @@ var plugins = [
     "packagePath": "./plugins/barcode"
   },
   {
+    "packagePath": "./plugins/proxy"
+  },
+  {
     "packagePath": "./plugins/fbs"
   }
 ];

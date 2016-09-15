@@ -1,9 +1,16 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams',
-  function($scope, $http, $window, $location, $routeParams) {
+angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'proxyService',
+  function($scope, $http, $window, $location, $routeParams, proxyService) {
     "use strict";
+
+    function barcodeCallback(data) {
+      console.log("barcodeCallback");
+      console.log(data);
+    }
+
+    proxyService.emitEvent('barcode.start', 'barcode.data', barcodeCallback);
 
     var usernameRegExp = /[0-3][0-9][0-1][1-9]\d{6}/;
     var passwordRegExp = /\d+/;

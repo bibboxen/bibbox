@@ -44,7 +44,7 @@ var enTranslations = {
 };
 
 var daTranslations = {
-  "menu.borrow": "Udlån",
+  "menu.borrow": "Lån",
   "menu.status": "Status / Forny",
   "menu.reservations": "Reservationer",
   "menu.return": "Aflevering",
