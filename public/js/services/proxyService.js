@@ -9,6 +9,7 @@ angular.module('BibBox').service('proxyService', [
         callback(data);
       });
       socket.once(errorEvent, function (err) {
+        console.log(err);
         errorCallback(err);
       });
       socket.emit(emitEvent);

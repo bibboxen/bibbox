@@ -198,7 +198,9 @@ module.exports = function (options, imports, register) {
    */
   barcode.on('err', function(err) {
     bus.emit('logger.err', 'Barcode: ' + err);
-    bus.emit('barcode.err', err);
+    bus.emit('barcode.err', {
+      'msg': err.message
+    });
   });
 
   register(null, {
