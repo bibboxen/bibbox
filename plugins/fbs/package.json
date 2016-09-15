@@ -6,8 +6,7 @@
   "private": true,
   "plugin": {
     "consumes": [
-      "bus",
-      "logger"
+      "bus"
     ],
     "provides": [
       "fbs"

@@ -4,7 +4,7 @@
  */
 
 /**
- * Setup the application plugin for FBS tests.
+ * Setup the application plugin for barcode tests.
  */
 var setup = function setup() {
   var path = require('path');
@@ -29,7 +29,7 @@ var setup = function setup() {
 	return setupArchitect(plugins, config);
 };
 
-it('Test parser', function() {
+it('Parser', function() {
   return setup().then(function (app) {
     app.services.barcode.parseBuffer(Buffer.from([0, 0, 30, 0, 0 ,0 ,0])).should.be.exactly(1).and.be.a.Number();
     app.services.barcode.parseBuffer(Buffer.from([0, 0, 31, 0, 0 ,0 ,0])).should.be.exactly(2).and.be.a.Number();
@@ -42,8 +42,11 @@ it('Test parser', function() {
     app.services.barcode.parseBuffer(Buffer.from([0, 0, 38, 0, 0 ,0 ,0])).should.be.exactly(9).and.be.a.Number();
     app.services.barcode.parseBuffer(Buffer.from([0, 0, 39, 0, 0 ,0 ,0])).should.be.exactly(0).and.be.a.Number();
     app.services.barcode.parseBuffer(Buffer.from([0, 0, 40, 0, 0 ,0 ,0])).should.be.exactly("\n");
-  },
-  function (err) {
-  	assert(false);
+  });
+});
+
+it('List devices', function() {
+	return setup().then(function (app) {
+		console.log(app.services.barcode.list());
 	});
 });

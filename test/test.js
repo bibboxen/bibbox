@@ -50,3 +50,4 @@ importTest("Logger", './logger.js');
 importTest("API (UI)", './api.js');
 importTest("BarCode", './barcode.js');
 importTest("FBS", './fbs.js');
+importTest("Printer", './printer.js');

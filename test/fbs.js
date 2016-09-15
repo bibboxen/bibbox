@@ -32,8 +32,5 @@ var setup = function setup() {
 it('Example test (42)', function() {
   return setup().then(function (app) {
   	app.services.fbs.test().should.be.exactly(42).and.be.a.Number();
-  },
-  function (err) {
-  	assert(false);
-	});
+  });
 });

@@ -1,6 +1,6 @@
 /**
  * @file
- * Defines an event bus to send messages between plugins.
+ * Handles communication with FBS through SIP2.
  */
 
 var FBS = function FBS() {

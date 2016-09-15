@@ -1,0 +1,19 @@
+{
+  "name": "printer",
+  "description": "Communication with printer",
+  "version": "0.0.1",
+  "main": "printer.js",
+  "private": true,
+  "plugin": {
+    "consumes": [
+      "bus"
+    ],
+    "provides": [
+      "printer"
+    ]
+  },
+  "dependencies": {
+    "q": "^1.4.1",
+    "wkhtmltopdf": "^0.3.3"
+  }
+}
