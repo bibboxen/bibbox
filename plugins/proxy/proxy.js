@@ -17,7 +17,7 @@ var Proxy = function (app, server, bus) {
 
   var io = require('socket.io')(server);
 
-  var busEvents = ['barcode.data', 'barcode.err'];
+  var busEvents = ['barcode.data', 'barcode.err', 'barcode.list.res'];
   var socketEvents = ['barcode.start', 'barcode.stop', 'barcode.list'];
 
   io.on('connection', function (socket) {
