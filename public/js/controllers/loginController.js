@@ -8,11 +8,10 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     function barcodeCallback(data) {
       console.log("barcodeCallback");
       console.log(data);
-      alert(data);
     }
 
     function barcodeErrorCallback(err) {
-      alert(err);
+      console.log(err);
     }
 
     proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', barcodeCallback, barcodeErrorCallback);
