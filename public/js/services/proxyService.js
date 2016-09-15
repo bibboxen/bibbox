@@ -4,15 +4,14 @@ angular.module('BibBox').service('proxyService', [
 
     var socket = io();
 
-    this.emitEvent = function(emitEvent, callbackEvent, errorEvent, callback, errorCallback) {
+    this.emitEvent = function(emitEvent, callbackEvent, errorEvent, emitCallback, errorCallback) {
       socket.once(callbackEvent, function (data) {
-        callback(data);
+        emitCallback(data);
       });
       socket.once(errorEvent, function (err) {
-        console.log(err);
         errorCallback(err);
       });
       socket.emit(emitEvent);
-    }
+    };
   }
 ]);
