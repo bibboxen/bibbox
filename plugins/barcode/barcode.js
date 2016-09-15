@@ -132,7 +132,7 @@ Barcode.prototype.resume = function resume() {
     this.device.resume();
   }
   else {
-    self.emit('error', new Error('No barcode devices available.', -1));
+    this.emit('err', new Error('No barcode devices available.', -1));
   }
 };
 
@@ -144,7 +144,7 @@ Barcode.prototype.pause = function pause() {
     this.device.pause();
   }
   else {
-    self.emit('error', new Error('No barcode devices available.', -1));
+    this.emit('err', new Error('No barcode devices available.', -1));
   }
 };
 

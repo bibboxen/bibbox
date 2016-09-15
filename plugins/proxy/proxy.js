@@ -17,11 +17,10 @@ var Proxy = function (app, server, bus) {
 
   var io = require('socket.io')(server);
 
-  var busEvents = ['barcode.data'];
+  var busEvents = ['barcode.data', 'barcode.err'];
   var socketEvents = ['barcode.start', 'barcode.stop'];
 
   io.on('connection', function (socket) {
-
     for (var i = 0; i < busEvents.length; i++) {
       var busEvent = busEvents[i];
       bus.on(busEvent, function (data) {

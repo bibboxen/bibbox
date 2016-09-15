@@ -8,9 +8,14 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     function barcodeCallback(data) {
       console.log("barcodeCallback");
       console.log(data);
+      alert(data);
     }
 
-    proxyService.emitEvent('barcode.start', 'barcode.data', barcodeCallback);
+    function barcodeErrorCallback(err) {
+      alert(err);
+    }
+
+    proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', barcodeCallback, barcodeErrorCallback);
 
     var usernameRegExp = /[0-3][0-9][0-1][1-9]\d{6}/;
     var passwordRegExp = /\d+/;
