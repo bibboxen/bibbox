@@ -8,12 +8,17 @@ angular.module('BibBox').service('proxyService', ['$q',
       // Try to connect to the server if not already connected.
       var deferred = $q.defer();
 
-      socket.once(callbackEvent, function (data) {
-        deferred.resolve(data);
-      });
-      socket.once(errorEvent, function (err) {
-        deferred.reject(err);
-      });
+      if (callbackEvent) {
+        socket.once(callbackEvent, function (data) {
+          deferred.resolve(data);
+        });
+      }
+
+      if (errorEvent) {
+        socket.once(errorEvent, function (err) {
+          deferred.reject(err);
+        });
+      }
 
       socket.emit(emitEvent, data);
 

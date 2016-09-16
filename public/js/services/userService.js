@@ -4,20 +4,25 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
 
     var user;
     this.login = function login(username, password) {
-      return true;
+      var deferred = $q.defer();
+
       /*
-      proxyService.emitEvent('login', 'login.success', 'login.error', {
+       proxyService.emitEvent('login', 'login.success', 'login.error', {
 
-        "username": username,
-        "password": password
-      }).then(
-        function success() {
+       "username": username,
+       "password": password
+       }).then(
+       function success() {
 
-        },
-        function error() {
+       },
+       function error() {
 
-        }
-      );       */
+       }
+       );       */
+
+      deferred.resolve(true);
+
+      return deferred.promise;
     };
   }
 ]);

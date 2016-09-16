@@ -8,6 +8,8 @@
  *
  * @param server
  * @param bus
+ * @param busEvents
+ * @param proxyEvents
  *
  * @constructor
  */
@@ -18,16 +20,14 @@ var Proxy = function (server, bus, busEvents, proxyEvents) {
 
   var registerBusEvent = function registerBusEvent(i, socket) {
     var busEvent = busEvents[i];
-    bus.once(busEvent, function (data) {
-      console.log("i: " + i + " - " + busEvent);
+    bus.on(busEvent, function (data) {
       socket.emit(busEvent, data);
     });
   };
 
   var registerProxyEvent = function registerProxyEvent(j, socket) {
     var proxyEvent = proxyEvents[j];
-    socket.once(proxyEvent, function (data) {
-      console.log("j: " + j + " - " + proxyEvent);
+    socket.on(proxyEvent, function (data) {
       bus.emit(proxyEvent, data);
     });
   };

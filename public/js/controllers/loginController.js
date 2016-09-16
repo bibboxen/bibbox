@@ -5,27 +5,31 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
   function($scope, $http, $window, $location, $routeParams, proxyService, userService) {
     "use strict";
 
-    proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
-      function success(data) {
-        console.log('barcode.start success');
-        console.log(data);
-      },
-      function error(err) {
-        console.log('barcode.start error');
-        console.log(err);
-      }
-    );
+    var barcodeResult = function barcodeResult(data) {
+      console.log(data);
+      $scope.user.username = data;
+      usernameEntered();
+    };
 
-    proxyService.emitEvent('barcode.list', 'barcode.list.res', 'barcode.err', 'barcode.list.res').then(
-      function success(data) {
-        console.log('barcode.list success');
-        console.log(data);
-      },
-      function error(err) {
-        console.log('barcode.list error');
-        console.log(err);
-      }
-    );
+    var barcodeError = function barcodeError(err) {
+      console.log(err);
+    };
+
+    var startBarcode = function scanBarcode() {
+      proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
+        function success(data) {
+          barcodeResult(data);
+          stopBarcode();
+        },
+        function error(err) {
+          barcodeError(err);
+        }
+      );
+    };
+
+    var stopBarcode = function stopBarcode() {
+      proxyService.emitEvent('barcode.stop', null, null, {}).then();
+    };
 
     var usernameRegExp = /[0-3][0-9][0-1][1-9]\d{6}/;
     var passwordRegExp = /\d+/;
@@ -38,6 +42,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
 
     $scope.useManualLogin = function useManualLogin() {
       $scope.display = 'username';
+      stopBarcode();
     };
 
     $scope.usernameEntered = function usernameEntered() {
@@ -61,6 +66,8 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     };
 
     var login = function login() {
+      console.log($scope.user.username + " - " + $scope.user.password + " is logging in.");
+
       userService.login($scope.user.username, $scope.user.password).then(
         function success() {
           $scope.loggedIn = true;
@@ -72,6 +79,6 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
       );
     };
 
-
+    startBarcode();
   }
 ]);
