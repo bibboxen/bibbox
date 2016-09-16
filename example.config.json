@@ -4,5 +4,17 @@
     "info": "logs/info.log",
     "error": "logs/error.log",
     "debug": "logs/debug.log"
+  },
+  "proxy": {
+    "busEvents": [
+      "barcode.data",
+      "barcode.err",
+      "barcode.list.res"
+    ],
+    "proxyEvents": [
+      "barcode.start",
+      "barcode.stop",
+      "barcode.list"
+    ]
   }
 }
