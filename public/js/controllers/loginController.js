@@ -8,7 +8,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     var barcodeResult = function barcodeResult(data) {
       console.log(data);
       $scope.user.username = data;
-      usernameEntered();
+      $scope.usernameEntered();
     };
 
     var barcodeError = function barcodeError(err) {
