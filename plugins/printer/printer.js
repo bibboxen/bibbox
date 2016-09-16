@@ -12,11 +12,10 @@ var Printer = function Printer() {
 
 };
 
-Printer.prototype.test = function test() {
+Printer.prototype.test = function test(file) {
   var deferred = Q.defer();
-  var os = require('os');
 
-  var stream = fs.createWriteStream(os.tmpdir() + '/out.pdf');
+  var stream = fs.createWriteStream(file);
   stream.on('finish', function() {
       deferred.resolve();
   });
