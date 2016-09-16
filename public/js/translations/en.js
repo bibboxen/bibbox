@@ -31,6 +31,7 @@ angular.module('BibBox').config(['$translateProvider', function ($translateProvi
     "reservations.reservation_number": "Number in Queue",
     "reservations.information": "Information",
 
+    "status.heading": "Status / Renew",
     "status.title": "Title",
     "status.return_date": "Return date",
     "status.bill": "Bill",

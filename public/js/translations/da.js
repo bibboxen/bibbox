@@ -31,6 +31,7 @@ angular.module('BibBox').config(['$translateProvider', function ($translateProvi
     "reservations.reservation_number": "Kø-nummer",
     "reservations.information": "Information",
 
+    "status.heading": "Status / Forny",
     "status.title": "Titel",
     "status.return_date": "Afleveringsdato",
     "status.bill": "Gebyr",
