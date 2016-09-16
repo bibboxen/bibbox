@@ -1,0 +1,10 @@
+<div>
+    <div class="page-header">
+        <h1>{{ 'reservations.heading' | translate }}</h1>
+    </div>
+
+    <ul class="list-group" style="text-align: left;">
+        <li data-ng-repeat="reservation in reservations" data-ng-class="{'list-group-item-success': reservation.status === 'ready'}" class="list-group-item"><span class="badge" data-ng-if="reservation.status === 'ready'">{{ 'reservations.ready' | translate }}</span>{{ reservation.title }}</li>
+    </ul>
+</div>
+
