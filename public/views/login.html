@@ -8,12 +8,12 @@
             <h3>{{ 'login.scan' | translate }}</h3>
         </div>
 
-        <a type="button" class="btn btn-info button" aria-label="Left Align" data-ng-click="useManualLogin()">
+        <a type="button" class="btn btn-info button" aria-label="Left Align" data-ng-click="useManualLogin(true)">
             <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> {{ 'login.button.manual_login' | translate }}
         </a>
     </div>
 
-    <div data-ng-if="display === 'username'" style="width: 450px; margin: 0 auto;">
+    <div data-ng-if="display === 'username'" class="login-container">
         <div class="alert alert-danger" role="alert" data-ng-if="usernameValidationError">
             <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
             <span class="sr-only">Error:</span>
@@ -29,7 +29,7 @@
         <keypad field="user.username" enter="usernameEntered()"></keypad>
     </div>
 
-    <div data-ng-if="display === 'password'" style="width: 450px; margin: 0 auto;">
+    <div data-ng-if="display === 'password'" class="login-container">
         <div class="alert alert-danger" role="alert" data-ng-if="passwordValidationError">
             <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
             <span class="sr-only">Error:</span>
@@ -40,9 +40,13 @@
 
         <div class="input-group input-group-lg numpad-container">
             <span class="input-group-addon" id="sizing-addon2">{{ 'login.password_short' | translate }}</span>
-            <input type="text" class="form-control" placeholder="{{ 'login.password' | translate }}" aria-describedby="sizing-addon2" data-ng-model="user.password">
+            <input type="password" class="form-control" placeholder="{{ 'login.password' | translate }}" aria-describedby="sizing-addon2" data-ng-model="user.password">
         </div>
         <keypad field="user.password" enter="passwordEntered()"></keypad>
     </div>
+
+    <a type="button" class="btn btn-danger button button-back" aria-label="Left Align" data-ng-click="useManualLogin(false)" data-ng-if="display !== 'default'">
+        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
+    </a>
 </div>
 

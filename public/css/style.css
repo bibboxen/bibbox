@@ -94,3 +94,18 @@ body {
 .numpad-float {
     float: left;
 }
+
+.login-container {
+    width: 450px;
+    margin: 0 auto;
+}
+
+.button-back {
+    position: fixed;
+    left: 10px;
+    bottom: 10px;
+}
+
+.text-left {
+    text-align: left;
+}

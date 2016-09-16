@@ -5,6 +5,8 @@ angular.module('BibBox').config(['$translateProvider', function ($translateProvi
     "menu.reservations": "Reservations",
     "menu.return": "Return",
 
+    "common.back": "Back",
+
     "index.heading": "Choose the desired function",
 
     "language.en": "English",

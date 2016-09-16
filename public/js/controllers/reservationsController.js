@@ -1,50 +1,80 @@
 /**
  * Reservations page controller.
  */
-angular.module('BibBox').controller('ReservationsController', ['$scope', '$http', '$window', '$location',
-  function($scope, $http, $window, $location) {
+angular.module('BibBox').controller('ReservationsController', ['$scope',
+  function($scope) {
     "use strict";
 
-    $scope.reservations = [
+    $scope.materials = [
       {
-        "title": "Cras justo odio",
-        "status": "ready"
+        "title": "Harry Potter and the Cursed Child",
+        "barcode": "123129902139",
+        "ready": false,
+        "reservation_number": 2,
+        "information": ""
       },
       {
         "title": "Dapibus ac facilisis in",
-        "status": ""
+        "barcode": "123129902139",
+        "ready": true,
+        "reservation_number": 1,
+        "information": ""
       },
       {
         "title": "Morbi leo risus",
-        "status": "ready"
+        "barcode": "123129902139",
+        "ready": false,
+        "reservation_number": 111,
+        "information": ""
       },
       {
         "title": "Porta ac consectetur ac",
-        "status": ""
+        "barcode": "123129902139",
+        "ready": false,
+        "reservation_number": 10,
+        "information": ""
       },
       {
         "title": "Vestibulum at eros",
-        "status": ""
+        "barcode": "123129902139",
+        "ready": true,
+        "reservation_number": 1,
+        "information": ""
       },
       {
         "title": "Cras justo odio",
-        "status": "ready"
+        "barcode": "123129902139",
+        "ready": false,
+        "reservation_number": 50,
+        "information": ""
       },
       {
         "title": "Dapibus ac facilisis in",
-        "status": ""
+        "barcode": "123129902139",
+        "ready": true,
+        "reservation_number": 1,
+        "information": "Hovedbiblioteket"
       },
       {
         "title": "Morbi leo risus",
-        "status": "ready"
+        "barcode": "123129902139",
+        "ready": false,
+        "reservation_number": 63,
+        "information": ""
       },
       {
         "title": "Porta ac consectetur ac",
-        "status": ""
+        "barcode": "123129902139",
+        "ready": false,
+        "reservation_number": 32,
+        "information": ""
       },
       {
         "title": "Vestibulum at eros",
-        "status": ""
+        "barcode": "123129902139",
+        "ready": false,
+        "reservation_number": 32,
+        "information": ""
       }
     ];
   }
