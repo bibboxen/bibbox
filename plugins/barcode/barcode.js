@@ -16,6 +16,7 @@ var Barcode = function Barcode(VID, PID) {
 
   this.code = [];
 
+  this.connected = false;
   this.emitCode = false;
 };
 
@@ -28,36 +29,43 @@ util.inherits(Barcode, eventEmitter);
 Barcode.prototype.connect = function connect() {
   var self = this;
 
-  // Get the device.
-  var term = usb.findByIds(self.VID, self.PID);
-  term.open();
+  try {
+    // Get the device.
+    var term = usb.findByIds(self.VID, self.PID);
+    term.open();
 
-  // Open the interface an connect.
-  var iface = term.interfaces.shift();
-  iface.claim();
+    // Open the interface an connect.
+    var iface = term.interfaces.shift();
+    iface.claim();
 
-  // Get end-point an start data event.
-  var inEndpoint = iface.endpoints[0];
-  inEndpoint.startPoll();
+    // Get end-point an start data event.
+    var inEndpoint = iface.endpoints[0];
+    inEndpoint.startPoll();
 
-  inEndpoint.on('data', function (data) {
-    if (self.emitCode) {
-      var key = self.parseBuffer(data);
-      if (key !== "\n") {
-        if (key !== -1) {
-          self.code.push(key);
+    inEndpoint.on('data', function (data) {
+      if (self.emitCode) {
+        var key = self.parseBuffer(data);
+        if (key !== "\n") {
+          if (key !== -1) {
+            self.code.push(key);
+          }
+        }
+        else {
+          self.emit('code', self.code.join(''));
+          self.code = [];
         }
       }
-      else {
-        self.emit('code', self.code.join(''));
-        self.code = [];
-      }
-    }
-  });
+    });
 
-  inEndpoint.on('error', function (error) {
+    inEndpoint.on('error', function (error) {
+      self.emit('err', err);
+    });
+
+    self.connected = true;
+  }
+  catch (err) {
     self.emit('err', err);
-  });
+  }
 };
 
 /**
@@ -138,14 +146,17 @@ Barcode.prototype.list = function list() {
 /**
  * Start emitting scanned codes.
  */
-Barcode.prototype.resume = function resume() {
+Barcode.prototype.start = function start() {
+  if (!this.connected) {
+    this.connect();
+  }
   this.emitCode = true;
 };
 
 /**
  * Stop emitting scanned codes.
  */
-Barcode.prototype.pause = function pause() {
+Barcode.prototype.stop = function stop() {
   this.emitCode = false;
 };
 
@@ -173,7 +184,7 @@ module.exports = function (options, imports, register) {
    */
   bus.on('barcode.start', function() {
     bus.emit('logger.debug', 'Barcode: started');
-    barcode.resume();
+    barcode.start();
   });
 
   /**
@@ -181,7 +192,7 @@ module.exports = function (options, imports, register) {
    */
   bus.on('barcode.stop', function() {
     bus.emit('logger.debug', 'Barcode: stopped');
-    barcode.pause();
+    barcode.stop();
   });
 
   /**

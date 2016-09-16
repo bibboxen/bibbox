@@ -47,6 +47,7 @@ it('Parser', function() {
 
 it('List devices', function() {
 	return setup().then(function (app) {
-		console.log(app.services.barcode.list());
+		var list = app.services.barcode.list();
+		list.length.should.be.above(0);
 	});
 });
