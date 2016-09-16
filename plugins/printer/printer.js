@@ -14,15 +14,16 @@ var Printer = function Printer() {
 
 Printer.prototype.test = function test() {
   var deferred = Q.defer();
+  var os = require('os');
 
-  var stream = fs.createWriteStream('/tmp/out.pdf');
+  var stream = fs.createWriteStream(os.tmpdir() + '/out.pdf');
   stream.on('finish', function() {
       deferred.resolve();
   });
   stream.on('error', function() {
     deferred.reject();
   });
-  wkhtmltopdf('http://google.com/', { pageSize: 'letter' })
+  wkhtmltopdf('<h1>Test</h1><p>Hello world</p>', { pageSize: 'letter' })
     .pipe(stream);
 
   return deferred.promise;
