@@ -23,7 +23,7 @@ Printer.prototype.test = function test() {
   stream.on('error', function() {
     deferred.reject();
   });
-  wkhtmltopdf('http://google.com/', { pageSize: 'letter' })
+  wkhtmltopdf('<h1>Test</h1><p>Hello world</p>', { pageSize: 'letter' })
     .pipe(stream);
 
   return deferred.promise;
