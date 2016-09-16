@@ -13,6 +13,6 @@
     ]
   },
   "dependencies": {
-    "node-hid": "^0.5.1"
+    "usb": "^1.2.0"
   }
 }
