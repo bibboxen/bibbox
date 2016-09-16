@@ -6,7 +6,7 @@
 // Node core modules required.
 var util = require('util');
 var eventEmitter = require('events').EventEmitter;
-var HID = require('node-hid');
+var usb = require('usb');
 
 var Barcode = function Barcode(VID, PID) {
   "use strict";
@@ -16,7 +16,7 @@ var Barcode = function Barcode(VID, PID) {
 
   this.code = [];
 
-  this.device = undefined;
+  this.emitCode = false;
 };
 
 // Extend the object with event emitter.
@@ -28,11 +28,20 @@ util.inherits(Barcode, eventEmitter);
 Barcode.prototype.connect = function connect() {
   var self = this;
 
-  try {
-    self.device = new HID.HID(self.VID, self.PID);
-    self.pause();
+  // Get the device.
+  var term = usb.findByIds(self.VID, self.PID);
+  term.open();
 
-    self.device.on('data', function(data) {
+  // Open the interface an connect.
+  var iface = term.interfaces.shift();
+  iface.claim();
+
+  // Get end-point an start data event.
+  var inEndpoint = iface.endpoints[0];
+  inEndpoint.startPoll();
+
+  inEndpoint.on('data', function (data) {
+    if (self.emitCode) {
       var key = self.parseBuffer(data);
       if (key !== "\n") {
         if (key !== -1) {
@@ -41,12 +50,14 @@ Barcode.prototype.connect = function connect() {
       }
       else {
         self.emit('code', self.code.join(''));
+        self.code = [];
       }
-    });
-  }
-  catch (err) {
+    }
+  });
+
+  inEndpoint.on('error', function (error) {
     self.emit('err', err);
-  }
+  });
 };
 
 /**
@@ -121,31 +132,21 @@ Barcode.prototype.parseBuffer = function parseBuffer(data) {
  * @returns {*}
  */
 Barcode.prototype.list = function list() {
-  return HID.devices();
+  return usb.getDeviceList();
 };
 
 /**
- *
+ * Start emitting scanned codes.
  */
 Barcode.prototype.resume = function resume() {
-  if (this.device !== undefined) {
-    this.device.resume();
-  }
-  else {
-    this.emit('err', new Error('No barcode devices available.', -1));
-  }
+  this.emitCode = true;
 };
 
 /**
- *
+ * Stop emitting scanned codes.
  */
 Barcode.prototype.pause = function pause() {
-  if (this.device !== undefined) {
-    this.device.pause();
-  }
-  else {
-    this.emit('err', new Error('No barcode devices available.', -1));
-  }
+  this.emitCode = false;
 };
 
 /**
