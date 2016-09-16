@@ -16,19 +16,41 @@ var Proxy = function (server, bus, busEvents, proxyEvents) {
 
   var io = require('socket.io')(server);
 
+  var registerBusEvent = function registerBusEvent(i, socket) {
+    var busEvent = busEvents[i];
+    bus.once(busEvent, function (data) {
+      console.log("i: " + i + " - " + busEvent);
+      socket.emit(busEvent, data);
+    });
+  };
+
+  var registerProxyEvent = function registerProxyEvent(j, socket) {
+    var proxyEvent = proxyEvents[j];
+    socket.once(proxyEvent, function (data) {
+      console.log("j: " + j + " - " + proxyEvent);
+      bus.emit(proxyEvent, data);
+    });
+  };
+
   io.on('connection', function (socket) {
     for (var i = 0; i < busEvents.length; i++) {
+      registerBusEvent(i, socket);
+    }
+
+    for (var j = 0; j < proxyEvents.length; j++) {
+      registerProxyEvent(j, socket);
+    }
+  });
+
+  io.on('disconnect', function (socket) {
+    for (var i = 0; i < busEvents.length; i++) {
       var busEvent = busEvents[i];
-      bus.on(busEvent, function (data) {
-        socket.emit(busEvent, data);
-      });
+      bus.off(busEvent);
     }
 
     for (var j = 0; j < proxyEvents.length; j++) {
       var proxyEvent = proxyEvents[j];
-      socket.on(proxyEvent, function (data) {
-        bus.emit(proxyEvent, data);
-      });
+      socket.off(proxyEvent);
     }
   });
 };
