@@ -7,18 +7,22 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
 
     proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
       function success(data) {
+        console.log('barcode.start success');
         console.log(data);
       },
       function error(err) {
+        console.log('barcode.start error');
         console.log(err);
       }
     );
 
     proxyService.emitEvent('barcode.list', 'barcode.list.res', 'barcode.err', 'barcode.list.res').then(
       function success(data) {
+        console.log('barcode.list success');
         console.log(data);
       },
       function error(err) {
+        console.log('barcode.list error');
         console.log(err);
       }
     );
