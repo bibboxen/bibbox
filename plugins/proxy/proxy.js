@@ -6,19 +6,15 @@
 /**
  * This object encapsulates the proxy.
  *
- * @param app
  * @param server
  * @param bus
  *
  * @constructor
  */
-var Proxy = function (app, server, bus) {
+var Proxy = function (server, bus, busEvents, proxyEvents) {
   "use strict";
 
   var io = require('socket.io')(server);
-
-  var busEvents = ['barcode.data', 'barcode.err', 'barcode.list.res'];
-  var socketEvents = ['barcode.start', 'barcode.stop', 'barcode.list'];
 
   io.on('connection', function (socket) {
     for (var i = 0; i < busEvents.length; i++) {
@@ -28,10 +24,10 @@ var Proxy = function (app, server, bus) {
       });
     }
 
-    for (var j = 0; j < socketEvents.length; j++) {
-      var socketEvent = socketEvents[j];
-      socket.on(socketEvent, function (data) {
-        bus.emit(socketEvent, data);
+    for (var j = 0; j < proxyEvents.length; j++) {
+      var proxyEvent = proxyEvents[j];
+      socket.on(proxyEvent, function (data) {
+        bus.emit(proxyEvent, data);
       });
     }
   });
@@ -44,7 +40,7 @@ var Proxy = function (app, server, bus) {
 module.exports = function (options, imports, register) {
   "use strict";
 
-  var proxy = new Proxy(imports.app, imports.server, imports.bus);
+  var proxy = new Proxy(imports.server, imports.bus, options.busEvents, options.proxyEvents);
 
   register(null, {
     "proxy": proxy

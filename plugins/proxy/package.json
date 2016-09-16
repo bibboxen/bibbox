@@ -11,7 +11,6 @@
   "plugin": {
     "consumes": [
       "server",
-      "app",
       "bus"
     ],
     "provides": [
