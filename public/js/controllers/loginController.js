@@ -5,23 +5,23 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
   function($scope, $http, $window, $location, $routeParams, proxyService) {
     "use strict";
 
-    function barcodeCallback(data) {
-      console.log("barcodeCallback");
-      console.log(data);
-    }
+    proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err').then(
+      function success(data) {
+        console.log(data);
+      },
+      function error(err) {
+        console.log(err);
+      }
+    );
 
-    function barcodeErrorCallback(err) {
-      console.log(err);
-    }
-
-    proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', barcodeCallback, barcodeErrorCallback);
-
-    function barcodeListCallback(data) {
-      console.log('barcode list');
-      console.log(data);
-    }
-
-    proxyService.emitEvent('barcode.list', 'barcode.list.res', 'barcode.err', barcodeListCallback, barcodeErrorCallback, 'barcode.list.res');
+    proxyService.emitEvent('barcode.list', 'barcode.list.res', 'barcode.err', 'barcode.list.res').then(
+      function success(data) {
+        console.log(data);
+      },
+      function error(err) {
+        console.log(err);
+      }
+    );
 
     var usernameRegExp = /[0-3][0-9][0-1][1-9]\d{6}/;
     var passwordRegExp = /\d+/;
