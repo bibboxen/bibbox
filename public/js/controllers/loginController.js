@@ -1,11 +1,11 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'proxyService',
-  function($scope, $http, $window, $location, $routeParams, proxyService) {
+angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'proxyService', 'userService',
+  function($scope, $http, $window, $location, $routeParams, proxyService, userService) {
     "use strict";
 
-    proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err').then(
+    proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
       function success(data) {
         console.log(data);
       },
@@ -57,11 +57,15 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     };
 
     var login = function login() {
-      $scope.loggedIn = true;
-
-      // @TODO: send login to service
-
-      $location.path("/" + $routeParams.redirectUrl);
+      userService.login($scope.user.username, $scope.user.password).then(
+        function success() {
+          $scope.loggedIn = true;
+          $location.path("/" + $routeParams.redirectUrl);
+        },
+        function error() {
+          //
+        }
+      );
     };
 
 
