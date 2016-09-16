@@ -14,8 +14,9 @@ var Printer = function Printer() {
 
 Printer.prototype.test = function test() {
   var deferred = Q.defer();
+  var os = require('os');
 
-  var stream = fs.createWriteStream('/tmp/out.pdf');
+  var stream = fs.createWriteStream(os.tmpdir() + '/out.pdf');
   stream.on('finish', function() {
       deferred.resolve();
   });
