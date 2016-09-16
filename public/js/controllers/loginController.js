@@ -94,8 +94,6 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
         function success() {
           $scope.loggedIn = userService.loggedIn;
           $location.path("/" + $routeParams.redirectUrl);
-
-          $timeout
         },
         function error() {
           // @TODO: Handle error.

@@ -25,6 +25,19 @@ angular.module('BibBox').config(['$translateProvider', function ($translateProvi
     "login.password_validation_error": "Not valid password",
 
     "reservations.heading": "Reservations",
+    "reservations.barcode": "Barcode",
+    "reservations.title": "Title",
+    "reservations.ready": "Available",
+    "reservations.reservation_number": "Number in Queue",
+    "reservations.information": "Information",
+
+    "status.title": "Title",
+    "status.return_date": "Return date",
+    "status.bill": "Bill",
+    "status.new_date": "New date",
+    "status.information": "Information",
+    "status.actions": "Actions",
+    "status.button.renew": "Renew",
 
     "numpad.back": 'Delete',
     "numpad.enter": 'Enter',
