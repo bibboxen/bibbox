@@ -23,7 +23,7 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
       },
       {
         "text": "menu.return",
-        "url": "/#/login/return",
+        "url": "/#/return",
         "icon": "glyphicon-time"
       }
     ];

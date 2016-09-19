@@ -45,12 +45,12 @@ var Proxy = function (server, bus, busEvents, proxyEvents) {
   io.on('disconnect', function (socket) {
     for (var i = 0; i < busEvents.length; i++) {
       var busEvent = busEvents[i];
-      bus.off(busEvent);
+      bus.removeListener(busEvent);
     }
 
     for (var j = 0; j < proxyEvents.length; j++) {
       var proxyEvent = proxyEvents[j];
-      socket.off(proxyEvent);
+      socket.removeListener(proxyEvent);
     }
   });
 };
