@@ -1,0 +1,17 @@
+{
+  "name": "Translation",
+  "description": "Provides translations",
+  "version": "0.0.1",
+  "main": "translation.js",
+  "private": true,
+  "dependencies": {
+  },
+  "plugin": {
+    "consumes": [
+      "bus"
+    ],
+    "provides": [
+      "translation"
+    ]
+  }
+}

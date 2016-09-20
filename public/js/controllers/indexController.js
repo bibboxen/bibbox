@@ -1,9 +1,23 @@
 /**
  * Index page controller.
  */
-angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$window', '$location', '$translate',
-  function($scope, $http, $window, $location, $translate) {
+angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$window', '$location', '$translate', 'proxyService', 'config',
+  function ($scope, $http, $window, $location, $translate, proxyService, config) {
     "use strict";
+
+    $scope.running = false;
+
+    // @TODO: Move this.
+    proxyService.emitEvent('config.translations', 'config.translations.res', 'config.translations.error', 'config.translations.res').then(
+      function success(translations) {
+        config.translations = angular.copy(translations);
+        $translate.refresh();
+        $scope.running = true;
+      },
+      function error(err) {
+        // @TODO: Handle error.
+      }
+    );
 
     $scope.buttons = [
       {
@@ -41,6 +55,11 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
       }
     ];
 
+    /**
+     * Change the language.
+     *
+     * @param langKey
+     */
     $scope.changeLanguage = function changeLanguage(langKey) {
       $translate.use(langKey);
     }
