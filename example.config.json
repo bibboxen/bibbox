@@ -11,8 +11,8 @@
       "barcode.data",
       "barcode.err",
       "barcode.list.res",
-      "config.translations.res"
-      "frontend.reload",
+      "config.translations.res",
+      "frontend.reload"
     ],
     "proxyEvents": [
       "barcode.start",
