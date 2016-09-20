@@ -40,9 +40,13 @@ var Proxy = function (server, bus, busEvents, proxyEvents) {
     for (var j = 0; j < proxyEvents.length; j++) {
       registerProxyEvent(j, socket);
     }
+
+    socket.on('frontend.ready', function () {
+      socket.emit('frontend.start');
+    });
   });
 
-  io.on('disconnect', function (socket) {
+  io.on('disconnect', function (socket) {
     for (var i = 0; i < busEvents.length; i++) {
       var busEvent = busEvents[i];
       bus.removeListener(busEvent);

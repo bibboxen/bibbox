@@ -33,6 +33,9 @@ var plugins = [
     "packagePath": "./plugins/barcode"
   },
   {
+    "packagePath": "./plugins/translation"
+  },
+  {
     "packagePath": "./plugins/proxy",
     "proxyEvents": config.proxy.proxyEvents,
     "busEvents": config.proxy.busEvents

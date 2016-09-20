@@ -88,15 +88,14 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     };
 
     var login = function login() {
-      console.log($scope.user.username + " - " + $scope.user.password + " is logging in.");
-
       userService.login($scope.user.username, $scope.user.password).then(
-        function success() {
+        function success(user) {
           $scope.loggedIn = userService.loggedIn;
           $location.path("/" + $routeParams.redirectUrl);
         },
-        function error() {
+        function error(err) {
           // @TODO: Handle error.
+          console.log(err);
         }
       );
     };

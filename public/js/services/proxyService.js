@@ -3,12 +3,25 @@
  * proxyService for communication with backend.
  */
 
-angular.module('BibBox').service('proxyService', ['$q',
-  function ($q) {
+angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', 'config', '$translate', '$rootScope',
+  function ($q, $location, $route, config, $translate, $rootScope) {
     'use strict';
 
     var socket = io();
 
+    /**
+     * Emits an event to the backend.
+     *
+     * Emits an event and resolves the promise when the callbackEvent/errorEvent is called.
+     * In some cases the backend expects a callback event in the data parameter,
+     *   in these cases data and callbackEvent should be the same.
+     *
+     * @param emitEvent
+     * @param callbackEvent
+     * @param errorEvent
+     * @param data
+     * @returns {*|promise}
+     */
     this.emitEvent = function(emitEvent, callbackEvent, errorEvent, data) {
       // Try to connect to the server if not already connected.
       var deferred = $q.defer();
@@ -32,5 +45,21 @@ angular.module('BibBox').service('proxyService', ['$q',
 
       return deferred.promise;
     };
+
+    /**
+     * Reloads the browser on the 'frontend.reload' event.
+     */
+    socket.on('frontend.reload', function () {
+      $location.path('/');
+      $route.reload();
+    });
+
+    /**
+     * Loads translations on frontend.translations event.
+     */
+    socket.on('config.translations', function (translations) {
+      config.translations = angular.copy(translations);
+      $translate.refresh();
+    });
   }
 ]);

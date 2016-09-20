@@ -9,12 +9,14 @@
     "busEvents": [
       "barcode.data",
       "barcode.err",
-      "barcode.list.res"
+      "barcode.list.res",
+      "config.translations.res"
     ],
     "proxyEvents": [
       "barcode.start",
       "barcode.stop",
-      "barcode.list"
+      "barcode.list",
+      "config.translations"
     ]
   }
 }
