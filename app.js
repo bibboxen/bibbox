@@ -31,6 +31,9 @@ var plugins = [
     "allowed": config.allowed
   },
   {
+    "packagePath": "./plugins/network"
+  },
+  {
     "packagePath": "./plugins/api"
   },
   {

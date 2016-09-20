@@ -41,12 +41,13 @@ var CTRL = function CTRL(app, bus, allowed) {
   /**
    * Handle SIP2 configuration request.
    *
-   * @TODO: Loaded from backend web-service dims.
+   * @TODO: Load from backend web-service dims.
    */
   bus.on('config.fbs', function sip2config(callback) {
-    bus.emit('callback', {
+    bus.emit(callback, {
       'username': 'sip2',
-      'password': 'password'
+      'password': 'password',
+      'endpoint': 'https://ET.Cicero-fbs.com/rest/sip2/DK-761500'
     });
   });
 };
