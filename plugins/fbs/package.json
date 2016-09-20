@@ -11,5 +11,8 @@
     "provides": [
       "fbs"
     ]
+  },
+  "dependencies": {
+    "sipcore": "^0.2.0"
   }
 }
