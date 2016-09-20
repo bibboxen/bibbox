@@ -18,13 +18,31 @@ var Proxy = function (server, bus, busEvents, proxyEvents) {
 
   var io = require('socket.io')(server);
 
+  // Event listener handlers. This is to enable removal of event listeners.
+  var busEventHandlers = {};
+
+  /**
+   * Register bus events.
+   *
+   * @param i
+   * @param socket
+   */
   var registerBusEvent = function registerBusEvent(i, socket) {
     var busEvent = busEvents[i];
-    bus.on(busEvent, function (data) {
+
+    busEventHandlers[socket][busEvent] = function (data) {
       socket.emit(busEvent, data);
-    });
+    };
+
+    bus.on(busEvent, busEventHandlers[socket][busEvent]);
   };
 
+  /**
+   * Register proxy events.
+   *
+   * @param j
+   * @param socket
+   */
   var registerProxyEvent = function registerProxyEvent(j, socket) {
     var proxyEvent = proxyEvents[j];
     socket.on(proxyEvent, function (data) {
@@ -33,28 +51,37 @@ var Proxy = function (server, bus, busEvents, proxyEvents) {
   };
 
   io.on('connection', function (socket) {
+    // Make sure busEventHandlers is initialized for socket.
+    if (!busEventHandlers[socket]) {
+      busEventHandlers[socket] = [];
+    }
+
+    // Add all event listeners for bus.
     for (var i = 0; i < busEvents.length; i++) {
+      var busEvent = busEvents[i];
+
+      // Cleanup old events listeners.
+      if (busEventHandlers[socket][busEvent] && typeof busEventHandlers[socket][busEvent] == 'function') {
+        for (var key in busEventHandlers) {
+          if (busEventHandlers.hasOwnProperty(key)) {
+            bus.removeListener(busEvent, busEventHandlers[key][busEvent]);
+          }
+        }
+      }
+
       registerBusEvent(i, socket);
     }
 
     for (var j = 0; j < proxyEvents.length; j++) {
       registerProxyEvent(j, socket);
     }
-
-    socket.on('frontend.ready', function () {
-      socket.emit('frontend.start');
-    });
   });
 
-  io.on('disconnect', function (socket) {
+  io.on('disconnect', function () {
     for (var i = 0; i < busEvents.length; i++) {
       var busEvent = busEvents[i];
-      bus.removeListener(busEvent);
-    }
 
-    for (var j = 0; j < proxyEvents.length; j++) {
-      var proxyEvent = proxyEvents[j];
-      socket.removeListener(proxyEvent);
+      bus.removeListener(busEvent, busEventHandlers[busEvent]);
     }
   });
 };
