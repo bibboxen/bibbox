@@ -50,6 +50,12 @@ var Proxy = function (server, bus, busEvents, proxyEvents) {
     });
   };
 
+  /**
+   * Reacts to connect.
+   *
+   * Removes old event listeners for bus for previous socket connections.
+   * Then registers event listeners for bus and socket.
+   */
   io.on('connection', function (socket) {
     // Make sure busEventHandlers is initialized for socket.
     if (!busEventHandlers[socket]) {
@@ -72,16 +78,9 @@ var Proxy = function (server, bus, busEvents, proxyEvents) {
       registerBusEvent(i, socket);
     }
 
+    // Add all event listeners for socket.
     for (var j = 0; j < proxyEvents.length; j++) {
       registerProxyEvent(j, socket);
-    }
-  });
-
-  io.on('disconnect', function () {
-    for (var i = 0; i < busEvents.length; i++) {
-      var busEvent = busEvents[i];
-
-      bus.removeListener(busEvent, busEventHandlers[busEvent]);
     }
   });
 };
