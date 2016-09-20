@@ -7,7 +7,9 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
 
     $scope.running = false;
 
-    // @TODO: Move this.
+    /**
+     * Request translations from backend.
+     */
     proxyService.emitEvent('config.translations', 'config.translations.res', 'config.translations.error', 'config.translations.res').then(
       function success(translations) {
         config.translations = angular.copy(translations);
