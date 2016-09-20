@@ -27,6 +27,10 @@ var plugins = [
     "path": path.join(__dirname, 'public')
   },
   {
+    "packagePath": "./plugins/ctrl",
+    "allowed": config.allowed
+  },
+  {
     "packagePath": "./plugins/api"
   },
   {

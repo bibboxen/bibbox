@@ -1,5 +1,6 @@
 {
   "port": 3010,
+  "allowed": [ "127.0.0.1", "::ffff:192.168.50.1" ],
   "logs": {
     "info": "logs/info.log",
     "error": "logs/error.log",
