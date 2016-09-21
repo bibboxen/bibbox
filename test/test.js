@@ -51,3 +51,5 @@ importTest("API (UI)", './api.js');
 importTest("BarCode", './barcode.js');
 importTest("FBS", './fbs.js');
 importTest("Printer", './printer.js');
+importTest("Proxy", './proxy.js');
+importTest("Translation", './translation.js');

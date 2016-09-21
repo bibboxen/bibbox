@@ -31,7 +31,7 @@ it('config.translation should return an object, with at least da and en translat
 
   setup().then(function (app) {
     // Make sure the translations have been written to disc and can be retrieved again.
-    app.services.bus.on('config.translations', function (data) {
+    app.services.bus.on('config.translations.resp', function (data) {
       data.should.be.a.Object();
       data.should.have.property('da').which.is.a.Object();
       data.should.have.property('en').which.is.a.Object();
@@ -48,7 +48,13 @@ it('config.translation should return an object, with at least da and en translat
     });
 
     // Emit new translations. This should result in config.translations event containing new translations.
-    app.services.bus.emit('config.translations.update', {"da": {}, "en": {}});
+    app.services.bus.emit('config.translations.update', {
+      "translations": {
+          "da": {},
+          "en": {}
+      },
+      "busEvent": "config.translations.resp"
+    });
   });
 
   // Give it 1 second to finish events.

@@ -11,14 +11,14 @@
       "barcode.data",
       "barcode.err",
       "barcode.list.res",
-      "config.translations.res",
+      "config.translations",
       "frontend.reload"
     ],
     "proxyEvents": [
       "barcode.start",
       "barcode.stop",
       "barcode.list",
-      "config.translations"
+      "config.translations.request"
     ]
   },
   "translation": {

@@ -17,7 +17,7 @@ module.exports = function (options, imports, register) {
   // Connect middleware extension.
   var bodyParser = require('body-parser');
   var favicon = require('serve-favicon');
-  var morgan = require('morgan')
+  var morgan = require('morgan');
 
   // Start the http server.
   var server = http.createServer(app);

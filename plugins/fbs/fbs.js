@@ -105,7 +105,7 @@ module.exports = function (options, imports, register) {
    */
   bus.on('fbs.login', function (data) {
     fbs.login(data.username, data.password).then(function (isLoggedIn) {
-      bus.emit(data.busEvent, isLoggedIn)
+      bus.emit(data.busEvent, isLoggedIn);
     },
     function (err) {
       bus.emit('fbs.err', err);

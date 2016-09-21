@@ -3,7 +3,7 @@ This plugin handles forwarding of between the bus and the frontend. The connecti
 
 # Events
 
-The events defined in the "proxy" block of config.json, decides which events are forwarded through the proxy.
+The events defined in the "proxy" block of config.json, decides which events are forwarded through the proxy. E.g.
 
 ```
 "proxy": {
@@ -11,14 +11,14 @@ The events defined in the "proxy" block of config.json, decides which events are
     "barcode.data",
     "barcode.err",
     "barcode.list.res",
-    "config.translations.res",
+    "config.translations",
     "frontend.reload"
   ],
   "proxyEvents": [
     "barcode.start",
     "barcode.stop",
     "barcode.list",
-    "config.translations"
+    "config.translations.request"
   ]
 }
 ```
