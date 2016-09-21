@@ -157,7 +157,15 @@ Request.prototype.libraryStatus = function libraryStatus(callback) {
 Request.prototype.patronStatus = function patronStatus(patronId, patronPassword, callback) {
   var self = this;
   var transactionDate = self.encodeTime();
-  var message = '23DAN' + transactionDate + '|AO' + self.agency + '|AA' + patronId + '|AC|AD' + patronPassword + '|';
+  var message = '23009' + transactionDate + '|AO' + self.agency + '|AA' + patronId + '|AC|AD' + patronPassword + '|';
+
+  self.send(message, 'AO', callback);
+};
+
+Request.prototype.patronInformation = function patronInformation(patronId, patronPassword, callback) {
+  var self = this;
+  var transactionDate = self.encodeTime();
+  var message = '63009' + transactionDate + new Array(10).join('Y') +'|AO' + self.agency + '|AA' + patronId + '|AC|AD' + patronPassword + '|';
 
   self.send(message, 'AO', callback);
 };
