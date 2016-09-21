@@ -21,7 +21,7 @@ read library cards and library material i the case where RFID do not work.
 
 # Example usage
 
-Error handling (this main be emitted when the barcode scanner is not found).
+Error handling (this will be emitted when the barcode scanner is not found).
 ```javascript
 bus.on('barcode.err', function(err) {
   console.log(err);
@@ -33,7 +33,9 @@ List available HID devices connected.
 bus.on('bartest', function(data) {
   console.log(data);
 });
-bus.emit(barcode.list, 'bartest');
+bus.emit(barcode.list, {
+  'busEvent': 'bartest'
+});
 ```
 
 Get barcode data form the connected device.
