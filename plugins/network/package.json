@@ -13,6 +13,7 @@
     ]
   },
   "dependencies": {
-    "connection-tester": "^0.1.1"
+    "connection-tester": "^0.1.1",
+    "q": "^1.4.1"
   }
 }

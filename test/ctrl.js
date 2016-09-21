@@ -1,13 +1,10 @@
 /**
  * @file
- * Unit test setup of FBS plugin.
+ * Unit test for ctrl plugin.
  *
  * @TODO: mock FSB?
  */
 
-/**
- * Setup the application plugin for FBS tests.
- */
 var app = null;
 var setup = function setup() {
 	if (!app) {

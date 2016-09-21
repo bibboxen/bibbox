@@ -48,7 +48,7 @@ function importTest(name, path) {
 importTest("Bus", './bus.js');
 importTest("Logger", './logger.js');
 importTest("ctrl", './ctrl.js');
-
+importTest("Network", './network.js');
 importTest("API (UI)", './api.js');
 importTest("BarCode", './barcode.js');
 importTest("FBS", './fbs.js');

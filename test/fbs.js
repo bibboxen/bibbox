@@ -89,6 +89,9 @@ it('Library status', function(done) {
 });
 
 it('Patron information', function(done) {
+  // Set timeout up as this may return large data amounts.
+  this.timeout('4000');
+
   setup().then(function (app) {
     app.services.fbs.patronInformation('3208100032', '12345').then(function (res) {
       try {
