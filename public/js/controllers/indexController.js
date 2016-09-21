@@ -10,10 +10,8 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
     /**
      * Request translations from backend.
      */
-    proxyService.emitEvent('config.translations', 'config.translations.res', 'config.translations.error', 'config.translations.res').then(
-      function success(translations) {
-        config.translations = angular.copy(translations);
-        $translate.refresh();
+    proxyService.emitEvent('config.translations.request', 'config.translations', 'config.translations.error', {"busEvent": "config.translations"}).then(
+      function success(data) {
         $scope.running = true;
       },
       function error(err) {

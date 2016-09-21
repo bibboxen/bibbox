@@ -21,15 +21,15 @@ var Translation = function (bus, destination) {
    *
    * Reads translations from disc.
    */
-  bus.on('config.translations', function (callback) {
+  bus.on('config.translations.request', function requestTranslations(data) {
     fs.readFile(__dirname + destination, 'utf-8', function (err, source) {
       if (err) {
         bus.emit('logger.error', err);
-        bus.emit(callback, {});
+        bus.emit(data.busEvent, {});
       }
       else {
         var translations = JSON.parse(source);
-        bus.emit(callback, translations);
+        bus.emit(data.busEvent, translations);
       }
     });
   });
@@ -39,21 +39,21 @@ var Translation = function (bus, destination) {
    *
    * Writes new translations to disc and emits the changes to the bus.
    */
-  bus.on('config.translations.update', function updateTranslations(translations) {
-    if (!translations || !translations.hasOwnProperty('da') || !translations.hasOwnProperty('en')) {
+  bus.on('config.translations.update', function updateTranslations(data) {
+    if (!data.translations || !data.translations.hasOwnProperty('da') || !data.translations.hasOwnProperty('en')) {
       bus.emit('logger.error', 'config.translations.update: Translations (da and en) not set.');
       return;
     }
 
     // Write the translations to disc.
-    fs.writeFile(__dirname + destination, JSON.stringify(translations),  function(err) {
+    fs.writeFile(__dirname + destination, JSON.stringify(data.translations), function (err) {
       if (err) {
         return console.error(err);
       }
     });
 
     // Emit the updated translations.
-    bus.emit('config.translations', translations);
+    bus.emit('config.translations.request', {"translations": data.translations, "busEvent": data.busEvent});
   });
 };
 

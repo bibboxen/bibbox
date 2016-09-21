@@ -52,9 +52,8 @@ var CTRL = function CTRL(app, bus, allowed) {
     });
   });
 
-
   // Temporary code.
-  // @TODO: Move this functionality to the ctrl, which receives translations from administration.
+  // @TODO: Remove all this translations code when it receives translations from administration.
   var trans = {
     "da": {
       "menu.borrow": "Lån",
@@ -165,7 +164,12 @@ var CTRL = function CTRL(app, bus, allowed) {
       "numpad.zero": "0"
     }
   };
-  bus.emit('config.translations.update', trans);
+  setTimeout(function () {
+    bus.emit('config.translations.update', {
+      "translations": trans,
+      "busEvent": "config.translations"
+    });
+  }, 1000);
 };
 
 /**

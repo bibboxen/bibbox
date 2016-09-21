@@ -44,8 +44,8 @@ var setup = function setup() {
 it('Proxy event should return a bus event', function (done) {
   var assert = require('assert');
 
-  // This test has 1 second to finish.
-  this.timeout(1500);
+  // This test has 2 second to finish.
+  this.timeout(2000);
 
   // Track if bus.event2 has been fired.
   var eventFired = 0;
@@ -89,6 +89,6 @@ it('Proxy event should return a bus event', function (done) {
     });
   });
 
-  // Wait 1 second to make sure the events have fired.
-  setTimeout(finish, 500);
+  // Wait 1.5 second to make sure the events have fired.
+  setTimeout(finish, 1500);
 });
