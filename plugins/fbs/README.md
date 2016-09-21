@@ -18,6 +18,8 @@ Require configuration from the "ctrl" plugin on the "fbs.config" event.
   * On
     * fbs.login  
       - Request login to verify a patron exists with the credentials.
+    * fbs.library.status
+      - Get basic information about the library and what is supports.
     
   * Emit
     

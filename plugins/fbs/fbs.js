@@ -20,22 +20,22 @@ util.inherits(FBS, eventEmitter);
 
 /**
  * Send status message to FBS.
- *
- * @param busMsg
- *   Message to send into the bus when parsed.
  */
-FBS.prototype.status = function status(busMsg) {
+FBS.prototype.libraryStatus = function libraryStatus() {
+  var deferred = Q.defer();
+
   var self = this;
 
   self.send('990xxx2.00', 'AO', function (err, response) {
     if (err) {
-      self.bus.emit('logger.err', err);
+      deferred.reject(err);
     }
     else {
-      console.log(response);
-      self.bus.emit(busMsg, response);
+      deferred.resolve(response);
     }
   });
+
+  return deferred.promise;
 };
 
 FBS.prototype.login = function login(username, password) {
@@ -46,8 +46,9 @@ FBS.prototype.login = function login(username, password) {
     if (err) {
       deferred.reject(err);
     }
-
-    deferred.resolve(res.validPatron === 'Y' && res.validPatronPassword === 'Y');
+    else {
+      deferred.resolve(res.validPatron === 'Y' && res.validPatronPassword === 'Y');
+    }
   });
 
   return deferred.promise;
@@ -72,6 +73,22 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, false);
     });
   });
+
+  /**
+   * Listen to library status requests.
+   */
+  bus.on('fbs.library.status', function (data) {
+    fbs.libraryStatus().then(function (res) {
+      bus.emit(data.busEvent, res)
+    },
+    function (err) {
+      bus.emit('fbs.err', err);
+      bus.emit(data.busEvent, false);
+    });
+  });
+
+
+  //fbs.patronInformation('', '12345', function)
 
   register(null, { "fbs": fbs });
 };
