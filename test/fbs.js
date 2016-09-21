@@ -21,7 +21,13 @@ var setup = function setup() {
 	  {
 	    "packagePath": "./../plugins/bus"
 	  },
-	  {
+		{
+			"packagePath": "./../plugins/server"
+		},
+		{
+			"packagePath": "./../plugins/ctrl"
+		},
+		{
 	    "packagePath": "./../plugins/fbs"
 	  }
 	];
@@ -29,8 +35,16 @@ var setup = function setup() {
 	return setupArchitect(plugins, config);
 };
 
-it('Example test (42)', function() {
-  return setup().then(function (app) {
-  	app.services.fbs.test().should.be.exactly(42).and.be.a.Number();
+it('Example test (42)', function(done) {
+	this.timeout(10000);
+	setup().then(function (app) {
+  	app.services.bus.on('fbs.test.status', function (res) {
+  		console.log(res);
+  		done();
+		});
+		app.services.bus.on('fbs.offline', function () {
+			done(new Error('FBS is offline'));
+		});
+  	app.services.fbs.status('fbs.test.status');
   });
 });

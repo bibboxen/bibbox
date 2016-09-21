@@ -17,14 +17,18 @@ var Response = function Response(xml, firstVariableName) {
   this.xml = xml;
   this.firstVariableName = firstVariableName;
 
+  this.error = '';
+
   // Parse message from XML.
   this.parseXML();
 
-  // Extract variables.
-  this.parseVariables();
+  if (!this.hasError()) {
+    // Extract variables.
+    this.parseVariables();
 
-  // Parse chars before variables in message.
-  this.parseEncoding();
+    // Parse chars before variables in message.
+    this.parseEncoding();
+  }
 };
 
 // Extend the object with event emitter.
@@ -62,7 +66,7 @@ Response.prototype.parseEncoding = function parseEncoding() {
   var decode = new Decoder(self.message, self.firstVariableName);
   self.id = decode.consume(2);
 
-  // Mapping array ['label', 'length', 'sub-field - message id']
+  // Mapping array ['label', 'length', 'name']
   var mappings = [];
   switch (self.id) {
     // Check-in Response.
@@ -190,7 +194,7 @@ Response.prototype.parseEncoding = function parseEncoding() {
             ['tooManyItemsBilled', 1]
           ];
           map.map(function (items) {
-            self[conf[0]][items[0]] = items[1];
+            self[conf[0]][items[0]] = subDecoder.consume(items[1]);
           });
           break;
       }
@@ -199,16 +203,70 @@ Response.prototype.parseEncoding = function parseEncoding() {
       self[conf[0]] = decode.consume(conf[1]);
     }
   });
-
-  // Notify that parsing is completed.
-  this.emit('done', self);
 };
 
 /**
  * Extract sip2 response from XML.
  */
 Response.prototype.parseXML = function parseXML() {
-  this.message = this.xml.match(/(<response>)(.*)(<\/response>)/)[2];
+  var res = this.xml.match(/(<response>)(.*)(<\/response>)/);
+  if (res) {
+    this.message = res[2];
+  }
+  else {
+    var err = this.xml.match(/(<error>)(.*)(<\/error>)/);
+    this.error = err[2];
+  }
+};
+
+/**
+ * Translate response variable codes to strings.
+ *
+ * @param code
+ *   The code to translate.
+ *
+ * @returns {*}
+ *   The translated string for the code or the cod if no translation exists.
+ */
+Response.prototype.variablesResponseTranslation = function variablesResponseTranslation(code) {
+  var codes = {
+    'AE': 'personalName',
+    'AU': 'chargedItems',
+    'AP': 'currentLocation',
+    'AH': 'dueDate',
+    'BE': 'emailAddress',
+    'BW': 'expirationDate',
+    'AV': 'fineItems',
+    'AS': 'holdItems',
+    'BD': 'homeAddress',
+    'BF': 'homePhoneNumber',
+    'AO': 'institutionId',
+    'AB': 'itemIdentifier',
+    'CF': 'holdQueueLength',
+    'CH': 'itemProperties',
+    'AT': 'overdueItems',
+    'AA': 'patronIdentifier',
+    'AD': 'patronStatus',
+    'AQ': 'permanentLocation',
+    'BS': 'pickupLocation',
+    'AG': 'printLine',
+    'BU': 'recallItems',
+    'BM': 'renewedItems',
+    'AF': 'screenMessage',
+    'AJ': 'titleIdentifier',
+    'BK': 'transactionId',
+    'CD': 'unavailableHoldItems',
+    'CG': 'feeIdentifier',
+    'BN': 'unrenewedItems',
+    'BL': 'validPatron',
+    'CQ': 'validPatronPassword'
+  };
+
+  if (codes.hasOwnProperty(code)) {
+    return codes[code];
+  }
+
+  return code;
 };
 
 /**
@@ -219,9 +277,29 @@ Response.prototype.parseVariables = function parseVariables() {
 
   self.message.substr(self.message.indexOf(self.firstVariableName)).split('|').map(function (str) {
     if (str) {
-      self[str.substr(0, 2)] = str.substr(2);
+      self[self.variablesResponseTranslation(str.substr(0, 2))] = str.substr(2);
     }
   });
+};
+
+/**
+ * Check if error exists.
+ *
+ * @returns {boolean}
+ *   TRUE on error else FALSE.
+ */
+Response.prototype.hasError = function hasError() {
+  return this.error !== '';
+};
+
+/**
+ * Get error message.
+ *
+ * @returns {string}
+ *   The error message.
+ */
+Response.prototype.getError = function getError() {
+  return this.error;
 };
 
 module.exports = Response;
