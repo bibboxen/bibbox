@@ -55,10 +55,9 @@ module.exports = function (options, imports, register) {
 
   // Register exposed function with architect.
   register(null, {
-    onDestruct: function (callback) {
+    "onDestroy": function (callback) {
+      bus.emit('logger.info', 'Server stopped');
       server.close(callback);
-
-      bus.emit('logger.debug', 'Server stopped');
     },
     app: app,
     server: server
