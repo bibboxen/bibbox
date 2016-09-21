@@ -40,7 +40,8 @@ var plugins = [
     "packagePath": "./plugins/barcode"
   },
   {
-    "packagePath": "./plugins/translation"
+    "packagePath": "./plugins/translation",
+    "destination": config.translation.destination
   },
   {
     "packagePath": "./plugins/proxy",
