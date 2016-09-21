@@ -4,19 +4,20 @@ This plugin serves translation strings for the frontend.
 # Events
 
   * On
-    * config.translations.request  (data)
+    * config.translations.request => {????}
       - emits data.busEvent with all translations
-    * config.translations.update (data)
+    * config.translations.update => {????}
       - updates translations on installation with data.translations.
       - emits data.busEvent
 
   * Emits
     * config.translations
       - emits all translations following a config.translations.update event.
+      - data format ????
 
 # Example usage
 
-Update translations
+### Update translations
 ```javascript
 bus.emit('config.translations.update', {
   "translations": {
@@ -36,7 +37,7 @@ bus.emit('config.translations.update', {
 This results in the translation file on the server being updated and 
 the event 'config.translations' being fired containing the new translations.
 
-Request translations
+### Request translations
 ```javascript
 bus.on('config.translations.response', function (translations) {
   console.log(translations);
@@ -45,7 +46,7 @@ bus.on('config.translations.response', function (translations) {
 bus.emit('config.translations.request', {"busEvents": "config.translations.response"});
 ```
 
-Listen for translation changes
+### Listen for translation changes
 ```javascript
 bus.on('config.translations', function (translations) {
   console.log(translations);

@@ -129,7 +129,7 @@ Request.prototype.send = function send(message, firstVar, callback) {
   // Check if server is online (FBS).
   self.bus.emit('network.online', {
     'url': self.endpoint,
-    'callback': 'fbs.sip2.online'
+    'busEvent': 'fbs.sip2.online'
   });
 };
 

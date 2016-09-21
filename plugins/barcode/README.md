@@ -5,7 +5,7 @@ read library cards and library material i the case where RFID do not work.
 # Events
 
   * On
-    * barcode.list  (callback)
+    * barcode.list => { busEvent }
       - list all HID devices connected to the system send back the event sent as
         callback
     * barcode.start ()
@@ -21,14 +21,16 @@ read library cards and library material i the case where RFID do not work.
 
 # Example usage
 
-Error handling (this will be emitted when the barcode scanner is not found).
+### Error handling
+This will be emitted when the barcode scanner is not found.
+
 ```javascript
 bus.on('barcode.err', function(err) {
   console.log(err);
 });
 ```
 
-List available HID devices connected. 
+### List available HID devices connected. 
 ```javascript
 bus.on('bartest', function(data) {
   console.log(data);
@@ -38,7 +40,7 @@ bus.emit(barcode.list, {
 });
 ```
 
-Get barcode data form the connected device.
+### Get barcode data form the connected device.
 ```javascript
 bus.on('barcode.data', function(data) {
   console.log(data);

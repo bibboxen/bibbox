@@ -16,11 +16,11 @@ var Network = function Network(bus) {
     var port = address.protocol === 'https:' ? 443 : 80;
     var connected = connectionTester.test(address.host, port, 1000);
     if (connected.error !== null) {
-      bus.emit('logger.error', connected.error);
-      bus.emit(data.callback, false);
+      bus.emit('logger.err', connected.error);
+      bus.emit(data.busEvent, false);
     }
     else {
-      bus.emit(data.callback, true);
+      bus.emit(data.busEvent, true);
     }
   });
 };
