@@ -20,5 +20,8 @@
       "barcode.list",
       "config.translations"
     ]
+  },
+  "translation": {
+    "destination": "/files/translations.json"
   }
 }
