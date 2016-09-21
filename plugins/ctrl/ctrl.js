@@ -43,8 +43,8 @@ var CTRL = function CTRL(app, bus, allowed) {
    *
    * @TODO: Load from backend web-service dims.
    */
-  bus.on('config.fbs', function sip2config(callback) {
-    bus.emit(callback, {
+  bus.on('config.fbs', function sip2config(data) {
+    bus.emit(data.busEvent, {
       'username': 'sip2',
       'password': 'password',
       'endpoint': 'https://ET.Cicero-fbs.com/rest/sip2/DK-761500',

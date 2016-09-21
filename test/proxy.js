@@ -42,11 +42,6 @@ var setup = function setup() {
 
 // Tests that the events defined in setup have been registered
 it('Proxy event should return a bus event', function (done) {
-  var assert = require('assert');
-
-  // This test has 2 second to finish.
-  this.timeout(2000);
-
   // Track if bus.event2 has been fired.
   var eventFired = 0;
 

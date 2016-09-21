@@ -24,7 +24,7 @@ var Request = function Request(bus) {
     self.endpoint = data.endpoint;
     self.agency = data.agency;
   });
-  bus.emit('config.fbs', 'config.fbs.res');
+  bus.emit('config.fbs', { 'busEvent': 'config.fbs.res' });
 };
 
 /**
@@ -147,12 +147,12 @@ Request.prototype.libraryStatus = function libraryStatus(callback) {
 /**
  * Get patron status.
  *
- * @param callback
- *   Function to call when completed request to FBS.
  * @param patronId
  *   Patron card number or CPR number.
  * @param patronPassword
  *   Pin code/password for the patron.
+ * @param callback
+ *   Function to call when completed request to FBS.
  */
 Request.prototype.patronStatus = function patronStatus(patronId, patronPassword, callback) {
   var self = this;
@@ -162,6 +162,16 @@ Request.prototype.patronStatus = function patronStatus(patronId, patronPassword,
   self.send(message, 'AO', callback);
 };
 
+/**
+ * Get all information about a patron.
+ *
+ * @param patronId
+ *   Patron card number or CPR number.
+ * @param patronPassword
+ *   Pin code/password for the patron.
+ * @param callback
+ *   Function to call when completed request to FBS.
+ */
 Request.prototype.patronInformation = function patronInformation(patronId, patronPassword, callback) {
   var self = this;
   var transactionDate = self.encodeTime();
