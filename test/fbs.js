@@ -6,45 +6,67 @@
 /**
  * Setup the application plugin for FBS tests.
  */
+var app = null;
 var setup = function setup() {
-  var path = require('path');
+	if (!app) {
+		var path = require('path');
 
-	// Load config file.
-	var config = require(__dirname + '/../config.json');
+		// Load config file.
+		var config = require(__dirname + '/../config.json');
 
-	// Configure the plugins.
-	var plugins = [
-	  {
-	    "packagePath": "./../plugins/logger",
-	    "logs": config.logs
-	  },
-	  {
-	    "packagePath": "./../plugins/bus"
-	  },
-		{
-			"packagePath": "./../plugins/server"
-		},
-		{
-			"packagePath": "./../plugins/ctrl"
-		},
-		{
-	    "packagePath": "./../plugins/fbs"
-	  }
-	];
+		// Configure the plugins.
+		var plugins = [
+			{
+				"packagePath": "./../plugins/logger",
+				"logs": config.logs
+			},
+			{
+				"packagePath": "./../plugins/bus"
+			},
+			{
+				"packagePath": "./../plugins/server"
+			},
+			{
+				"packagePath": "./../plugins/ctrl"
+			},
+			{
+				"packagePath": "./../plugins/network"
+			},
+			{
+				"packagePath": "./../plugins/fbs"
+			}
+		];
 
-	return setupArchitect(plugins, config);
+		app = setupArchitect(plugins, config);
+	}
+
+	return app;
 };
 
-it('Example test (42)', function(done) {
-	this.timeout(10000);
+it('Login (correct)', function(done) {
 	setup().then(function (app) {
-  	app.services.bus.on('fbs.test.status', function (res) {
-  		console.log(res);
-  		done();
-		});
-		app.services.bus.on('fbs.offline', function () {
-			done(new Error('FBS is offline'));
-		});
-  	app.services.fbs.status('fbs.test.status');
-  });
+		app.services.fbs.login('1234567890', '1234').then(function (val) {
+			try {
+				val.should.be.true();
+				done();
+			}
+			catch (err) {
+				done(err);
+			}
+		}, done);
+  }, done);
+});
+
+it('Login (correct)', function(done) {
+	setup().then(function (app) {
+		app.services.fbs.login('1234567890', '12345').then(function (val) {
+			try {
+				val.should.be.false();
+				done();
+			}
+			catch (err) {
+				done(err);
+			}
+		}, done);
+	}, done);
 });

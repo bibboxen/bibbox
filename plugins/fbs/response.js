@@ -1,5 +1,6 @@
 /**
  * @file
+ * Handle sip2 response from FBS server.
  */
 
 var util = require('util');
@@ -161,8 +162,8 @@ Response.prototype.parseEncoding = function parseEncoding() {
       mappings.push(['onlineStatus', 1]);
       mappings.push(['checkIn', 1]);
       mappings.push(['checkOut', 1]);
-      mappings.push(['status update', 1]);
-      mappings.push(['offline ', 1]);
+      mappings.push(['statusUpdate', 1]);
+      mappings.push(['offline', 1]);
       mappings.push(['timeoutPeriod', 3]);
       mappings.push(['retriesAllowed', 3]);
       mappings.push(['datetimeSync', 18]);
@@ -194,7 +195,8 @@ Response.prototype.parseEncoding = function parseEncoding() {
             ['tooManyItemsBilled', 1]
           ];
           map.map(function (items) {
-            self[conf[0]][items[0]] = subDecoder.consume(items[1]);
+            var val = subDecoder.consume(items[1]);
+            self[conf[0]][items[0]] = (val === 'Y');
           });
           break;
       }
@@ -259,7 +261,9 @@ Response.prototype.variablesResponseTranslation = function variablesResponseTran
     'CG': 'feeIdentifier',
     'BN': 'unrenewedItems',
     'BL': 'validPatron',
-    'CQ': 'validPatronPassword'
+    'CQ': 'validPatronPassword',
+    'AM': 'libraryName',
+    'BX': 'supportedMessages'
   };
 
   if (codes.hasOwnProperty(code)) {

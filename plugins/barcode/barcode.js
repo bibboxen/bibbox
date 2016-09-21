@@ -57,7 +57,7 @@ Barcode.prototype.connect = function connect() {
       }
     });
 
-    inEndpoint.on('error', function (error) {
+    inEndpoint.on('error', function (err) {
       self.emit('err', err);
     });
 
@@ -175,8 +175,8 @@ module.exports = function (options, imports, register) {
   /**
    * Listen to list devices event.
    */
-  bus.on('barcode.list', function(callback) {
-    bus.emit(callback, barcode.list());
+  bus.on('barcode.list', function(data) {
+    bus.emit(data.busEvent, barcode.list());
   });
 
   /**
