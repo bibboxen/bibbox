@@ -3,30 +3,31 @@
  * Unit test setup of barcode plugin.
  */
 
-/**
- * Setup the application plugin for barcode tests.
- */
+var app = null;
 var setup = function setup() {
-  var path = require('path');
 
-	// Load config file.
-	var config = require(__dirname + '/../config.json');
+	if (!app) {
+		// Load config file.
+		var config = require(__dirname + '/../config.json');
 
-	// Configure the plugins.
-	var plugins = [
-	  {
-	    "packagePath": "./../plugins/logger",
-	    "logs": config.logs
-	  },
-	  {
-	    "packagePath": "./../plugins/bus"
-	  },
-	  {
-	    "packagePath": "./../plugins/barcode"
-	  }
-	];
+		// Configure the plugins.
+		var plugins = [
+			{
+				"packagePath": "./../plugins/logger",
+				"logs": config.logs
+			},
+			{
+				"packagePath": "./../plugins/bus"
+			},
+			{
+				"packagePath": "./../plugins/barcode"
+			}
+		];
 
-	return setupArchitect(plugins, config);
+		app = setupArchitect(plugins, config);
+	}
+
+	return app;
 };
 
 it('Parser', function() {
@@ -50,4 +51,11 @@ it('List devices', function() {
 		var list = app.services.barcode.list();
 		list.length.should.be.above(0);
 	});
+});
+
+it('Teardown', function(done) {
+	setup().then(function (app) {
+		app.destroy();
+		done();
+	}, done);
 });

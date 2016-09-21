@@ -5,25 +5,27 @@
 
 var fs = require('fs');
 
-/**
- * Setup the application plugin for proxy tests.
- */
+var app = null;
 var setup = function setup() {
-  // Load config file.
-  var config = require(__dirname + '/../config.json');
+  if (!app) {
+    // Load config file.
+    var config = require(__dirname + '/../config.json');
 
-  // Configure the plugins.
-  var plugins = [
-    {
-      "packagePath": "./../plugins/bus"
-    },
-    {
-      "packagePath": "./../plugins/translation",
-      "destination": "/files/test_translations_test.json"
-    }
-  ];
+    // Configure the plugins.
+    var plugins = [
+      {
+        "packagePath": "./../plugins/bus"
+      },
+      {
+        "packagePath": "./../plugins/translation",
+        "destination": "/files/test_translations_test.json"
+      }
+    ];
 
-  return setupArchitect(plugins, config);
+    app = setupArchitect(plugins, config);
+  }
+
+  return app;
 };
 
 it('config.translation should return an object, with at least da and en translations', function (done) {
@@ -59,4 +61,11 @@ it('config.translation should return an object, with at least da and en translat
 
   // Give it 1 second to finish events.
   setTimeout(function () {}, 1000);
+});
+
+it('Teardown', function(done) {
+  setup().then(function (app) {
+    app.destroy();
+    done();
+  }, done);
 });

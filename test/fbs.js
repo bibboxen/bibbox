@@ -102,3 +102,10 @@ it('Patron information', function(done) {
     }, done);
   }, done);
 });
+
+it('Teardown', function(done) {
+  setup().then(function (app) {
+    app.destroy();
+    done();
+  }, done);
+});

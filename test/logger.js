@@ -3,27 +3,27 @@
  * Unit test setup for logger plugin.
  */
 
-/**
- * Setup the application plugin for logger tests.
- */
+var app = null;
 var setup = function setup() {
-  var path = require('path');
+	if (!app) {
+		// Load config file.
+		var config = require(__dirname + '/../config.json');
 
-	// Load config file.
-	var config = require(__dirname + '/../config.json');
+		// Configure the plugins.
+		var plugins = [
+			{
+				"packagePath": "./../plugins/logger",
+				"logs": config.logs
+			},
+			{
+				"packagePath": "./../plugins/bus"
+			}
+		];
 
-	// Configure the plugins.
-	var plugins = [
-	  {
-	    "packagePath": "./../plugins/logger",
-	    "logs": config.logs
-	  },
-	  {
-	    "packagePath": "./../plugins/bus"
-	  }
-	];
+		app = setupArchitect(plugins, config);
+	}
 
-	return setupArchitect(plugins, config);
+	return app;
 };
 
 it('Test info event (@TODO: validate)', function() {
@@ -47,4 +47,9 @@ it('Test error event (@TODO: validate)', function() {
 	});
 });
 
-
+it('Teardown', function(done) {
+	setup().then(function (app) {
+		app.destroy();
+		done();
+	}, done);
+});

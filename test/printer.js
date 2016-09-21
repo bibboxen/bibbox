@@ -3,30 +3,30 @@
  * Unit test setup of Printer plugin.
  */
 
-/**
- * Setup the application plugin for Printer tests.
- */
+var app = null;
 var setup = function setup() {
-  var path = require('path');
+	if (!app) {
+		// Load config file.
+		var config = require(__dirname + '/../config.json');
 
-	// Load config file.
-	var config = require(__dirname + '/../config.json');
+		// Configure the plugins.
+		var plugins = [
+			{
+				"packagePath": "./../plugins/logger",
+				"logs": config.logs
+			},
+			{
+				"packagePath": "./../plugins/bus"
+			},
+			{
+				"packagePath": "./../plugins/printer"
+			}
+		];
 
-	// Configure the plugins.
-	var plugins = [
-	  {
-	    "packagePath": "./../plugins/logger",
-	    "logs": config.logs
-	  },
-	  {
-	    "packagePath": "./../plugins/bus"
-	  },
-	  {
-	    "packagePath": "./../plugins/printer"
-	  }
-	];
+		app = setupArchitect(plugins, config);
+	}
 
-	return setupArchitect(plugins, config);
+	return app;
 };
 
 it('Test file generation', function(done) {
@@ -48,4 +48,11 @@ it('Test file generation', function(done) {
 			}
 		});
   });
+});
+
+it('Teardown', function(done) {
+	setup().then(function (app) {
+		app.destroy();
+		done();
+	}, done);
 });

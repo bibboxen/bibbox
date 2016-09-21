@@ -47,6 +47,8 @@ function importTest(name, path) {
 // Load test cases.
 importTest("Bus", './bus.js');
 importTest("Logger", './logger.js');
+importTest("ctrl", './ctrl.js');
+
 importTest("API (UI)", './api.js');
 importTest("BarCode", './barcode.js');
 importTest("FBS", './fbs.js');

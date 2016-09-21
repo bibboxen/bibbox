@@ -3,23 +3,23 @@
  * Unit test setup for bus plugin.
  */
 
-/**
- * Setup the application plugin for bus tests.
- */
+var app = null;
 var setup = function setup() {
-  var path = require('path');
+	if (!app) {
+		// Load config file.
+		var config = require(__dirname + '/../config.json');
 
-	// Load config file.
-	var config = require(__dirname + '/../config.json');
+		// Configure the plugins.
+		var plugins = [
+			{
+				"packagePath": "./../plugins/bus"
+			}
+		];
 
-	// Configure the plugins.
-	var plugins = [
-	  {
-	    "packagePath": "./../plugins/bus"
-	  }
-	];
+		app = setupArchitect(plugins, config);
+	}
 
-	return setupArchitect(plugins, config);
+	return app;
 };
 
 it('Simple "on" and "emit" event', function() {
@@ -55,4 +55,11 @@ it('Simple once only event', function () {
 
 		assert(callback.calledOnce);
 	});
+});
+
+it('Teardown', function(done) {
+	setup().then(function (app) {
+		app.destroy();
+		done();
+	}, done);
 });

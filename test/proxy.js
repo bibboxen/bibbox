@@ -3,41 +3,43 @@
  * Unit test setup of proxy plugin.
  */
 
-/**
- * Setup the application plugin for proxy tests.
- */
+var app = null;
 var setup = function setup() {
-  var path = require('path');
+  if (!app) {
+    var path = require('path');
 
-  // Load config file.
-  var config = require(__dirname + '/../config.json');
+    // Load config file.
+    var config = require(__dirname + '/../config.json');
 
-  // Configure the plugins.
-  var plugins = [
-    {
-      "packagePath": "./../plugins/bus"
-    },
-    {
-      "packagePath": "./../plugins/server",
-      "port": 3011,
-      "path": path.join(__dirname, 'public')
-    },
-    {
-      "packagePath": "./../plugins/proxy",
-      "busEvents": [
-        "bus.event1",
-        "bus.event2",
-        "bus.event3"
-      ],
-      "proxyEvents": [
-        "proxy.event1",
-        "proxy.event2",
-        "proxy.event3"
-      ]
-    }
-  ];
+    // Configure the plugins.
+    var plugins = [
+      {
+        "packagePath": "./../plugins/bus"
+      },
+      {
+        "packagePath": "./../plugins/server",
+        "port": 3011,
+        "path": path.join(__dirname, 'public')
+      },
+      {
+        "packagePath": "./../plugins/proxy",
+        "busEvents": [
+          "bus.event1",
+          "bus.event2",
+          "bus.event3"
+        ],
+        "proxyEvents": [
+          "proxy.event1",
+          "proxy.event2",
+          "proxy.event3"
+        ]
+      }
+    ];
 
-  return setupArchitect(plugins, config);
+    app = setupArchitect(plugins, config);
+  }
+
+  return app;
 };
 
 // Tests that the events defined in setup have been registered
@@ -86,4 +88,11 @@ it('Proxy event should return a bus event', function (done) {
 
   // Wait 1.5 second to make sure the events have fired.
   setTimeout(finish, 1500);
+});
+
+it('Teardown', function(done) {
+  setup().then(function (app) {
+    app.destroy();
+    done();
+  }, done);
 });

@@ -3,28 +3,33 @@
  * Test of the UI API.
  */
 
+var app = null;
 var setup = function setup() {
   var path = require('path');
 
-  // Load config file.
-  var config = require(__dirname + '/../config.json');
+  if (!app) {
+    // Load config file.
+    var config = require(__dirname + '/../config.json');
 
-  // Configure the plugins.
-  var plugins = [
-    {
-      "packagePath": "./../plugins/bus"
-    },
-    {
-      "packagePath": "./../plugins/api"
-    },
-    {
-      "packagePath": "./../plugins/server",
-      "port": config.port,
-      "path": path.join(__dirname, 'public')
-    }
-  ];
+    // Configure the plugins.
+    var plugins = [
+      {
+        "packagePath": "./../plugins/bus"
+      },
+      {
+        "packagePath": "./../plugins/api"
+      },
+      {
+        "packagePath": "./../plugins/server",
+        "port": config.port,
+        "path": path.join(__dirname, 'public')
+      }
+    ];
 
-  return setupArchitect(plugins, config);
+    app = setupArchitect(plugins, config);
+  }
+
+  return app;
 };
 
 
@@ -39,4 +44,11 @@ it('Test /api exists (501)', function(done) {
         done();
       });
   });
+});
+
+it('Teardown', function(done) {
+  setup().then(function (app) {
+    app.destroy();
+    done();
+  }, done);
 });
