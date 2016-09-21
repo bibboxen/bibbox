@@ -1,6 +1,8 @@
 /**
  * @file
- * Translation
+ * Translations plugin.
+ *
+ * Enables the front-end (AngularJS) to have dynamic language translations.
  */
 
 var fs = require('fs');
@@ -41,14 +43,16 @@ var Translation = function (bus, destination) {
    */
   bus.on('config.translations.update', function updateTranslations(data) {
     if (!data.translations || !data.translations.hasOwnProperty('da') || !data.translations.hasOwnProperty('en')) {
-      bus.emit('logger.error', 'config.translations.update: Translations (da and en) not set.');
+      bus.emit('logger.err', 'config.translations.update: Translations (da and en) not set.');
       return;
     }
 
     // Write the translations to disc.
+    // @TODO: maybe look into https://www.npmjs.com/package/json-file !
+    // @TODO: maybe write logger.debug message?
     fs.writeFile(__dirname + destination, JSON.stringify(data.translations), function (err) {
       if (err) {
-        return console.error(err);
+        bus.emit('logger.err', err);
       }
     });
 
