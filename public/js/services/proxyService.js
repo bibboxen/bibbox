@@ -58,7 +58,6 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
      * Loads translations on frontend.translations event.
      */
     socket.on('config.translations', function (translations) {
-      console.log(translations);
       config.translations = angular.copy(translations);
       $translate.refresh();
     });
