@@ -26,7 +26,8 @@ FBS.prototype.libraryStatus = function libraryStatus() {
 
   var self = this;
 
-  self.send('990xxx2.00', 'AO', function (err, response) {
+  var req = new Request(this.bus);
+  req.libraryStatus(function (err, response) {
     if (err) {
       deferred.reject(err);
     }
@@ -38,6 +39,17 @@ FBS.prototype.libraryStatus = function libraryStatus() {
   return deferred.promise;
 };
 
+/**
+ * Login check.
+ *
+ * @param username
+ *   Username for the patron (card or CPR number).
+ * @param password
+ *   The patrons password.
+ *
+ * @returns {*|promise}
+ *   TRUE if valid else FALSE.
+ */
 FBS.prototype.login = function login(username, password) {
   var deferred = Q.defer();
 
@@ -48,6 +60,33 @@ FBS.prototype.login = function login(username, password) {
     }
     else {
       deferred.resolve(res.validPatron === 'Y' && res.validPatronPassword === 'Y');
+    }
+  });
+
+  return deferred.promise;
+};
+
+/**
+ * Get all available information about a patron.
+ *
+ * @param username
+ *   Username for the patron (card or CPR number).
+ * @param password
+ *   The patrons password.
+ *
+ * @returns {*|promise}
+ *   JSON object with information or FALSE on failure.
+ */
+FBS.prototype.patronInformation = function patronInformation(username, password) {
+  var deferred = Q.defer();
+
+  var req = new Request(this.bus);
+  req.patronInformation(username, password, function (err, res) {
+    if (err) {
+      deferred.reject(err);
+    }
+    else {
+      deferred.resolve(res);
     }
   });
 
@@ -87,8 +126,18 @@ module.exports = function (options, imports, register) {
     });
   });
 
-
-  //fbs.patronInformation('', '12345', function)
+  /**
+   * Listen to library status requests.
+   */
+  bus.on('fbs.patron', function (data) {
+    fbs.patronInformation(data.username, data.password).then(function (isLoggedIn) {
+      bus.emit(data.busEvent, isLoggedIn)
+    },
+    function (err) {
+      bus.emit('fbs.err', err);
+      bus.emit(data.busEvent, false);
+    });
+  });
 
   register(null, { "fbs": fbs });
 };

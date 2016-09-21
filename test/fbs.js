@@ -1,6 +1,8 @@
 /**
  * @file
  * Unit test setup of FBS plugin.
+ *
+ * @TODO: mock FSB?
  */
 
 /**
@@ -69,4 +71,34 @@ it('Login (correct)', function(done) {
 			}
 		}, done);
 	}, done);
+});
+
+it('Library status', function(done) {
+  setup().then(function (app) {
+    app.services.fbs.libraryStatus().then(function (res) {
+      try {
+        res.error.should.equal('');
+        res.institutionId.should.equal('DK-761500');
+        done();
+      }
+      catch (err) {
+        done(err);
+      }
+    }, done);
+  }, done);
+});
+
+it('Patron information', function(done) {
+  setup().then(function (app) {
+    app.services.fbs.patronInformation('3208100032', '12345').then(function (res) {
+      try {
+        res.institutionId.should.equal('DK-761500');
+        res.patronIdentifier.should.equal('LN:3208100032');
+        done();
+      }
+      catch (err) {
+        done(err);
+      }
+    }, done);
+  }, done);
 });

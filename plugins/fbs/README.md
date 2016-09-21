@@ -16,10 +16,12 @@ Require configuration from the "ctrl" plugin on the "fbs.config" event.
 # Events
 
   * On
-    * fbs.login  
+    * fbs.login => { username, password, busEvent }
       - Request login to verify a patron exists with the credentials.
-    * fbs.library.status
+    * fbs.library.status => { busEvent }
       - Get basic information about the library and what is supports.
+    * fbs.patron => { username, password, busEvent }
+      - All information about a give patron (inc. reservations, loans etc).
     
   * Emit
     

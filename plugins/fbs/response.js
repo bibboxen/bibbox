@@ -263,7 +263,13 @@ Response.prototype.variablesResponseTranslation = function variablesResponseTran
     'BL': 'validPatron',
     'CQ': 'validPatronPassword',
     'AM': 'libraryName',
-    'BX': 'supportedMessages'
+    'BX': 'supportedMessages',
+    'BZ': 'holdItemsLimit',
+    'CA': 'overdueItemsLimit',
+    'CB': 'chargedItemsLimit',
+    'BH': 'currencyType',
+    'BV': 'feeAmount',
+    'CC': 'feeLimit'
   };
 
   if (codes.hasOwnProperty(code)) {
@@ -281,7 +287,131 @@ Response.prototype.parseVariables = function parseVariables() {
 
   self.message.substr(self.message.indexOf(self.firstVariableName)).split('|').map(function (str) {
     if (str) {
-      self[self.variablesResponseTranslation(str.substr(0, 2))] = str.substr(2);
+      var key = str.substr(0, 2);
+      var keyTrans = self.variablesResponseTranslation(key);
+      var val = str.substr(2);
+
+      // Init the field as an array.
+      if (!self.hasOwnProperty(keyTrans)) {
+        self[keyTrans] = [];
+      }
+
+      switch (key) {
+        // Home address.
+        case 'BD':
+          val = val.split('%');
+          self[keyTrans] = {
+            'Name': val.shift(),
+            'Street': val.shift(),
+            'postel': val.shift(),
+            'city': val.shift()
+          };
+          break;
+
+        // Hold items.
+        case 'AS':
+          val = val.split('%');
+          if (val.length > 1) {
+            self[keyTrans].push({
+              'bibliographicId': val.shift(),
+              'id': val.shift(),
+              'pickupId': val.shift(),
+              'pickupDate': val.shift(),
+              'pickupLocation': val.shift(),
+              'title': val.shift(),
+              'author': val.shift(),
+              'GMB': val.shift(),
+              'SMB': val.shift(),
+              'DK5': val.shift()
+            });
+          }
+          break;
+
+        // Overdue items.
+        case 'AT':
+          val = val.split('%');
+          if (val.length > 1) {
+            self[keyTrans].push({
+              'id': val.shift(),
+              'dueDate': val.shift(),
+              'title': val.shift(),
+              'author': val.shift(),
+              'GMB': val.shift(),
+              'SMB': val.shift(),
+              'DK5': val.shift()
+            });
+          }
+          break;
+
+        // Fine items.
+        case 'AV':
+          val = val.split('%');
+          if (val.length > 1) {
+            self[keyTrans].push({
+              'id': val.shift(),
+              'fineId': val.shift(),
+              'fineDate': val.shift(),
+              'fineAmount': val.shift(),
+              'title': val.shift(),
+              'author': val.shift(),
+              'GMB': val.shift(),
+              'SMB': val.shift(),
+              'DK5': val.shift()
+            });
+          }
+          break;
+
+        // Recall items.
+        case 'BU':
+          val = val.split('%');
+          if (val.length > 1) {
+            self[keyTrans].push({
+              'id': val.shift(),
+              'recallDate': val.shift(),
+              'title': val.shift(),
+              'author': val.shift(),
+              'GMB': val.shift(),
+              'SMB': val.shift(),
+              'DK5': val.shift()
+            });
+          }
+          break;
+
+        // Unavailable hold items.
+        case 'CD':
+          val = val.split('%');
+          if (val.length > 1) {
+            self[keyTrans].push({
+              'bibliographicId': val.shift(),
+              'id': val.shift(),
+              'interestDate': val.shift(),
+              'title': val.shift(),
+              'author': val.shift(),
+              'GMB': val.shift(),
+              'SMB': val.shift(),
+              'DK5': val.shift()
+            });
+          }
+          break;
+
+        // Charged items.
+        case 'AU':
+          val = val.split('%');
+          if (val.length > 1) {
+            self[keyTrans].push({
+              'id': val.shift(),
+              'returnDate': val.shift(),
+              'title': val.shift(),
+              'author': val.shift(),
+              'GMB': val.shift(),
+              'SMB': val.shift()
+            });
+          }
+          break;
+
+        default:
+          self[keyTrans] = val;
+      }
     }
   });
 };
