@@ -5,6 +5,7 @@
 var util = require('util');
 var handlebars = require('handlebars');
 var fs = require('fs');
+var Q = require('q');
 
 var Response = require('./response.js');
 
@@ -61,6 +62,38 @@ Request.prototype.encodeTime = function encodeTime(timestamp) {
 };
 
 /**
+ * Use template to build XML message.
+ *
+ * @param message
+ *   Message to wrap in XML.
+ *
+ * @returns {*|promise}
+ *   XML message or error on failure.
+ */
+Request.prototype.buildXML = function buildXML(message) {
+  var deferred = Q.defer();
+  var self = this;
+
+  fs.readFile(__dirname + '/templates/sip2_message.xml', 'utf-8', function(error, source) {
+    if (error) {
+      deferred.reject(err);
+    }
+    else {
+      var template = handlebars.compile(source);
+      var xml = template({
+        'username': self.username,
+        'password': self.password,
+        'message': message
+      });
+
+      deferred.resolve(xml);
+    }
+  });
+
+  return deferred.promise;
+};
+
+/**
  * Send request to FBS.
  *
  * @param message
@@ -76,13 +109,9 @@ Request.prototype.send = function send(message, firstVar, callback) {
 
   self.bus.once('fbs.sip2.online', function(online) {
     if (online) {
-      fs.readFile(__dirname + '/templates/sip2_message.xml', 'utf-8', function(error, source) {
-        var template = handlebars.compile(source);
-        var xml = template({
-          'username': self.username,
-          'password': self.password,
-          'message': message
-        });
+      self.buildXML(message).then(function(xml) {
+        // Log XML message.
+        self.bus.emit('logger.debug', 'FBS send: ' + xml);
 
         var options = {
           'method': 'POST',
@@ -93,9 +122,6 @@ Request.prototype.send = function send(message, firstVar, callback) {
           },
           'body': xml
         };
-
-        // Log message sent to FBS.
-        self.bus.emit('logger.debug', 'FBS send: ' + xml);
 
         var request = require('request');
         request.post(options, function(error, response, body) {
