@@ -94,6 +94,35 @@ FBS.prototype.patronInformation = function patronInformation(username, password)
 };
 
 /**
+ * Checkout (loan) item.
+ *
+ * @param username
+ *   Username for the patron (card or CPR number).
+ * @param password
+ *   The patrons password.
+ * @param itemIdentifier
+ *   The item to checkout.
+ *
+ * @returns {*|promise}
+ *   JSON object with information or error message on failure.
+ */
+FBS.prototype.checkout = function checkout(username, password, itemIdentifier) {
+  var deferred = Q.defer();
+
+  var req = new Request(this.bus);
+  req.checkout(username, password, itemIdentifier, function (err, res) {
+    if (err) {
+      deferred.reject(err);
+    }
+    else {
+      deferred.resolve(res);
+    }
+  });
+
+  return deferred.promise;
+};
+
+/**
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
@@ -118,7 +147,7 @@ module.exports = function (options, imports, register) {
    */
   bus.on('fbs.library.status', function (data) {
     fbs.libraryStatus().then(function (res) {
-      bus.emit(data.busEvent, res)
+      bus.emit(data.busEvent, res);
     },
     function (err) {
       bus.emit('fbs.err', err);
@@ -127,16 +156,29 @@ module.exports = function (options, imports, register) {
   });
 
   /**
-   * Listen to library status requests.
+   * Listen to patron status requests.
    */
   bus.on('fbs.patron', function (data) {
     fbs.patronInformation(data.username, data.password).then(function (isLoggedIn) {
-      bus.emit(data.busEvent, isLoggedIn)
+      bus.emit(data.busEvent, isLoggedIn);
     },
     function (err) {
       bus.emit('fbs.err', err);
       bus.emit(data.busEvent, false);
     });
+  });
+
+  /**
+   * Listen to checkout requests.
+   */
+  bus.on('fbs.checkout', function (data) {
+    fbs.checkout(data.username, data.password).then(function (res) {
+        bus.emit(data.busEvent, res);
+      },
+      function (err) {
+        bus.emit('fbs.err', err);
+        bus.emit(data.busEvent, false);
+      });
   });
 
   register(null, { "fbs": fbs });

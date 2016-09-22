@@ -22,6 +22,8 @@ Require configuration from the "ctrl" plugin on the "fbs.config" event.
       - Get basic information about the library and what is supports.
     * fbs.patron => { username, password, busEvent }
       - All information about a give patron (inc. reservations, loans etc).
+    * fbs.checkout => { username, password, itemIdentifier, busEvent }
+      - Checkout (loan) item in the library system. Only different in response is the "ok" field: if '1' success else failure.
     
   * Emit
     

@@ -206,4 +206,24 @@ Request.prototype.patronInformation = function patronInformation(patronId, patro
   self.send(message, 'AO', callback);
 };
 
+/**
+ * Checkout items.
+ *
+ * @param patronId
+ *   Patron card number or CPR number.
+ * @param patronPassword
+ *   Pin code/password for the patron.
+ * @param itemIdentifier
+ *   The item to checkout.
+ * @param callback
+ *   Function to call when completed request to FBS.
+ */
+Request.prototype.checkout = function checkout(patronId, patronPassword, itemIdentifier, callback) {
+  var self = this;
+  var transactionDate = self.encodeTime();
+  var message = '11NN' + transactionDate + transactionDate +'|AO' + self.agency + '|AA' + patronId + '|AB' + itemIdentifier + '|AC|CH|AD' + patronPassword + '|';
+
+  self.send(message, 'AO', callback);
+};
+
 module.exports = Request;

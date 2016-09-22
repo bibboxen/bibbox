@@ -409,6 +409,20 @@ Response.prototype.parseVariables = function parseVariables() {
           }
           break;
 
+        // Items properties.
+        case 'CH':
+          val = val.split('%');
+          if (val.length > 1) {
+            self[keyTrans] = {
+              'title': val.shift(),
+              'author': val.shift(),
+              'GMB': val.shift(),
+              'SMB': val.shift(),
+              'DK5': val.shift()
+            };
+          }
+          break;
+
         default:
           self[keyTrans] = val;
       }
