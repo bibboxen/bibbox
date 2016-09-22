@@ -175,6 +175,33 @@ FBS.prototype.renew = function renew(username, password, itemIdentifier) {
 };
 
 /**
+ * Renew all items.
+ *
+ * @param username
+ *   Username for the patron (card or CPR number).
+ * @param password
+ *   The patrons password.
+ *
+ * @returns {*|promise}
+ *   JSON object with information or error message on failure.
+ */
+FBS.prototype.renewAll = function renewAll(username, password) {
+  var deferred = Q.defer();
+
+  var req = new Request(this.bus);
+  req.renewAll(username, password, function (err, res) {
+    if (err) {
+      deferred.reject(err);
+    }
+    else {
+      deferred.resolve(res);
+    }
+  });
+
+  return deferred.promise;
+};
+
+/**
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
@@ -257,6 +284,19 @@ module.exports = function (options, imports, register) {
       bus.emit('fbs.err', err);
       bus.emit(data.busEvent, false);
     });
+  });
+
+  /**
+   * Listen to renew all requests.
+   */
+  bus.on('fbs.renew.all', function (data) {
+    fbs.renewAll(data.username, data.password).then(function (res) {
+        bus.emit(data.busEvent, res);
+      },
+      function (err) {
+        bus.emit('fbs.err', err);
+        bus.emit(data.busEvent, false);
+      });
   });
 
   register(null, { "fbs": fbs });

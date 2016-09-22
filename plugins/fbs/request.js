@@ -255,10 +255,28 @@ Request.prototype.checkIn = function checkIn(itemIdentifier, callback) {
  * @param callback
  *   Function to call when completed request to FBS.
  */
-  Request.prototype.renew = function renew(patronId, patronPassword, itemIdentifier, callback) {
+Request.prototype.renew = function renew(patronId, patronPassword, itemIdentifier, callback) {
   var self = this;
   var transactionDate = self.encodeTime();
   var message = '29NN' + transactionDate + transactionDate + '|AO' + self.agency + '|AA' + patronId + '|AD' + patronPassword + '|AB' + itemIdentifier + '|';
+
+  self.send(message, 'AO', callback);
+};
+
+/**
+ * Renew all items.
+ *
+ * @param patronId
+ *   Patron card number or CPR number.
+ * @param patronPassword
+ *   Pin code/password for the patron.
+ * @param callback
+ *   Function to call when completed request to FBS.
+ */
+Request.prototype.renewAll = function renewAll(patronId, patronPassword, callback) {
+  var self = this;
+  var transactionDate = self.encodeTime();
+  var message = '65' + transactionDate + '|AO' + self.agency + '|AA' + patronId + '|AD' + patronPassword + '|';
 
   self.send(message, 'AO', callback);
 };

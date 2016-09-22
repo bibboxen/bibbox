@@ -28,7 +28,9 @@ Required configuration from the "ctrl" plugin on the "fbs.config" event:
       - Check-in (return) item.
     * fbs.renew => { username, password, itemIdentifier, busEvent }
       - Renew item in the library system.
-    
+    * fbs.renew.all => { username, password, busEvent }
+      - Renew all the patrons loans.
+
   * Emit
     * fbs.err
       - Error event.
