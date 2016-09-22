@@ -175,8 +175,8 @@ Response.prototype.parseEncoding = function parseEncoding() {
     // Renew All Response.
     case '66':
       mappings.push(['ok', 1]);
-      mappings.push(['renewedCount', 1]);
-      mappings.push(['unrenewedCount', 1]);
+      mappings.push(['renewedCount', 4]);
+      mappings.push(['unrenewedCount', 4]);
       mappings.push(['transactionDate', 18]);
       break;
 
@@ -342,6 +342,40 @@ Response.prototype.parseVariables = function parseVariables() {
             'zipcode': val.shift(),
             'city': val.shift()
           };
+          break;
+
+        // Renewed items.
+        case 'BM':
+          val = val.split('%');
+          if (val.length > 1) {
+            consoel.log(val);
+            self[keyTrans].push({
+              'id': val.shift(),
+              'dueDate': self.parseDate(val.shift()),
+              'title': entities.decode(val.shift()),
+              'author': entities.decode(val.shift()),
+              'GMB': val.shift(),
+              'SMB': val.shift(),
+              'DK5': val.shift()
+            });
+          }
+          break;
+
+        // Unrenewed items.
+        case 'BN':
+          val = val.split('%');
+          if (val.length > 1) {
+            self[keyTrans].push({
+              'id': val.shift(),
+              'reason': entities.decode(val.shift()),
+              'dueDate': self.parseDate(val.shift()),
+              'title': entities.decode(val.shift()),
+              'author': entities.decode(val.shift()),
+              'GMB': val.shift(),
+              'SMB': val.shift(),
+              'DK5': val.shift()
+            });
+          }
           break;
 
         // Hold items.

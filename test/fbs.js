@@ -238,13 +238,10 @@ it('Renew (5010941603)', function(done) {
 
 it('Renew all', function(done) {
   setup().then(function (app) {
-    app.services.fbs.renew('3208100032', '12345', '5010941603').then(function (res) {
+    app.services.fbs.renewAll('3208100032', '12345').then(function (res) {
       try {
-        // This renew will always fail as we only can renew item after due
-        // data. But the fact that it say that we can't means that the message
-        // was sent.
-        res.ok.should.equal('0');
-        res.screenMessage.should.equal('[BEFORE_RENEW_PERIOD]');
+        res.unrenewedItems.pop().id.should.equal('5010941603');
+        res.ok.should.equal('1');
         done();
       }
       catch (err) {
