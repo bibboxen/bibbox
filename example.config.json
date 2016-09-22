@@ -16,7 +16,8 @@
       "fbs.login.success",
       "fbs.login.error",
       "fbs.patron.success",
-      "fbs.patron.error"
+      "fbs.patron.error",
+      "fbs.checkout.success"
     ],
     "proxyEvents": [
       "barcode.start",
@@ -24,7 +25,8 @@
       "barcode.list",
       "config.translations.request",
       "fbs.login",
-      "fbs.patron"
+      "fbs.patron",
+      "fbs.checkout"
     ]
   },
   "translation": {

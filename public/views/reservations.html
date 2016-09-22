@@ -7,11 +7,12 @@
         <table class="table">
             <tr>
                 <th></th>
-                <th>{{ 'reservations.bibliographicId' | translate }}</th>
+                <th>{{ 'reservations.bibliographic_id' | translate }}</th>
                 <th>{{ 'reservations.title' | translate }}</th>
                 <th>{{ 'reservations.ready' | translate }}</th>
+                <th>{{ 'reservations.interest_date' | translate }}</th>
                 <th>{{ 'reservations.reservation_number' | translate }}</th>
-                <th>{{ 'reservations.information' | translate }}</th>
+                <th>{{ 'reservations.pickup_location' | translate }}</th>
             </tr>
             <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.ready}">
                 <td>{{ $index + 1 }}</td>
@@ -21,7 +22,7 @@
                     <span data-ng-if="material.ready" class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
                 </td>
                 <td>{{ material.reservationNumber }}</td>
-                <td>{{ material.information }}</td>
+                <td>{{ material.pickupLocation }}</td>
             </tr>
         </table>
     </div>

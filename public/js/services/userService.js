@@ -4,6 +4,7 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
 
     var username;
     var password;
+    var loggedIn;
 
     /**
      * Login.
@@ -23,8 +24,9 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
         "password": password,
         "busEvent": "fbs.login.success"
       }).then(
-        function success(loggedIn) {
-          deferred.resolve(loggedIn);
+        function success(loggedInSuccess) {
+          loggedIn = loggedInSuccess;
+          deferred.resolve(loggedInSuccess);
         },
         function error(err) {
           deferred.reject(err);
@@ -32,6 +34,40 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
       );
 
       return deferred.promise;
+    };
+
+    /**
+     * Borrow a material.
+     *
+     * @param itemIdentifier
+     */
+    this.borrow = function borrow(itemIdentifier) {
+      var deferred = $q.defer();
+
+      proxyService.emitEvent('fbs.checkout', 'fbs.checkout.success', 'fbs.error', {
+        "busEvent": "fbs.checkout.success",
+        "username": username,
+        "password": password,
+        "itemIdentifier": itemIdentifier
+      }).then(
+        function success(result) {
+          deferred.resolve(result);
+        },
+        function error(err) {
+          deferred.reject(err);
+        }
+      );
+
+      return deferred.promise;
+    };
+
+    /**
+     * Is user logged in?
+     *
+     * @returns {*}
+     */
+    this.userLoggedIn = function userLoggedIn() {
+      return loggedIn;
     };
 
     /**

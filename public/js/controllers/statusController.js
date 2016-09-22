@@ -9,6 +9,8 @@ angular.module('BibBox').controller('StatusController', ['$scope', 'userService'
 
     userService.patron().then(
       function (patron) {
+        console.log(patron);
+
         // If patron exists, get all charged, overdue and recall items
         if (patron) {
           var i, item;
