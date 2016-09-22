@@ -1,8 +1,8 @@
 # FBS plugin
-Handel communication with FBS library system over the SIP2 protocol. 
+Handles communication with FBS library system using the SIP2 protocol. 
 
 ## Configuration
-Require configuration from the "ctrl" plugin on the "fbs.config" event.
+Required configuration from the "ctrl" plugin on the "fbs.config" event:
 
 ```javascript
 {
