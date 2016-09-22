@@ -26,6 +26,10 @@ Required configuration from the "ctrl" plugin on the "fbs.config" event:
       - Checkout (loan) item in the library system. Only different in response is the "ok" field: if '1' success else failure.
     
   * Emit
+    * fbs.err
+      - Error event.
+    * fbs.sip2.online
+      - True if FBS is online else FALSE.
     
 
 # Example usage

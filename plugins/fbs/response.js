@@ -38,10 +38,36 @@ var Response = function Response(xml, firstVariableName) {
 util.inherits(Response, eventEmitter);
 
 /**
+ * Parse SIP2 data formats to timestamp.
+ *
+ * @param str
+ * @returns {number}
+ */
+Response.prototype.parseDate = function parseDate(str) {
+  var time = str.split('    ');
+  var hours = 0;
+  var minutes = 0;
+  var seconds = 0;
+
+  if (time.length === 2) {
+    hours = time[1].substr(0, 2);
+    minutes = time[1].substr(2, 2);
+    seconds = time[1].substr(4, 2);
+  }
+
+  return new Date(time[0].substr(0, 4), (time[0].substr(4, 2)) - 1, time[0].substr(6, 2), hours, minutes, seconds, 0).getTime();
+};
+
+/**
  * Parse the encoded part of the response.
  */
 Response.prototype.parseEncoding = function parseEncoding() {
   var self = this;
+
+  // Fields that needs to get dates converted.
+  var dateFields = [
+    'transactionDate'
+  ];
 
   /**
    * Inner helper function to decode the encoded string.
@@ -204,7 +230,13 @@ Response.prototype.parseEncoding = function parseEncoding() {
       }
     }
     else {
-      self[conf[0]] = decode.consume(conf[1]);
+      // Convert dates.
+      if (dateFields.indexOf(conf[0]) !== -1) {
+        self[conf[0]] = self.parseDate(decode.consume(conf[1]));
+      }
+      else {
+        self[conf[0]] = decode.consume(conf[1]);
+      }
     }
   });
 };
@@ -320,7 +352,7 @@ Response.prototype.parseVariables = function parseVariables() {
               'bibliographicId': val.shift(),
               'id': val.shift(),
               'pickupId': val.shift(),
-              'pickupDate': val.shift(),
+              'pickupDate': self.parseDate(val.shift()),
               'pickupLocation': val.shift(),
               'title': entities.decode(val.shift()),
               'author': entities.decode(val.shift()),
@@ -337,7 +369,7 @@ Response.prototype.parseVariables = function parseVariables() {
           if (val.length > 1) {
             self[keyTrans].push({
               'id': val.shift(),
-              'dueDate': val.shift(),
+              'dueDate': self.parseDate(val.shift()),
               'title': entities.decode(val.shift()),
               'author': entities.decode(val.shift()),
               'GMB': val.shift(),
@@ -354,7 +386,7 @@ Response.prototype.parseVariables = function parseVariables() {
             self[keyTrans].push({
               'id': val.shift(),
               'fineId': val.shift(),
-              'fineDate': val.shift(),
+              'fineDate': self.parseDate(val.shift()),
               'fineAmount': val.shift(),
               'title': entities.decode(val.shift()),
               'author': entities.decode(val.shift()),
@@ -371,7 +403,7 @@ Response.prototype.parseVariables = function parseVariables() {
           if (val.length > 1) {
             self[keyTrans].push({
               'id': val.shift(),
-              'recallDate': val.shift(),
+              'recallDate': self.parseDate(val.shift()),
               'title': val.shift(),
               'author': val.shift(),
               'GMB': val.shift(),
@@ -388,7 +420,7 @@ Response.prototype.parseVariables = function parseVariables() {
             self[keyTrans].push({
               'bibliographicId': val.shift(),
               'id': val.shift(),
-              'interestDate': val.shift(),
+              'interestDate': self.parseDate(val.shift()),
               'title': entities.decode(val.shift()),
               'author': entities.decode(val.shift()),
               'GMB': val.shift(),
@@ -404,7 +436,7 @@ Response.prototype.parseVariables = function parseVariables() {
           if (val.length > 1) {
             self[keyTrans].push({
               'id': val.shift(),
-              'returnDate': val.shift(),
+              'returnDate': self.parseDate(val.shift()),
               'title': entities.decode(val.shift()),
               'author': entities.decode(val.shift()),
               'GMB': val.shift(),
