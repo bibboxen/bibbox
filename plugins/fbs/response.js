@@ -6,6 +6,8 @@
 var util = require('util');
 var eventEmitter = require('events').EventEmitter;
 
+var Entities = require('html-entities').AllHtmlEntities;
+
 /**
  * Response object.
  *
@@ -285,6 +287,8 @@ Response.prototype.variablesResponseTranslation = function variablesResponseTran
 Response.prototype.parseVariables = function parseVariables() {
   var self = this;
 
+  var entities = new Entities();
+
   self.message.substr(self.message.indexOf(self.firstVariableName)).split('|').map(function (str) {
     if (str) {
       var key = str.substr(0, 2);
@@ -301,9 +305,9 @@ Response.prototype.parseVariables = function parseVariables() {
         case 'BD':
           val = val.split('%');
           self[keyTrans] = {
-            'Name': val.shift(),
+            'Name': entities.decode(val.shift()),
             'Street': val.shift(),
-            'postel': val.shift(),
+            'zipcode': val.shift(),
             'city': val.shift()
           };
           break;
@@ -318,8 +322,8 @@ Response.prototype.parseVariables = function parseVariables() {
               'pickupId': val.shift(),
               'pickupDate': val.shift(),
               'pickupLocation': val.shift(),
-              'title': val.shift(),
-              'author': val.shift(),
+              'title': entities.decode(val.shift()),
+              'author': entities.decode(val.shift()),
               'GMB': val.shift(),
               'SMB': val.shift(),
               'DK5': val.shift()
@@ -334,8 +338,8 @@ Response.prototype.parseVariables = function parseVariables() {
             self[keyTrans].push({
               'id': val.shift(),
               'dueDate': val.shift(),
-              'title': val.shift(),
-              'author': val.shift(),
+              'title': entities.decode(val.shift()),
+              'author': entities.decode(val.shift()),
               'GMB': val.shift(),
               'SMB': val.shift(),
               'DK5': val.shift()
@@ -352,8 +356,8 @@ Response.prototype.parseVariables = function parseVariables() {
               'fineId': val.shift(),
               'fineDate': val.shift(),
               'fineAmount': val.shift(),
-              'title': val.shift(),
-              'author': val.shift(),
+              'title': entities.decode(val.shift()),
+              'author': entities.decode(val.shift()),
               'GMB': val.shift(),
               'SMB': val.shift(),
               'DK5': val.shift()
@@ -385,8 +389,8 @@ Response.prototype.parseVariables = function parseVariables() {
               'bibliographicId': val.shift(),
               'id': val.shift(),
               'interestDate': val.shift(),
-              'title': val.shift(),
-              'author': val.shift(),
+              'title': entities.decode(val.shift()),
+              'author': entities.decode(val.shift()),
               'GMB': val.shift(),
               'SMB': val.shift(),
               'DK5': val.shift()
@@ -401,8 +405,8 @@ Response.prototype.parseVariables = function parseVariables() {
             self[keyTrans].push({
               'id': val.shift(),
               'returnDate': val.shift(),
-              'title': val.shift(),
-              'author': val.shift(),
+              'title': entities.decode(val.shift()),
+              'author': entities.decode(val.shift()),
               'GMB': val.shift(),
               'SMB': val.shift()
             });
@@ -414,8 +418,8 @@ Response.prototype.parseVariables = function parseVariables() {
           val = val.split('%');
           if (val.length > 1) {
             self[keyTrans] = {
-              'title': val.shift(),
-              'author': val.shift(),
+              'title': entities.decode(val.shift()),
+              'author': entities.decode(val.shift()),
               'GMB': val.shift(),
               'SMB': val.shift(),
               'DK5': val.shift()

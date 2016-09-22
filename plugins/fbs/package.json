@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "handlebars": "^4.0.5",
+    "html-entities": "^1.2.0",
     "q": "^1.4.1",
     "request": "^2.75.0"
   }
