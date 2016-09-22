@@ -9,6 +9,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', 'userSe
 
     userService.patron().then(
       function (patron) {
+        console.log(patron);
+
         // If patron exists, get reservations.
         if (patron) {
           var i, item;
@@ -18,6 +20,12 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', 'userSe
             item = angular.copy(patron.holdItems[i]);
 
             item.ready = true;
+
+            // Remove ID from pickup location string.
+            var pickupSplit = item.pickupLocation.split(' - ');
+            if (pickupSplit.length > 0) {
+              item.pickupLocation = pickupSplit[1];
+            }
 
             $scope.materials.push(item);
           }

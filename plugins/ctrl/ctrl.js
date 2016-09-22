@@ -82,11 +82,12 @@ var CTRL = function CTRL(app, bus, allowed) {
       "login.password_validation_error": "Ikke gyldigt kodeord",
 
       "reservations.heading": "Reservationer",
-      "reservations.bibliographicId": "Stregkode",
+      "reservations.bibliographic_id": "Stregkode",
+      "reservations.interest_date": "Interessedato",
       "reservations.title": "Titel",
       "reservations.ready": "Til rådighed",
       "reservations.reservation_number": "Kø-nummer",
-      "reservations.information": "Information",
+      "reservations.pickup_location": "Afhentningssted",
 
       "status.heading": "Status / Forny",
       "status.title": "Titel",
@@ -96,6 +97,10 @@ var CTRL = function CTRL(app, bus, allowed) {
       "status.information": "Information",
       "status.actions": "Handlinger",
       "status.button.renew": "Forny",
+
+      "borrow.heading": "Lån",
+      "borrow.title": "Titel",
+      "borrow.return_date": "Afleveringsdato",
 
       "numpad.back": "Slet",
       "numpad.enter": "Enter",
@@ -136,11 +141,12 @@ var CTRL = function CTRL(app, bus, allowed) {
       "login.password_validation_error": "Not valid password",
 
       "reservations.heading": "Reservations",
-      "reservations.bibliographicId": "Barcode",
+      "reservations.bibliographic_id": "Barcode",
+      "reservations.interest_date": "Interest date",
       "reservations.title": "Title",
       "reservations.ready": "Available",
       "reservations.reservation_number": "Number in Queue",
-      "reservations.information": "Information",
+      "reservations.pickup_location": "Afhentningssted",
 
       "status.heading": "Status / Renew",
       "status.title": "Title",
@@ -150,6 +156,10 @@ var CTRL = function CTRL(app, bus, allowed) {
       "status.information": "Information",
       "status.actions": "Actions",
       "status.button.renew": "Renew",
+
+      "borrow.heading": "Borrow",
+      "borrow.title": "Title",
+      "borrow.return_date": "Return date",
 
       "numpad.back": "Delete",
       "numpad.enter": "Enter",
