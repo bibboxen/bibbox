@@ -218,6 +218,25 @@ it('Checkout (5010941603) - error', function(done) {
   }, done);
 });
 
+it('Renew (5010941603)', function(done) {
+  this.timeout(10000);
+  setup().then(function (app) {
+    app.services.fbs.renew('3208100032', '12345', '5010941603').then(function (res) {
+      try {
+        // This renew will always fail as we only can renew item after due
+        // data. But the fact that it say that we can't means that the message
+        // was sent.
+        res.ok.should.equal('0');
+        res.screenMessage.should.equal('[BEFORE_RENEW_PERIOD]');
+        done();
+      }
+      catch (err) {
+        done(err);
+      }
+    }, done);
+  }, done);
+});
+
 
 it('Check-in (5010941603)', function(done) {
   setup().then(function (app) {

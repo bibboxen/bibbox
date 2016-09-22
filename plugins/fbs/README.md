@@ -25,7 +25,9 @@ Required configuration from the "ctrl" plugin on the "fbs.config" event:
     * fbs.checkout => { username, password, itemIdentifier, busEvent }
       - Checkout (loan) item in the library system. Only different in response is the "ok" field: if '1' success else failure.
     * fbs.checkin => { itemIdentifier, busEvent }
-      - Checkin (return) item.
+      - Check-in (return) item.
+    * fbs.renew => { username, password, itemIdentifier, busEvent }
+      - Renew item in the library system.
     
   * Emit
     * fbs.err

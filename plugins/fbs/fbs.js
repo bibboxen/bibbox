@@ -146,6 +146,35 @@ FBS.prototype.checkIn = function checkIn(itemIdentifier) {
 };
 
 /**
+ * Renew item.
+ *
+ * @param username
+ *   Username for the patron (card or CPR number).
+ * @param password
+ *   The patrons password.
+ * @param itemIdentifier
+ *   The item to renew.
+ *
+ * @returns {*|promise}
+ *   JSON object with information or error message on failure.
+ */
+FBS.prototype.renew = function renew(username, password, itemIdentifier) {
+  var deferred = Q.defer();
+
+  var req = new Request(this.bus);
+  req.renew(username, password, itemIdentifier, function (err, res) {
+    if (err) {
+      deferred.reject(err);
+    }
+    else {
+      deferred.resolve(res);
+    }
+  });
+
+  return deferred.promise;
+};
+
+/**
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
@@ -196,12 +225,12 @@ module.exports = function (options, imports, register) {
    */
   bus.on('fbs.checkout', function (data) {
     fbs.checkout(data.username, data.password, data.itemIdentifier).then(function (res) {
-        bus.emit(data.busEvent, res);
-      },
-      function (err) {
-        bus.emit('fbs.err', err);
-        bus.emit(data.busEvent, false);
-      });
+      bus.emit(data.busEvent, res);
+    },
+    function (err) {
+      bus.emit('fbs.err', err);
+      bus.emit(data.busEvent, false);
+    });
   });
 
   /**
@@ -209,12 +238,25 @@ module.exports = function (options, imports, register) {
    */
   bus.on('fbs.checkout', function (data) {
     fbs.checkIn(data.itemIdentifier).then(function (res) {
-        bus.emit(data.busEvent, res);
-      },
-      function (err) {
-        bus.emit('fbs.err', err);
-        bus.emit(data.busEvent, false);
-      });
+      bus.emit(data.busEvent, res);
+    },
+    function (err) {
+      bus.emit('fbs.err', err);
+      bus.emit(data.busEvent, false);
+    });
+  });
+
+  /**
+   * Listen to renew requests.
+   */
+  bus.on('fbs.renew', function (data) {
+    fbs.renew(data.username, data.password, data.itemIdentifier).then(function (res) {
+      bus.emit(data.busEvent, res);
+    },
+    function (err) {
+      bus.emit('fbs.err', err);
+      bus.emit(data.busEvent, false);
+    });
   });
 
   register(null, { "fbs": fbs });
