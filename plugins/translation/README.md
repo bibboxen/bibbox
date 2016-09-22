@@ -4,16 +4,29 @@ This plugin serves translation strings for the frontend.
 # Events
 
   * On
-    * config.translations.request => {????}
+    * config.translations.request => { busEvent }
       - emits data.busEvent with all translations
-    * config.translations.update => {????}
+    * config.translations.update => { translations, busEvent }
       - updates translations on installation with data.translations.
       - emits data.busEvent
 
   * Emits
     * config.translations
       - emits all translations following a config.translations.update event.
-      - data format ????
+      - data format:
+      <pre>
+      {
+        "da": {
+          "string.one": "translation.one",
+          "string.two": "translation.two"
+        },
+        "en": {
+          "string.one": "translation.one",
+          "string.two": "translation.two"
+        }
+      }
+      </pre>
+
 
 # Example usage
 

@@ -3,8 +3,8 @@
  * proxyService for communication with backend.
  */
 
-angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', 'config', '$translate', '$rootScope',
-  function ($q, $location, $route, config, $translate, $rootScope) {
+angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', 'config', '$translate',
+  function ($q, $location, $route, config, $translate) {
     'use strict';
 
     var socket = io();

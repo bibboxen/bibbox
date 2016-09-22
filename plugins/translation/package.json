@@ -5,6 +5,7 @@
   "main": "translation.js",
   "private": true,
   "dependencies": {
+    "jsonfile": "^2.4.0"
   },
   "plugin": {
     "consumes": [

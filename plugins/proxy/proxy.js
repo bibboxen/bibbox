@@ -1,6 +1,6 @@
 /**
  * @file
- * Proxy
+ * Proxy for forwarding events between frontend (connected through socket.io) and the bus.
  */
 
 /**
