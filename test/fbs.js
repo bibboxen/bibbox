@@ -208,6 +208,7 @@ it('Checkout (5010941603) - error', function(done) {
     app.services.fbs.checkout('3208100032', '12345', '5010941603').then(function (res) {
       try {
         res.ok.should.equal('0');
+        res.screenMessage.should.equal('[BEFORE_RENEW_PERIOD]');
         done();
       }
       catch (err) {
