@@ -24,6 +24,8 @@ Required configuration from the "ctrl" plugin on the "fbs.config" event:
       - All information about a give patron (inc. reservations, loans etc).
     * fbs.checkout => { username, password, itemIdentifier, busEvent }
       - Checkout (loan) item in the library system. Only different in response is the "ok" field: if '1' success else failure.
+    * fbs.checkin => { itemIdentifier, busEvent }
+      - Checkin (return) item.
     
   * Emit
     * fbs.err

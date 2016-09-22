@@ -48,7 +48,8 @@ var CTRL = function CTRL(app, bus, allowed) {
       'username': 'sip2',
       'password': 'password',
       'endpoint': 'https://ET.Cicero-fbs.com/rest/sip2/DK-761500',
-      'agency': 'DK-761500'
+      'agency': 'DK-761500',
+      'location': 'hb'
     });
   });
 
