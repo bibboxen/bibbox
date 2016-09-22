@@ -121,6 +121,31 @@ FBS.prototype.checkout = function checkout(username, password, itemIdentifier) {
 };
 
 /**
+ * Check-in (return) item.
+ *
+ * @param itemIdentifier
+ *   The item to checkout.
+ *
+ * @returns {*|promise}
+ *   JSON object with information or error message on failure.
+ */
+FBS.prototype.checkIn = function checkIn(itemIdentifier) {
+  var deferred = Q.defer();
+
+  var req = new Request(this.bus);
+  req.checkIn(itemIdentifier, function (err, res) {
+    if (err) {
+      deferred.reject(err);
+    }
+    else {
+      deferred.resolve(res);
+    }
+  });
+
+  return deferred.promise;
+};
+
+/**
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
@@ -170,7 +195,20 @@ module.exports = function (options, imports, register) {
    * Listen to checkout requests.
    */
   bus.on('fbs.checkout', function (data) {
-    fbs.checkout(data.username, data.password).then(function (res) {
+    fbs.checkout(data.username, data.password, data.itemIdentifier).then(function (res) {
+        bus.emit(data.busEvent, res);
+      },
+      function (err) {
+        bus.emit('fbs.err', err);
+        bus.emit(data.busEvent, false);
+      });
+  });
+
+  /**
+   * Listen to checkIn requests.
+   */
+  bus.on('fbs.checkout', function (data) {
+    fbs.checkIn(data.itemIdentifier).then(function (res) {
         bus.emit(data.busEvent, res);
       },
       function (err) {

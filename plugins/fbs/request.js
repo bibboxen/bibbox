@@ -24,6 +24,7 @@ var Request = function Request(bus) {
     self.password = data.password;
     self.endpoint = data.endpoint;
     self.agency = data.agency;
+    self.location = data.location;
   });
   bus.emit('config.fbs', { 'busEvent': 'config.fbs.res' });
 };
@@ -222,6 +223,22 @@ Request.prototype.checkout = function checkout(patronId, patronPassword, itemIde
   var self = this;
   var transactionDate = self.encodeTime();
   var message = '11NN' + transactionDate + transactionDate +'|AO' + self.agency + '|AA' + patronId + '|AB' + itemIdentifier + '|AC|CH|AD' + patronPassword + '|';
+
+  self.send(message, 'AO', callback);
+};
+
+/**
+ * Checkout items.
+ *
+ * @param itemIdentifier
+ *   The item to checkout.
+ * @param callback
+ *   Function to call when completed request to FBS.
+ */
+Request.prototype.checkIn = function checkIn(itemIdentifier, callback) {
+  var self = this;
+  var transactionDate = self.encodeTime();
+  var message = '09N' + transactionDate + transactionDate + '|AP' + self.location + '|AO' + self.agency + '|AB' + itemIdentifier + '|AC|CH|';
 
   self.send(message, 'AO', callback);
 };
