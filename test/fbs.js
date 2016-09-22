@@ -103,9 +103,9 @@ it('XML parser (complex message)', function(done) {
   res.id.should.equal('64');
 
   // Sub-field translation.
-  res.homeAddress.postel.should.equal('8000');
+  res.homeAddress.zipcode.should.equal('8000');
 
-  // Sub-field multivalue fields.
+  // Sub-field multi-value fields.
   res.chargedItems.should.have.property('length', 2);
   res.chargedItems[0].id.should.equal('5010941603');
   res.chargedItems[0].author.should.equal('Rowling Joanne K.');

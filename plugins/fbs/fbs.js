@@ -24,8 +24,6 @@ util.inherits(FBS, eventEmitter);
 FBS.prototype.libraryStatus = function libraryStatus() {
   var deferred = Q.defer();
 
-  var self = this;
-
   var req = new Request(this.bus);
   req.libraryStatus(function (err, response) {
     if (err) {
