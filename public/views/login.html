@@ -24,7 +24,7 @@
 
         <div class="input-group input-group-lg numpad-container">
             <span class="input-group-addon" id="sizing-addon1">{{ 'login.username_short' | translate }}</span>
-            <input type="text" class="form-control" placeholder="{{ 'login.username' | translate }}" aria-describedby="sizing-addon1" data-ng-model="user.username">
+            <input type="text" class="form-control" placeholder="{{ 'login.username' | translate }}" autofocus aria-describedby="sizing-addon1" data-ng-model="user.username">
         </div>
         <keypad field="user.username" enter="usernameEntered()"></keypad>
     </div>

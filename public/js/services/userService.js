@@ -2,75 +2,60 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
   function ($q, proxyService) {
     'use strict';
 
-    // @TODO: Remove this, when the backend responds with a valid user.
-    var loggedInUser = {
-      "name": "Theis Test"
-    };
+    var username;
+    var password;
 
     /**
      * Login.
      *
-     * @param username
-     * @param password
+     * @param user
+     * @param pass
      * @returns {*|promise}
      */
-    this.login = function login(username, password) {
+    this.login = function login(user, pass) {
       var deferred = $q.defer();
 
-      if (!loggedInUser) {
-        proxyService.emitEvent('login', 'login.success', 'login.error', {
-          "username": username,
-          "password": password
-        }).then(
-          function success(user) {
-            loggedInUser = user;
-            deferred.resolve(loggedInUser);
-          },
-          function error(err) {
-            deferred.reject(err);
-          }
-        );
-      }
-      else {
-        deferred.resolve(loggedInUser);
-      }
+      username = user;
+      password = pass;
+
+      proxyService.emitEvent('fbs.login', 'fbs.login.success', 'fbs.login.error', {
+        "username": username,
+        "password": password,
+        "busEvent": "fbs.login.success"
+      }).then(
+        function success(loggedIn) {
+          deferred.resolve(loggedIn);
+        },
+        function error(err) {
+          deferred.reject(err);
+        }
+      );
 
       return deferred.promise;
     };
 
     /**
-     * Logout.
+     * Get patron.
      *
-     * @TODO: Is this be the expected logout routine?
+     * @returns {*|promise}
      */
-    this.logout = function logout() {
+    this.patron = function patron() {
       var deferred = $q.defer();
 
-      if (loggedInUser) {
-        // Log out in front end no matter what.
-        loggedInUser = null;
-
-        // Send logout event to backend.
-        proxyService.emitEvent('logout', 'logout.success', 'logout.error', {}).then(
-          function success(data) {
-            deferred.resolve(data);
-          },
-          function error(err) {
-            deferred.reject(err);
-          }
-        );
-      }
+      proxyService.emitEvent('fbs.patron', 'fbs.patron.success', 'fbs.patron.error', {
+        "username": username,
+        "password": password,
+        "busEvent": "fbs.patron.success"
+      }).then(
+        function success(patron) {
+          deferred.resolve(patron);
+        },
+        function error(err) {
+          deferred.reject(err);
+        }
+      );
 
       return deferred.promise;
-    };
-
-    /**
-     * Get user.
-     * @returns {*}|null
-     *   The user if logged in, or null if not.
-     */
-    this.getUser = function getUser() {
-      return loggedInUser;
-    };
+    }
   }
 ]);

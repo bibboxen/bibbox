@@ -52,7 +52,7 @@ var CTRL = function CTRL(app, bus, allowed) {
     });
   });
 
-  // Temporary code.
+  // @TODO: Temporary code.
   // @TODO: Remove all this translations code when it receives translations from administration.
   var trans = {
     "da": {
@@ -81,7 +81,7 @@ var CTRL = function CTRL(app, bus, allowed) {
       "login.password_validation_error": "Ikke gyldigt kodeord",
 
       "reservations.heading": "Reservationer",
-      "reservations.barcode": "Stregkode",
+      "reservations.bibliographicId": "Stregkode",
       "reservations.title": "Titel",
       "reservations.ready": "Til rådighed",
       "reservations.reservation_number": "Kø-nummer",
@@ -90,7 +90,7 @@ var CTRL = function CTRL(app, bus, allowed) {
       "status.heading": "Status / Forny",
       "status.title": "Titel",
       "status.return_date": "Afleveringsdato",
-      "status.bill": "Gebyr",
+      "status.fine": "Gebyr",
       "status.new_date": "Ny dato",
       "status.information": "Information",
       "status.actions": "Handlinger",
@@ -135,7 +135,7 @@ var CTRL = function CTRL(app, bus, allowed) {
       "login.password_validation_error": "Not valid password",
 
       "reservations.heading": "Reservations",
-      "reservations.barcode": "Barcode",
+      "reservations.bibliographicId": "Barcode",
       "reservations.title": "Title",
       "reservations.ready": "Available",
       "reservations.reservation_number": "Number in Queue",
@@ -144,7 +144,7 @@ var CTRL = function CTRL(app, bus, allowed) {
       "status.heading": "Status / Renew",
       "status.title": "Title",
       "status.return_date": "Return date",
-      "status.bill": "Bill",
+      "status.fine": "Fine",
       "status.new_date": "New date",
       "status.information": "Information",
       "status.actions": "Actions",
@@ -164,6 +164,7 @@ var CTRL = function CTRL(app, bus, allowed) {
       "numpad.zero": "0"
     }
   };
+  // @TODO: Temporary code.
   setTimeout(function () {
     bus.emit('config.translations.update', {
       "translations": trans,

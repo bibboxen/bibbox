@@ -5,7 +5,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
   function($scope, $http, $window, $location, $routeParams, proxyService, userService) {
     "use strict";
 
-    var usernameRegExp = /[0-3][0-9][0-1][1-9]\d{6}/;
+    var usernameRegExp = /\d{10}/;///[0-3][0-9][0-1][1-9]\d{6}/;
     var passwordRegExp = /\d+/;
     $scope.loggedIn = false;
     $scope.display = 'default';
@@ -89,9 +89,13 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
 
     var login = function login() {
       userService.login($scope.user.username, $scope.user.password).then(
-        function success(user) {
-          $scope.loggedIn = userService.loggedIn;
-          $location.path("/" + $routeParams.redirectUrl);
+        function success(loggedIn) {
+          if (loggedIn) {
+            $location.path("/" + $routeParams.redirectUrl);
+          }
+          else {
+            $scope.passwordValidationError = true;
+          }
         },
         function error(err) {
           // @TODO: Handle error.

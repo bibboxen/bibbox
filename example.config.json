@@ -12,13 +12,16 @@
       "barcode.err",
       "barcode.list.res",
       "config.translations",
-      "frontend.reload"
+      "frontend.reload",
+      "fbs.login.success",
+      "fbs.login.error"
     ],
     "proxyEvents": [
       "barcode.start",
       "barcode.stop",
       "barcode.list",
-      "config.translations.request"
+      "config.translations.request",
+      "fbs.login"
     ]
   },
   "translation": {

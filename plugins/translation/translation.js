@@ -54,11 +54,11 @@ var Translation = function (bus, destination) {
       }
       else {
         bus.emit('logger.debug', 'Translations read successfully from ' + __dirname + destination);
+
+        // Emit the updated translations.
+        bus.emit('config.translations.request', {"translations": data.translations, "busEvent": data.busEvent});
       }
     });
-
-    // Emit the updated translations.
-    bus.emit('config.translations.request', {"translations": data.translations, "busEvent": data.busEvent});
   });
 };
 
