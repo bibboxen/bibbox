@@ -16,10 +16,21 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
 
     $scope.materials = [];
 
-    var barcodeResult = function barcodeResult(data) {
+    var itemScannedResult = function itemScannedResult(data) {
       userService.borrow(data).then(
         function (result) {
+          console.log(result);
 
+          var item = {};
+
+          if (result.ok === "0") {
+            item.status = 'borrow.error';
+          }
+          else {
+            item.status = 'borrow.success';
+          }
+
+          $scope.materials.push(item);
         },
         function (err) {
           // @TODO: Handle error.
@@ -30,7 +41,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       console.log(data);
     };
 
-    var barcodeError = function barcodeError(err) {
+    var itemScannedError = function itemScannedError(err) {
       // @TODO: Handle error.
       console.log(err);
     };
@@ -42,11 +53,11 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     var startBarcode = function scanBarcode() {
       proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
         function success(data) {
-          barcodeResult(data);
+          itemScannedResult(data);
           stopBarcode();
         },
         function error(err) {
-          barcodeError(err);
+          itemScannedError(err);
         }
       );
     };
@@ -58,6 +69,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       proxyService.emitEvent('barcode.stop', null, null, {}).then();
     };
 
-    startBarcode();
+    //startBarcode();
+
+    // Test
+    //itemScannedResult(4140809956);
+    itemScannedResult(5010941603);
   }
 ]);

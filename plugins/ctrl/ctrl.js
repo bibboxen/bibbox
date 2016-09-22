@@ -97,6 +97,10 @@ var CTRL = function CTRL(app, bus, allowed) {
       "status.actions": "Handlinger",
       "status.button.renew": "Forny",
 
+      "borrow.heading": "Lån",
+      "borrow.title": "Titel",
+      "borrow.return_date": "Afleveringsdato",
+
       "numpad.back": "Slet",
       "numpad.enter": "Enter",
       "numpad.one": "1",
@@ -151,6 +155,10 @@ var CTRL = function CTRL(app, bus, allowed) {
       "status.information": "Information",
       "status.actions": "Actions",
       "status.button.renew": "Renew",
+
+      "borrow.heading": "Borrow",
+      "borrow.title": "Title",
+      "borrow.return_date": "Return date",
 
       "numpad.back": "Delete",
       "numpad.enter": "Enter",

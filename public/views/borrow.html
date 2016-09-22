@@ -3,10 +3,23 @@
         <h1>{{ 'borrow.heading' | translate }}</h1>
     </div>
 
-    <div>
-        <div>
-            <h3>{{ 'borrow.scan' | translate }}</h3>
-        </div>
+    <div class="panel panel-default">
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>{{ 'borrow.title' | translate }}</th>
+                <th>{{ 'borrow.return_date' | translate }}</th>
+                <th>{{ 'borrow.status' | translate }}</th>
+                <th>{{ 'borrow.information' | translate }}</th>
+            </tr>
+            <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.status === 'borrow.success', 'bg-danger': material.status === 'borrow.error'}">
+                <td>{{ $index + 1 }}</td>
+                <td>{{ material.title }}</td>
+                <td>{{ material.returnDate }}</td>
+                <td>{{ material.status | translate }}</td>
+                <td>{{ material.information }}</td>
+            </tr>
+        </table>
     </div>
 </div>
 
