@@ -9,20 +9,36 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', 'userSe
 
     userService.patron().then(
       function (patron) {
-        console.log(patron);
-
+        // If patron exists, get reservations.
         if (patron) {
-          for (var i = 0; i < patron.unavailableHoldItems.length; i++) {
-            var item = angular.copy(patron.unavailableHoldItems[i]);
+          var i, item;
 
-            item.reservationNumber = "? 1 ?";
+          // Add available items
+          for (i = 0; i < patron.holdItems.length; i++) {
+            item = angular.copy(patron.holdItems[i]);
+
+            item.ready = true;
+
+            $scope.materials.push(item);
+          }
+
+          // Add unavailable items
+          for (i = 0; i < patron.unavailableHoldItems.length; i++) {
+            item = angular.copy(patron.unavailableHoldItems[i]);
+
+            item.reservationNumber = "?";
             item.ready = false;
 
             $scope.materials.push(item);
           }
         }
+        else {
+          // @TODO: Report error.
+          console.log(err);
+        }
       },
       function (err) {
+        // @TODO: Report error.
         console.log(err);
       }
     );

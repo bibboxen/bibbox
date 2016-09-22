@@ -14,14 +14,17 @@
       "config.translations",
       "frontend.reload",
       "fbs.login.success",
-      "fbs.login.error"
+      "fbs.login.error",
+      "fbs.patron.success",
+      "fbs.patron.error"
     ],
     "proxyEvents": [
       "barcode.start",
       "barcode.stop",
       "barcode.list",
       "config.translations.request",
-      "fbs.login"
+      "fbs.login",
+      "fbs.patron"
     ]
   },
   "translation": {
