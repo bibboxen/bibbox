@@ -189,6 +189,49 @@ it('Patron information', function(done) {
   }, done);
 });
 
+it('Checkout (5010941603)', function(done) {
+  setup().then(function (app) {
+    app.services.fbs.checkout('3208100032', '12345', '5010941603').then(function (res) {
+      try {
+        res.ok.should.equal('1');
+        done();
+      }
+      catch (err) {
+        done(err);
+      }
+    }, done);
+  }, done);
+});
+
+it('Checkout (5010941603) - error', function(done) {
+  setup().then(function (app) {
+    app.services.fbs.checkout('3208100032', '12345', '5010941603').then(function (res) {
+      try {
+        res.ok.should.equal('0');
+        done();
+      }
+      catch (err) {
+        done(err);
+      }
+    }, done);
+  }, done);
+});
+
+
+it('Check-in (5010941603)', function(done) {
+  setup().then(function (app) {
+    app.services.fbs.checkIn('5010941603').then(function (res) {
+      try {
+        res.ok.should.equal('1');
+        done();
+      }
+      catch (err) {
+        done(err);
+      }
+    }, done);
+  }, done);
+});
+
 it('Teardown', function(done) {
   setup().then(function (app) {
     app.destroy();
