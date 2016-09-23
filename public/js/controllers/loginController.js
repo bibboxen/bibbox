@@ -5,9 +5,9 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
   function($scope, $http, $window, $location, $routeParams, proxyService, userService) {
     "use strict";
 
-    var usernameRegExp = /\d{10}/;///[0-3][0-9][0-1][1-9]\d{6}/;
+    // @TODO: Update validation function.
+    var usernameRegExp = /\d{10}/;
     var passwordRegExp = /\d+/;
-    $scope.loggedIn = false;
     $scope.display = 'default';
     $scope.user = {
       username : '',
@@ -46,7 +46,6 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     var stopBarcode = function stopBarcode() {
       proxyService.emitEvent('barcode.stop', null, null, {}).then();
     };
-
 
     /**
      * Use manual login.

@@ -23,8 +23,13 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
 
           var item = {};
 
+          item.title = result.itemProperties.title;
+          item.author = result.itemProperties.author;
+          item.dueDate = 'missing in fbs';
+
           if (result.ok === "0") {
             item.status = 'borrow.error';
+            item.information = result.screenMessage;
           }
           else {
             item.status = 'borrow.success';
@@ -37,8 +42,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
           console.log(err);
         }
       );
-
-      console.log(data);
     };
 
     var itemScannedError = function itemScannedError(err) {
@@ -73,6 +76,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
 
     // Test
     //itemScannedResult(4140809956);
-    itemScannedResult(5010941603);
+    itemScannedResult(5010941603); // Harry Potter
   }
 ]);

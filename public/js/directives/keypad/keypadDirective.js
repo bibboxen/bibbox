@@ -9,7 +9,8 @@
 (function () {
   'use strict';
 
-  angular.module('BibBox').directive('keypad', ['$document',
+  angular.module('BibBox').directive('keypad', [
+    '$document',
     function ($document) {
       return {
         restrict: 'E',
@@ -36,15 +37,19 @@
           // Handler for keyboard presses.
           var keypressHandler = function keypressHandler(event) {
             scope.$apply(function () {
+              // Handle backspace.
               if (event.which === 8) {
                 scope.field = scope.field.slice(0, -1);
               }
+              // Handle enter.
               else if (event.which === 13) {
                 scope.enter();
               }
+              // Handle numbers 0-9.
               else if (event.which >= 48 && event.which < 58) {
                 scope.field = scope.field + String.fromCharCode(event.which);
               }
+              // Ignore all other keys.
             });
           };
 
