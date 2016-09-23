@@ -19,7 +19,7 @@ var Request = function Request(bus) {
   var self = this;
   self.bus = bus;
 
-  bus.on('config.fbs.res', function fbsConfig(data) {
+  bus.once('config.fbs.res', function fbsConfig(data) {
     self.username = data.username;
     self.password = data.password;
     self.endpoint = data.endpoint;
