@@ -1,8 +1,8 @@
 /**
  * Index page controller.
  */
-angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$window', '$location', '$translate', 'proxyService', 'config',
-  function ($scope, $http, $window, $location, $translate, proxyService, config) {
+angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$window', '$location', '$translate', 'proxyService', 'config', 'tmhDynamicLocale',
+  function ($scope, $http, $window, $location, $translate, proxyService, config, tmhDynamicLocale) {
     "use strict";
 
     $scope.running = false;
@@ -62,6 +62,7 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
      */
     $scope.changeLanguage = function changeLanguage(langKey) {
       $translate.use(langKey);
+      tmhDynamicLocale.set(langKey);
     }
   }
 ]);
