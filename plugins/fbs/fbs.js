@@ -263,7 +263,7 @@ module.exports = function (options, imports, register) {
   /**
    * Listen to checkIn requests.
    */
-  bus.on('fbs.checkout', function (data) {
+  bus.on('fbs.checkin', function (data) {
     fbs.checkIn(data.itemIdentifier).then(function (res) {
       bus.emit(data.busEvent, res);
     },
