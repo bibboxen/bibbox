@@ -7,7 +7,16 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
   function ($q, $location, $route, config, $translate) {
     'use strict';
 
-    var socket = io();
+    /**
+     * Get socket.
+     *
+     * Wrapped in function to allow testing.
+     *
+     * @returns {*}
+     */
+    this.getSocket = function getSocket() {
+      return io();
+    };
 
     /**
      * Emits an event to the backend.
@@ -46,20 +55,25 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
       return deferred.promise;
     };
 
-    /**
-     * Reloads the browser on the 'frontend.reload' event.
-     */
-    socket.on('frontend.reload', function () {
-      $location.path('/');
-      $route.reload();
-    });
+    this.registerListeners = function () {
+      /**
+       * Reloads the browser on the 'frontend.reload' event.
+       */
+      socket.on('frontend.reload', function () {
+        $location.path('/');
+        $route.reload();
+      });
 
-    /**
-     * Loads translations on frontend.translations event.
-     */
-    socket.on('config.translations', function (translations) {
-      config.translations = angular.copy(translations);
-      $translate.refresh();
-    });
+      /**
+       * Loads translations on frontend.translations event.
+       */
+      socket.on('config.translations', function (translations) {
+        config.translations = angular.copy(translations);
+        $translate.refresh();
+      });
+    };
+
+    var socket = this.getSocket();
+    this.registerListeners();
   }
 ]);

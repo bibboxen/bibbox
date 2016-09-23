@@ -5,5 +5,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$http', '$wi
   function($scope, $http, $window, $location) {
     "use strict";
 
+    $scope.state = false;
+
   }
 ]);

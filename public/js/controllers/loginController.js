@@ -3,7 +3,7 @@
  */
 angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'proxyService', 'userService',
   function($scope, $http, $window, $location, $routeParams, proxyService, userService) {
-    "use strict";
+    'use strict';
 
     // @TODO: Update validation function.
     var usernameRegExp = /\d{10}/;
@@ -50,10 +50,10 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     /**
      * Use manual login.
      *
-     * @param useManualLogin
+     * @param use
      */
-    $scope.useManualLogin = function useManualLogin(useManualLogin) {
-      if (useManualLogin) {
+    $scope.useManualLogin = function useManualLogin(use) {
+      if (use) {
         $scope.display = 'username';
         stopBarcode();
       }
