@@ -9,7 +9,7 @@ var eventEmitter = require('events').EventEmitter;
 var usb = require('usb');
 
 var Barcode = function Barcode(VID, PID) {
-  "use strict";
+  'use strict';
 
   this.VID = VID;
   this.PID = PID;
@@ -25,6 +25,11 @@ util.inherits(Barcode, eventEmitter);
 
 /**
  * Connect to barcode reader.
+ *
+ * Connects to the barcode reader.
+ * Then starts to listen for data from barcode reader,
+ * and when the "\n" key is received, emits the code event,
+ * containing the data received.
  */
 Barcode.prototype.connect = function connect() {
   var self = this;
@@ -42,6 +47,7 @@ Barcode.prototype.connect = function connect() {
     var inEndpoint = iface.endpoints[0];
     inEndpoint.startPoll();
 
+    // Register listener for data events.
     inEndpoint.on('data', function (data) {
       if (self.emitCode) {
         var key = self.parseBuffer(data);
@@ -51,6 +57,7 @@ Barcode.prototype.connect = function connect() {
           }
         }
         else {
+          // Emit the code that was read.
           self.emit('code', self.code.join(''));
           self.code = [];
         }
@@ -136,6 +143,7 @@ Barcode.prototype.parseBuffer = function parseBuffer(data) {
 };
 
 /**
+ * List devices.
  *
  * @returns {*}
  */

@@ -15,6 +15,7 @@ var Entities = require('html-entities').AllHtmlEntities;
  *   Raw XML message from FBS (sip2).
  * @param firstVariableName
  *   The name of the first variable.
+ *   @TODO: First variable of what? Do you mean the root element of the XML, or?
  */
 var Response = function Response(xml, firstVariableName) {
   this.xml = xml;
@@ -75,7 +76,7 @@ Response.prototype.parseEncoding = function parseEncoding() {
    * @param msg
    *   The raw message form SIP2.
    * @param cutoff
-   *   The posstion of the first variable.
+   *   The position of the first variable.
    */
   var Decoder = function Decoder(msg, cutoff) {
     this.ptr = 0;
@@ -262,7 +263,7 @@ Response.prototype.parseXML = function parseXML() {
  *   The code to translate.
  *
  * @returns {*}
- *   The translated string for the code or the cod if no translation exists.
+ *   The translated string for the code or the code if no translation exists.
  */
 Response.prototype.variablesResponseTranslation = function variablesResponseTranslation(code) {
   var codes = {

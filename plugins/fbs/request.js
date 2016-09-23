@@ -26,7 +26,7 @@ var Request = function Request(bus) {
     self.agency = data.agency;
     self.location = data.location;
   });
-  bus.emit('config.fbs', { 'busEvent': 'config.fbs.res' });
+  bus.emit('config.fbs', {'busEvent': 'config.fbs.res'});
 };
 
 /**
@@ -75,7 +75,7 @@ Request.prototype.buildXML = function buildXML(message) {
   var deferred = Q.defer();
   var self = this;
 
-  fs.readFile(__dirname + '/templates/sip2_message.xml', 'utf-8', function(error, source) {
+  fs.readFile(__dirname + '/templates/sip2_message.xml', 'utf-8', function (error, source) {
     if (error) {
       deferred.reject(err);
     }
@@ -108,9 +108,9 @@ Request.prototype.buildXML = function buildXML(message) {
 Request.prototype.send = function send(message, firstVar, callback) {
   var self = this;
 
-  self.bus.once('fbs.sip2.online', function(online) {
+  self.bus.once('fbs.sip2.online', function (online) {
     if (online) {
-      self.buildXML(message).then(function(xml) {
+      self.buildXML(message).then(function (xml) {
         // Log XML message.
         self.bus.emit('logger.debug', 'FBS send: ' + xml);
 
@@ -125,7 +125,7 @@ Request.prototype.send = function send(message, firstVar, callback) {
         };
 
         var request = require('request');
-        request.post(options, function(error, response, body) {
+        request.post(options, function (error, response, body) {
           if (error || response.statusCode !== 200) {
             // Log error message from FBS.
             self.bus.emit('logger.error', 'FBS error: ' + error + ' <-> ' + response.statusCode);
@@ -149,7 +149,7 @@ Request.prototype.send = function send(message, firstVar, callback) {
       });
     }
     else {
-      callback(new Error('FBS is off-line'), null);
+      callback(new Error('FBS is offline'), null);
     }
   });
 
@@ -202,13 +202,13 @@ Request.prototype.patronStatus = function patronStatus(patronId, patronPassword,
 Request.prototype.patronInformation = function patronInformation(patronId, patronPassword, callback) {
   var self = this;
   var transactionDate = self.encodeTime();
-  var message = '63009' + transactionDate + new Array(10).join('Y') +'|AO' + self.agency + '|AA' + patronId + '|AC|AD' + patronPassword + '|';
+  var message = '63009' + transactionDate + new Array(10).join('Y') + '|AO' + self.agency + '|AA' + patronId + '|AC|AD' + patronPassword + '|';
 
   self.send(message, 'AO', callback);
 };
 
 /**
- * Checkout items.
+ * Check out item.
  *
  * @param patronId
  *   Patron card number or CPR number.
@@ -222,13 +222,13 @@ Request.prototype.patronInformation = function patronInformation(patronId, patro
 Request.prototype.checkout = function checkout(patronId, patronPassword, itemIdentifier, callback) {
   var self = this;
   var transactionDate = self.encodeTime();
-  var message = '11NN' + transactionDate + transactionDate +'|AO' + self.agency + '|AA' + patronId + '|AB' + itemIdentifier + '|AC|CH|AD' + patronPassword + '|';
+  var message = '11NN' + transactionDate + transactionDate + '|AO' + self.agency + '|AA' + patronId + '|AB' + itemIdentifier + '|AC|CH|AD' + patronPassword + '|';
 
   self.send(message, 'AO', callback);
 };
 
 /**
- * Checkout items.
+ * Check in item.
  *
  * @param itemIdentifier
  *   The item to checkout.

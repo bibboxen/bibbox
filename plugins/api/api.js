@@ -23,24 +23,6 @@ var API = function (app, options, bus) {
   app.get('/api', function (req, res) {
     res.status(501).send('Please see documentation about using this api.');
   });
-
-  /**
-   *
-   */
-  app.get('/api/barcode', function getBarcode(req, res) {
-    bus.once('barcode.data', function barcodeData(data) {
-      console.log(data);
-      bus.emit('barcode.stop');
-      res.status(200).send(data);
-    });
-
-    bus.emit('barcode.start');
-  });
-
-  app.get('/api/barcode/stop', function stopBarcode(req, res) {
-    bus.off('barcode.data');
-    bus.emit('barcode.stop');
-  });
 };
 
 
