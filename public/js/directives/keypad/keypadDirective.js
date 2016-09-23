@@ -9,8 +9,8 @@
 (function () {
   'use strict';
 
-  angular.module('BibBox').directive('keypad', [
-    function () {
+  angular.module('BibBox').directive('keypad', ['$document',
+    function ($document) {
       return {
         restrict: 'E',
         replace: true,
@@ -20,17 +20,41 @@
           enter: '&'
         },
         link: function (scope) {
+          // Handler for button clicks.
           scope.pressKey = function pressKey(key) {
-            if (key == 'back') {
+            if (key === 'back') {
               scope.field = scope.field.slice(0, -1);
             }
-            else if (key == 'enter') {
+            else if (key === 'enter') {
               scope.enter();
             }
             else {
               scope.field = scope.field + key;
             }
-          }
+          };
+
+          // Handler for keyboard presses.
+          var keypressHandler = function keypressHandler(event) {
+            scope.$apply(function () {
+              if (event.which === 8) {
+                scope.field = scope.field.slice(0, -1);
+              }
+              else if (event.which === 13) {
+                scope.enter();
+              }
+              else if (event.which >= 48 && event.which < 58) {
+                scope.field = scope.field + String.fromCharCode(event.which);
+              }
+            });
+          };
+
+          // Bind to keypress.
+          $document.bind('keydown', keypressHandler);
+
+          // Unbind keypress on destroy.
+          scope.$on('$destroy', function () {
+            $document.unbind('keypress', keypressHandler);
+          });
         }
       };
     }

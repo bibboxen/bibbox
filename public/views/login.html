@@ -24,7 +24,7 @@
 
         <div class="input-group input-group-lg numpad-container">
             <span class="input-group-addon" id="sizing-addon1">{{ 'login.username_short' | translate }}</span>
-            <input type="text" class="form-control" placeholder="{{ 'login.username' | translate }}" autofocus aria-describedby="sizing-addon1" data-ng-model="user.username">
+            <input type="text" class="form-control" placeholder="{{ 'login.username' | translate }}" tabIndex="-1" aria-describedby="sizing-addon1" data-ng-model="user.username">
         </div>
         <keypad field="user.username" enter="usernameEntered()"></keypad>
     </div>
@@ -40,7 +40,7 @@
 
         <div class="input-group input-group-lg numpad-container">
             <span class="input-group-addon" id="sizing-addon2">{{ 'login.password_short' | translate }}</span>
-            <input type="password" class="form-control" placeholder="{{ 'login.password' | translate }}" aria-describedby="sizing-addon2" data-ng-model="user.password">
+            <input type="password" class="form-control" placeholder="{{ 'login.password' | translate }}" tabIndex="-1" aria-describedby="sizing-addon2" data-ng-model="user.password">
         </div>
         <keypad field="user.password" enter="passwordEntered()"></keypad>
     </div>
