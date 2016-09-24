@@ -9,10 +9,15 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     var usernameRegExp = /\d{10}/;
     var passwordRegExp = /\d+/;
     $scope.display = 'default';
-    $scope.user = {
-      username : '',
-      password: ''
+    $scope.user = null;
+
+    var resetUser = function resetUser() {
+      $scope.user = {
+        username : '',
+        password: ''
+      };
     };
+    resetUser();
 
     var barcodeResult = function barcodeResult(data) {
       $scope.user.username = data;
@@ -54,10 +59,12 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      */
     $scope.useManualLogin = function useManualLogin(use) {
       if (use) {
+        resetUser();
         $scope.display = 'username';
         stopBarcode();
       }
       else {
+        resetUser();
         $scope.display = 'default';
         startBarcode();
       }
@@ -87,6 +94,8 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     };
 
     var login = function login() {
+      stopBarcode();
+
       userService.login($scope.user.username, $scope.user.password).then(
         function success(loggedIn) {
           if (loggedIn) {

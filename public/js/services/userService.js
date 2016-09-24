@@ -1,3 +1,11 @@
+/**
+ * @file
+ * Contains the userService, that handles login/out of patrons,
+ * checkin/out of materials.
+ * This is the service that temporarily keeps login for the currently logged in
+ * user (Patron).
+ */
+
 angular.module('BibBox').service('userService', ['$q', 'proxyService',
   function ($q, proxyService) {
     'use strict';
@@ -8,6 +16,10 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
 
     /**
      * Login.
+     *
+     * Tests if the user is valid.
+     * @TODO: Does it check for valid user? Are there error codes that should
+     * be handled?
      *
      * @param user
      * @param pass
@@ -34,6 +46,15 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
       );
 
       return deferred.promise;
+    };
+
+    /**
+     * Deletes user data, thereby logging it out.
+     */
+    this.logout = function () {
+      username = null;
+      password = null;
+      loggedIn = false;
     };
 
     /**
@@ -72,6 +93,8 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
 
     /**
      * Get patron.
+     *
+     * Contains all info about the currently logged in patron.
      *
      * @returns {*|promise}
      */
