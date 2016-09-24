@@ -10,9 +10,18 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
   function ($q, proxyService) {
     'use strict';
 
-    var username;
-    var password;
-    var loggedIn;
+    var username = null;
+    var password = null;
+    var loggedIn = false;
+
+    /**
+     * Is user logged in?
+     *
+     * @returns {*}
+     */
+    this.userLoggedIn = function userLoggedIn() {
+      return loggedIn;
+    };
 
     /**
      * Login.
@@ -49,6 +58,8 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
     };
 
     /**
+     * Logout.
+     *
      * Deletes user data, thereby logging it out.
      */
     this.logout = function () {
@@ -80,15 +91,6 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
       );
 
       return deferred.promise;
-    };
-
-    /**
-     * Is user logged in?
-     *
-     * @returns {*}
-     */
-    this.userLoggedIn = function userLoggedIn() {
-      return loggedIn;
     };
 
     /**
