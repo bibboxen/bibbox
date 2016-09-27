@@ -11,6 +11,10 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     $scope.display = 'default';
     $scope.user = null;
 
+    // Log out of user service.
+    userService.logout();
+
+    // Clean local user.
     var resetUser = function resetUser() {
       $scope.user = {
         username : '',
