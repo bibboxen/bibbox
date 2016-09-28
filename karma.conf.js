@@ -16,7 +16,9 @@ module.exports = function(config) {
       'public/js/lib/angular.min.js',
       'public/js/*.js',
       'public/js/**/*.js',
-      'public_tests/**/*.spec.js'
+      'public_tests/**/*.spec.js',
+
+      'public/views/*.html'
     ],
 
     // list of files to exclude
@@ -24,7 +26,9 @@ module.exports = function(config) {
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {},
+    preprocessors: {
+      'public/views/**/*.html': ['ng-html2js']
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
@@ -54,6 +58,16 @@ module.exports = function(config) {
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity
+    concurrency: Infinity,
+
+    ngHtml2JsPreprocessor: {
+      // If your build process changes the path to your templates,
+      // use stripPrefix and prependPrefix to adjust it.
+      stripPrefix: 'public/',
+      //prependPrefix: "web/path/to/templates/",
+
+      // the name of the Angular module to create
+      moduleName: "my.templates"
+    }
   })
 };
