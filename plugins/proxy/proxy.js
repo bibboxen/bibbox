@@ -18,73 +18,45 @@ var Proxy = function (server, bus, busEvents, proxyEvents) {
 
   var io = require('socket.io')(server);
 
-  // Event listener handlers. This is to enable removal of event listeners.
-  var busEventHandlers = {};
+  // Add wildcard support for socket.
+  var wildcard = require('socketio-wildcard')();
+  io.use(wildcard);
 
-  /**
-   * Register bus events.
-   *
-   * @param i
-   * @param socket
-   */
-  var registerBusEvent = function registerBusEvent(i, socket) {
-    var busEvent = busEvents[i];
+  var currentSocket = null;
 
-    busEventHandlers[socket][busEvent] = function (data) {
-      socket.emit(busEvent, data);
-    };
+  var busEventHandler = function (event, value) {
+    // @TODO: Filter whitelist.
 
-    bus.on(busEvent, busEventHandlers[socket][busEvent]);
+    if (currentSocket) {
+      currentSocket.emit(event, value);
+    }
+  };
+
+  var socketEventHandler = function (event) {
+    // @TODO: Filter whitelist.
+
+    bus.emit(event.data[0], event.data[1]);
   };
 
   /**
-   * Register proxy events.
-   *
-   * @param j
-   * @param socket
-   */
-  var registerProxyEvent = function registerProxyEvent(j, socket) {
-    var proxyEvent = proxyEvents[j];
-    socket.on(proxyEvent, function (data) {
-      bus.emit(proxyEvent, data);
-    });
-  };
-
-  /**
-   * Reacts to connect.
-   *
-   * Removes old event listeners for bus for previous socket connections.
-   * Then registers event listeners for bus and socket.
+   * On connect.
    */
   io.on('connection', function (socket) {
-    // Make sure busEventHandlers is initialized for socket.
-    if (!busEventHandlers[socket]) {
-      busEventHandlers[socket] = [];
+    // If a connection has already been set up, remove listeners from previous.
+    if (currentSocket) {
+      bus.offAny(busEventHandler);
     }
 
-    // Add all event listeners for bus.
-    for (var i = 0; i < busEvents.length; i++) {
-      var busEvent = busEvents[i];
+    // Set current socket.
+    currentSocket = socket;
 
-      // Cleanup old events listeners.
-      if (busEventHandlers[socket][busEvent] && typeof busEventHandlers[socket][busEvent] == 'function') {
-        for (var key in busEventHandlers) {
-          if (busEventHandlers.hasOwnProperty(key)) {
-            bus.removeListener(busEvent, busEventHandlers[key][busEvent]);
-          }
-        }
-      }
+    // Register event listener for all bus events.
+    bus.onAny(busEventHandler);
 
-      registerBusEvent(i, socket);
-    }
-
-    // Add all event listeners for socket.
-    for (var j = 0; j < proxyEvents.length; j++) {
-      registerProxyEvent(j, socket);
-    }
+    // Forward all events from socket to the event bus.
+    socket.on('*', socketEventHandler);
   });
 };
-
 
 /**
  * Register the plugin with architect.
