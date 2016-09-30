@@ -23,15 +23,15 @@ var setup = function setup() {
       },
       {
         "packagePath": "./../plugins/proxy",
-        "busEvents": [
-          "bus.event1",
-          "bus.event2",
-          "bus.event3"
+        "whitelistedBusEvents": [
+          "^bus.event1$",
+          "^bus.event2$",
+          "^bus.event3$"
         ],
-        "proxyEvents": [
-          "proxy.event1",
-          "proxy.event2",
-          "proxy.event3"
+        "whitelistedSocketEvents": [
+          "^proxy.event1$",
+          "^proxy.event2$",
+          "^proxy.event3$"
         ]
       }
     ];

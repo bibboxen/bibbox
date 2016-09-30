@@ -23,7 +23,9 @@ module.exports = function (options, imports, register) {
       onAny: emitter.onAny,
       offAny: emitter.offAny,
       on: emitter.on,
+      off: emitter.off,
       once: emitter.once,
+      many: emitter.many,
       removeListener: emitter.removeListener
     }
   });

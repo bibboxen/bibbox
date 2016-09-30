@@ -7,16 +7,28 @@
     "debug": "logs/debug.log"
   },
   "proxy": {
-    "busEvents": [
-      "barcode.**",
-      "config.**",
-      "frontend.**",
-      "fbs.**"
+    "whitelistedBusEvents": [
+      "^barcode.data$",
+      "^config.translations$",
+      "^frontend.[\\w]+$",
+      "^fbs.login.[\\w]+-[\\w]+$",
+      "^fbs.patron.[\\w]+-[\\w]+$",
+      "^fbs.checkout.[\\w]+-[\\w]+$",
+      "^fbs.checkin.[\\w]+-[\\w]+$",
+      "^fbs.renew.[\\w]+-[\\w]+$",
+      "^fbs.renew.all.[\\w]+-[\\w]+$"
     ],
-    "proxyEvents": [
-      "barcode.*",
-      "config.translations.*",
-      "fbs.*"
+    "whitelistedSocketEvents": [
+      "^barcode.start$",
+      "^barcode.stop$",
+      "^barcode.list$",
+      "^config.translations.request$",
+      "^fbs.login$",
+      "^fbs.patron$",
+      "^fbs.checkout$",
+      "^fbs.checkin$",
+      "^fbs.renew$",
+      "^fbs.renew.all$"
     ]
   },
   "translation": {

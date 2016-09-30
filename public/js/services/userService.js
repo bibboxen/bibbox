@@ -19,10 +19,12 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
       username = user;
       password = pass;
 
-      proxyService.emitEvent('fbs.login', 'fbs.login.success', 'fbs.login.error', {
+      var uniqueId = CryptoJS.MD5("userService" + Date.now());
+
+      proxyService.emitEvent('fbs.login', 'fbs.login.success-' + uniqueId, 'fbs.login.error', {
         "username": username,
         "password": password,
-        "busEvent": "fbs.login.success"
+        "busEvent": "fbs.login.success-" + uniqueId
       }).then(
         function success(loggedInSuccess) {
           loggedIn = loggedInSuccess;
