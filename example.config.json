@@ -11,12 +11,12 @@
       "^barcode.data$",
       "^config.translations$",
       "^frontend.[\\w]+$",
-      "^fbs.login.[\\w]+-[\\w]+$",
-      "^fbs.patron.[\\w]+-[\\w]+$",
-      "^fbs.checkout.[\\w]+-[\\w]+$",
-      "^fbs.checkin.[\\w]+-[\\w]+$",
-      "^fbs.renew.[\\w]+-[\\w]+$",
-      "^fbs.renew.all.[\\w]+-[\\w]+$"
+      "^fbs.login.[\\w]+$",
+      "^fbs.patron.[\\w]+$",
+      "^fbs.checkout.[\\w]+$",
+      "^fbs.checkin.[\\w]+$",
+      "^fbs.renew.[\\w]+$",
+      "^fbs.renew.all.[\\w]+$"
     ],
     "whitelistedSocketEvents": [
       "^barcode.start$",
