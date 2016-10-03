@@ -19,6 +19,7 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
       }
     );
 
+    // @TODO: Make this configurable.
     $scope.buttons = [
       {
         "text": "menu.borrow",
@@ -42,6 +43,7 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
       }
     ];
 
+    // @TODO: Make this configurable.
     $scope.languages = [
       {
         "text": "language.da",
