@@ -1,26 +1,20 @@
 /**
  * Borrow page controller.
  */
-angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 'userService', 'proxyService',
-  function($scope, $location, userService, proxyService) {
+angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'proxyService',
+  function($scope, $location, $timeout, userService, proxyService) {
     "use strict";
-
-    $scope.loggedIn = false;
 
     if (!userService.userLoggedIn()) {
       $location.path('/');
       return;
     }
 
-    $scope.loggedIn = true;
-
     $scope.materials = [];
 
     var itemScannedResult = function itemScannedResult(data) {
       userService.borrow(data).then(
         function (result) {
-          console.log(result);
-
           var item = {};
 
           item.title = result.itemProperties.title;
@@ -44,11 +38,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       );
     };
 
-    var itemScannedError = function itemScannedError(err) {
-      // @TODO: Handle error.
-      console.log(err);
-    };
-
     /**
      * Start scanning for a barcode.
      * Stops after one "barcode.data" has been returned.
@@ -57,10 +46,16 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
         function success(data) {
           itemScannedResult(data);
-          stopBarcode();
+
+          // Start barcode again.
+          $timeout(startBarcode, 1000);
         },
         function error(err) {
-          itemScannedError(err);
+          // @TODO: Handle error.
+          console.log(err);
+
+          // Start barcode again.
+          $timeout(startBarcode, 1000);
         }
       );
     };
@@ -72,10 +67,16 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       proxyService.emitEvent('barcode.stop', null, null, {}).then();
     };
 
-    //startBarcode();
+    // Start looking for material.
+    startBarcode();
 
-    // Test
-    //itemScannedResult(4140809956);
-    itemScannedResult(5010941603); // Harry Potter
+    /**
+     * On destroy.
+     *
+     * Stop listening for barcode.
+     */
+    $scope.$on("$destroy", function() {
+      stopBarcode();
+    });
   }
 ]);

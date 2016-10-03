@@ -63,6 +63,7 @@ var CTRL = function CTRL(app, bus, allowed) {
       "menu.return": "Aflevering",
 
       "common.back": "Tilbage",
+      "common.loading": "Indlæser",
 
       "index.heading": "Vælg ønsket funktion",
 
@@ -124,6 +125,7 @@ var CTRL = function CTRL(app, bus, allowed) {
       "menu.return": "Return",
 
       "common.back": "Back",
+      "common.loading": "Loading",
 
       "index.heading": "Choose the desired function",
 
