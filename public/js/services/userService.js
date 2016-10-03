@@ -19,7 +19,7 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
       username = user;
       password = pass;
 
-      var uniqueId = CryptoJS.MD5("userService" + Date.now());
+      var uniqueId = CryptoJS.MD5("userServiceLogin" + Date.now());
 
       proxyService.emitEvent('fbs.login', 'fbs.login.success' + uniqueId, 'fbs.login.error', {
         "username": username,
@@ -46,8 +46,10 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
     this.borrow = function borrow(itemIdentifier) {
       var deferred = $q.defer();
 
-      proxyService.emitEvent('fbs.checkout', 'fbs.checkout.success', 'fbs.error', {
-        "busEvent": "fbs.checkout.success",
+      var uniqueId = CryptoJS.MD5("userServiceBorrow" + Date.now());
+
+      proxyService.emitEvent('fbs.checkout', 'fbs.checkout.success' + uniqueId, 'fbs.error', {
+        "busEvent": "fbs.checkout.success" + uniqueId,
         "username": username,
         "password": password,
         "itemIdentifier": itemIdentifier
@@ -80,10 +82,12 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
     this.patron = function patron() {
       var deferred = $q.defer();
 
-      proxyService.emitEvent('fbs.patron', 'fbs.patron.success', 'fbs.patron.error', {
+      var uniqueId = CryptoJS.MD5("userServicePatron" + Date.now());
+
+      proxyService.emitEvent('fbs.patron', 'fbs.patron.success' + uniqueId, 'fbs.patron.error', {
         "username": username,
         "password": password,
-        "busEvent": "fbs.patron.success"
+        "busEvent": "fbs.patron.success" + uniqueId
       }).then(
         function success(patron) {
           deferred.resolve(patron);
