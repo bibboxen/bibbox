@@ -23,11 +23,21 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     };
     resetUser();
 
+    /**
+     * Barcode result handler.
+     *
+     * @param data
+     */
     var barcodeResult = function barcodeResult(data) {
       $scope.user.username = data;
       $scope.usernameEntered();
     };
 
+    /**
+     * Barcode error handler.
+     *
+     * @param err
+     */
     var barcodeError = function barcodeError(err) {
       // @TODO: Handle error.
       console.log(err);
@@ -75,7 +85,9 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     };
 
     /**
+     * Username entered.
      *
+     * Enter button handler for username screen.
      */
     $scope.usernameEntered = function usernameEntered() {
       if (!usernameRegExp.test($scope.user.username)) {
@@ -87,6 +99,11 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
       }
     };
 
+    /**
+     * Password entered.
+     *
+     * Enter button handler for password screen.
+     */
     $scope.passwordEntered = function passwordEntered() {
       if (!passwordRegExp.test($scope.user.password)) {
         $scope.passwordValidationError = true;
@@ -97,6 +114,11 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
       }
     };
 
+    /**
+     * Login.
+     *
+     * Calls FBS to verify credentials.
+     */
     var login = function login() {
       stopBarcode();
 

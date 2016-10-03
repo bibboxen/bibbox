@@ -43,7 +43,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, true);
       },
       function (err) {
-        bus.emit('logger.err', connected.error);
+        bus.emit('logger.err', err);
         bus.emit(data.busEvent, false);
       }
     );
