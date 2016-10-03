@@ -1,15 +1,20 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'proxyService', 'userService',
-  function($scope, $http, $window, $location, $routeParams, proxyService, userService) {
+angular.module('BibBox').controller('LoginController', [
+  '$scope',
+  '$http',
+  '$window',
+  '$location',
+  '$routeParams',
+  'proxyService',
+  'userService',
+  function ($scope, $http, $window, $location, $routeParams, proxyService, userService) {
     'use strict';
 
     // @TODO: Update validation function.
     var usernameRegExp = /\d{10}/;
     var passwordRegExp = /\d+/;
-    $scope.display = 'default';
-    $scope.user = null;
 
     // Log out of user service.
     userService.logout();
@@ -17,11 +22,21 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     // Clean local user.
     var resetUser = function resetUser() {
       $scope.user = {
-        username : '',
+        username: '',
         password: ''
       };
     };
     resetUser();
+
+    /**
+     * Sets the $scope.display variable.
+     *
+     * @param step
+     */
+    var gotoStep = function (step) {
+      $scope.display = step;
+    };
+    gotoStep('default');
 
     /**
      * Barcode result handler.
@@ -48,15 +63,16 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * Stops after one "barcode.data" has been returned.
      */
     var startBarcode = function scanBarcode() {
-      proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
-        function success(data) {
-          barcodeResult(data);
-          stopBarcode();
-        },
-        function error(err) {
-          barcodeError(err);
-        }
-      );
+      proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {})
+        .then(
+          function success(data) {
+            barcodeResult(data);
+            stopBarcode();
+          },
+          function error(err) {
+            barcodeError(err);
+          }
+        );
     };
 
     /**
@@ -72,14 +88,14 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * @param use
      */
     $scope.useManualLogin = function useManualLogin(use) {
+      resetUser();
+
       if (use) {
-        resetUser();
-        $scope.display = 'username';
+        gotoStep('username');
         stopBarcode();
       }
       else {
-        resetUser();
-        $scope.display = 'default';
+        gotoStep('default');
         startBarcode();
       }
     };
@@ -90,7 +106,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * Enter button handler for username screen.
      */
     $scope.usernameEntered = function usernameEntered() {
-      if (!usernameRegExp.test($scope.user.username)) {
+      if ($scope.user.username === '' || !usernameRegExp.test($scope.user.username)) {
         $scope.usernameValidationError = true;
       }
       else {
@@ -105,7 +121,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * Enter button handler for password screen.
      */
     $scope.passwordEntered = function passwordEntered() {
-      if (!passwordRegExp.test($scope.user.password)) {
+      if ($scope.user.password === '' || !passwordRegExp.test($scope.user.password)) {
         $scope.passwordValidationError = true;
       }
       else {

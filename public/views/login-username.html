@@ -1,0 +1,14 @@
+<div class="alert alert-danger" role="alert" data-ng-if="usernameValidationError">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  <span class="sr-only">Error:</span>
+  {{ 'login.username_validation_error' | translate }}
+</div>
+
+<h3>{{ 'login.username_help' | translate }}</h3>
+
+<div class="input-group input-group-lg numpad-container">
+  <span class="input-group-addon" id="sizing-addon1">{{ 'login.username_short' | translate }}</span>
+  <input type="text" class="form-control" placeholder="{{ 'login.username' | translate }}" tabIndex="-1"
+         aria-describedby="sizing-addon1" data-ng-model="user.username">
+</div>
+<keypad field="user.username" enter="usernameEntered()"></keypad>

@@ -1,31 +1,31 @@
 <div>
-    <div class="page-header">
-        <h1>{{ 'reservations.heading' | translate }}</h1>
-    </div>
+  <div class="page-header">
+    <h1>{{ 'reservations.heading' | translate }}</h1>
+  </div>
 
-    <div class="panel panel-default">
-        <table class="table">
-            <tr>
-                <th></th>
-                <th>{{ 'reservations.bibliographic_id' | translate }}</th>
-                <th>{{ 'reservations.title' | translate }}</th>
-                <th>{{ 'reservations.ready' | translate }}</th>
-                <th>{{ 'reservations.interest_date' | translate }}</th>
-                <th>{{ 'reservations.reservation_number' | translate }}</th>
-                <th>{{ 'reservations.pickup_location' | translate }}</th>
-            </tr>
-            <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.ready}">
-                <td>{{ $index + 1 }}</td>
-                <td>{{ material.bibliographicId }}</td>
-                <td>{{ material.title }}</td>
-                <td>
-                    <span data-ng-if="material.ready" class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
-                </td>
-                <td>{{ material.interestDate | date }}</td>
-                <td>{{ material.reservationNumber }}</td>
-                <td>{{ material.pickupLocation }}</td>
-            </tr>
-        </table>
-    </div>
+  <div class="panel panel-default">
+    <table class="table">
+      <tr>
+        <th></th>
+        <th>{{ 'reservations.bibliographic_id' | translate }}</th>
+        <th>{{ 'reservations.title' | translate }}</th>
+        <th>{{ 'reservations.ready' | translate }}</th>
+        <th>{{ 'reservations.interest_date' | translate }}</th>
+        <th>{{ 'reservations.reservation_number' | translate }}</th>
+        <th>{{ 'reservations.pickup_location' | translate }}</th>
+      </tr>
+      <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.ready}">
+        <td class="vert-align">{{ $index + 1 }}</td>
+        <td class="vert-align">{{ material.bibliographicId }}</td>
+        <td class="vert-align">{{ material.title }}</td>
+        <td class="vert-align td-center">
+          <span data-ng-if="material.ready" class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
+        </td>
+        <td class="vert-align">{{ material.interestDate | date }}</td>
+        <td class="vert-align">{{ material.reservationNumber }}</td>
+        <td class="vert-align">{{ material.pickupLocation }}</td>
+      </tr>
+    </table>
+  </div>
 </div>
 

@@ -13,7 +13,7 @@
     function ($document) {
       return {
         restrict: 'E',
-        replace: true,
+        replace: false,
         templateUrl: 'views/keypad.html',
         scope: {
           field: '=',
@@ -57,7 +57,7 @@
 
           // Unbind keypress on destroy.
           scope.$on('$destroy', function () {
-            $document.unbind('keypress', keypressHandler);
+            $document.unbind('keydown', keypressHandler);
           });
         }
       };

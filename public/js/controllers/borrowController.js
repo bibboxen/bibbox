@@ -3,7 +3,7 @@
  */
 angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'proxyService',
   function($scope, $location, $timeout, userService, proxyService) {
-    "use strict";
+    'use strict';
 
     if (!userService.userLoggedIn()) {
       $location.path('/');
@@ -73,9 +73,11 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     /**
      * On destroy.
      *
+     * Log out of user service.
      * Stop listening for barcode.
      */
     $scope.$on("$destroy", function() {
+      userService.logout();
       stopBarcode();
     });
   }

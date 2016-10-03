@@ -1,9 +1,14 @@
 /**
  * Reservations page controller.
  */
-angular.module('BibBox').controller('ReservationsController', ['$scope', 'userService',
-  function($scope, userService) {
+angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', 'userService',
+  function($scope, $location, userService) {
     "use strict";
+
+    if (!userService.userLoggedIn()) {
+      $location.path('/');
+      return;
+    }
 
     $scope.materials = [];
 
@@ -50,5 +55,14 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', 'userSe
         console.log(err);
       }
     );
+
+    /**
+     * On destroy.
+     *
+     * Log out of user service.
+     */
+    $scope.$on("$destroy", function() {
+      userService.logout();
+    });
   }
 ]);
