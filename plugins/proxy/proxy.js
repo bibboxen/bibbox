@@ -8,83 +8,93 @@
  *
  * @param server
  * @param bus
- * @param busEvents
- * @param proxyEvents
+ * @param whitelistedBusEvents
+ * @param whitelistedSocketEvents
  *
  * @constructor
  */
-var Proxy = function (server, bus, busEvents, proxyEvents) {
+var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents) {
   "use strict";
 
   var io = require('socket.io')(server);
 
-  // Event listener handlers. This is to enable removal of event listeners.
-  var busEventHandlers = {};
+  // Add wildcard support for socket.
+  var wildcard = require('socketio-wildcard')();
+  io.use(wildcard);
+
+  var currentSocket = null;
 
   /**
-   * Register bus events.
+   * Handler for bus events.
    *
-   * @param i
-   * @param socket
+   * @param event
+   * @param value
    */
-  var registerBusEvent = function registerBusEvent(i, socket) {
-    var busEvent = busEvents[i];
+  var busEventHandler = function (event, value) {
+    var accept = false;
 
-    busEventHandlers[socket][busEvent] = function (data) {
-      socket.emit(busEvent, data);
-    };
+    // Test for each whitelist RegExp
+    for (var item in whitelistedBusEvents) {
+      if (whitelistedBusEvents.hasOwnProperty(item)) {
+        var reg = new RegExp(whitelistedBusEvents[item]);
 
-    bus.on(busEvent, busEventHandlers[socket][busEvent]);
-  };
-
-  /**
-   * Register proxy events.
-   *
-   * @param j
-   * @param socket
-   */
-  var registerProxyEvent = function registerProxyEvent(j, socket) {
-    var proxyEvent = proxyEvents[j];
-    socket.on(proxyEvent, function (data) {
-      bus.emit(proxyEvent, data);
-    });
-  };
-
-  /**
-   * Reacts to connect.
-   *
-   * Removes old event listeners for bus for previous socket connections.
-   * Then registers event listeners for bus and socket.
-   */
-  io.on('connection', function (socket) {
-    // Make sure busEventHandlers is initialized for socket.
-    if (!busEventHandlers[socket]) {
-      busEventHandlers[socket] = [];
-    }
-
-    // Add all event listeners for bus.
-    for (var i = 0; i < busEvents.length; i++) {
-      var busEvent = busEvents[i];
-
-      // Cleanup old events listeners.
-      if (busEventHandlers[socket][busEvent] && typeof busEventHandlers[socket][busEvent] == 'function') {
-        for (var key in busEventHandlers) {
-          if (busEventHandlers.hasOwnProperty(key)) {
-            bus.removeListener(busEvent, busEventHandlers[key][busEvent]);
-          }
+        if (reg.test(event)) {
+          accept = true;
+          break;
         }
       }
-
-      registerBusEvent(i, socket);
     }
 
-    // Add all event listeners for socket.
-    for (var j = 0; j < proxyEvents.length; j++) {
-      registerProxyEvent(j, socket);
+    // If a socket has been set and the event has been accepted, emit it.
+    if (currentSocket && accept) {
+      currentSocket.emit(event, value);
     }
+  };
+
+  /**
+   * Handler for socket events.
+   *
+   * @param event
+   */
+  var socketEventHandler = function (event) {
+    var accept = false;
+
+    // Test for each whitelist RegExp
+    for (var item in whitelistedSocketEvents) {
+      if (whitelistedSocketEvents.hasOwnProperty(item)) {
+        var reg = new RegExp(whitelistedSocketEvents[item]);
+
+        if (reg.test(event.data[0])) {
+          accept = true;
+          break;
+        }
+      }
+    }
+
+    if (accept) {
+      bus.emit(event.data[0], event.data[1]);
+    }
+  };
+
+  /**
+   * On connect.
+   */
+  io.on('connection', function (socket) {
+    // If a connection has already been set up, remove listeners from previous.
+    if (currentSocket) {
+      bus.offAny(busEventHandler);
+    }
+
+    // Set current socket.
+    currentSocket = socket;
+
+    // Register event listener for all bus events.
+    bus.onAny(busEventHandler);
+
+    // Register event listener for all socket events.
+    socket.on('*', socketEventHandler);
   });
 };
-
 
 /**
  * Register the plugin with architect.
@@ -92,7 +102,7 @@ var Proxy = function (server, bus, busEvents, proxyEvents) {
 module.exports = function (options, imports, register) {
   "use strict";
 
-  var proxy = new Proxy(imports.server, imports.bus, options.busEvents, options.proxyEvents);
+  var proxy = new Proxy(imports.server, imports.bus, options.whitelistedBusEvents, options.whitelistedSocketEvents);
 
   register(null, {
     "proxy": proxy

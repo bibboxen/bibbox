@@ -45,8 +45,8 @@ var plugins = [
   },
   {
     "packagePath": "./plugins/proxy",
-    "proxyEvents": config.proxy.proxyEvents,
-    "busEvents": config.proxy.busEvents
+    "whitelistedSocketEvents": config.proxy.whitelistedSocketEvents,
+    "whitelistedBusEvents": config.proxy.whitelistedBusEvents
   },
   {
     "packagePath": "./plugins/fbs"
