@@ -3,16 +3,25 @@
  */
 angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'proxyService', 'userService',
   function($scope, $http, $window, $location, $routeParams, proxyService, userService) {
-    "use strict";
+    'use strict';
 
     // @TODO: Update validation function.
     var usernameRegExp = /\d{10}/;
     var passwordRegExp = /\d+/;
     $scope.display = 'default';
-    $scope.user = {
-      username : '',
-      password: ''
+    $scope.user = null;
+
+    // Log out of user service.
+    userService.logout();
+
+    // Clean local user.
+    var resetUser = function resetUser() {
+      $scope.user = {
+        username : '',
+        password: ''
+      };
     };
+    resetUser();
 
     var barcodeResult = function barcodeResult(data) {
       $scope.user.username = data;
@@ -50,14 +59,16 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     /**
      * Use manual login.
      *
-     * @param useManualLogin
+     * @param use
      */
-    $scope.useManualLogin = function useManualLogin(useManualLogin) {
-      if (useManualLogin) {
+    $scope.useManualLogin = function useManualLogin(use) {
+      if (use) {
+        resetUser();
         $scope.display = 'username';
         stopBarcode();
       }
       else {
+        resetUser();
         $scope.display = 'default';
         startBarcode();
       }
@@ -87,6 +98,8 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     };
 
     var login = function login() {
+      stopBarcode();
+
       userService.login($scope.user.username, $scope.user.password).then(
         function success(loggedIn) {
           if (loggedIn) {

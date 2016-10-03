@@ -9,8 +9,7 @@
 (function () {
   'use strict';
 
-  angular.module('BibBox').directive('keypad', [
-    '$document',
+  angular.module('BibBox').directive('keypad', ['$document',
     function ($document) {
       return {
         restrict: 'E',
