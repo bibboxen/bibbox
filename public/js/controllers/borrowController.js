@@ -25,13 +25,13 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
 
           item.title = result.itemProperties.title;
           item.author = result.itemProperties.author;
-          item.dueDate = '?';
 
           if (result.ok === "0") {
             item.status = 'borrow.error';
             item.information = result.screenMessage;
           }
           else {
+            item.dueDate = result.dueDate;
             item.status = 'borrow.success';
           }
 

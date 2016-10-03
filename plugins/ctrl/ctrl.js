@@ -101,6 +101,8 @@ var CTRL = function CTRL(app, bus, allowed) {
       "borrow.heading": "Lån",
       "borrow.title": "Titel",
       "borrow.return_date": "Afleveringsdato",
+      "borrow.status": "Status",
+      "borrow.information": "Information",
 
       "numpad.back": "Slet",
       "numpad.enter": "Enter",
@@ -160,6 +162,8 @@ var CTRL = function CTRL(app, bus, allowed) {
       "borrow.heading": "Borrow",
       "borrow.title": "Title",
       "borrow.return_date": "Return date",
+      "borrow.status": "Status",
+      "borrow.information": "Information",
 
       "numpad.back": "Delete",
       "numpad.enter": "Enter",

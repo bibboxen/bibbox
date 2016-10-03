@@ -15,8 +15,11 @@
             <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.status === 'borrow.success', 'bg-danger': material.status === 'borrow.error'}">
                 <td>{{ $index + 1 }}</td>
                 <td>{{ material.title }}</td>
-                <td>{{ material.returnDate }}</td>
-                <td>{{ material.status | translate }}</td>
+                <td>{{ material.dueDate | date }}</td>
+                <td>
+                    <span data-ng-if="material.status === 'borrow.success'" class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
+                    <span data-ng-if="material.status === 'borrow.error'" class="glyphicon glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </td>
                 <td>{{ material.information }}</td>
             </tr>
         </table>
