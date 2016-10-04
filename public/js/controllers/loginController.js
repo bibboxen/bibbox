@@ -9,17 +9,24 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     var usernameRegExp = /\d{10}/;
     var passwordRegExp = /\d+/;
 
+    var barcodeRunning = false;
+
     // Log out of user service.
     userService.logout();
 
+    $scope.display = 'default';
+
     // Clean local user.
-    var resetUser = function resetUser() {
+    var resetScope = function resetScope() {
       $scope.user = {
         username: '',
         password: ''
       };
+
+      $scope.passwordValidationError = false;
+      $scope.usernameValidationError = false;
     };
-    resetUser();
+    resetScope();
 
     /**
      * Sets the $scope.display variable.
@@ -28,8 +35,11 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      */
     var gotoStep = function (step) {
       $scope.display = step;
+
+      if (step === 'default') {
+        startBarcode();
+      }
     };
-    gotoStep('default');
 
     /**
      * Barcode result handler.
@@ -57,11 +67,16 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * Stops after one "barcode.data" has been returned.
      */
     var startBarcode = function scanBarcode() {
+      barcodeRunning = true;
+
       proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {})
         .then(
           function success(data) {
-            barcodeResult(data);
-            stopBarcode();
+            // Ignore result if the barcode should not be running.
+            if (barcodeRunning) {
+              barcodeResult(data);
+              stopBarcode();
+            }
           },
           function error(err) {
             barcodeError(err);
@@ -73,7 +88,13 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * Stop scanning for a barcode.
      */
     var stopBarcode = function stopBarcode() {
-      proxyService.emitEvent('barcode.stop', null, null, {}).then();
+      if (barcodeRunning) {
+        proxyService.emitEvent('barcode.stop', null, null, {}).then(
+          function () {
+            barcodeRunning = false;
+          }
+        );
+      }
     };
 
     /**
@@ -82,15 +103,14 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * @param use
      */
     $scope.useManualLogin = function useManualLogin(use) {
-      resetUser();
+      resetScope();
 
       if (use) {
-        gotoStep('username');
         stopBarcode();
+        gotoStep('username');
       }
       else {
         gotoStep('default');
-        startBarcode();
       }
     };
 
@@ -104,6 +124,8 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
         $scope.usernameValidationError = true;
       }
       else {
+        stopBarcode();
+
         $scope.usernameValidationError = false;
         $scope.display = 'password';
       }
@@ -130,8 +152,6 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * Calls FBS to verify credentials.
      */
     var login = function login() {
-      stopBarcode();
-
       userService.login($scope.user.username, $scope.user.password).then(
         function success(loggedIn) {
           if (loggedIn) {
@@ -142,13 +162,21 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
           }
         },
         function error() {
-          $scope.invalidLoginError = true;
-          resetUser();
+          // @TODO: Show error.
+          resetScope();
           gotoStep('default');
         }
       );
     };
 
-    startBarcode();
+    // Go to start page.
+    gotoStep('default');
+
+    /**
+     * On destroy.
+     */
+    $scope.$on("$destroy", function() {
+      stopBarcode();
+    });
   }
 ]);
