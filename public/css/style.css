@@ -1,5 +1,11 @@
 body {
-  background-image: radial-gradient(circle at bottom center, #eee, #fff);
+  background-image: radial-gradient(circle at bottom center, #ddd, #eee);
+  background-size: cover;
+
+  -webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  user-select: none;          /* Likely future */
 }
 
 .logo {
@@ -12,7 +18,7 @@ body {
 
 .button {
   height: 50px;
-  min-width: 180px;
+  min-width: 160px;
   font-size: 18px;
   padding: .65em;
   margin: 1em;
@@ -44,7 +50,7 @@ body {
 }
 
 .navbar {
-  background-image: linear-gradient(to bottom, #fff 0, #eee 100%);
+  background-image: linear-gradient(to bottom, #eee 0, #ccc 100%);
 }
 
 .page-header-frontpage {
@@ -100,10 +106,12 @@ body {
   margin: 0 auto;
 }
 
-.button-back {
-  position: fixed;
-  left: 10px;
-  bottom: 10px;
+.button-left {
+  float: left;
+}
+
+.button-right {
+  float: right;
 }
 
 .text-left {
@@ -116,4 +124,17 @@ body {
 
 .td-center {
   text-align: center;
+}
+
+.is-not-disabled {
+  cursor: default !important;
+  background-color: #fff !important;
+}
+
+.buttons-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
 }

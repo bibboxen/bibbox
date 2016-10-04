@@ -53,6 +53,52 @@ var CTRL = function CTRL(app, bus, allowed) {
     });
   });
 
+  /**
+   * @TODO: Move to separate configurable file.
+   */
+  bus.on('config.features.request', function () {
+    bus.emit('config.features', [
+      {
+        "text": "menu.borrow",
+        "url": "/#/login/borrow",
+        "icon": "glyphicon-tasks"
+      },
+      {
+        "text": "menu.status",
+        "url": "/#/login/status",
+        "icon": "glyphicon-refresh"
+      },
+      {
+        "text": "menu.reservations",
+        "url": "/#/login/reservations",
+        "icon": "glyphicon-list-alt"
+      },
+      {
+        "text": "menu.return",
+        "url": "/#/return",
+        "icon": "glyphicon-time"
+      }
+    ]);
+  });
+
+  /**
+   * @TODO: Move to separate configurable file.
+   */
+  bus.on('config.languages.request', function () {
+    bus.emit('config.languages', [
+      {
+        "text": "language.da",
+        "langKey": "da",
+        "icon": "img/flags/DK.png"
+      },
+      {
+        "text": "language.en",
+        "langKey": "en",
+        "icon": "img/flags/GB.png"
+      }
+    ]);
+  });
+
   // @TODO: Temporary code.
   // @TODO: Remove all this translations code when it receives translations from administration.
   var trans = {
@@ -64,6 +110,7 @@ var CTRL = function CTRL(app, bus, allowed) {
 
       "common.back": "Tilbage",
       "common.loading": "Indlæser",
+      "common.kr": "kr.",
 
       "index.heading": "Vælg ønsket funktion",
 
@@ -98,12 +145,24 @@ var CTRL = function CTRL(app, bus, allowed) {
       "status.information": "Information",
       "status.actions": "Handlinger",
       "status.button.renew": "Forny",
+      "status.button.renew_all": "Forny alle",
+      "status.button.fines": "Gebyr",
+      "status.button.receipt": "Kvittering",
+      "status.button.ok": "Ok",
+      "status.renew.ok": "Materiale fornyet",
+      "status.fines.heading": "Gebyr",
+      "status.fines.fine": "Gebyr",
 
       "borrow.heading": "Lån",
       "borrow.title": "Titel",
       "borrow.return_date": "Afleveringsdato",
       "borrow.status": "Status",
       "borrow.information": "Information",
+
+      "return.heading": "Aflever",
+      "return.title": "Titel",
+      "return.status": "Status",
+      "return.information": "Information",
 
       "numpad.back": "Slet",
       "numpad.enter": "Enter",
@@ -116,7 +175,10 @@ var CTRL = function CTRL(app, bus, allowed) {
       "numpad.seven": "7",
       "numpad.eight": "8",
       "numpad.nine": "9",
-      "numpad.zero": "0"
+      "numpad.zero": "0",
+
+      "[BEFORE_RENEW_PERIOD]": "For tidligt fornyet",
+      "UNSUCCESSFUL": "Lykkedes ikke"
     },
     "en": {
       "menu.borrow": "Borrow",
@@ -150,7 +212,7 @@ var CTRL = function CTRL(app, bus, allowed) {
       "reservations.title": "Title",
       "reservations.ready": "Available",
       "reservations.reservation_number": "Number in Queue",
-      "reservations.pickup_location": "Afhentningssted",
+      "reservations.pickup_location": "Pickup Location",
 
       "status.heading": "Status / Renew",
       "status.title": "Title",
@@ -178,7 +240,9 @@ var CTRL = function CTRL(app, bus, allowed) {
       "numpad.seven": "7",
       "numpad.eight": "8",
       "numpad.nine": "9",
-      "numpad.zero": "0"
+      "numpad.zero": "0",
+
+      "[BEFORE_RENEW_PERIOD]": "Before renew period"
     }
   };
   // @TODO: Temporary code.

@@ -26,9 +26,14 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
      *   in these cases data and callbackEvent should be the same.
      *
      * @param emitEvent
+     *   The event to emit through the socket.
      * @param callbackEvent
+     *   The event to listen for with result.
      * @param errorEvent
+     *   The event to listen for with error.
      * @param data
+     *   The data to send with the event.
+     *
      * @returns {*|promise}
      */
     this.emitEvent = function(emitEvent, callbackEvent, errorEvent, data) {
@@ -55,6 +60,11 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
       return deferred.promise;
     };
 
+    /**
+     * Register socket listeners.
+     *
+     * Wrapped in function to allow testing.
+     */
     this.registerListeners = function () {
       /**
        * Reloads the browser on the 'frontend.reload' event.
@@ -65,14 +75,29 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
       });
 
       /**
-       * Loads translations on frontend.translations event.
+       * Loads translations on config.translations event.
        */
       socket.on('config.translations', function (translations) {
         config.translations = angular.copy(translations);
         $translate.refresh();
       });
+
+      /**
+       * Loads languages on config.languages event.
+       */
+      socket.on('config.languages', function (languages) {
+        config.languages = angular.copy(languages);
+      });
+
+      /**
+       * Loads features on config.features event.
+       */
+      socket.on('config.features', function (features) {
+        config.features = angular.copy(features);
+      });
     };
 
+    // Initialize.
     var socket = this.getSocket();
     this.registerListeners();
   }

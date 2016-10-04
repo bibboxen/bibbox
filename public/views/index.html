@@ -7,9 +7,9 @@
   </div>
 
   <div class="container-fluid">
-    <a type="button" data-ng-repeat="button in buttons" class="btn btn-default button" aria-label="Left Align"
-       data-ng-href="{{ button.url }}">
-      <span class="glyphicon {{ button.icon }}" aria-hidden="true"></span> {{ button.text | translate }}
+    <a type="button" data-ng-repeat="feature in features" class="btn btn-default button" aria-label="Left Align"
+       data-ng-href="{{ feature.url }}">
+      <span class="glyphicon {{ feature.icon }}" aria-hidden="true"></span> {{ feature.text | translate }}
     </a>
   </div>
 

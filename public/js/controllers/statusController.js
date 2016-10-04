@@ -1,15 +1,25 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('StatusController', ['$scope', 'userService',
-  function($scope, userService) {
+angular.module('BibBox').controller('StatusController', ['$scope', '$location', 'userService',
+  function($scope, $location, userService) {
     "use strict";
 
-    $scope.materials = [];
+    // Check that the user is logged in.
+    if (!userService.userLoggedIn()) {
+      $location.path('/');
+      return;
+    }
 
+    $scope.materials = [];
+    $scope.currentPatron = null;
+
+    // Load materials for currrent user.
     userService.patron().then(
       function (patron) {
         console.log(patron);
+
+        $scope.currentPatron = patron;
 
         // If patron exists, get all charged, overdue and recall items
         if (patron) {
@@ -43,5 +53,102 @@ angular.module('BibBox').controller('StatusController', ['$scope', 'userService'
         console.log(err);
       }
     );
+
+    /**
+     * Renew a material.
+     *
+     * @param material
+     */
+    $scope.renew = function renew(material) {
+      userService.renew(material.id).then(
+        function success(data) {
+          console.log(data);
+
+          if (data.renewalOk === 'Y') {
+            material.newDate = data.dueDate;
+            material.information = "status.renew.ok";
+          }
+          else {
+            material.information = data.screenMessage;
+          }
+        },
+        function error(err) {
+          console.log(err);
+        }
+      );
+    };
+
+    /**
+     * Renew all materials.
+     */
+    $scope.renewAll = function renewAll() {
+      userService.renewAll().then(
+        function success(data) {
+          console.log(data);
+
+          if (data.ok === '1') {
+            // Update renewed items.
+            if (data.renewedItems !== null) {
+              for (var i = 0; i < data.renewedItems; i++) {
+                for (var material in $scope.materials) {
+                  material = $scope.materials[material];
+
+                  if (material.id === data.renewedItems[i].id) {
+                    material.information = 'status.renew.ok';
+                    material.renewed = true;
+                    break;
+                  }
+                }
+              }
+            }
+
+            // Update unrenewed items.
+            if (data.unrenewedItems !== null) {
+              for (var i = 0; i < data.unrenewedItems.length; i++) {
+                for (var material in $scope.materials) {
+                  material = $scope.materials[material];
+
+                  if (material.id === data.unrenewedItems[i].id) {
+                    material.information = data.unrenewedItems[i].reason;
+                    material.renewed = false;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+          else {
+            console.log("not ok");
+          }
+        },
+        function error(err) {
+          console.log(err);
+        }
+      );
+    };
+
+    /**
+     * Print receipt.
+     */
+    $scope.receipt = function receipt() {
+      alert('Not supported yet!');
+    };
+
+    /**
+     * Goto to front page.
+     */
+    $scope.gotoFront = function gotoFront() {
+      userService.logout();
+      $location.path('/');
+    };
+
+    /**
+     * On destroy.
+     *
+     * Log out of user service.
+     */
+    $scope.$on("$destroy", function() {
+      userService.logout();
+    });
   }
 ]);

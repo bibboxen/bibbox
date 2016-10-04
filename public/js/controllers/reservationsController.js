@@ -57,6 +57,21 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
     );
 
     /**
+     * Print receipt.
+     */
+    $scope.receipt = function receipt() {
+      alert('Not supported yet!');
+    };
+
+    /**
+     * Goto to front page.
+     */
+    $scope.gotoFront = function gotoFront() {
+      userService.logout();
+      $location.path('/');
+    };
+
+    /**
      * On destroy.
      *
      * Log out of user service.

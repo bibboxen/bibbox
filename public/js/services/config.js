@@ -4,5 +4,7 @@
  */
 
 angular.module('BibBox').value('config', {
-  "translations": {}
+  "translations": {},
+  "languages": [],
+  "features": []
 });

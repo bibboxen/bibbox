@@ -48,7 +48,7 @@ var Translation = function (bus, destination) {
     }
 
     // Write the translations to disc.
-    jsonfile.writeFile(__dirname + destination, data.translations, function(err) {
+    jsonfile.writeFile(__dirname + destination, data.translations, function (err) {
       if (err) {
         bus.emit('logger.err', err);
       }
@@ -56,7 +56,10 @@ var Translation = function (bus, destination) {
         bus.emit('logger.debug', 'Translations read successfully from ' + __dirname + destination);
 
         // Emit the updated translations.
-        bus.emit('config.translations.request', {"translations": data.translations, "busEvent": data.busEvent});
+        bus.emit('config.translations.request', {
+          "translations": data.translations,
+          "busEvent": data.busEvent
+        });
       }
     });
   });
