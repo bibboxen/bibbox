@@ -141,5 +141,14 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
       userService.logout();
       $location.path('/');
     };
+
+    /**
+     * On destroy.
+     *
+     * Log out of user service.
+     */
+    $scope.$on("$destroy", function() {
+      userService.logout();
+    });
   }
 ]);

@@ -112,6 +112,11 @@ var CTRL = function CTRL(app, bus, allowed) {
       "borrow.status": "Status",
       "borrow.information": "Information",
 
+      "return.heading": "Aflever",
+      "return.title": "Titel",
+      "return.status": "Status",
+      "return.information": "Information",
+
       "numpad.back": "Slet",
       "numpad.enter": "Enter",
       "numpad.one": "1",

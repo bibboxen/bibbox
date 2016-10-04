@@ -64,6 +64,14 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
     };
 
     /**
+     * Goto to front page.
+     */
+    $scope.gotoFront = function gotoFront() {
+      userService.logout();
+      $location.path('/');
+    };
+
+    /**
      * On destroy.
      *
      * Log out of user service.
