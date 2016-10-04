@@ -64,6 +64,7 @@ var CTRL = function CTRL(app, bus, allowed) {
 
       "common.back": "Tilbage",
       "common.loading": "Indlæser",
+      "common.kr": "kr.",
 
       "index.heading": "Vælg ønsket funktion",
 

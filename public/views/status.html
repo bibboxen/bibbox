@@ -38,8 +38,8 @@
   <a type="button" class="btn btn-success button button-left" aria-label="Left Align" data-ng-click="receipt()">
     <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
   </a>
-  <button type="button" class="btn btn-info button button-left" data-toggle="modal" data-target="#fineModal">
-    <span class="glyphicon glyphicon-euro" aria-hidden="true"></span> {{ 'status.button.fines' | translate }}
+  <button type="button" class="btn btn-warning button button-left" data-toggle="modal" data-target="#fineModal">
+    <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{ 'status.button.fines' | translate }}
   </button>
 
   <a type="button" class="btn btn-info button button-right" aria-label="Left Align" data-ng-click="renewAll()">
@@ -55,7 +55,7 @@
         <h2 class="modal-title" id="myModalLabel">{{ 'status.fines.heading' | translate }}</h2>
       </div>
       <div class="modal-body">
-        <h3>{{ 'status.fines.fine' | translate }} {{ currentPatron.feeAmount }} {{ 'kr.' | translate }}</h3>
+        <h3>{{ 'status.fines.fine' | translate }} {{ currentPatron.feeAmount }} {{ 'common.kr' | translate }}</h3>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-info button" data-dismiss="modal">{{ 'status.button.ok' | translate }}</button>
