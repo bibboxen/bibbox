@@ -53,6 +53,52 @@ var CTRL = function CTRL(app, bus, allowed) {
     });
   });
 
+  /**
+   * @TODO: Move to separate configurable file.
+   */
+  bus.on('config.features.request', function () {
+    bus.emit('config.features', [
+      {
+        "text": "menu.borrow",
+        "url": "/#/login/borrow",
+        "icon": "glyphicon-tasks"
+      },
+      {
+        "text": "menu.status",
+        "url": "/#/login/status",
+        "icon": "glyphicon-refresh"
+      },
+      {
+        "text": "menu.reservations",
+        "url": "/#/login/reservations",
+        "icon": "glyphicon-list-alt"
+      },
+      {
+        "text": "menu.return",
+        "url": "/#/return",
+        "icon": "glyphicon-time"
+      }
+    ]);
+  });
+
+  /**
+   * @TODO: Move to separate configurable file.
+   */
+  bus.on('config.languages.request', function () {
+    bus.emit('config.languages', [
+      {
+        "text": "language.da",
+        "langKey": "da",
+        "icon": "img/flags/DK.png"
+      },
+      {
+        "text": "language.en",
+        "langKey": "en",
+        "icon": "img/flags/GB.png"
+      }
+    ]);
+  });
+
   // @TODO: Temporary code.
   // @TODO: Remove all this translations code when it receives translations from administration.
   var trans = {

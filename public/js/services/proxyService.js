@@ -75,11 +75,25 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
       });
 
       /**
-       * Loads translations on frontend.translations event.
+       * Loads translations on config.translations event.
        */
       socket.on('config.translations', function (translations) {
         config.translations = angular.copy(translations);
         $translate.refresh();
+      });
+
+      /**
+       * Loads languages on config.languages event.
+       */
+      socket.on('config.languages', function (languages) {
+        config.languages = angular.copy(languages);
+      });
+
+      /**
+       * Loads features on config.features event.
+       */
+      socket.on('config.features', function (features) {
+        config.features = angular.copy(features);
       });
     };
 

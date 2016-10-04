@@ -10,6 +10,8 @@
     "whitelistedBusEvents": [
       "^barcode.data$",
       "^config.translations$",
+      "^config.languages$",
+      "^config.features$",
       "^frontend.[\\w]+$",
       "^fbs.login.[\\w]+$",
       "^fbs.patron.[\\w]+$",
@@ -23,6 +25,8 @@
       "^barcode.stop$",
       "^barcode.list$",
       "^config.translations.request$",
+      "^config.languages.request$",
+      "^config.features.request$",
       "^fbs.login$",
       "^fbs.patron$",
       "^fbs.checkout$",
