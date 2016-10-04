@@ -1,5 +1,6 @@
 body {
-  background-image: radial-gradient(circle at bottom center, #eee, #fff);
+  background-image: radial-gradient(circle at bottom center, #ddd, #eee);
+  background-size: cover;
 
   -webkit-user-select: none;  /* Chrome all / Safari all */
   -moz-user-select: none;     /* Firefox all */
@@ -49,7 +50,7 @@ body {
 }
 
 .navbar {
-  background-image: linear-gradient(to bottom, #fff 0, #eee 100%);
+  background-image: linear-gradient(to bottom, #eee 0, #ccc 100%);
 }
 
 .page-header-frontpage {
