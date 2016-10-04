@@ -37,21 +37,25 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
     this.login = function login(user, pass) {
       var deferred = $q.defer();
 
-      username = user;
-      password = pass;
-
       var uniqueId = CryptoJS.MD5("userServiceLogin" + Date.now());
 
       proxyService.emitEvent('fbs.login', 'fbs.login.success' + uniqueId, 'fbs.login.error', {
-        "username": username,
-        "password": password,
+        "username": user,
+        "password": pass,
         "busEvent": "fbs.login.success" + uniqueId
       }).then(
         function success(loggedInSuccess) {
+          username = user;
+          password = pass;
           loggedIn = loggedInSuccess;
+
           deferred.resolve(loggedInSuccess);
         },
         function error(err) {
+          username = null;
+          password = null;
+          loggedIn = false;
+
           deferred.reject(err);
         }
       );
@@ -85,6 +89,60 @@ angular.module('BibBox').service('userService', ['$q', 'proxyService',
         "username": username,
         "password": password,
         "itemIdentifier": itemIdentifier
+      }).then(
+        function success(result) {
+          deferred.resolve(result);
+        },
+        function error(err) {
+          deferred.reject(err);
+        }
+      );
+
+      return deferred.promise;
+    };
+
+    /**
+     * Renew a material.
+     *
+     * @param itemIdentifier
+     * @returns {Function}
+     */
+    this.renew = function renew(itemIdentifier) {
+      var deferred = $q.defer();
+
+      var uniqueId = CryptoJS.MD5("userServiceRenew" + Date.now());
+
+      proxyService.emitEvent('fbs.renew', 'fbs.renew.success' + uniqueId, 'fbs.error', {
+        "busEvent": "fbs.renew.success" + uniqueId,
+        "username": username,
+        "password": password,
+        "itemIdentifier": itemIdentifier
+      }).then(
+        function success(result) {
+          deferred.resolve(result);
+        },
+        function error(err) {
+          deferred.reject(err);
+        }
+      );
+
+      return deferred.promise;
+    };
+
+    /**
+     * Renew all materials for a user.
+     *
+     * @returns {Function}
+     */
+    this.renewAll = function renewAll() {
+      var deferred = $q.defer();
+
+      var uniqueId = CryptoJS.MD5("userServiceRenewAll" + Date.now());
+
+      proxyService.emitEvent('fbs.renew.all', 'fbs.renew.all.success' + uniqueId, 'fbs.error', {
+        "busEvent": "fbs.renew.all.success" + uniqueId,
+        "username": username,
+        "password": password
       }).then(
         function success(result) {
           deferred.resolve(result);

@@ -2,9 +2,17 @@
   <h1>{{ 'login.heading' | translate }}</h1>
 </div>
 
+<div class="alert alert-danger" role="alert" data-ng-if="invalidLoginError">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  <span class="sr-only">Error:</span>
+  {{ 'login.invalid_login_error' | translate }}
+</div>
+
 <div data-ng-include="'views/login-' + display + '.html'" class="login-container"></div>
 
-<a type="button" class="btn btn-danger button button-back" aria-label="Left Align" data-ng-click="useManualLogin(false)"
-   data-ng-if="display !== 'default'">
-  <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
-</a>
+<div class="buttons-bottom">
+  <a type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="useManualLogin(false)"
+     data-ng-if="display !== 'default'">
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
+  </a>
+</div>

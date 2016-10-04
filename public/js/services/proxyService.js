@@ -26,9 +26,14 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
      *   in these cases data and callbackEvent should be the same.
      *
      * @param emitEvent
+     *   The event to emit through the socket.
      * @param callbackEvent
+     *   The event to listen for with result.
      * @param errorEvent
+     *   The event to listen for with error.
      * @param data
+     *   The data to send with the event.
+     *
      * @returns {*|promise}
      */
     this.emitEvent = function(emitEvent, callbackEvent, errorEvent, data) {
@@ -55,6 +60,11 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
       return deferred.promise;
     };
 
+    /**
+     * Register socket listeners.
+     *
+     * Wrapped in function to allow testing.
+     */
     this.registerListeners = function () {
       /**
        * Reloads the browser on the 'frontend.reload' event.
@@ -73,6 +83,7 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
       });
     };
 
+    // Initialize.
     var socket = this.getSocket();
     this.registerListeners();
   }

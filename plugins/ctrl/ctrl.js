@@ -98,6 +98,13 @@ var CTRL = function CTRL(app, bus, allowed) {
       "status.information": "Information",
       "status.actions": "Handlinger",
       "status.button.renew": "Forny",
+      "status.button.renew_all": "Forny alle",
+      "status.button.fines": "Gebyr",
+      "status.button.receipt": "Kvittering",
+      "status.button.ok": "Ok",
+      "status.renew.ok": "Materiale fornyet",
+      "status.fines.heading": "Gebyr",
+      "status.fines.fine": "Gebyr",
 
       "borrow.heading": "Lån",
       "borrow.title": "Titel",
@@ -116,7 +123,10 @@ var CTRL = function CTRL(app, bus, allowed) {
       "numpad.seven": "7",
       "numpad.eight": "8",
       "numpad.nine": "9",
-      "numpad.zero": "0"
+      "numpad.zero": "0",
+
+      "[BEFORE_RENEW_PERIOD]": "For tidligt fornyet",
+      "UNSUCCESSFUL": "Lykkedes ikke"
     },
     "en": {
       "menu.borrow": "Borrow",
@@ -150,7 +160,7 @@ var CTRL = function CTRL(app, bus, allowed) {
       "reservations.title": "Title",
       "reservations.ready": "Available",
       "reservations.reservation_number": "Number in Queue",
-      "reservations.pickup_location": "Afhentningssted",
+      "reservations.pickup_location": "Pickup Location",
 
       "status.heading": "Status / Renew",
       "status.title": "Title",
@@ -178,7 +188,9 @@ var CTRL = function CTRL(app, bus, allowed) {
       "numpad.seven": "7",
       "numpad.eight": "8",
       "numpad.nine": "9",
-      "numpad.zero": "0"
+      "numpad.zero": "0",
+
+      "[BEFORE_RENEW_PERIOD]": "Before renew period"
     }
   };
   // @TODO: Temporary code.

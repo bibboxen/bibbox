@@ -14,13 +14,13 @@
         <th>{{ 'status.information' | translate }}</th>
         <th>{{ 'status.actions' | translate }}</th>
       </tr>
-      <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.ready}">
+      <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.renewed}">
         <td class="vert-align">{{ $index + 1 }}</td>
         <td class="vert-align">{{ material.title }}</td>
         <td class="vert-align">{{ material.returnDate | date }}</td>
         <td class="vert-align">{{ material.fine }}</td>
         <td class="vert-align">{{ material.newDate | date }}</td>
-        <td class="vert-align">{{ material.information }}</td>
+        <td class="vert-align">{{ material.information | translate }}</td>
         <td class="vert-align">
           <a type="button" class="btn btn-info" aria-label="Left Align" data-ng-click="renew(material)">
             <span class="glyphicon glyphicon-refresh"></span> {{ 'status.button.renew' | translate }}
@@ -31,3 +31,35 @@
   </div>
 </div>
 
+<div class="buttons-bottom">
+  <a type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="gotoFront()">
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
+  </a>
+  <a type="button" class="btn btn-success button button-left" aria-label="Left Align" data-ng-click="receipt()">
+    <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
+  </a>
+  <button type="button" class="btn btn-info button button-left" data-toggle="modal" data-target="#fineModal">
+    <span class="glyphicon glyphicon-euro" aria-hidden="true"></span> {{ 'status.button.fines' | translate }}
+  </button>
+
+  <a type="button" class="btn btn-info button button-right" aria-label="Left Align" data-ng-click="renewAll()">
+    <span class="glyphicon glyphicon-refresh"></span> {{ 'status.button.renew_all' | translate }}
+  </a>
+</div>
+
+<!-- Fines modal -->
+<div class="modal fade" id="fineModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">{{ 'status.fines.heading' | translate }}</h2>
+      </div>
+      <div class="modal-body">
+        <h3>{{ 'status.fines.fine' | translate }} {{ currentPatron.feeAmount }} {{ 'kr.' | translate }}</h3>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info button" data-dismiss="modal">{{ 'status.button.ok' | translate }}</button>
+      </div>
+    </div>
+  </div>
+</div>

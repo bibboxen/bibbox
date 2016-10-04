@@ -1,18 +1,11 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('LoginController', [
-  '$scope',
-  '$http',
-  '$window',
-  '$location',
-  '$routeParams',
-  'proxyService',
-  'userService',
+angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'proxyService', 'userService',
   function ($scope, $http, $window, $location, $routeParams, proxyService, userService) {
     'use strict';
 
-    // @TODO: Update validation function.
+    // @TODO: Update validation functions.
     var usernameRegExp = /\d{10}/;
     var passwordRegExp = /\d+/;
 
@@ -54,8 +47,9 @@ angular.module('BibBox').controller('LoginController', [
      * @param err
      */
     var barcodeError = function barcodeError(err) {
-      // @TODO: Handle error.
-      console.log(err);
+      // Ignore error. Restart barcode scanner.
+      // @TODO: Should this be handled differently?
+      startBarcode();
     };
 
     /**
@@ -147,9 +141,10 @@ angular.module('BibBox').controller('LoginController', [
             $scope.passwordValidationError = true;
           }
         },
-        function error(err) {
-          // @TODO: Handle error.
-          console.log(err);
+        function error() {
+          $scope.invalidLoginError = true;
+          resetUser();
+          gotoStep('default');
         }
       );
     };

@@ -1,0 +1,29 @@
+<div>
+  <div class="page-header">
+    <h1>{{ 'return.heading' | translate }}</h1>
+  </div>
+
+  <div class="panel panel-default">
+    <table class="table">
+      <tr>
+        <th></th>
+        <th>{{ 'return.title' | translate }}</th>
+        <th>{{ 'return.status' | translate }}</th>
+        <th>{{ 'return.information' | translate }}</th>
+      </tr>
+      <tr data-ng-repeat="material in materials"
+          data-ng-class="{'bg-success': material.status === 'return.success', 'bg-danger': material.status === 'return.error'}">
+        <td class="vert-align">{{ $index + 1 }}</td>
+        <td class="vert-align">{{ material.title }}</td>
+        <td class="vert-align td-center">
+          <span data-ng-if="material.status === 'return.success'" class="glyphicon glyphicon glyphicon-ok"
+                aria-hidden="true"></span>
+          <span data-ng-if="material.status === 'return.error'" class="glyphicon glyphicon glyphicon-remove"
+                aria-hidden="true"></span>
+        </td>
+        <td class="vert-align">{{ material.information }}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
