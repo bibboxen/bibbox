@@ -1,7 +1,4 @@
 body {
-  background-image: radial-gradient(circle at bottom center, #ddd, #eee);
-  background-size: cover;
-
   -webkit-user-select: none;  /* Chrome all / Safari all */
   -moz-user-select: none;     /* Firefox all */
   -ms-user-select: none;      /* IE 10+ */
@@ -50,7 +47,7 @@ body {
 }
 
 .navbar {
-  background-image: linear-gradient(to bottom, #eee 0, #ccc 100%);
+  background: #eee;
 }
 
 .page-header-frontpage {
@@ -137,4 +134,13 @@ body {
   left: 0;
   right: 0;
   width: 100%;
+}
+
+.btn-default {
+  background-image: linear-gradient(to bottom,#eee 0,#d0d0d0 100%);
+}
+
+.btn-default:hover, .btn-default:focus {
+  background-color: #d0d0d0;
+  background-position: 0 -15px;
 }

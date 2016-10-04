@@ -71,7 +71,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     startBarcode();
 
     /**
-     * Goto to front page.
+     * Go to front page.
      */
     $scope.gotoFront = function gotoFront() {
       userService.logout();
