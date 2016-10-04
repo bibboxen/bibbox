@@ -17,7 +17,9 @@ var Notification = function Printer() {
   this.printerName = printer.getDefaultPrinterName();
 };
 
-Notification
+Notification.prototype.defaultPrinter = function defaultPrinter() {
+
+};
 
 Notification.prototype.test = function test(file) {
   var deferred = Q.defer();
