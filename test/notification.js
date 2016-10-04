@@ -19,7 +19,7 @@ var setup = function setup() {
 				"packagePath": "./../plugins/bus"
 			},
 			{
-				"packagePath": "./../plugins/printer"
+				"packagePath": "./../plugins/notification"
 			}
 		];
 
@@ -36,7 +36,7 @@ it('Test file generation', function(done) {
 		var os = require('os');
 		var file = os.tmpdir() + '/out.pdf';
 
-		app.services.printer.test(file).then(function () {
+		app.services.notification.test(file).then(function () {
 			try {
 				var stats = fs.statSync(file);
 				stats.isFile().should.be.true();

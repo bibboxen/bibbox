@@ -1,20 +1,21 @@
 {
-  "name": "printer",
-  "description": "Communication with printer",
+  "name": "notification",
+  "description": "User notification (mail/printer)",
   "version": "0.0.1",
-  "main": "printer.js",
+  "main": "notification.js",
   "private": true,
   "plugin": {
     "consumes": [
       "bus"
     ],
     "provides": [
-      "printer"
+      "notification"
     ]
   },
   "dependencies": {
     "email-templates": "^2.4.1",
     "nodemailer": "^2.6.0",
+    "printer": "^0.2.2",
     "q": "^1.4.1",
     "wkhtmltopdf": "^0.3.3"
   }

@@ -4,15 +4,22 @@
  */
 
 var wkhtmltopdf = require('wkhtmltopdf');
+var printer = require('printer');
+
 var fs = require('fs');
 var Q = require('q');
 
-var Printer = function Printer() {
+
+var Notification = function Printer() {
   "use strict";
 
+  // Get default printer name and use that as printer.
+  this.printerName = printer.getDefaultPrinterName();
 };
 
-Printer.prototype.test = function test(file) {
+Notification
+
+Notification.prototype.test = function test(file) {
   var deferred = Q.defer();
 
   var stream = fs.createWriteStream(file);
@@ -33,9 +40,9 @@ Printer.prototype.test = function test(file) {
  */
 module.exports = function (options, imports, register) {
 
-	var printer = new Printer();
+	var notification = new Notification();
 
   register(null, {
-    "printer": printer
+    "notification": notification
   });
 };
