@@ -52,6 +52,6 @@ importTest("Network", './network.js');
 importTest("API (UI)", './api.js');
 importTest("BarCode", './barcode.js');
 importTest("FBS", './fbs.js');
-importTest("Printer", './printer.js');
+importTest("Notification", './notification.js');
 importTest("Proxy", './proxy.js');
 importTest("Translation", './translation.js');

@@ -52,7 +52,7 @@ var plugins = [
     "packagePath": "./plugins/fbs"
   },
   {
-    "packagePath": "./plugins/printer"
+    "packagePath": "./plugins/notification"
   }
 ];
 
