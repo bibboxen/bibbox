@@ -5,6 +5,8 @@
 
 var wkhtmltopdf = require('wkhtmltopdf');
 var printer = require('printer');
+var handlebars = require('handlebars');
+var i18n = require("i18n");
 
 var fs = require('fs');
 var Q = require('q');
@@ -14,10 +16,77 @@ var Notification = function Printer() {
   "use strict";
 
   // Get default printer name and use that as printer.
-  this.printerName = printer.getDefaultPrinterName();
+  this.defaultPrinterName = printer.getDefaultPrinterName();
+
+  i18n.configure({
+    locales:['en', 'da'],
+    directory: __dirname + '/locales'
+  });
+
+  // Add translation helper (https://www.npmjs.com/package/i18n).
+  // <div>{{translate myVar}}</div>
+  Handlebars.registerHelper('translate',
+     function(str){
+       return (i18n != undefined ? i18n.__(str) : str);
+     }
+  );
 };
 
-Notification.prototype.defaultPrinter = function defaultPrinter() {
+
+
+/**
+ * Get name of the default system printer.
+ *
+ * @returns string
+ *   Name of the printer.
+ */
+Notification.prototype.getDefaultPrinterName = function getDefaultPrinterName() {
+  return this.defaultPrinterName;
+};
+
+/**
+ * Check out receipt.
+ *
+ * @param username
+ * @param password
+ * @param counter
+ * @param items
+ * @param mail
+ *   If TRUE send mail else print receipt.
+ */
+Notification.prototype.checkOutReceipt = function checkOutReceipt(username, password, counter, items, mail) {
+
+};
+
+/**
+ *
+ * @param username
+ * @param password
+ * @param counter
+ * @param items
+ * @param mail
+ */
+Notification.prototype.checkInReceipt = function checkInReceipt(username, password, counter, items, mail) {
+
+};
+
+/**
+ *
+ * @param username
+ * @param password
+ * @param mail
+ */
+Notification.prototype.reservationsReceipt = function reservationsReceipt(username, password, mail) {
+
+};
+
+/**
+ *
+ * @param username
+ * @param password
+ * @param mail
+ */
+Notification.prototype.statusReceipt = function statusReceipt(username, password, mail) {
 
 };
 

@@ -1,0 +1,18 @@
+
+  <!-- Library header -->
+
+  <!-- User info -->
+
+  <!-- Check in -->
+  <!---- New loans ---->
+  <!---- Loans (all) ---->
+
+  <!-- Check out -->
+
+
+  <!-- Reservation -->
+
+  <!-- Fee's -->
+
+  <!-- Summery -->
+

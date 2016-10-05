@@ -29,7 +29,7 @@ var setup = function setup() {
 	return app;
 };
 
-it('Test file generation', function(done) {
+it('Mail template', function(done) {
 	var fs = require('fs');
 
 	setup().then(function (app) {
@@ -48,6 +48,13 @@ it('Test file generation', function(done) {
 			}
 		});
   });
+});
+
+it('Default printer - exists', function() {
+	return setup().then(function (app) {
+		var data = app.services.notification.getDefaultPrinterName();
+		data.should.be.string();
+	});
 });
 
 it('Teardown', function(done) {
