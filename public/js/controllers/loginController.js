@@ -68,7 +68,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * Start scanning for a barcode.
      * Stops after one "barcode.data" has been returned.
      */
-    var startBarcode = function scanBarcode() {
+    var startBarcode = function startBarcode() {
       barcodeRunning = true;
 
       proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {})
