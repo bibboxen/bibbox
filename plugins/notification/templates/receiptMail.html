@@ -4,20 +4,82 @@
   </head>
   <body>
     <!-- Library header -->
+    <section>
+      <p>{{ library.name }}</p>
+      <p>{{ library.address }}</p>
+      <p>{{ library.zipcode }} {{ library.city }}</p>
+      <p>Tlf. {{ library.phone }}</p>
+    </section>
 
     <!-- User info -->
-
+    <section>
+      <p>Låner: {{ homeAddress.Name }}</p>
+    </section>
 
     <!-- Check in -->
     <!---- New loans ---->
-    <!---- Loans (all) ---->
+
+    {{if chargedItems}}
+    <!---- Loans (all - @todo: sort queue no) ---->
+    <section>
+      <h2>Lån</h2>
+      {{chargedItems|sort>interestDate}}<ul>
+        <li>Materialnr.: {{ id }}</li>
+        <li>{{ title }}</li>
+        <li>{{ author }}</li>
+        <li>Afleveres senest.: {{ returnDate|date }}</li>
+      </ul>{{/chargedItems}}
+
+    </section>
+    {{/if}}
 
     <!-- Check out -->
 
+    {{if holdItems}}
+    <!-- Reservation (ready)-->
+    <section>
+      <h2>Reserveringer klar til afhentning</h2>
+      {{holdItems|pickupDate>interestDate}}<ul>
+        <li>Materialnr.: {{ id }}</li>
+        <li>{{ title }}</li>
+        <li>{{ author }}</li>
+        <li>pickupDate: {{ pickupDate|date }}</li>
+        <li>pickupLocation: {{ pickupLocation|date }}</li>
+      </ul>{{/holdItems}}
+    </section>
+    {{/if}}
 
-    <!-- Reservation -->
+    {{if unavailableHoldItems}}
+    <!-- Reservation (not ready)-->
+    <section>
+      <h2>Reserveringer</h2>
+      {{unavailableHoldItems|sort>returnDate}}<ul>
 
+
+      <!--bibliographicId: '51011341',-->
+      <!--id: '',-->
+      <!--interestDate: 1489964400000,-->
+      <!--title: 'Krydderurter i have og køkken',-->
+      <!--author: 'Olesen Anemette',-->
+      <!--GMB: 'a',-->
+      <!--SMB: 'xx',-->
+      <!--DK5: '63.54'-->
+
+      </ul>{{/unavailableHoldItems}}
+    </section>
+    {{/if}}
+
+    {{if fineItems}}
     <!-- Fee's -->
+    <section>
+      <h2>Økonomisk mellemværende:</h2>
+      {{fineItems|sort>id}}<ul>
+        {{if id}}<li>Materialnr.: {{ id }}</li>{{/if}}
+        {{if title}}<li>{{ title }}</li>{{/if}}
+        <li>Dato: {{ fineDate|date }} Beløb: {{ fineAmount }}</li>
+      </ul>{{/fineItems}}
+    </section>
+    {{/if}}
 
     <!-- Summery -->
 
