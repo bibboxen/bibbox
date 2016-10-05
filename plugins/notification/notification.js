@@ -3,7 +3,6 @@
  * Handle PDF generation and printer events..
  */
 
-var wkhtmltopdf = require('wkhtmltopdf');
 var printer = require('printer');
 var Mark = require('markup-js');
 
@@ -16,7 +15,12 @@ var Notification = function Notification(bus) {
 
   this.bus = bus;
 
-  this.mailTemplate = fs.readFileSync(__dirname + '/templates/receiptMail.html', 'utf8');
+  // Load template snippets.
+  this.mailTemplate = fs.readFileSync(__dirname + '/templates/receipt.html', 'utf8');
+  this.textTemplate = fs.readFileSync(__dirname + '/templates/receipt.txt', 'utf8');
+
+  this.mailLibraryTemplate = fs.readFileSync(__dirname + '/templates/library.html', 'utf8');
+  this.textLibraryTemplate = fs.readFileSync(__dirname + '/templates/library.txt', 'utf8');
 
   /**
    * New data MarkupJS pipe format.
@@ -52,6 +56,30 @@ var Notification = function Notification(bus) {
 Notification.prototype.getDefaultPrinterName = function getDefaultPrinterName() {
   return this.defaultPrinterName;
 };
+
+/**
+ * Render library informatino.
+ *
+ * @param html
+ *   If TRUE HTML is outputted else clean text.
+ * @returns {*}
+ */
+Notification.prototype.renderLibrary = function renderLibrary(html) {
+  var data = {
+    'name': 'Test bibliotek',
+    'address': 'Testvej 123',
+    'zipcode': '8000',
+    'city': 'Aarhus',
+    'phone': '12344556'
+  };
+  if (html) {
+    return Mark.up(this.mailLibraryTemplate, data);
+  }
+  else {
+    return Mark.up(this.textLibraryTemplate, data);
+  }
+};
+
 
 /**
  * Check out receipt.
@@ -101,7 +129,23 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
   this.bus.once('notification.statusReceipt', function(data) {
     console.log(data);
     console.log('--------------------------------');
-    var result = Mark.up(self.mailTemplate, data);
+    console.log(self.renderLibrary(true));
+    console.log('--------------------------------');
+
+    var options = {
+      includes: {
+        library: self.renderLibrary(mail)
+      }
+    };
+
+    var result = '';
+    if (mail) {
+      result = Mark.up(self.mailTemplate, data, options);
+    }
+    else {
+      result = Mark.up(self.textTemplate, data, options);
+    }
+
     console.log('--------------------------------');
     console.log(result);
 
@@ -114,22 +158,6 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
   });
 };
 
-Notification.prototype.test = function test(file) {
-  var deferred = Q.defer();
-
-  var stream = fs.createWriteStream(file);
-  stream.on('finish', function() {
-      deferred.resolve();
-  });
-  stream.on('error', function() {
-    deferred.reject();
-  });
-  wkhtmltopdf('<h1>Test</h1><p>Hello world</p>', { pageSize: 'letter' })
-    .pipe(stream);
-
-  return deferred.promise;
-};
-
 /**
  * Register the plugin with architect.
  */
@@ -137,7 +165,7 @@ module.exports = function (options, imports, register) {
 
 	var notification = new Notification(imports.bus);
 
-  //notification.statusReceipt('3208100032', '12345', false);
+  notification.statusReceipt('3208100032', '12345', false);
 
   register(null, {
     "notification": notification

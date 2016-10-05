@@ -29,27 +29,6 @@ var setup = function setup() {
 	return app;
 };
 
-it('Mail template', function(done) {
-	var fs = require('fs');
-
-	setup().then(function (app) {
-		var os = require('os');
-		var file = os.tmpdir() + '/out.pdf';
-
-		app.services.notification.test(file).then(function () {
-			try {
-				var stats = fs.statSync(file);
-				stats.isFile().should.be.true();
-				stats.size.should.not.equal(0);
-				done();
-			}
-			catch (err) {
-				done(err);
-			}
-		});
-  });
-});
-
 it('Default printer - exists', function() {
 	return setup().then(function (app) {
 		var data = app.services.notification.getDefaultPrinterName();

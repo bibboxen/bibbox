@@ -1,15 +1,12 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>{{ title }}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   </head>
   <body>
     <!-- Library header -->
-    <section>
-      <p>{{ library.name }}</p>
-      <p>{{ library.address }}</p>
-      <p>{{ library.zipcode }} {{ library.city }}</p>
-      <p>Tlf. {{ library.phone }}</p>
-    </section>
+    {{ library }}
 
     <!-- User info -->
     <section>
@@ -43,8 +40,9 @@
         <li>Materialnr.: {{ id }}</li>
         <li>{{ title }}</li>
         <li>{{ author }}</li>
+        <li>pickupId: {{ pickupId }}</li>
         <li>pickupDate: {{ pickupDate|date }}</li>
-        <li>pickupLocation: {{ pickupLocation|date }}</li>
+        <li>pickupLocation: {{ pickupLocation }}</li>
       </ul>{{/holdItems}}
     </section>
     {{/if}}
@@ -54,17 +52,11 @@
     <section>
       <h2>Reserveringer</h2>
       {{unavailableHoldItems|sort>returnDate}}<ul>
-
-
-      <!--bibliographicId: '51011341',-->
-      <!--id: '',-->
-      <!--interestDate: 1489964400000,-->
-      <!--title: 'Krydderurter i have og køkken',-->
-      <!--author: 'Olesen Anemette',-->
-      <!--GMB: 'a',-->
-      <!--SMB: 'xx',-->
-      <!--DK5: '63.54'-->
-
+        <li>Materialnr.: {{ id }}</li>
+        <li>{{ title }}</li>
+        <li>{{ author }}</li>
+        <li>interestDate: {{ interestDate|date }}</li>
+        <li>DK5: {{ DK5 }}</li>
       </ul>{{/unavailableHoldItems}}
     </section>
     {{/if}}
