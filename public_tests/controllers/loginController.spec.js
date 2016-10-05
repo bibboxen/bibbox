@@ -3,10 +3,14 @@ describe('loginController', function () {
   var scope;
   var ctrl;
   var $q;
+  var proxyReturn = null;
+  var proxyResolve = null;
+  var rootScope = null;
 
   beforeEach(function () {
     module('BibBox');
 
+    // Setup mock proxyService.
     module(function ($provide) {
       $provide.service('proxyService', function () {
         this.getSocket = function () {
@@ -14,6 +18,15 @@ describe('loginController', function () {
         };
         this.emitEvent = function (a, b, c, d) {
           var deferred = $q.defer();
+
+          if (proxyResolve !== null) {
+            if (proxyResolve) {
+              deferred.resolve(proxyReturn);
+            }
+            else {
+              deferred.reject(proxyReturn);
+            }
+          }
 
           return deferred.promise;
         };
@@ -24,11 +37,18 @@ describe('loginController', function () {
     inject(function ($rootScope, $controller, _$q_) {
       $q = _$q_;
       scope = $rootScope.$new();
+      rootScope = $rootScope;
 
       ctrl = $controller('LoginController', {
         $scope: scope
       });
     })
+  });
+
+  // Reset what the mock ProxyService returns after each run.
+  afterEach(function () {
+    proxyReturn = null;
+    proxyResolve = null;
   });
 
   it('$scope should have a variable user that is an object', function () {
@@ -108,5 +128,19 @@ describe('loginController', function () {
     scope.passwordEntered();
 
     expect(scope.passwordValidationError).to.equal(false);
+  });
+
+  it('Barcode Login: it should accept a barcode result', function () {
+    expect(scope.display).to.equal('default');
+
+    proxyReturn = '1234';
+    proxyResolve = true;
+
+    // Trigger Barcode Start
+    scope.useManualLogin(false);
+
+    scope.$apply();
+
+    expect(scope.user.username).to.equal('1234');
   });
 });

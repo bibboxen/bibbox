@@ -123,6 +123,10 @@ body {
   text-align: center;
 }
 
+.td-right {
+  text-align: center;
+}
+
 .is-not-disabled {
   cursor: default !important;
   background-color: #fff !important;

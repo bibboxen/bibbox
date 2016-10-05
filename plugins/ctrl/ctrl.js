@@ -149,7 +149,11 @@ var CTRL = function CTRL(app, bus, allowed) {
       "status.button.fines": "Gebyr",
       "status.button.receipt": "Kvittering",
       "status.button.ok": "Ok",
+      "status.button.close": "Luk",
+      "status.button.receipt_mail": "Email",
+      "status.button.receipt_printer": "Print",
       "status.renew.ok": "Materiale fornyet",
+      "status.receipt.heading": "Kvittering",
       "status.fines.heading": "Gebyr",
       "status.fines.fine": "Gebyr",
 
@@ -178,7 +182,9 @@ var CTRL = function CTRL(app, bus, allowed) {
       "numpad.zero": "0",
 
       "[BEFORE_RENEW_PERIOD]": "For tidligt fornyet",
-      "UNSUCCESSFUL": "Lykkedes ikke"
+      "UNSUCCESSFUL": "Lykkedes ikke",
+
+      "DKK": "kr."
     },
     "en": {
       "menu.borrow": "Borrow",

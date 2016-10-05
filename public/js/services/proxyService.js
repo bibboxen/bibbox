@@ -7,6 +7,8 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
   function ($q, $location, $route, config, $translate) {
     'use strict';
 
+    var self = this;
+
     /**
      * Get socket.
      *
@@ -14,7 +16,7 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
      *
      * @returns {*}
      */
-    this.getSocket = function getSocket() {
+    self.getSocket = function getSocket() {
       return io();
     };
 
@@ -36,7 +38,7 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
      *
      * @returns {*|promise}
      */
-    this.emitEvent = function(emitEvent, callbackEvent, errorEvent, data) {
+    self.emitEvent = function(emitEvent, callbackEvent, errorEvent, data) {
       // Try to connect to the server if not already connected.
       var deferred = $q.defer();
 
@@ -65,7 +67,7 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
      *
      * Wrapped in function to allow testing.
      */
-    this.registerListeners = function () {
+    self.registerListeners = function () {
       /**
        * Reloads the browser on the 'frontend.reload' event.
        */
@@ -98,7 +100,7 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
     };
 
     // Initialize.
-    var socket = this.getSocket();
-    this.registerListeners();
+    var socket = self.getSocket();
+    self.registerListeners();
   }
 ]);

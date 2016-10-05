@@ -5,6 +5,8 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
   function ($scope, $http, $window, $location, $routeParams, proxyService, userService) {
     'use strict';
 
+    // @TODO: Block user on X number of failed login attempts.
+
     // @TODO: Update validation functions.
     var usernameRegExp = /\d{10}/;
     var passwordRegExp = /\d+/;
@@ -66,7 +68,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * Start scanning for a barcode.
      * Stops after one "barcode.data" has been returned.
      */
-    var startBarcode = function scanBarcode() {
+    var startBarcode = function startBarcode() {
       barcodeRunning = true;
 
       proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {})

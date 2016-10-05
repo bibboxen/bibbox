@@ -1,8 +1,8 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('StatusController', ['$scope', '$location', 'userService',
-  function($scope, $location, userService) {
+angular.module('BibBox').controller('StatusController', ['$scope', '$location', '$translate', 'userService',
+  function($scope, $location, $translate, userService) {
     "use strict";
 
     // Check that the user is logged in.
@@ -129,8 +129,11 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
 
     /**
      * Print receipt.
+     *
+     * @param type
+     *   'mail' or 'printer'
      */
-    $scope.receipt = function receipt() {
+    $scope.receipt = function receipt(type) {
       alert('Not supported yet!');
     };
 

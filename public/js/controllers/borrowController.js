@@ -10,6 +10,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       return;
     }
 
+    var barcodeRunning = false;
+
     $scope.materials = [];
 
     var itemScannedResult = function itemScannedResult(data) {
@@ -30,45 +32,21 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
           }
 
           $scope.materials.push(item);
+
+          startBarcode();
         },
         function (err) {
+          alert(err);
+
           // @TODO: Handle error.
           console.log(err);
+
+          startBarcode();
         }
       );
     };
 
-    /**
-     * Start scanning for a barcode.
-     * Stops after one "barcode.data" has been returned.
-     */
-    var startBarcode = function scanBarcode() {
-      proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
-        function success(data) {
-          itemScannedResult(data);
-
-          // Start barcode again.
-          $timeout(startBarcode, 1000);
-        },
-        function error(err) {
-          // @TODO: Handle error.
-          console.log(err);
-
-          // Start barcode again.
-          $timeout(startBarcode, 1000);
-        }
-      );
-    };
-
-    /**
-     * Stop scanning for a barcode.
-     */
-    var stopBarcode = function stopBarcode() {
-      proxyService.emitEvent('barcode.stop', null, null, {}).then();
-    };
-
-    // Start looking for material.
-    startBarcode();
+    // @TODO: Subscribe to rfid.tag_detected
 
     /**
      * Go to front page.
@@ -77,6 +55,44 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       userService.logout();
       $location.path('/');
     };
+
+    /**
+    * Start scanning for a barcode.
+    * Stops after one "barcode.data" has been returned.
+    */
+    var startBarcode = function scanBarcode() {
+      barcodeRunning = true;
+
+      proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
+        function success(data) {
+          itemScannedResult(data);
+
+          // Start barcode again.
+          startBarcode();
+        },
+        function error(err) {
+          // @TODO: Handle error.
+          console.log(err);
+
+          // Start barcode again.
+          startBarcode();
+        }
+      );
+    };
+
+    /**
+     * Stop scanning for a barcode.
+     */
+    var stopBarcode = function stopBarcode() {
+      proxyService.emitEvent('barcode.stop', null, null, {}).then(
+        function () {
+          barcodeRunning = false;
+        }
+      );
+    };
+
+    // Start looking for material.
+    startBarcode();
 
     /**
      * On destroy.

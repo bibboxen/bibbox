@@ -50,10 +50,10 @@ var plugins = [
   },
   {
     "packagePath": "./plugins/fbs"
-  },
+  }/*,
   {
     "packagePath": "./plugins/notification"
-  }
+  }*/
 ];
 
 // User the configuration to start the application.

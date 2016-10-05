@@ -6,8 +6,8 @@
  * user (Patron).
  */
 
-angular.module('BibBox').service('userService', ['$q', 'proxyService',
-  function ($q, proxyService) {
+angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 'proxyService',
+  function ($q, $timeout, $location, proxyService) {
     'use strict';
 
     var username = null;
