@@ -238,8 +238,8 @@ module.exports = function (options, imports, register) {
    * Listen to patron status requests.
    */
   bus.on('fbs.patron', function (data) {
-    fbs.patronInformation(data.username, data.password).then(function (isLoggedIn) {
-      bus.emit(data.busEvent, isLoggedIn);
+    fbs.patronInformation(data.username, data.password).then(function (status) {
+      bus.emit(data.busEvent, status);
     },
     function (err) {
       bus.emit('fbs.err', err);

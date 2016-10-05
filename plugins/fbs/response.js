@@ -379,6 +379,12 @@ Response.prototype.parseVariables = function parseVariables() {
           }
           break;
 
+        // Pick-up location.
+        case 'BS':
+          // Filter out agency ('DK|FBS-123456') from pickup location.
+          self[keyTrans] = val.match(/\w{2,3}-\d{6}\s-\s(.*)/)[1];
+          break;
+
         // Hold items.
         case 'AS':
           val = val.split('%');
@@ -388,7 +394,7 @@ Response.prototype.parseVariables = function parseVariables() {
               'id': val.shift(),
               'pickupId': val.shift(),
               'pickupDate': self.parseDate(val.shift()),
-              'pickupLocation': val.shift(),
+              'pickupLocation': val.shift().match(/\w{2,3}-\d{6}\s-\s(.*)/)[1],
               'title': entities.decode(val.shift()),
               'author': entities.decode(val.shift()),
               'GMB': val.shift(),
