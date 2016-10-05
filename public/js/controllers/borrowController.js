@@ -10,6 +10,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       return;
     }
 
+    var barcodeRunning = false;
+
     $scope.materials = [];
 
     var itemScannedResult = function itemScannedResult(data) {
@@ -30,10 +32,16 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
           }
 
           $scope.materials.push(item);
+
+          startBarcode();
         },
         function (err) {
+          alert(err);
+
           // @TODO: Handle error.
           console.log(err);
+
+          startBarcode();
         }
       );
     };
@@ -49,6 +57,44 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     };
 
     /**
+    * Start scanning for a barcode.
+    * Stops after one "barcode.data" has been returned.
+    */
+    var startBarcode = function scanBarcode() {
+      barcodeRunning = true;
+
+      proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
+        function success(data) {
+          itemScannedResult(data);
+
+          // Start barcode again.
+          startBarcode();
+        },
+        function error(err) {
+          // @TODO: Handle error.
+          console.log(err);
+
+          // Start barcode again.
+          startBarcode();
+        }
+      );
+    };
+
+    /**
+     * Stop scanning for a barcode.
+     */
+    var stopBarcode = function stopBarcode() {
+      proxyService.emitEvent('barcode.stop', null, null, {}).then(
+        function () {
+          barcodeRunning = false;
+        }
+      );
+    };
+
+    // Start looking for material.
+    startBarcode();
+
+    /**
      * On destroy.
      *
      * Log out of user service.
@@ -56,7 +102,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
      */
     $scope.$on("$destroy", function() {
       userService.logout();
-      // @TODO: Unsubscribe to rfid.tag_detected
+      stopBarcode();
     });
   }
 ]);
