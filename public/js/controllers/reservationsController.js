@@ -5,6 +5,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
   function($scope, $location, userService) {
     "use strict";
 
+    $scope.loading = true;
+
     if (!userService.userLoggedIn()) {
       $location.path('/');
       return;
@@ -14,6 +16,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
 
     userService.patron().then(
       function (patron) {
+        $scope.loading = false;
+
         console.log(patron);
 
         // If patron exists, get reservations.
@@ -25,12 +29,6 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
             item = angular.copy(patron.holdItems[i]);
 
             item.ready = true;
-
-            // Remove ID from pickup location string.
-            var pickupSplit = item.pickupLocation.split(' - ');
-            if (pickupSplit.length > 0) {
-              item.pickupLocation = pickupSplit[1];
-            }
 
             $scope.materials.push(item);
           }
@@ -51,6 +49,7 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
         }
       },
       function (err) {
+        $scope.loading = false;
         // @TODO: Report error.
         console.log(err);
       }

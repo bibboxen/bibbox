@@ -5,6 +5,8 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
   function($scope, $location, $translate, userService) {
     "use strict";
 
+    $scope.loading = true;
+
     // Check that the user is logged in.
     if (!userService.userLoggedIn()) {
       $location.path('/');
@@ -12,14 +14,19 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
     }
 
     $scope.materials = [];
+    $scope.fineItems = [];
     $scope.currentPatron = null;
 
     // Load materials for currrent user.
     userService.patron().then(
       function (patron) {
+        $scope.loading = false;
+
         console.log(patron);
 
         $scope.currentPatron = patron;
+
+        $scope.fineItems = patron.fineItems;
 
         // If patron exists, get all charged, overdue and recall items
         if (patron) {
@@ -42,6 +49,16 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
             item = angular.copy(patron.recallItems[i]);
             $scope.materials.push(item);
           }
+
+          // Add fines to items.
+          for (i = 0; i < patron.fineItems.length; i++) {
+            for (var j = 0; j < $scope.materials.length; j++) {
+              if ($scope.materials[j].id === patron.fineItems[i].id) {
+                $scope.materials[j].fineItem = patron.fineItems[i];
+                break;
+              }
+            }
+          }
         }
         else {
           // @TODO: Report error
@@ -60,8 +77,11 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
      * @param material
      */
     $scope.renew = function renew(material) {
+      material.loading = true;
+
       userService.renew(material.id).then(
         function success(data) {
+          material.loading = false;
           console.log(data);
 
           if (data.renewalOk === 'Y') {
@@ -73,6 +93,9 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
           }
         },
         function error(err) {
+          material.loading = false;
+
+          // @TODO: Handle error.
           console.log(err);
         }
       );
@@ -82,6 +105,10 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
      * Renew all materials.
      */
     $scope.renewAll = function renewAll() {
+      for (var i = 0; i < $scope.materials.length; i++) {
+        $scope.materials[i].loading = true;
+      }
+
       userService.renewAll().then(
         function success(data) {
           console.log(data);
@@ -94,6 +121,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
                   material = $scope.materials[material];
 
                   if (material.id === data.renewedItems[i].id) {
+                    material.loading = false;
                     material.information = 'status.renew.ok';
                     material.renewed = true;
                     break;
@@ -109,6 +137,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
                   material = $scope.materials[material];
 
                   if (material.id === data.unrenewedItems[i].id) {
+                    material.loading = false;
                     material.information = data.unrenewedItems[i].reason;
                     material.renewed = false;
                     break;

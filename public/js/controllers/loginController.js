@@ -17,6 +17,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     userService.logout();
 
     $scope.display = 'default';
+    $scope.loading = false;
 
     // Clean local user.
     var resetScope = function resetScope() {
@@ -154,8 +155,12 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * Calls FBS to verify credentials.
      */
     var login = function login() {
+      $scope.loading = true;
+
       userService.login($scope.user.username, $scope.user.password).then(
         function success(loggedIn) {
+          $scope.loading = false;
+
           if (loggedIn) {
             $location.path("/" + $routeParams.redirectUrl);
           }
@@ -167,6 +172,8 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
           // @TODO: Show error.
           resetScope();
           gotoStep('default');
+
+          $scope.loading = false;
         }
       );
     };
