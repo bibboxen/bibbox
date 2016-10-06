@@ -14,20 +14,21 @@
       <tr>
         <th></th>
         <th>{{ 'return.title' | translate }}</th>
-        <th>{{ 'return.status' | translate }}</th>
+        <th class="text-center">{{ 'return.status' | translate }}</th>
         <th>{{ 'return.information' | translate }}</th>
       </tr>
       <tr data-ng-repeat="material in materials"
           data-ng-class="{'bg-success': material.status === 'return.success', 'bg-danger': material.status === 'return.error'}">
         <td class="vert-align">{{ $index + 1 }}</td>
         <td class="vert-align">{{ material.title }}</td>
-        <td class="vert-align td-center">
+        <td class="vert-align text-center">
+          <spinner data-ng-if="material.loading"></spinner>
           <span data-ng-if="material.status === 'return.success'" class="glyphicon glyphicon glyphicon-ok"
                 aria-hidden="true"></span>
           <span data-ng-if="material.status === 'return.error'" class="glyphicon glyphicon glyphicon-remove"
                 aria-hidden="true"></span>
         </td>
-        <td class="vert-align">{{ material.information }}</td>
+        <td class="vert-align">{{ material.information | translate }}</td>
       </tr>
     </table>
   </div>

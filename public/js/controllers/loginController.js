@@ -60,6 +60,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * @param err
      */
     var barcodeError = function barcodeError(err) {
+      console.log(err);
       // Ignore error. Restart barcode scanner.
       // @TODO: Should this be handled differently?
       startBarcode();

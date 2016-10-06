@@ -31,6 +31,8 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
           "itemIdentifier": id
         }).then(
           function success(result) {
+            console.log(result);
+
             if (result.ok === '1') {
               for (var i = 0; i < $scope.materials.length; i++) {
                 if ($scope.materials[i].id === result.itemIdentifier) {
@@ -39,6 +41,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
                     "title": result.itemProperties.title,
                     "author": result.itemProperties.author,
                     "status": 'return.success',
+                    "information": "return.was_successful",
                     "loading": false
                   };
                   break;
@@ -49,7 +52,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
               for (var i = 0; i < $scope.materials.length; i++) {
                 if ($scope.materials[i].id === result.itemIdentifier) {
                   $scope.materials[i].loading = false;
-                  $scope.materials[i].information = "Failed (TODO)";
+                  $scope.materials[i].information = result.screenMessage;
                   $scope.materials[i].status = 'return.error';
 
                   break;
@@ -101,11 +104,13 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
      * Stop scanning for a barcode.
      */
     var stopBarcode = function stopBarcode() {
-      proxyService.emitEvent('barcode.stop', null, null, {}).then(
-        function () {
-          barcodeRunning = false;
-        }
-      );
+      if (barcodeRunning) {
+        proxyService.emitEvent('barcode.stop', null, null, {}).then(
+          function () {
+            barcodeRunning = false;
+          }
+        );
+      }
     };
 
     // Start looking for material.
