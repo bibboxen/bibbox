@@ -39,7 +39,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
           }
           else {
             for (var i = 0; i < $scope.materials.length; i++) {
-              if ($scope.materials[i].id === result.itemProperties.id) {
+              if ($scope.materials[i].id === result.itemIdentifier) {
                 $scope.materials[i].loading = false;
                 $scope.materials[i].information = "Failed (TODO)"
                 $scope.materials[i].status = 'return.error';
