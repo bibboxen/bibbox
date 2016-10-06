@@ -54,6 +54,21 @@ var CTRL = function CTRL(app, bus, allowed) {
   });
 
   /**
+   * Handle notification template configuration request.
+   *
+   * @TODO: Load from backend web-service dims.
+   */
+  bus.on('config.notification.library', function libraryConfig(data) {
+    bus.emit(data.busEvent, {
+      'name': 'Test bibliotek',
+      'address': 'Testvej 123',
+      'zipcode': '8000',
+      'city': 'Aarhus',
+      'phone': '12344556'
+    });
+  });
+
+  /**
    * @TODO: Move to separate configurable file.
    */
   bus.on('config.features.request', function () {
