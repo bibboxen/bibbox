@@ -5,6 +5,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
   function($scope, $location, userService) {
     "use strict";
 
+    $scope.loading = true;
+
     if (!userService.userLoggedIn()) {
       $location.path('/');
       return;
@@ -14,6 +16,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
 
     userService.patron().then(
       function (patron) {
+        $scope.loading = false;
+
         console.log(patron);
 
         // If patron exists, get reservations.
@@ -51,6 +55,7 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
         }
       },
       function (err) {
+        $scope.loading = false;
         // @TODO: Report error.
         console.log(err);
       }
