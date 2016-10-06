@@ -7,44 +7,53 @@ var printer = require('printer');
 var Mark = require('markup-js');
 
 var fs = require('fs');
-var Q = require('q');
-
 
 var Notification = function Notification(bus) {
   "use strict";
-
+  var self = this;
   this.bus = bus;
+
+  bus.once('notification.library', function (data) {
+    self.libraryHeader = data;
+  });
+  bus.emit('config.notification.library', { 'busEvent': 'notification.library'});
 
   // Load template snippets.
   this.mailTemplate = fs.readFileSync(__dirname + '/templates/receipt.html', 'utf8');
   this.textTemplate = fs.readFileSync(__dirname + '/templates/receipt.txt', 'utf8');
 
+  // Load library header templates
   this.mailLibraryTemplate = fs.readFileSync(__dirname + '/templates/library.html', 'utf8');
   this.textLibraryTemplate = fs.readFileSync(__dirname + '/templates/library.txt', 'utf8');
 
-  /**
-   * New data MarkupJS pipe format.
-   *
-   * @param milliseconds
-   *   The timestamp to format.
-   *
-   * @returns {string}
-   *   The data formatted.
-   */
-  Mark.pipes.date = function (milliseconds) {
-    var date = new Date(milliseconds);
-
-    // Prefix month with '0';
-    var month = ('0' + (date.getMonth() + 1)).slice(-2);
-
-    // Only get latest 2 char of yera.
-    var year = ('' + date.getFullYear()).slice(-2);
-
-    return '' + date.getDate() + '/' + month + '/' + year;
-  };
+  // Add data MarkupJS pipe format.
+  Mark.pipes.date = this.formatDate;
 
   // Get default printer name and use that as printer.
   this.defaultPrinterName = printer.getDefaultPrinterName();
+};
+
+/**
+ * Date formatter.
+ *
+ * User as MarkupJS pipe function.
+ *
+ * @param milliseconds
+ *   The timestamp to format.
+ *
+ * @returns {string}
+ *   The data formatted.
+ */
+Notification.prototype.formatDate = function formatDate(milliseconds) {
+  var date = new Date(milliseconds);
+
+  // Prefix month with '0';
+  var month = ('0' + (date.getMonth() + 1)).slice(-2);
+
+  // Only get latest 2 char of yera.
+  var year = ('' + date.getFullYear()).slice(-2);
+
+  return '' + date.getDate() + '/' + month + '/' + year;
 };
 
 /**
@@ -65,18 +74,11 @@ Notification.prototype.getDefaultPrinterName = function getDefaultPrinterName() 
  * @returns {*}
  */
 Notification.prototype.renderLibrary = function renderLibrary(html) {
-  var data = {
-    'name': 'Test bibliotek',
-    'address': 'Testvej 123',
-    'zipcode': '8000',
-    'city': 'Aarhus',
-    'phone': '12344556'
-  };
   if (html) {
-    return Mark.up(this.mailLibraryTemplate, data);
+    return Mark.up(this.mailLibraryTemplate, this.libraryHeader);
   }
   else {
-    return Mark.up(this.textLibraryTemplate, data);
+    return Mark.up(this.textLibraryTemplate, this.libraryHeader);
   }
 };
 
@@ -127,10 +129,8 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
   var self = this;
 
   this.bus.once('notification.statusReceipt', function(data) {
-    console.log(data);
-    console.log('--------------------------------');
-    console.log(self.renderLibrary(true));
-    console.log('--------------------------------');
+    //console.log(data);
+    //console.log('--------------------------------');
 
     var options = {
       includes: {
