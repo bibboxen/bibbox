@@ -30,12 +30,6 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
 
             item.ready = true;
 
-            // Remove ID from pickup location string.
-            var pickupSplit = item.pickupLocation.split(' - ');
-            if (pickupSplit.length > 0) {
-              item.pickupLocation = pickupSplit[1];
-            }
-
             $scope.materials.push(item);
           }
 
