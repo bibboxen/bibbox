@@ -14,6 +14,7 @@ var Notification = function Notification(bus) {
   this.bus = bus;
 
   bus.once('notification.config', function (data) {
+    self.headerConfig = data.header;
     self.libraryHeader = data.library;
     self.footer = data.footer;
   });
@@ -218,7 +219,7 @@ Notification.prototype.renderFooter = function renderFooter(html) {
     });
   }
   else {
-    return Mark.up(this.mailFooterTemplate, {
+    return Mark.up(this.textFooterTemplate, {
       'text': self.footer.text,
       'date': receiptDate()
     });
@@ -285,12 +286,17 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
       }
     };
 
+    var context = {
+      'name': data.homeAddress.Name,
+      'header': self.headerConfig
+    };
+
     var result = '';
     if (mail) {
-      result = Mark.up(self.mailTemplate, { 'name': data.homeAddress.Name }, options);
+      result = Mark.up(self.mailTemplate, context, options);
     }
     else {
-      result = Mark.up(self.textTemplate, { 'name': data.homeAddress.Name }, options);
+      result = Mark.up(self.textTemplate, context, options);
 
       // Remove empty lines (from template engine if statements).
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
