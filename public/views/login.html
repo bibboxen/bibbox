@@ -9,18 +9,22 @@
 </nav>
 
 <div class="container">
-  <div class="alert alert-danger" role="alert" data-ng-if="invalidLoginError">
-    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-    <span class="sr-only">Error:</span>
-    {{ 'login.invalid_login_error' | translate }}
-  </div>
+  <spinner data-ng-if="loading"></spinner>
 
-  <div data-ng-include="'views/login-' + display + '.html'" class="login-container"></div>
+  <div data-ng-if="!loading">
+    <div class="alert alert-danger" role="alert" data-ng-if="invalidLoginError">
+      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ 'login.invalid_login_error' | translate }}
+    </div>
 
-  <div class="buttons-bottom">
-    <a type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="useManualLogin(false)"
-       data-ng-if="display !== 'default'">
-      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
-    </a>
+    <div data-ng-include="'views/login-' + display + '.html'" class="login-container"></div>
+
+    <div class="buttons-bottom">
+      <a type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="useManualLogin(false)"
+         data-ng-if="display !== 'default'">
+        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
+      </a>
+    </div>
   </div>
 </div>

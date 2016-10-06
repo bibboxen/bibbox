@@ -9,37 +9,41 @@
 </nav>
 
 <div class="container">
-  <div class="panel panel-default">
-    <table class="table">
-      <tr>
-        <th></th>
-        <th>{{ 'reservations.bibliographic_id' | translate }}</th>
-        <th>{{ 'reservations.title' | translate }}</th>
-        <th>{{ 'reservations.ready' | translate }}</th>
-        <th>{{ 'reservations.interest_date' | translate }}</th>
-        <th>{{ 'reservations.reservation_number' | translate }}</th>
-        <th>{{ 'reservations.pickup_location' | translate }}</th>
-      </tr>
-      <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.ready}">
-        <td class="vert-align">{{ $index + 1 }}</td>
-        <td class="vert-align">{{ material.bibliographicId }}</td>
-        <td class="vert-align">{{ material.title }}</td>
-        <td class="vert-align td-center">
-          <span data-ng-if="material.ready" class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
-        </td>
-        <td class="vert-align">{{ material.interestDate | date }}</td>
-        <td class="vert-align">{{ material.reservationNumber }}</td>
-        <td class="vert-align">{{ material.pickupLocation }}</td>
-      </tr>
-    </table>
-  </div>
+  <spinner data-ng-if="loading"></spinner>
 
-  <div class="buttons-bottom">
-    <a type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="gotoFront()">
-      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
-    </a>
-    <a type="button" class="btn btn-success button button-left" aria-label="Left Align" data-ng-click="receipt()">
-      <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
-    </a>
+  <div data-ng-if="!loading">
+    <div class="panel panel-default">
+      <table class="table">
+        <tr>
+          <th></th>
+          <th>{{ 'reservations.bibliographic_id' | translate }}</th>
+          <th>{{ 'reservations.title' | translate }}</th>
+          <th>{{ 'reservations.ready' | translate }}</th>
+          <th>{{ 'reservations.interest_date' | translate }}</th>
+          <th>{{ 'reservations.reservation_number' | translate }}</th>
+          <th>{{ 'reservations.pickup_location' | translate }}</th>
+        </tr>
+        <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.ready}">
+          <td class="vert-align">{{ $index + 1 }}</td>
+          <td class="vert-align">{{ material.bibliographicId }}</td>
+          <td class="vert-align">{{ material.title }}</td>
+          <td class="vert-align td-center">
+            <span data-ng-if="material.ready" class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
+          </td>
+          <td class="vert-align">{{ material.interestDate | date }}</td>
+          <td class="vert-align">{{ material.reservationNumber }}</td>
+          <td class="vert-align">{{ material.pickupLocation }}</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="buttons-bottom">
+      <a type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="gotoFront()">
+        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
+      </a>
+      <a type="button" class="btn btn-success button button-left" aria-label="Left Align" data-ng-click="receipt()">
+        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
+      </a>
+    </div>
   </div>
 </div>

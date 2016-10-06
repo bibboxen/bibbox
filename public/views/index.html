@@ -9,10 +9,9 @@
 </nav>
 
 <div class="container">
-  <div data-ng-if="!running">
-    {{ 'common.loading' | translate }}
-  </div>
-  <div data-ng-if="running">
+  <spinner data-ng-if="loading"></spinner>
+
+  <div data-ng-if="!loading">
     <div class="page-header-frontpage page-header">
       <h1>{{ 'index.heading' | translate }}</h1>
     </div>
