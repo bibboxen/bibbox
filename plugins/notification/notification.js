@@ -13,10 +13,11 @@ var Notification = function Notification(bus) {
   var self = this;
   this.bus = bus;
 
-  bus.once('notification.library', function (data) {
-    self.libraryHeader = data;
+  bus.once('notification.config', function (data) {
+    self.libraryHeader = data.library;
+    self.footer = data.footer;
   });
-  bus.emit('config.notification.library', { 'busEvent': 'notification.library'});
+  bus.emit('config.notification', { 'busEvent': 'notification.config'});
 
   // Load template snippets.
   this.mailTemplate = fs.readFileSync(__dirname + '/templates/receipt.html', 'utf8');
@@ -200,24 +201,26 @@ Notification.prototype.renderReservations = function renderReservations(html, re
  * @returns {*}
  */
 Notification.prototype.renderFooter = function renderFooter(html) {
-  function zeroPad(number) {
-    return ('0' + (number)).slice(-2)
-  }
+  var self = this;
+  // @TODO: Make util library thing for this stuff. HACK ALERT.
   function receiptDate() {
+    function zeroPad(number) {
+      return ('0' + (number)).slice(-2)
+    }
     var d = new Date();
     return '' + zeroPad(d.getDate()) + '/' + zeroPad(d.getMonth() + 1) + '/' + d.getFullYear().toString().slice(-2) + ' ' + zeroPad(d.getHours()) + ':' + zeroPad(d.getMinutes()) + ':' + zeroPad(d.getSeconds());
   }
 
   if (html) {
     return Mark.up(this.mailFooterTemplate, {
-      'text': 'Åbningstider: se <a href="https://www.aakb.dk" target="_blank">www.aakb.dk</a>',
+      'html': self.footer.html,
       'date': receiptDate()
     });
   }
   else {
     return Mark.up(this.mailFooterTemplate, {
-      'link': 'Se www.aakb.dk',
-      'date': '12/12/!2 12:00:12'
+      'text': self.footer.text,
+      'date': receiptDate()
     });
   }
 };
@@ -268,7 +271,7 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
   var self = this;
 
   this.bus.once('notification.statusReceipt', function(data) {
-    console.log(data);
+    //console.log(data);
 
     var options = {
       includes: {
@@ -293,14 +296,13 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
     }
 
+    // @TODO: TEMP FILE SAVE UNTIL MAIL IS READY.
     fs.writeFile(__dirname + "/test.html", result, function(err) {
       if(err) {
         return console.log(err);
       }
-
       console.log("The file was saved!");
     });
-
   });
 
   this.bus.emit('fbs.patron', {

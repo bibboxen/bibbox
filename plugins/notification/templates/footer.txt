@@ -1,1 +1,1 @@
-Åbningstider: {{ url }} {{ date }}
+{{ text }} {{ date }}

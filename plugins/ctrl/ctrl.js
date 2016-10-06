@@ -58,14 +58,20 @@ var CTRL = function CTRL(app, bus, allowed) {
    *
    * @TODO: Load from backend web-service dims.
    */
-  bus.on('config.notification.library', function libraryConfig(data) {
+  bus.on('config.notification', function libraryConfig(data) {
     bus.emit(data.busEvent, {
-      'title': 'Det besøgte bibliotek',
-      'name': 'Test bibliotek',
-      'address': 'Testvej 123',
-      'zipcode': '8000',
-      'city': 'Aarhus',
-      'phone': '12344556'
+      'library': {
+        'title': 'Det besøgte bibliotek',
+        'name': 'Test bibliotek',
+        'address': 'Testvej 123',
+        'zipcode': '8000',
+        'city': 'Aarhus',
+        'phone': '12344556'
+      },
+      'footer': {
+        'html': 'Åbningstider: se <a href="https://www.aakb.dk" target="_blank">www.aakb.dk</a>',
+        'text': 'Åbningstider: se www.aakb.dk'
+      }
     });
   });
 
