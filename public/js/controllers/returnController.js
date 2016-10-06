@@ -17,7 +17,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
           break;
         }
       }
-      if (!itemNotAdded) {
+      if (itemNotAdded) {
         $scope.materials.push({
           "id": id,
           "title": id,
