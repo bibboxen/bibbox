@@ -5,6 +5,8 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
   function($scope, $location, $translate, userService) {
     "use strict";
 
+    $scope.loading = true;
+
     // Check that the user is logged in.
     if (!userService.userLoggedIn()) {
       $location.path('/');
@@ -18,6 +20,8 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
     // Load materials for currrent user.
     userService.patron().then(
       function (patron) {
+        $scope.loading = false;
+
         console.log(patron);
 
         $scope.currentPatron = patron;

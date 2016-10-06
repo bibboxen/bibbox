@@ -1,8 +1,8 @@
 body {
-  -webkit-user-select: none;  /* Chrome all / Safari all */
-  -moz-user-select: none;     /* Firefox all */
-  -ms-user-select: none;      /* IE 10+ */
-  user-select: none;          /* Likely future */
+  -webkit-user-select: none; /* Chrome all / Safari all */
+  -moz-user-select: none; /* Firefox all */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* Likely future */
 }
 
 .logo {
@@ -141,7 +141,7 @@ body {
 }
 
 .btn-default {
-  background-image: linear-gradient(to bottom,#eee 0,#d0d0d0 100%);
+  background-image: linear-gradient(to bottom, #eee 0, #d0d0d0 100%);
 }
 
 .btn-default:hover, .btn-default:focus {
@@ -152,4 +152,16 @@ body {
 .row-nav {
   margin-right: 0;
   margin-left: 0;
+}
+
+.spinner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

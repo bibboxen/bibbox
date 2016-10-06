@@ -5,7 +5,7 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
   function ($scope, $http, $window, $location, $translate, proxyService, config, tmhDynamicLocale) {
     "use strict";
 
-    $scope.running = false;
+    $scope.loading = true;
 
     /**
      * Request config.
@@ -19,7 +19,7 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
                 $scope.features = config.features;
                 $scope.languages = config.languages;
 
-                $scope.running = true;
+                $scope.loading = false;
               });
           });
       },
