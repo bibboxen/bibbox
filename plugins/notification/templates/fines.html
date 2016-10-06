@@ -1,0 +1,8 @@
+<section>
+  <h2>Økonomisk mellemværende:</h2>
+    {{items|sort>id}}<ul>
+    {{if id}}<li>Materialnr.: {{ id }}</li>{{/if}}
+    {{if title}}<li>{{ title }}</li>{{/if}}
+    <li>Dato: {{ fineDate|date }} Beløb: {{ fineAmount }}</li>
+  </ul>{{/items}}
+</section>

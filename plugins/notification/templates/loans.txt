@@ -1,0 +1,8 @@
+{{ title }}
+-----------------------------------------------
+{{items|sort>interestDate}}
+Materialnr.: {{ id }}
+{{ title }}{{if author}}
+{{ author }}{{/if}}
+Afleveres senest.: {{ returnDate|date }}
+{{/items}}

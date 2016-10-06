@@ -1,0 +1,10 @@
+Reserveringer klar til afhentning
+-----------------------------------------------
+{{items|pickupDate>interestDate}}
+Afh.sted: {{ pickupLocation }}
+Afhentes senest: {{ pickupDate|date }}
+Reserveringsnr.: {{ pickupId }}
+Materialnr.: {{ id }}
+{{ title }}
+{{ author }}
+{{/items}}

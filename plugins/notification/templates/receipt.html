@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>{{ title }}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   </head>
   <body>
@@ -10,70 +9,29 @@
 
     <!-- User info -->
     <section>
-      <p>Låner: {{ homeAddress.Name }}</p>
+      <p>Låner: {{ name }}</p>
     </section>
 
     <!-- Check in -->
     <!---- New loans ---->
+    {{ new_loans }}
 
-    {{if chargedItems}}
     <!---- Loans (all - @todo: sort queue no) ---->
-    <section>
-      <h2>Lån</h2>
-      {{chargedItems|sort>interestDate}}<ul>
-        <li>Materialnr.: {{ id }}</li>
-        <li>{{ title }}</li>
-        <li>{{ author }}</li>
-        <li>Afleveres senest.: {{ returnDate|date }}</li>
-      </ul>{{/chargedItems}}
-
-    </section>
-    {{/if}}
+    {{ loans }}
 
     <!-- Check out -->
 
-    {{if holdItems}}
     <!-- Reservation (ready)-->
-    <section>
-      <h2>Reserveringer klar til afhentning</h2>
-      {{holdItems|pickupDate>interestDate}}<ul>
-        <li>Materialnr.: {{ id }}</li>
-        <li>{{ title }}</li>
-        <li>{{ author }}</li>
-        <li>pickupId: {{ pickupId }}</li>
-        <li>pickupDate: {{ pickupDate|date }}</li>
-        <li>pickupLocation: {{ pickupLocation }}</li>
-      </ul>{{/holdItems}}
-    </section>
-    {{/if}}
+    {{ reservations_ready }}
 
-    {{if unavailableHoldItems}}
     <!-- Reservation (not ready)-->
-    <section>
-      <h2>Reserveringer</h2>
-      {{unavailableHoldItems|sort>returnDate}}<ul>
-        <li>Materialnr.: {{ id }}</li>
-        <li>{{ title }}</li>
-        <li>{{ author }}</li>
-        <li>interestDate: {{ interestDate|date }}</li>
-        <li>DK5: {{ DK5 }}</li>
-      </ul>{{/unavailableHoldItems}}
-    </section>
-    {{/if}}
+    {{ reservations }}
 
-    {{if fineItems}}
-    <!-- Fee's -->
-    <section>
-      <h2>Økonomisk mellemværende:</h2>
-      {{fineItems|sort>id}}<ul>
-        {{if id}}<li>Materialnr.: {{ id }}</li>{{/if}}
-        {{if title}}<li>{{ title }}</li>{{/if}}
-        <li>Dato: {{ fineDate|date }} Beløb: {{ fineAmount }}</li>
-      </ul>{{/fineItems}}
-    </section>
-    {{/if}}
+    <!-- Fines -->
+    {{ fines }}
 
     <!-- Summery -->
+    {{ summery }}
 
   </body>
 </html>

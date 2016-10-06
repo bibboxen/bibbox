@@ -1,0 +1,9 @@
+<section>
+  <h2>{{ title }}</h2>
+  {{items|sort>interestDate}}<ul>
+  <li>Materialnr.: {{ id }}</li>
+  <li>{{ title }}</li>
+  <li>{{ author }}</li>
+  <li>Afleveres senest.: {{ returnDate|date }}</li>
+</ul>{{/items}}
+</section>

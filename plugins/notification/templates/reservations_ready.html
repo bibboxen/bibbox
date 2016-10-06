@@ -1,0 +1,11 @@
+<section>
+  <h2>Reserveringer klar til afhentning</h2>
+    {{items|pickupDate>interestDate}}<ul>
+    <li>Afh.sted: {{ pickupLocation }}</li>
+    <li>Afhentes senest: {{ pickupDate|date }}</li>
+    <li>Reserveringsnr.: {{ pickupId }}</li>
+    <li>Materialnr.: {{ id }}</li>
+    <li>{{ title }}</li>
+    <li>{{ author }}</li>
+  </ul>{{/items}}
+</section>

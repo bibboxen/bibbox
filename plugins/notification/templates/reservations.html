@@ -1,0 +1,10 @@
+<section>
+  <h2>Reserveringer</h2>
+  {{items|sort>returnDate}}<ul>
+  <li>Materialnr.: {{ id }}</li>
+  <li>{{ title }}</li>
+  <li>{{ author }}</li>
+  <li>Udløbsdato: {{ interestDate|date }}</li>
+  <li>DK5: {{ DK5 }}</li>
+</ul>{{/items}}
+</section>
