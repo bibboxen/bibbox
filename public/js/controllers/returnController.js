@@ -10,11 +10,20 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     $scope.materials = [];
 
     var itemScannedResult = function itemScannedResult(id) {
-      $scope.materials.push({
-        "id": id,
-        "title": id,
-        "loading": true
-      });
+      var itemNotAdded = true;
+      for (var i = 0; i < $scope.materials.length; i++) {
+        if ($scope.materials[i].id === result.itemIdentifier) {
+          itemNotAdded = false;
+          break;
+        }
+      }
+      if (!itemNotAdded) {
+        $scope.materials.push({
+          "id": id,
+          "title": id,
+          "loading": true
+        });
+      }
 
       var uniqueId = CryptoJS.MD5("returnControllerReturn" + Date.now());
 
@@ -41,7 +50,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
             for (var i = 0; i < $scope.materials.length; i++) {
               if ($scope.materials[i].id === result.itemIdentifier) {
                 $scope.materials[i].loading = false;
-                $scope.materials[i].information = "Failed (TODO)"
+                $scope.materials[i].information = "Failed (TODO)";
                 $scope.materials[i].status = 'return.error';
 
                 break;
@@ -76,14 +85,14 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
           itemScannedResult(data);
 
           // Start barcode again after 1 second.
-          $timeout(startBarcode, 1000);
+          $timeout(startBarcode, 500);
         },
         function error(err) {
           // @TODO: Handle error.
           console.log(err);
 
           // Start barcode again.
-          $timeout(startBarcode, 1000);
+          $timeout(startBarcode, 500);
         }
       );
     };
