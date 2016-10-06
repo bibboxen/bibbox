@@ -12,6 +12,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
     }
 
     $scope.materials = [];
+    $scope.fineItems = [];
     $scope.currentPatron = null;
 
     // Load materials for currrent user.
@@ -20,6 +21,8 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
         console.log(patron);
 
         $scope.currentPatron = patron;
+
+        $scope.fineItems = patron.fineItems;
 
         // If patron exists, get all charged, overdue and recall items
         if (patron) {
@@ -41,6 +44,16 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
           for (i = 0; i < patron.recallItems.length; i++) {
             item = angular.copy(patron.recallItems[i]);
             $scope.materials.push(item);
+          }
+
+          // Add fines to items.
+          for (i = 0; i < patron.fineItems.length; i++) {
+            for (var j = 0; j < $scope.materials.length; j++) {
+              if ($scope.materials[j].id === patron.fineItems[i].id) {
+                $scope.materials[j].fineItem = patron.fineItems[i];
+                break;
+              }
+            }
           }
         }
         else {

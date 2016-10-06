@@ -10,7 +10,7 @@ body {
 }
 
 .logo-container {
-  padding: 1em 1.5em;
+  padding: 1em 0.5em;
 }
 
 .button {
@@ -147,4 +147,9 @@ body {
 .btn-default:hover, .btn-default:focus {
   background-color: #d0d0d0;
   background-position: 0 -15px;
+}
+
+.row-nav {
+  margin-right: 0;
+  margin-left: 0;
 }

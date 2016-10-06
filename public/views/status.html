@@ -1,18 +1,14 @@
 <nav class="navbar navbar-default navbar-absolute-top">
   <div>
-    <div class="row">
+    <div class="row row-nav">
       <div class="col-xs-6 col-md-4"><div class="logo-container"><a href="/"><img src="img/aarhus.png" class="logo"></a></div></div>
-      <div class="col-xs-6 col-md-4 text-center"><h1>{{ 'return.heading' | translate }}</h1></div>
+      <div class="col-xs-6 col-md-4 text-center"><h1>{{ 'status.heading' | translate }}</h1></div>
       <div class="col-xs-6 col-md-4"></div>
     </div>
   </div>
 </nav>
 
 <div class="container">
-  <div class="page-header">
-    <h1>{{ 'status.heading' | translate }}</h1>
-  </div>
-
   <div class="panel panel-default">
     <table class="table">
       <tr>
@@ -28,7 +24,7 @@
         <td class="vert-align">{{ $index + 1 }}</td>
         <td class="vert-align">{{ material.title }}</td>
         <td class="vert-align">{{ material.returnDate | date }}</td>
-        <td class="vert-align">{{ material.fine }}</td>
+        <td class="vert-align">{{ material.fineItem.fineAmount | currency: ( currentPatron.currencyType | translate )  }}</td>
         <td class="vert-align">{{ material.newDate | date }}</td>
         <td class="vert-align">{{ material.information | translate }}</td>
         <td class="vert-align td-right">
@@ -58,7 +54,7 @@
       <span class="glyphicon glyphicon-refresh"></span> {{ 'status.button.renew_all' | translate }}
     </button>
   </div>
-  
+
   <!-- Fines modal -->
   <div class="modal fade" id="fineModal" tabindex="-1" role="dialog" aria-labelledby="fineModalLabel">
     <div class="modal-dialog" role="document">
@@ -68,6 +64,21 @@
         </div>
         <div class="modal-body">
           <h3>{{ 'status.fines.fine' | translate }} {{ currentPatron.feeAmount | currency: ( currentPatron.currencyType | translate ) }}</h3>
+
+          <div class="panel panel-default">
+            <table class="table">
+              <tr>
+                <th></th>
+                <th>{{ 'status.material' | translate }}</th>
+                <th>{{ 'status.fine' | translate }}</th>
+              </tr>
+              <tr data-ng-repeat="material in fineItems" data-ng-class="{'bg-success': material.renewed}">
+                <td class="vert-align">{{ $index + 1 }}</td>
+                <td class="vert-align">{{ material.title ? material.title : ('status.fine.material_not_specified' | translate) }}</td>
+                <td class="vert-align">{{ material.fineAmount | currency: ( currentPatron.currencyType | translate )  }}</td>
+              </tr>
+            </table>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-info button" data-dismiss="modal">{{ 'status.button.ok' | translate }}</button>
