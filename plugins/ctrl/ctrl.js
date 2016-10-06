@@ -60,6 +60,7 @@ var CTRL = function CTRL(app, bus, allowed) {
    */
   bus.on('config.notification.library', function libraryConfig(data) {
     bus.emit(data.busEvent, {
+      'title': 'Det besøgte bibliotek',
       'name': 'Test bibliotek',
       'address': 'Testvej 123',
       'zipcode': '8000',

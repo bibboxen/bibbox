@@ -42,6 +42,10 @@ var Notification = function Notification(bus) {
   this.mailReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.html', 'utf8');
   this.textReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.txt', 'utf8');
 
+  // Load footer templates.
+  this.mailFooterTemplate = fs.readFileSync(__dirname + '/templates/footer.html', 'utf8');
+  this.textFooterTemplate = fs.readFileSync(__dirname + '/templates/footer.txt', 'utf8');
+
   // Add data MarkupJS pipe format.
   Mark.pipes.date = this.formatDate;
 
@@ -189,6 +193,36 @@ Notification.prototype.renderReservations = function renderReservations(html, re
 };
 
 /**
+ * Render footer.
+ *
+ * @param html
+ *   If TRUE HTML is outputted else clean text.
+ * @returns {*}
+ */
+Notification.prototype.renderFooter = function renderFooter(html) {
+  function zeroPad(number) {
+    return ('0' + (number)).slice(-2)
+  }
+  function receiptDate() {
+    var d = new Date();
+    return '' + zeroPad(d.getDate()) + '/' + zeroPad(d.getMonth() + 1) + '/' + d.getFullYear().toString().slice(-2) + ' ' + zeroPad(d.getHours()) + ':' + zeroPad(d.getMinutes()) + ':' + zeroPad(d.getSeconds());
+  }
+
+  if (html) {
+    return Mark.up(this.mailFooterTemplate, {
+      'text': 'Åbningstider: se <a href="https://www.aakb.dk" target="_blank">www.aakb.dk</a>',
+      'date': receiptDate()
+    });
+  }
+  else {
+    return Mark.up(this.mailFooterTemplate, {
+      'link': 'Se www.aakb.dk',
+      'date': '12/12/!2 12:00:12'
+    });
+  }
+};
+
+/**
  * Check out receipt.
  *
  * @param username
@@ -243,6 +277,7 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
         loans: self.renderLoans(mail, 'Lån', data.chargedItems),
         reservations: self.renderReservations(mail, data.unavailableHoldItems),
         reservations_ready: self.renderReadyReservations(mail, data.holdItems),
+        footer: self.renderFooter(mail),
         pokemon: 'true'
       }
     };
@@ -258,19 +293,14 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
     }
 
-    //console.log(result);
-
-    printer.printDirect({
-      printer: self.getDefaultPrinterName(),
-      data: result,
-      type: 'TEXT',
-      success: function(id) {
-        console.log('printed with id ' + id);
-      },
-      error: function(err) {
-        console.error('error on printing: ' + err);
+    fs.writeFile(__dirname + "/test.html", result, function(err) {
+      if(err) {
+        return console.log(err);
       }
-    })
+
+      console.log("The file was saved!");
+    });
+
   });
 
   this.bus.emit('fbs.patron', {
@@ -287,7 +317,7 @@ module.exports = function (options, imports, register) {
 
 	var notification = new Notification(imports.bus);
 
-  notification.statusReceipt('3208100032', '12345', false);
+  notification.statusReceipt('3208100032', '12345', true);
 
   register(null, {
     "notification": notification
