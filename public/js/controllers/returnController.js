@@ -10,6 +10,12 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     $scope.materials = [];
 
     var itemScannedResult = function itemScannedResult(id) {
+      $scope.materials.push({
+        "id": id,
+        "title": id,
+        "loading": true
+      });
+
       var uniqueId = CryptoJS.MD5("returnControllerReturn" + Date.now());
 
       proxyService.emitEvent('fbs.checkin', 'fbs.checkin.success' + uniqueId, 'fbs.error', {
@@ -17,7 +23,31 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
         "itemIdentifier": id
       }).then(
         function success(result) {
-          console.log(result);
+          if (result.ok === '1') {
+            for (var i = 0; i < $scope.materials.length; i++) {
+              if ($scope.materials[i].id === result.itemIdentifier) {
+                $scope.materials[i] = {
+                  "id": result.itemIdentifier,
+                  "title": result.itemProperties.title,
+                  "author": result.itemProperties.author,
+                  "status": 'return.success',
+                  "loading": false
+                };
+                break;
+              }
+            }
+          }
+          else {
+            for (var i = 0; i < $scope.materials.length; i++) {
+              if ($scope.materials[i].id === result.itemProperties.id) {
+                $scope.materials[i].loading = false;
+                $scope.materials[i].information = "Failed (TODO)"
+                $scope.materials[i].status = 'return.error';
+
+                break;
+              }
+            }
+          }
         },
         function error(err) {
           console.log(err);
@@ -45,15 +75,15 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
         function success(data) {
           itemScannedResult(data);
 
-          // Start barcode again.
-          startBarcode();
+          // Start barcode again after 1 second.
+          $timeout(startBarcode, 1000);
         },
         function error(err) {
           // @TODO: Handle error.
           console.log(err);
 
           // Start barcode again.
-          startBarcode();
+          $timeout(startBarcode, 1000);
         }
       );
     };
