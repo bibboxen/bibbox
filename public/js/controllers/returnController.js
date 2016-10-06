@@ -12,7 +12,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     var itemScannedResult = function itemScannedResult(id) {
       var itemNotAdded = true;
       for (var i = 0; i < $scope.materials.length; i++) {
-        if ($scope.materials[i].id === result.itemIdentifier) {
+        if ($scope.materials[i].id === id) {
           itemNotAdded = false;
           break;
         }
@@ -23,45 +23,45 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
           "title": id,
           "loading": true
         });
+
+        var uniqueId = CryptoJS.MD5("returnControllerReturn" + Date.now());
+
+        proxyService.emitEvent('fbs.checkin', 'fbs.checkin.success' + uniqueId, 'fbs.error', {
+          "busEvent": "fbs.checkin.success" + uniqueId,
+          "itemIdentifier": id
+        }).then(
+          function success(result) {
+            if (result.ok === '1') {
+              for (var i = 0; i < $scope.materials.length; i++) {
+                if ($scope.materials[i].id === result.itemIdentifier) {
+                  $scope.materials[i] = {
+                    "id": result.itemIdentifier,
+                    "title": result.itemProperties.title,
+                    "author": result.itemProperties.author,
+                    "status": 'return.success',
+                    "loading": false
+                  };
+                  break;
+                }
+              }
+            }
+            else {
+              for (var i = 0; i < $scope.materials.length; i++) {
+                if ($scope.materials[i].id === result.itemIdentifier) {
+                  $scope.materials[i].loading = false;
+                  $scope.materials[i].information = "Failed (TODO)";
+                  $scope.materials[i].status = 'return.error';
+
+                  break;
+                }
+              }
+            }
+          },
+          function error(err) {
+            console.log(err);
+          }
+        );
       }
-
-      var uniqueId = CryptoJS.MD5("returnControllerReturn" + Date.now());
-
-      proxyService.emitEvent('fbs.checkin', 'fbs.checkin.success' + uniqueId, 'fbs.error', {
-        "busEvent": "fbs.checkin.success" + uniqueId,
-        "itemIdentifier": id
-      }).then(
-        function success(result) {
-          if (result.ok === '1') {
-            for (var i = 0; i < $scope.materials.length; i++) {
-              if ($scope.materials[i].id === result.itemIdentifier) {
-                $scope.materials[i] = {
-                  "id": result.itemIdentifier,
-                  "title": result.itemProperties.title,
-                  "author": result.itemProperties.author,
-                  "status": 'return.success',
-                  "loading": false
-                };
-                break;
-              }
-            }
-          }
-          else {
-            for (var i = 0; i < $scope.materials.length; i++) {
-              if ($scope.materials[i].id === result.itemIdentifier) {
-                $scope.materials[i].loading = false;
-                $scope.materials[i].information = "Failed (TODO)";
-                $scope.materials[i].status = 'return.error';
-
-                break;
-              }
-            }
-          }
-        },
-        function error(err) {
-          console.log(err);
-        }
-      );
     };
 
     // @TODO: Subscribe to rfid.tag_detected
