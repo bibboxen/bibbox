@@ -77,8 +77,11 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
      * @param material
      */
     $scope.renew = function renew(material) {
+      material.loading = true;
+
       userService.renew(material.id).then(
         function success(data) {
+          material.loading = false;
           console.log(data);
 
           if (data.renewalOk === 'Y') {
@@ -90,6 +93,9 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
           }
         },
         function error(err) {
+          material.loading = false;
+
+          // @TODO: Handle error.
           console.log(err);
         }
       );
@@ -99,6 +105,10 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
      * Renew all materials.
      */
     $scope.renewAll = function renewAll() {
+      for (var i = 0; i < $scope.materials.length; i++) {
+        $scope.materials[i].loading = true;
+      }
+
       userService.renewAll().then(
         function success(data) {
           console.log(data);
@@ -111,6 +121,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
                   material = $scope.materials[material];
 
                   if (material.id === data.renewedItems[i].id) {
+                    material.loading = false;
                     material.information = 'status.renew.ok';
                     material.renewed = true;
                     break;
@@ -126,6 +137,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
                   material = $scope.materials[material];
 
                   if (material.id === data.unrenewedItems[i].id) {
+                    material.loading = false;
                     material.information = data.unrenewedItems[i].reason;
                     material.renewed = false;
                     break;

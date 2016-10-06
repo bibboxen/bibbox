@@ -154,7 +154,7 @@ body {
   margin-left: 0;
 }
 
-.spinner {
+.spinner-global {
   position: absolute;
   left: 0;
   right: 0;

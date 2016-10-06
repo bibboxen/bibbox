@@ -9,7 +9,7 @@
 </nav>
 
 <div class="container">
-  <spinner data-ng-if="loading"></spinner>
+  <spinner-global data-ng-if="loading"></spinner-global>
 
   <div class="panel panel-default">
     <table class="table">
@@ -28,7 +28,7 @@
         <td class="vert-align">{{ material.returnDate | date }}</td>
         <td class="vert-align">{{ material.fineItem.fineAmount | currency: ( currentPatron.currencyType | translate )  }}</td>
         <td class="vert-align">{{ material.newDate | date }}</td>
-        <td class="vert-align">{{ material.information | translate }}</td>
+        <td class="vert-align"><spinner data-ng-if="material.loading"></spinner><div data-ng-if="!material.loading">{{ material.information | translate }}</div></td>
         <td class="vert-align td-right">
           <a type="button" class="btn btn-info" aria-label="Left Align" data-ng-click="renew(material)">
             <span class="glyphicon glyphicon-refresh"></span> {{ 'status.button.renew' | translate }}
