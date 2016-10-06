@@ -1,8 +1,8 @@
 /**
  * Return page controller.
  */
-angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 'proxyService',
-  function($scope, $location, proxyService) {
+angular.module('BibBox').controller('ReturnController', ['$scope', '$location', '$timeout', 'proxyService',
+  function($scope, $location, $timeout, proxyService) {
     'use strict';
 
     var barcodeRunning = false;
