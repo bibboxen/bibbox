@@ -1,0 +1,9 @@
+Reserveringer
+-----------------------------------------------
+{{items|sort>returnDate}}
+Materialnr.: {{ id }}
+{{ title }}
+{{ author }}
+Udløbsdato: {{ interestDate|date }}
+DK5: {{ DK5 }}
+{{/items}}

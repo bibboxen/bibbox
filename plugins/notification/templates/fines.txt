@@ -1,0 +1,7 @@
+Økonomisk mellemværende:
+-----------------------------------------------
+{{items|sort>id}}{{if id}}
+Materialnr.: {{ id }}{{/if}}{{if title}}
+{{ title }}{{/if}}
+Dato: {{ fineDate|date }} Beløb: {{ fineAmount }}
+{{/items}}
