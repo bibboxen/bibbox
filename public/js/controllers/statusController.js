@@ -1,8 +1,8 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('StatusController', ['$scope', '$location', '$translate', '$timeout', 'userService',
-  function($scope, $location, $translate, $timeout, userService) {
+angular.module('BibBox').controller('StatusController', ['$scope', '$location', '$translate', '$timeout', 'userService', 'logoutService',
+  function($scope, $location, $translate, $timeout, userService, logoutService) {
     "use strict";
 
     $scope.loading = true;
@@ -13,21 +13,8 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
       return;
     }
 
-    // Log out timer.
-    var timer = null;
-    $scope.startTimer = function startTimer() {
-      if (timer) {
-        if (angular.isDefined(timer)) {
-          $timeout.cancel(timer);
-        }
-      }
-
-      var now = new Date();
-      $scope.compareTime = now.getTime() + 15 * 1000;
-
-      timer = $timeout(function () {
-        $location.path('/');
-      }, 15000);
+    $scope.startTimer = function () {
+      $scope.compareTime = logoutService.startTimer();
     };
 
     $scope.materials = [];
@@ -96,6 +83,8 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
      * @param material
      */
     $scope.renew = function renew(material) {
+      $scope.startTimer();
+
       material.loading = true;
 
       userService.renew(material.id).then(
@@ -124,6 +113,8 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
      * Renew all materials.
      */
     $scope.renewAll = function renewAll() {
+      $scope.startTimer();
+
       for (var i = 0; i < $scope.materials.length; i++) {
         $scope.materials[i].loading = true;
       }
@@ -182,6 +173,8 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
      *   'mail' or 'printer'
      */
     $scope.receipt = function receipt(type) {
+      $scope.startTimer();
+
       alert('Not supported yet!');
     };
 
@@ -193,6 +186,8 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
       $location.path('/');
     };
 
+    $scope.startTimer();
+
     /**
      * On destroy.
      *
@@ -201,11 +196,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
     $scope.$on("$destroy", function() {
       userService.logout();
 
-      if (timer) {
-        if (angular.isDefined(timer)) {
-          $timeout.cancel(timer);
-        }
-      }
+      logoutService.cancelTimer();
     });
   }
 ]);

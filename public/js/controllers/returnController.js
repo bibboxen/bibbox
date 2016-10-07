@@ -1,27 +1,14 @@
 /**
  * Return page controller.
  */
-angular.module('BibBox').controller('ReturnController', ['$scope', '$location', '$timeout', 'proxyService',
-  function($scope, $location, $timeout, proxyService) {
+angular.module('BibBox').controller('ReturnController', ['$scope', '$location', '$timeout', 'proxyService', 'logoutService',
+  function($scope, $location, $timeout, proxyService, logoutService) {
     'use strict';
 
     var barcodeRunning = false;
 
-    // Log out timer.
-    var timer = null;
-    $scope.startTimer = function startTimer() {
-      if (timer) {
-        if (angular.isDefined(timer)) {
-          $timeout.cancel(timer);
-        }
-      }
-
-      var now = new Date();
-      $scope.compareTime = now.getTime() + 15 * 1000;
-
-      timer = $timeout(function () {
-        $location.path('/');
-      }, 15000);
+    $scope.startTimer = function () {
+      $scope.compareTime = logoutService.startTimer();
     };
 
     $scope.materials = [];
@@ -133,6 +120,8 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     // Start looking for material.
     startBarcode();
 
+    $scope.startTimer();
+
     /**
      * On destroy.
      *
@@ -141,11 +130,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     $scope.$on("$destroy", function() {
       stopBarcode();
 
-      if (timer) {
-        if (angular.isDefined(timer)) {
-          $timeout.cancel(timer);
-        }
-      }
+      logoutService.cancelTimer();
     });
   }
 ]);

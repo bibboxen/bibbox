@@ -8,7 +8,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     // @TODO: Block user on X number of failed login attempts.
 
     // @TODO: Update validation functions.
-    var usernameRegExp = /\d{10}/;
+    var usernameRegExp = /^\d{10}$/;
     var passwordRegExp = /\d+/;
 
     var barcodeRunning = false;

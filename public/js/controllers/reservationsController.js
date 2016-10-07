@@ -1,8 +1,8 @@
 /**
  * Reservations page controller.
  */
-angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService',
-  function($scope, $location, $timeout, userService) {
+angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'logoutService',
+  function($scope, $location, $timeout, userService, logoutService) {
     "use strict";
 
     $scope.loading = true;
@@ -12,21 +12,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
       return;
     }
 
-    // Log out timer.
-    var timer = null;
-    $scope.startTimer = function startTimer() {
-      if (timer) {
-        if (angular.isDefined(timer)) {
-          $timeout.cancel(timer);
-        }
-      }
-
-      var now = new Date();
-      $scope.compareTime = now.getTime() + 15 * 1000;
-
-      timer = $timeout(function () {
-        $location.path('/');
-      }, 15000);
+    $scope.startTimer = function () {
+      $scope.compareTime = logoutService.startTimer();
     };
 
     $scope.materials = [];
@@ -99,11 +86,7 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
     $scope.$on("$destroy", function() {
       userService.logout();
 
-      if (timer) {
-        if (angular.isDefined(timer)) {
-          $timeout.cancel(timer);
-        }
-      }
+     logoutService.cancelTimer();
     });
   }
 ]);

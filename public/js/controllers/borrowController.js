@@ -1,8 +1,9 @@
 /**
  * Borrow page controller.
  */
-angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'proxyService',
-  function($scope, $location, $timeout, userService, proxyService) {
+angular.module('BibBox').controller('BorrowController', [
+  '$scope', '$location', '$timeout', 'userService', 'proxyService', 'logoutService',
+  function($scope, $location, $timeout, userService, proxyService, logoutService) {
     'use strict';
 
     if (!userService.userLoggedIn()) {
@@ -10,21 +11,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       return;
     }
 
-    // Log out timer.
-    var timer = null;
-    $scope.startTimer = function startTimer() {
-      if (timer) {
-        if (angular.isDefined(timer)) {
-          $timeout.cancel(timer);
-        }
-      }
-
-      var now = new Date();
-      $scope.compareTime = now.getTime() + 15 * 1000;
-
-      timer = $timeout(function () {
-        $location.path('/');
-      }, 15000);
+    $scope.startTimer = function () {
+      $scope.compareTime = logoutService.startTimer();
     };
 
     var barcodeRunning = false;
@@ -32,6 +20,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     $scope.materials = [];
 
     var itemScannedResult = function itemScannedResult(id) {
+      // Restart timer.
+      $scope.startTimer();
+
       var itemNotAdded = true;
       for (var i = 0; i < $scope.materials.length; i++) {
         if ($scope.materials[i].id === id) {
@@ -145,6 +136,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
 
     // Start looking for material.
     startBarcode();
+
+    // Start timer
     $scope.startTimer();
 
     /**
@@ -157,11 +150,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       userService.logout();
       stopBarcode();
 
-      if (timer) {
-        if (angular.isDefined(timer)) {
-          $timeout.cancel(timer);
-        }
-      }
+      logoutService.cancelTimer();
     });
   }
 ]);
