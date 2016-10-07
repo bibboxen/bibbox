@@ -22,7 +22,8 @@
       "^fbs.checkout.[\\w]+$",
       "^fbs.checkin.[\\w]+$",
       "^fbs.renew.[\\w]+$",
-      "^fbs.renew.all.[\\w]+$"
+      "^fbs.renew.all.[\\w]+$",
+      "^notification.status.sent$"
     ],
     "whitelistedSocketEvents": [
       "^barcode.start$",
@@ -36,7 +37,8 @@
       "^fbs.checkout$",
       "^fbs.checkin$",
       "^fbs.renew$",
-      "^fbs.renew.all$"
+      "^fbs.renew.all$",
+      "^notification.status$"
     ]
   },
   "translation": {

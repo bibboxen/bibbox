@@ -1,8 +1,8 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('StatusController', ['$scope', '$location', '$translate', '$timeout', 'userService', 'logoutService',
-  function($scope, $location, $translate, $timeout, userService, logoutService) {
+angular.module('BibBox').controller('StatusController', ['$scope', '$location', '$translate', '$timeout', 'userService', 'logoutService', 'receiptService',
+  function($scope, $location, $translate, $timeout, userService, logoutService, receiptService) {
     "use strict";
 
     $scope.loading = true;
@@ -34,23 +34,23 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
 
         $scope.fineItems = patron.fineItems;
 
-        // If patron exists, get all charged, overdue and recall items
+        // If patron exists, get all charged, overdue and recall items.
         if (patron) {
           var i, item;
 
-          // Add charged items
+          // Add charged items.
           for (i = 0; i < patron.chargedItems.length; i++) {
             item = angular.copy(patron.chargedItems[i]);
             $scope.materials.push(item);
           }
 
-          // Add overdue items
+          // Add overdue items.
           for (i = 0; i < patron.overdueItems.length; i++) {
             item = angular.copy(patron.overdueItems[i]);
             $scope.materials.push(item);
           }
 
-          // Add recall items
+          // Add recall items.
           for (i = 0; i < patron.recallItems.length; i++) {
             item = angular.copy(patron.recallItems[i]);
             $scope.materials.push(item);
@@ -174,6 +174,18 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
      */
     $scope.receipt = function receipt(type) {
       $scope.startTimer();
+
+      var credentials = userService.getCredentials();
+
+      // @TODO: handel error etc.
+      receiptService.status(credentials.username, credentials.password, type).then(
+        function(status) {
+          alert('mail sent');
+        },
+        function(err) {
+          alert(err);
+        }
+      );
 
       alert('Not supported yet!');
     };
