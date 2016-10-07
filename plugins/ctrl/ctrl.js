@@ -196,11 +196,13 @@ var CTRL = function CTRL(app, bus, allowed) {
       "borrow.return_date": "Afleveringsdato",
       "borrow.status": "Status",
       "borrow.information": "Information",
+      "borrow.was_successful": "Materialelån gennemført",
 
       "return.heading": "Aflever",
       "return.title": "Titel",
       "return.status": "Status",
       "return.information": "Information",
+      "return.was_successful": "Materialet er afleveret",
 
       "numpad.back": "Slet",
       "numpad.enter": "Enter",
@@ -217,6 +219,8 @@ var CTRL = function CTRL(app, bus, allowed) {
 
       "[BEFORE_RENEW_PERIOD]": "For tidligt fornyet",
       "UNSUCCESSFUL": "Lykkedes ikke",
+      "MATERIAL_NOT_FOUND": "Materialet blev ikke fundet",
+      "[MATERIAL_NOT_FOUND]": "Materialet blev ikke fundet",
 
       "DKK": "kr."
     },
