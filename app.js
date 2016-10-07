@@ -37,7 +37,9 @@ var plugins = [
     "packagePath": "./plugins/api"
   },
   {
-    "packagePath": "./plugins/barcode"
+    "packagePath": "./plugins/barcode",
+    "pid": config.barcode.pid,
+    "vid": config.barcode.vid
   },
   {
     "packagePath": "./plugins/translation",

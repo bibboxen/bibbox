@@ -3,7 +3,7 @@
     <div class="row row-nav">
       <div class="col-xs-6 col-md-4"><div class="logo-container"><a href="/"><img src="img/aarhus.png" class="logo"></a></div></div>
       <div class="col-xs-6 col-md-4 text-center"><h1>{{ 'status.heading' | translate }}</h1></div>
-      <div class="col-xs-6 col-md-4"></div>
+      <div class="col-xs-6 col-md-4 text-right"><h1 class="text-faded"><timer compare-time="compareTime" on-click="startTimer()"></h1></timer></div>
     </div>
   </div>
 </nav>
@@ -42,13 +42,13 @@
     <button type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="gotoFront()">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
     </button>
-    <button type="button" class="btn btn-success button button-left" data-toggle="modal" data-target="#receiptModal" data-ng-if="currentPatron && currentPatron.emailAddress">
+    <button type="button" class="btn btn-success button button-left" data-toggle="modal" data-target="#receiptModal" data-ng-click="startTimer()" data-ng-if="currentPatron && currentPatron.emailAddress">
       <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
     </button>
-    <button type="button" class="btn btn-success button button-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress">
+    <button type="button" class="btn btn-success button button-left" data-ng-click="receipt('printer')" data-ng-click="startTimer()" data-ng-if="currentPatron && !currentPatron.emailAddress">
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
     </button>
-    <button type="button" class="btn btn-warning button button-left" data-toggle="modal" data-target="#fineModal" data-ng-if="currentPatron">
+    <button type="button" class="btn btn-warning button button-left" data-toggle="modal" data-target="#fineModal" data-ng-click="startTimer()" data-ng-if="currentPatron">
       <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{ 'status.button.fines' | translate }}
     </button>
 
@@ -83,7 +83,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-info button" data-dismiss="modal">{{ 'status.button.ok' | translate }}</button>
+          <button type="button" class="btn btn-info button" data-dismiss="modal" data-ng-click="startTimer()">{{ 'status.button.ok' | translate }}</button>
         </div>
       </div>
     </div>
@@ -105,7 +105,7 @@
           </button>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger button" data-dismiss="modal">{{ 'status.button.close' | translate }}</button>
+          <button type="button" class="btn btn-danger button" data-dismiss="modal" data-ng-click="startTimer()">{{ 'status.button.close' | translate }}</button>
         </div>
       </div>
     </div>

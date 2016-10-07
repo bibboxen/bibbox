@@ -177,7 +177,7 @@ module.exports = function (options, imports, register) {
   /**
    * @TODO: make the VID and PID configurable.
    */
-  var barcode = new Barcode(1529, 8710);
+  var barcode = new Barcode(options.vid, options.pid);
   barcode.connect();
 
   /**

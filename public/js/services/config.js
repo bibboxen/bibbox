@@ -6,5 +6,6 @@
 angular.module('BibBox').value('config', {
   "translations": {},
   "languages": [],
-  "features": []
+  "features": [],
+  "timeout": 20000
 });

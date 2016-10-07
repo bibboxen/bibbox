@@ -3,7 +3,7 @@
     <div class="row row-nav">
       <div class="col-xs-6 col-md-4"><div class="logo-container"><a href="/"><img src="img/aarhus.png" class="logo"></a></div></div>
       <div class="col-xs-6 col-md-4 text-center"><h1>{{ 'borrow.heading' | translate }}</h1></div>
-      <div class="col-xs-6 col-md-4"></div>
+      <div class="col-xs-6 col-md-4 text-right"><h1 class="text-faded"><timer compare-time="compareTime" on-click="startTimer()"></h1></timer></div>
     </div>
   </div>
 </nav>
@@ -15,7 +15,7 @@
         <th></th>
         <th>{{ 'borrow.title' | translate }}</th>
         <th>{{ 'borrow.return_date' | translate }}</th>
-        <th>{{ 'borrow.status' | translate }}</th>
+        <th class="text-center">{{ 'borrow.status' | translate }}</th>
         <th>{{ 'borrow.information' | translate }}</th>
       </tr>
       <tr data-ng-repeat="material in materials"
@@ -23,13 +23,14 @@
         <td class="vert-align">{{ $index + 1 }}</td>
         <td class="vert-align">{{ material.title }}</td>
         <td class="vert-align">{{ material.dueDate | date }}</td>
-        <td class="vert-align td-center">
+        <td class="vert-align text-center">
+          <spinner data-ng-if="material.loading"></spinner>
           <span data-ng-if="material.status === 'borrow.success'" class="glyphicon glyphicon glyphicon-ok"
                 aria-hidden="true"></span>
           <span data-ng-if="material.status === 'borrow.error'" class="glyphicon glyphicon glyphicon-remove"
                 aria-hidden="true"></span>
         </td>
-        <td class="vert-align">{{ material.information }}</td>
+        <td class="vert-align">{{ material.information | translate }}</td>
       </tr>
     </table>
   </div>

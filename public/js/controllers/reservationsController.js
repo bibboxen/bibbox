@@ -1,8 +1,8 @@
 /**
  * Reservations page controller.
  */
-angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', 'userService',
-  function($scope, $location, userService) {
+angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'logoutService',
+  function($scope, $location, $timeout, userService, logoutService) {
     "use strict";
 
     $scope.loading = true;
@@ -12,11 +12,17 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
       return;
     }
 
+    $scope.startTimer = function () {
+      $scope.compareTime = logoutService.startTimer();
+    };
+
     $scope.materials = [];
 
     userService.patron().then(
       function (patron) {
         $scope.loading = false;
+
+        $scope.startTimer();
 
         console.log(patron);
 
@@ -70,6 +76,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
       $location.path('/');
     };
 
+    $scope.startTimer();
+
     /**
      * On destroy.
      *
@@ -77,6 +85,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
      */
     $scope.$on("$destroy", function() {
       userService.logout();
+
+     logoutService.cancelTimer();
     });
   }
 ]);

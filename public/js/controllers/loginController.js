@@ -8,7 +8,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     // @TODO: Block user on X number of failed login attempts.
 
     // @TODO: Update validation functions.
-    var usernameRegExp = /\d{10}/;
+    var usernameRegExp = /^\d{10}$/;
     var passwordRegExp = /\d+/;
 
     var barcodeRunning = false;
@@ -60,6 +60,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * @param err
      */
     var barcodeError = function barcodeError(err) {
+      console.log(err);
       // Ignore error. Restart barcode scanner.
       // @TODO: Should this be handled differently?
       startBarcode();
