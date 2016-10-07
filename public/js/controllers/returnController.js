@@ -7,6 +7,23 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
 
     var barcodeRunning = false;
 
+    // Log out timer.
+    var timer = null;
+    $scope.startTimer = function startTimer() {
+      if (timer) {
+        if (angular.isDefined(timer)) {
+          $timeout.cancel(timer);
+        }
+      }
+
+      var now = new Date();
+      $scope.compareTime = now.getTime() + 15 * 1000;
+
+      timer = $timeout(function () {
+        $location.path('/');
+      }, 15000);
+    };
+
     $scope.materials = [];
 
     var itemScannedResult = function itemScannedResult(id) {
@@ -123,6 +140,12 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
      */
     $scope.$on("$destroy", function() {
       stopBarcode();
+
+      if (timer) {
+        if (angular.isDefined(timer)) {
+          $timeout.cancel(timer);
+        }
+      }
     });
   }
 ]);

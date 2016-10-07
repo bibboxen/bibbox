@@ -10,6 +10,23 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       return;
     }
 
+    // Log out timer.
+    var timer = null;
+    $scope.startTimer = function startTimer() {
+      if (timer) {
+        if (angular.isDefined(timer)) {
+          $timeout.cancel(timer);
+        }
+      }
+
+      var now = new Date();
+      $scope.compareTime = now.getTime() + 15 * 1000;
+
+      timer = $timeout(function () {
+        $location.path('/');
+      }, 15000);
+    };
+
     var barcodeRunning = false;
 
     $scope.materials = [];
@@ -128,6 +145,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
 
     // Start looking for material.
     startBarcode();
+    $scope.startTimer();
 
     /**
      * On destroy.
@@ -138,6 +156,12 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     $scope.$on("$destroy", function() {
       userService.logout();
       stopBarcode();
+
+      if (timer) {
+        if (angular.isDefined(timer)) {
+          $timeout.cancel(timer);
+        }
+      }
     });
   }
 ]);
