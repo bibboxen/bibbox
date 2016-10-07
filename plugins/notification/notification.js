@@ -5,6 +5,8 @@
 
 var printer = require('printer');
 var Mark = require('markup-js');
+var nodemailer = require('nodemailer');
+var Q = require('q');
 
 var fs = require('fs');
 
@@ -14,9 +16,17 @@ var Notification = function Notification(bus) {
   this.bus = bus;
 
   bus.once('notification.config', function (data) {
+    self.mailConfig = data.mailer;
     self.headerConfig = data.header;
     self.libraryHeader = data.library;
     self.footer = data.footer;
+
+    self.mailTransporter = nodemailer.createTransport({
+      'host': self.mailConfig.host,
+      'port': self.mailConfig.port,
+      'secure': self.mailConfig.secure,
+      'ignoreTLS': !self.mailConfig.secure
+    });
   });
   bus.emit('config.notification', { 'busEvent': 'notification.config'});
 
@@ -267,13 +277,16 @@ Notification.prototype.reservationsReceipt = function reservationsReceipt(userna
  * @param username
  * @param password
  * @param mail
+ *
+ * @return {*|promise}
+ *   Resolved or error message on failure.
  */
 Notification.prototype.statusReceipt = function statusReceipt(username, password, mail) {
   var self = this;
 
+  // Listen for status notification message.
   this.bus.once('notification.statusReceipt', function(data) {
-    //console.log(data);
-
+    // Options on what to include in the notification.
     var options = {
       includes: {
         library: self.renderLibrary(mail),
@@ -286,6 +299,7 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
       }
     };
 
+    // Data for the main render.
     var context = {
       'name': data.homeAddress.Name,
       'header': self.headerConfig
@@ -294,28 +308,56 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
     var result = '';
     if (mail) {
       result = Mark.up(self.mailTemplate, context, options);
+
+      return self.sendMail(data.emailAddress, result);
     }
     else {
       result = Mark.up(self.textTemplate, context, options);
 
       // Remove empty lines (from template engine if statements).
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-    }
 
-    // @TODO: TEMP FILE SAVE UNTIL MAIL IS READY.
-    fs.writeFile(__dirname + "/test.html", result, function(err) {
-      if(err) {
-        return console.log(err);
-      }
-      console.log("The file was saved!");
-    });
+      // @TODO: PRINT IT.
+    }
   });
 
+  // Request the data to use in the notification.
   this.bus.emit('fbs.patron', {
     'username': username,
     'password': password,
     'busEvent': 'notification.statusReceipt'
   });
+};
+
+/**
+ * Send mail notification.
+ *
+ * @param to
+ *   The mail address to send mail to.
+ * @param content
+ *   The html content to send.
+ */
+Notification.prototype.sendMail = function sendMail(to, content) {
+  var deferred = Q.defer();
+
+  var self = this;
+  var mailOptions = {
+    from: self.mailConfig.from,
+    to: to,
+    subject: self.mailConfig.subject,
+    html: content
+  };
+
+  // Send mail with defined transporter.
+  self.mailTransporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+      self.bus.emit('logger.err', error);
+      deferred.reject(error);
+    }
+    deferred.resolve();
+  });
+
+  return deferred.promise;
 };
 
 /**
@@ -325,7 +367,7 @@ module.exports = function (options, imports, register) {
 
 	var notification = new Notification(imports.bus);
 
-  notification.statusReceipt('3208100032', '12345', true);
+  //notification.statusReceipt('3208100032', '12345', true);
 
   register(null, {
     "notification": notification
