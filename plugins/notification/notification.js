@@ -367,6 +367,18 @@ module.exports = function (options, imports, register) {
 
 	var notification = new Notification(imports.bus);
 
+  /**
+   * Listen status receipt events.
+   */
+  bus.on('notification.status', function (data) {
+    notification.statusReceipt(data.username, data.password, data.mail).then(function () {
+      bus.emit(data.busEvent, true);
+    },
+    function (err) {
+      bus.emit(data.busEvent, false);
+    });
+  });
+
   //notification.statusReceipt('3208100032', '12345', true);
 
   register(null, {

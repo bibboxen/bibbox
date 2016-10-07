@@ -2,7 +2,7 @@
 Handles communication with FBS library system using the SIP2 protocol. 
 
 ## Configuration
-Required configuration from the "ctrl" plugin on the "fbs.config" event:
+Required configuration from the "ctrl" plugin on the "config.fbs" event:
 
 ```javascript
 {
