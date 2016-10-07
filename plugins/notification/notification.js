@@ -364,8 +364,8 @@ Notification.prototype.sendMail = function sendMail(to, content) {
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
-
-	var notification = new Notification(imports.bus);
+  var bus = imports.bus;
+	var notification = new Notification(bus);
 
   /**
    * Listen status receipt events.
@@ -375,7 +375,7 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, true);
     },
     function (err) {
-      bus.emit(data.busEvent, false);
+      bus.emit(data.busEvent, err);
     });
   });
 
