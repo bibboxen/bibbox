@@ -2,8 +2,8 @@
  * Borrow page controller.
  */
 angular.module('BibBox').controller('BorrowController', [
-  '$scope', '$location', '$timeout', 'userService', 'proxyService', 'logoutService',
-  function($scope, $location, $timeout, userService, proxyService, logoutService) {
+  '$scope', '$location', '$timeout', 'userService', 'proxyService',
+  function($scope, $location, $timeout, userService, proxyService) {
     'use strict';
 
     if (!userService.userLoggedIn()) {
@@ -11,18 +11,29 @@ angular.module('BibBox').controller('BorrowController', [
       return;
     }
 
-    $scope.startTimer = function () {
-      $scope.compareTime = logoutService.startTimer();
-    };
+    $scope.$on('IdleWarn', function(e, countdown) {
+	  $scope.$apply(function () {
+        $scope.countdown = countdown;
+	  });
+    });
 
+    $scope.$on('IdleTimeout', function() {
+	  $scope.$apply(function () {
+        $location.path('/');
+	  });
+    });
+
+    $scope.$on('IdleEnd', function() {
+      $scope.$apply(function () {
+	    $scope.countdown = null;
+      });
+    });
+	
     var barcodeRunning = false;
 
     $scope.materials = [];
 
     var itemScannedResult = function itemScannedResult(id) {
-      // Restart timer.
-      $scope.startTimer();
-
       var itemNotAdded = true;
       for (var i = 0; i < $scope.materials.length; i++) {
         if ($scope.materials[i].id === id) {
@@ -137,9 +148,6 @@ angular.module('BibBox').controller('BorrowController', [
     // Start looking for material.
     startBarcode();
 
-    // Start timer
-    $scope.startTimer();
-
     /**
      * On destroy.
      *
@@ -149,8 +157,6 @@ angular.module('BibBox').controller('BorrowController', [
     $scope.$on("$destroy", function() {
       userService.logout();
       stopBarcode();
-
-      logoutService.cancelTimer();
     });
   }
 ]);
