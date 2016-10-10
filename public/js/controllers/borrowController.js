@@ -1,15 +1,17 @@
 /**
  * Borrow page controller.
  */
-angular.module('BibBox').controller('BorrowController', [
-  '$scope', '$location', '$timeout', 'userService', 'proxyService',
-  function ($scope, $location, $timeout, userService, proxyService) {
+angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'proxyService', 'Idle',
+  function ($scope, $location, $timeout, userService, proxyService, Idle) {
     'use strict';
 
     if (!userService.userLoggedIn()) {
       $location.path('/');
       return;
     }
+
+    // Restart idle service if not running.
+    Idle.watch();
 
     $scope.$on('IdleWarn', function (e, countdown) {
       $scope.$apply(function () {

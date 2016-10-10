@@ -1,8 +1,8 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'proxyService', 'userService',
-  function ($scope, $http, $window, $location, $routeParams, proxyService, userService) {
+angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'proxyService', 'userService', 'Idle',
+  function ($scope, $http, $window, $location, $routeParams, proxyService, userService, Idle) {
     'use strict';
 
     // @TODO: Block user on X number of failed login attempts.
@@ -30,6 +30,9 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
       $scope.usernameValidationError = false;
     };
     resetScope();
+
+    // Restart idle service if not running.
+    Idle.watch();
 
     $scope.$on('IdleWarn', function (e, countdown) {
       $scope.$apply(function () {

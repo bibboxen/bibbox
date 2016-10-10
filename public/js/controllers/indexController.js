@@ -9,6 +9,8 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
 
     /**
      * Request config.
+     *
+     * @TODO: Gather in single config.request event.
      */
     proxyService.emitEvent('config.translations.request', 'config.translations', 'config.translations.error', {"busEvent": "config.translations"}).then(
       function success() {

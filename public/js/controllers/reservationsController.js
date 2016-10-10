@@ -1,8 +1,8 @@
 /**
  * Reservations page controller.
  */
-angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService',
-  function($scope, $location, $timeout, userService) {
+angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'Idle',
+  function($scope, $location, $timeout, userService, Idle) {
     "use strict";
 
     $scope.loading = true;
@@ -11,6 +11,9 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
       $location.path('/');
       return;
     }
+
+    // Restart idle service if not running.
+    Idle.watch();
 
     $scope.$on('IdleWarn', function (e, countdown) {
       $scope.$apply(function () {

@@ -1,11 +1,14 @@
 /**
  * Return page controller.
  */
-angular.module('BibBox').controller('ReturnController', ['$scope', '$location', '$timeout', 'proxyService',
-  function($scope, $location, $timeout, proxyService) {
+angular.module('BibBox').controller('ReturnController', ['$scope', '$location', '$timeout', 'proxyService', 'Idle',
+  function($scope, $location, $timeout, proxyService, Idle) {
     'use strict';
 
     var barcodeRunning = false;
+
+    // Restart idle service if not running.
+    Idle.watch();
 
     $scope.$on('IdleWarn', function (e, countdown) {
       $scope.$apply(function () {

@@ -1,8 +1,8 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('StatusController', ['$scope', '$location', '$translate', '$timeout', 'userService',
-  function($scope, $location, $translate, $timeout, userService) {
+angular.module('BibBox').controller('StatusController', ['$scope', '$location', '$translate', '$timeout', 'userService', 'Idle',
+  function($scope, $location, $translate, $timeout, userService, Idle) {
     "use strict";
 
     $scope.loading = true;
@@ -12,6 +12,9 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
       $location.path('/');
       return;
     }
+
+    // Restart idle service if not running.
+    Idle.watch();
 
     $scope.$on('IdleWarn', function (e, countdown) {
       $scope.$apply(function () {
