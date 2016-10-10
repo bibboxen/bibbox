@@ -93,6 +93,12 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
 
     // Register event listener for all socket events.
     socket.on('*', socketEventHandler);
+
+    socket.on('error',function(err){
+      // @TODO: Handle! How?
+
+      console.log(err);
+    });
   });
 };
 

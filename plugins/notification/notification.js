@@ -28,7 +28,7 @@ var Notification = function Notification(bus) {
       'ignoreTLS': !self.mailConfig.secure
     });
   });
-  bus.emit('config.notification', { 'busEvent': 'notification.config'});
+  bus.emit('config.notification', {'busEvent': 'notification.config'});
 
   // Load template snippets.
   this.mailTemplate = fs.readFileSync(__dirname + '/templates/receipt.html', 'utf8');
@@ -130,10 +130,10 @@ Notification.prototype.renderLibrary = function renderLibrary(html) {
  */
 Notification.prototype.renderFines = function renderFines(html, fines) {
   if (html) {
-    return Mark.up(this.mailFinesTemplate, { 'items': fines });
+    return Mark.up(this.mailFinesTemplate, {'items': fines});
   }
   else {
-    return Mark.up(this.textFinesTemplate, { 'items': fines });
+    return Mark.up(this.textFinesTemplate, {'items': fines});
   }
 };
 
@@ -177,10 +177,10 @@ Notification.prototype.renderLoans = function renderLoans(html, title, loans) {
  */
 Notification.prototype.renderReadyReservations = function renderReadyReservations(html, reservations) {
   if (html) {
-    return Mark.up(this.mailReservationsReadyTemplate, { 'items': reservations });
+    return Mark.up(this.mailReservationsReadyTemplate, {'items': reservations});
   }
   else {
-    return Mark.up(this.textReservationsReadyTemplate, { 'items': reservations });
+    return Mark.up(this.textReservationsReadyTemplate, {'items': reservations});
   }
 };
 
@@ -197,10 +197,10 @@ Notification.prototype.renderReadyReservations = function renderReadyReservation
  */
 Notification.prototype.renderReservations = function renderReservations(html, reservations) {
   if (html) {
-    return Mark.up(this.mailReservationsTemplate, { 'items': reservations });
+    return Mark.up(this.mailReservationsTemplate, {'items': reservations});
   }
   else {
-    return Mark.up(this.textReservationsTemplate, { 'items': reservations });
+    return Mark.up(this.textReservationsTemplate, {'items': reservations});
   }
 };
 
@@ -218,6 +218,7 @@ Notification.prototype.renderFooter = function renderFooter(html) {
     function zeroPad(number) {
       return ('0' + (number)).slice(-2)
     }
+
     var d = new Date();
     return '' + zeroPad(d.getDate()) + '/' + zeroPad(d.getMonth() + 1) + '/' + d.getFullYear().toString().slice(-2) + ' ' + zeroPad(d.getHours()) + ':' + zeroPad(d.getMinutes()) + ':' + zeroPad(d.getSeconds());
   }
@@ -283,9 +284,10 @@ Notification.prototype.reservationsReceipt = function reservationsReceipt(userna
  */
 Notification.prototype.statusReceipt = function statusReceipt(username, password, mail) {
   var self = this;
+  var deferred = Q.defer();
 
   // Listen for status notification message.
-  this.bus.once('notification.statusReceipt', function(data) {
+  this.bus.once('notification.statusReceipt', function (data) {
     // Options on what to include in the notification.
     var options = {
       includes: {
@@ -309,7 +311,7 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
     if (mail) {
       result = Mark.up(self.mailTemplate, context, options);
 
-      return self.sendMail(data.emailAddress, result);
+      deferred.resolve(self.sendMail(data.emailAddress, result));
     }
     else {
       result = Mark.up(self.textTemplate, context, options);
@@ -318,6 +320,8 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
       // @TODO: PRINT IT.
+
+      deferred.resolve();
     }
   });
 
@@ -327,6 +331,8 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
     'password': password,
     'busEvent': 'notification.statusReceipt'
   });
+
+  return deferred.promise;
 };
 
 /**
@@ -349,7 +355,7 @@ Notification.prototype.sendMail = function sendMail(to, content) {
   };
 
   // Send mail with defined transporter.
-  self.mailTransporter.sendMail(mailOptions, function(error, info){
+  self.mailTransporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       self.bus.emit('logger.err', error);
       deferred.reject(error);
@@ -365,18 +371,20 @@ Notification.prototype.sendMail = function sendMail(to, content) {
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
-	var notification = new Notification(bus);
+  var notification = new Notification(bus);
 
   /**
    * Listen status receipt events.
    */
   bus.on('notification.status', function (data) {
-    notification.statusReceipt(data.username, data.password, data.mail).then(function () {
-      bus.emit(data.busEvent, true);
-    },
-    function (err) {
-      bus.emit(data.busEvent, err);
-    });
+    notification.statusReceipt(data.username, data.password, data.mail).then(
+      function () {
+        bus.emit(data.busEvent, true);
+      },
+      function (err) {
+        bus.emit(data.busEvent, err);
+      }
+    );
   });
 
   //notification.statusReceipt('3208100032', '12345', true);
