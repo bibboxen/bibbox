@@ -162,6 +162,7 @@ var CTRL = function CTRL(app, bus, allowed) {
       "login.password_short": "Kode",
       "login.password_help": "Indtast kodeord og tryk Enter",
       "login.password_validation_error": "Ikke gyldigt kodeord",
+      "login.invalid_login_error": "Login fejl",
 
       "reservations.heading": "Reservationer",
       "reservations.bibliographic_id": "Stregkode",
@@ -297,7 +298,7 @@ var CTRL = function CTRL(app, bus, allowed) {
     });
 
     bus.emit('config.idle_config', {
-      "idleTimeout": 18,
+      "idleTimeout": 15,
       "idleWarn": 7
     });
   }, 3000);
