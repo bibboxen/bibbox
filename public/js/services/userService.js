@@ -24,6 +24,18 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     };
 
     /**
+     * Get the current logged in users credentials.
+     *
+     * @returns {{username: *, password: *}}
+     */
+    this.getCredentials = function getCredentials() {
+      return {
+        'username': this.username,
+        'password': this.password
+      }
+    };
+
+    /**
      * Login.
      *
      * Tests if the user is valid.
