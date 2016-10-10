@@ -39,7 +39,8 @@ module.exports = function (options, imports, register) {
    * Check if a given network address is online.
    */
   bus.on('network.online', function online(data) {
-    network.isOnline(data.url).then(function () {
+    network.isOnline(data.url).then(
+      function () {
         bus.emit(data.busEvent, true);
       },
       function (err) {
@@ -49,5 +50,5 @@ module.exports = function (options, imports, register) {
     );
   });
 
-  register(null, { "network": network });
+  register(null, {"network": network});
 };

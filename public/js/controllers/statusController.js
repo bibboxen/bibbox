@@ -105,18 +105,25 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
           material.loading = false;
           console.log(data);
 
+          if (!data) {
+            material.information = 'status.renew.failed';
+            material.renewed = false;
+            return;
+          }
+
           if (data.renewalOk === 'Y') {
             material.newDate = data.dueDate;
             material.information = "status.renew.ok";
           }
           else {
             material.information = data.screenMessage;
+            material.renewed = false;
           }
         },
         function error(err) {
           material.loading = false;
-
-          // @TODO: Handle error.
+          material.information = 'status.renew.failed';
+          material.renewed = false;
           console.log(err);
         }
       );
@@ -168,10 +175,16 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
             }
           }
           else {
-            console.log("not ok");
+            for (var material in $scope.materials) {
+              material = $scope.materials[material];
+              material.loading = false;
+              material.information = 'status.renew.failed';
+              material.renewed = false;
+            }
           }
         },
         function error(err) {
+          // @TODO: Handle error!
           console.log(err);
         }
       );

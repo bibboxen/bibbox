@@ -299,5 +299,23 @@ module.exports = function (options, imports, register) {
       });
   });
 
+  /**
+   * Listen for fbs.online events.
+   */
+  bus.on('fbs.online', function (request) {
+    bus.once('network.fbs.online', function (online) {
+      bus.emit(request.busEvent, online);
+    });
+    // When config is delivered, test for network.online with fbs server.
+    bus.once('config.fbs.online.res', function (config) {
+      bus.emit('network.online', {
+        "url": config.endpoint,
+        "busEvent": "network.fbs.online"
+      });
+    });
+    // Request config.
+    bus.emit('config.fbs', {'busEvent': 'config.fbs.online.res'});
+  });
+
   register(null, { "fbs": fbs });
 };
