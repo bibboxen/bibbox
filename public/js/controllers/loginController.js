@@ -99,6 +99,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
           function success(data) {
             // Restart idle service.
             Idle.watch();
+            $scope.countdown = null;
 
             // Ignore result if the barcode should not be running.
             if (barcodeRunning) {
