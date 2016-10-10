@@ -94,6 +94,9 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     var startBarcode = function startBarcode() {
       barcodeRunning = true;
 
+      // Restart idle service.
+      Idle.watch();
+
       proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {})
         .then(
           function success(data) {
