@@ -1,8 +1,8 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('StatusController', ['$scope', '$location', '$translate', '$timeout', 'userService', 'logoutService', 'receiptService',
-  function($scope, $location, $translate, $timeout, userService, logoutService, receiptService) {
+angular.module('BibBox').controller('StatusController', ['$scope', '$location', '$translate', '$timeout', 'userService', 'receiptService', 'Idle',
+  function($scope, $location, $translate, $timeout, userService, receiptService, Idle) {
     "use strict";
 
     $scope.loading = true;
@@ -13,9 +13,26 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
       return;
     }
 
-    $scope.startTimer = function () {
-      $scope.compareTime = logoutService.startTimer();
-    };
+    // Restart idle service if not running.
+    Idle.watch();
+
+    $scope.$on('IdleWarn', function (e, countdown) {
+      $scope.$apply(function () {
+        $scope.countdown = countdown;
+      });
+    });
+
+    $scope.$on('IdleTimeout', function () {
+      $scope.$evalAsync(function () {
+        $location.path('/');
+      });
+    });
+
+    $scope.$on('IdleEnd', function () {
+      $scope.$apply(function () {
+        $scope.countdown = null;
+      });
+    });
 
     $scope.materials = [];
     $scope.fineItems = [];
@@ -25,8 +42,6 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
     userService.patron().then(
       function (patron) {
         $scope.loading = false;
-
-        $scope.startTimer();
 
         console.log(patron);
 
@@ -83,8 +98,6 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
      * @param material
      */
     $scope.renew = function renew(material) {
-      $scope.startTimer();
-
       material.loading = true;
 
       userService.renew(material.id).then(
@@ -113,8 +126,6 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
      * Renew all materials.
      */
     $scope.renewAll = function renewAll() {
-      $scope.startTimer();
-
       for (var i = 0; i < $scope.materials.length; i++) {
         $scope.materials[i].loading = true;
       }
@@ -173,8 +184,6 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
      *   'mail' or 'printer'
      */
     $scope.receipt = function receipt(type) {
-      $scope.startTimer();
-
       var credentials = userService.getCredentials();
 
       // @TODO: handel error etc.
@@ -186,8 +195,6 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
           alert(err);
         }
       );
-
-      alert('Not supported yet!');
     };
 
     /**
@@ -198,8 +205,6 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
       $location.path('/');
     };
 
-    $scope.startTimer();
-
     /**
      * On destroy.
      *
@@ -207,8 +212,6 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
      */
     $scope.$on("$destroy", function() {
       userService.logout();
-
-      logoutService.cancelTimer();
     });
   }
 ]);

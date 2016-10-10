@@ -295,7 +295,12 @@ var CTRL = function CTRL(app, bus, allowed) {
       "translations": trans,
       "busEvent": "config.translations"
     });
-  }, 1000);
+
+    bus.emit('config.idle_config', {
+      "idleTimeout": 18,
+      "idleWarn": 7
+    });
+  }, 3000);
 };
 
 /**

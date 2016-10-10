@@ -16,6 +16,7 @@
       "^config.translations$",
       "^config.languages$",
       "^config.features$",
+      "^config.idle_config$",
       "^frontend.[\\w]+$",
       "^fbs.login.[\\w]+$",
       "^fbs.patron.[\\w]+$",

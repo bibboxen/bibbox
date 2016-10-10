@@ -1,8 +1,8 @@
 /**
  * Reservations page controller.
  */
-angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'logoutService',
-  function($scope, $location, $timeout, userService, logoutService) {
+angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'Idle',
+  function($scope, $location, $timeout, userService, Idle) {
     "use strict";
 
     $scope.loading = true;
@@ -12,17 +12,32 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
       return;
     }
 
-    $scope.startTimer = function () {
-      $scope.compareTime = logoutService.startTimer();
-    };
+    // Restart idle service if not running.
+    Idle.watch();
+
+    $scope.$on('IdleWarn', function (e, countdown) {
+      $scope.$apply(function () {
+        $scope.countdown = countdown;
+      });
+    });
+
+    $scope.$on('IdleTimeout', function () {
+      $scope.$evalAsync(function () {
+        $location.path('/');
+      });
+    });
+
+    $scope.$on('IdleEnd', function () {
+      $scope.$apply(function () {
+        $scope.countdown = null;
+      });
+    });
 
     $scope.materials = [];
 
     userService.patron().then(
       function (patron) {
         $scope.loading = false;
-
-        $scope.startTimer();
 
         console.log(patron);
 
@@ -76,8 +91,6 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
       $location.path('/');
     };
 
-    $scope.startTimer();
-
     /**
      * On destroy.
      *
@@ -85,8 +98,6 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
      */
     $scope.$on("$destroy", function() {
       userService.logout();
-
-     logoutService.cancelTimer();
     });
   }
 ]);

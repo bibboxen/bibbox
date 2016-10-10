@@ -1,9 +1,8 @@
 /**
  * Borrow page controller.
  */
-angular.module('BibBox').controller('BorrowController', [
-  '$scope', '$location', '$timeout', 'userService', 'proxyService', 'logoutService',
-  function($scope, $location, $timeout, userService, proxyService, logoutService) {
+angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'proxyService', 'Idle',
+  function ($scope, $location, $timeout, userService, proxyService, Idle) {
     'use strict';
 
     if (!userService.userLoggedIn()) {
@@ -11,18 +10,32 @@ angular.module('BibBox').controller('BorrowController', [
       return;
     }
 
-    $scope.startTimer = function () {
-      $scope.compareTime = logoutService.startTimer();
-    };
+    // Restart idle service if not running.
+    Idle.watch();
+
+    $scope.$on('IdleWarn', function (e, countdown) {
+      $scope.$apply(function () {
+        $scope.countdown = countdown;
+      });
+    });
+
+    $scope.$on('IdleTimeout', function () {
+      $scope.$evalAsync(function () {
+        $location.path('/');
+      });
+    });
+
+    $scope.$on('IdleEnd', function () {
+      $scope.$apply(function () {
+        $scope.countdown = null;
+      });
+    });
 
     var barcodeRunning = false;
 
     $scope.materials = [];
 
     var itemScannedResult = function itemScannedResult(id) {
-      // Restart timer.
-      $scope.startTimer();
-
       var itemNotAdded = true;
       for (var i = 0; i < $scope.materials.length; i++) {
         if ($scope.materials[i].id === id) {
@@ -98,13 +111,14 @@ angular.module('BibBox').controller('BorrowController', [
     };
 
     /**
-    * Start scanning for a barcode.
-    * Stops after one "barcode.data" has been returned.
-    */
+     * Start scanning for a barcode.
+     * Stops after one "barcode.data" has been returned.
+     */
     var startBarcode = function scanBarcode() {
       barcodeRunning = true;
 
-      proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
+      proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {})
+      .then(
         function success(data) {
           itemScannedResult(data);
 
@@ -137,20 +151,15 @@ angular.module('BibBox').controller('BorrowController', [
     // Start looking for material.
     startBarcode();
 
-    // Start timer
-    $scope.startTimer();
-
     /**
      * On destroy.
      *
      * Log out of user service.
      * Stop listening for barcode.
      */
-    $scope.$on("$destroy", function() {
+    $scope.$on("$destroy", function () {
       userService.logout();
       stopBarcode();
-
-      logoutService.cancelTimer();
     });
   }
 ]);

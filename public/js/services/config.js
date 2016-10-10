@@ -7,5 +7,8 @@ angular.module('BibBox').value('config', {
   "translations": {},
   "languages": [],
   "features": [],
-  "timeout": 20000
+  "timeout": {
+    "idleTimeout": 15,
+    "IdleWarn": 5
+  }
 });

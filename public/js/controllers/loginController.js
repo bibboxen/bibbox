@@ -1,8 +1,8 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'proxyService', 'userService',
-  function ($scope, $http, $window, $location, $routeParams, proxyService, userService) {
+angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'proxyService', 'userService', 'Idle',
+  function ($scope, $http, $window, $location, $routeParams, proxyService, userService, Idle) {
     'use strict';
 
     // @TODO: Block user on X number of failed login attempts.
@@ -30,6 +30,27 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
       $scope.usernameValidationError = false;
     };
     resetScope();
+
+    // Restart idle service if not running.
+    Idle.watch();
+
+    $scope.$on('IdleWarn', function (e, countdown) {
+      $scope.$apply(function () {
+        $scope.countdown = countdown;
+      });
+    });
+
+    $scope.$on('IdleTimeout', function () {
+      $scope.$evalAsync(function () {
+        $location.path('/');
+      });
+    });
+
+    $scope.$on('IdleEnd', function () {
+      $scope.$apply(function () {
+        $scope.countdown = null;
+      });
+    });
 
     /**
      * Sets the $scope.display variable.
@@ -76,6 +97,10 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
       proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {})
         .then(
           function success(data) {
+            // Restart idle service.
+            Idle.watch();
+            $scope.countdown = null;
+
             // Ignore result if the barcode should not be running.
             if (barcodeRunning) {
               barcodeResult(data);
