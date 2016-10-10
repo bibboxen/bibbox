@@ -18,7 +18,7 @@ angular.module('BibBox').controller('BorrowController', [
     });
 
     $scope.$on('IdleTimeout', function () {
-      $scope.$apply(function () {
+      $scope.$evalAsync(function () {
         $location.path('/');
       });
     });

@@ -19,7 +19,7 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
     });
 
     $scope.$on('IdleTimeout', function () {
-      $scope.$apply(function () {
+      $scope.$evalAsync(function () {
         $location.path('/');
       });
     });

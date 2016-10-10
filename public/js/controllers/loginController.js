@@ -38,7 +38,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     });
 
     $scope.$on('IdleTimeout', function () {
-      $scope.$apply(function () {
+      $scope.$evalAsync(function () {
         $location.path('/');
       });
     });

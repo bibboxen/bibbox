@@ -14,7 +14,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     });
 
     $scope.$on('IdleTimeout', function () {
-      $scope.$apply(function () {
+      $scope.$evalAsync(function () {
         $location.path('/');
       });
     });
