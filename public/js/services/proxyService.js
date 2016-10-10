@@ -3,8 +3,8 @@
  * proxyService for communication with backend.
  */
 
-angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', 'config', '$translate',
-  function ($q, $location, $route, config, $translate) {
+angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', 'config', '$translate', 'Idle',
+  function ($q, $location, $route, config, $translate, idle) {
     'use strict';
 
     var self = this;
@@ -77,7 +77,7 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
       });
 
       /**
-       * Loads translations on config.translations event.
+       * Sets translations on config.translations event.
        */
       socket.on('config.translations', function (translations) {
         config.translations = angular.copy(translations);
@@ -85,17 +85,26 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
       });
 
       /**
-       * Loads languages on config.languages event.
+       * Sets languages on config.languages event.
        */
       socket.on('config.languages', function (languages) {
         config.languages = angular.copy(languages);
       });
 
       /**
-       * Loads features on config.features event.
+       * Sets features on config.features event.
        */
       socket.on('config.features', function (features) {
         config.features = angular.copy(features);
+      });
+
+      /**
+       * Sets idle timeouts on config.
+       */
+      socket.on('config.idle_config', function (idleConfig) {
+        config.idle = angular.copy(idleConfig);
+        idle.setIdle(config.idle.idleTimeout);
+        idle.setTimeout(config.idle.idleWarn);
       });
     };
 

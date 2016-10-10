@@ -31,6 +31,24 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     };
     resetScope();
 
+    $scope.$on('IdleWarn', function (e, countdown) {
+      $scope.$apply(function () {
+        $scope.countdown = countdown;
+      });
+    });
+
+    $scope.$on('IdleTimeout', function () {
+      $scope.$apply(function () {
+        $location.path('/');
+      });
+    });
+
+    $scope.$on('IdleEnd', function () {
+      $scope.$apply(function () {
+        $scope.countdown = null;
+      });
+    });
+
     /**
      * Sets the $scope.display variable.
      *

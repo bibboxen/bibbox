@@ -3,7 +3,7 @@
  */
 angular.module('BibBox').controller('BorrowController', [
   '$scope', '$location', '$timeout', 'userService', 'proxyService',
-  function($scope, $location, $timeout, userService, proxyService) {
+  function ($scope, $location, $timeout, userService, proxyService) {
     'use strict';
 
     if (!userService.userLoggedIn()) {
@@ -11,24 +11,24 @@ angular.module('BibBox').controller('BorrowController', [
       return;
     }
 
-    $scope.$on('IdleWarn', function(e, countdown) {
-	  $scope.$apply(function () {
-        $scope.countdown = countdown;
-	  });
-    });
-
-    $scope.$on('IdleTimeout', function() {
-	  $scope.$apply(function () {
-        $location.path('/');
-	  });
-    });
-
-    $scope.$on('IdleEnd', function() {
+    $scope.$on('IdleWarn', function (e, countdown) {
       $scope.$apply(function () {
-	    $scope.countdown = null;
+        $scope.countdown = countdown;
       });
     });
-	
+
+    $scope.$on('IdleTimeout', function () {
+      $scope.$apply(function () {
+        $location.path('/');
+      });
+    });
+
+    $scope.$on('IdleEnd', function () {
+      $scope.$apply(function () {
+        $scope.countdown = null;
+      });
+    });
+
     var barcodeRunning = false;
 
     $scope.materials = [];
@@ -109,13 +109,14 @@ angular.module('BibBox').controller('BorrowController', [
     };
 
     /**
-    * Start scanning for a barcode.
-    * Stops after one "barcode.data" has been returned.
-    */
+     * Start scanning for a barcode.
+     * Stops after one "barcode.data" has been returned.
+     */
     var startBarcode = function scanBarcode() {
       barcodeRunning = true;
 
-      proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
+      proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {})
+      .then(
         function success(data) {
           itemScannedResult(data);
 
@@ -154,7 +155,7 @@ angular.module('BibBox').controller('BorrowController', [
      * Log out of user service.
      * Stop listening for barcode.
      */
-    $scope.$on("$destroy", function() {
+    $scope.$on("$destroy", function () {
       userService.logout();
       stopBarcode();
     });
