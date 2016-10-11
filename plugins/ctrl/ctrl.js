@@ -83,6 +83,44 @@ var CTRL = function CTRL(app, bus, allowed) {
       'footer': {
         'html': 'Åbningstider: se <a href="https://www.aakb.dk" target="_blank">www.aakb.dk</a>',
         'text': 'Åbningstider: se www.aakb.dk'
+      },
+      'layouts': {
+        'status': {
+          'fines': true,
+          'loans': true,
+          'loans_new': true,
+          'reservations': true,
+          'reservations_ready': true,
+          'check_ins': false,
+          'pokemon': true
+        },
+        'checkIn': {
+          'fines': true,
+          'loans': true,
+          'loans_new': true,
+          'reservations': true,
+          'reservations_ready': true,
+          'check_ins': true,
+          'pokemon': true
+        },
+        'checkOut': {
+          'fines': true,
+          'loans': true,
+          'loans_new': true,
+          'reservations': true,
+          'reservations_ready': true,
+          'check_ins': true,
+          'pokemon': true
+        },
+        'reservations': {
+          'fines': true,
+          'loans': false,
+          'loans_new': false,
+          'reservations': false,
+          'reservations_ready': true,
+          'check_ins': false,
+          'pokemon': true
+        }
       }
     });
   });

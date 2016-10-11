@@ -30,8 +30,8 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      */
     this.getCredentials = function getCredentials() {
       return {
-        'username': this.username,
-        'password': this.password
+        'username': username,
+        'password': password
       }
     };
 

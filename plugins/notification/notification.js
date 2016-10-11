@@ -20,6 +20,7 @@ var Notification = function Notification(bus) {
     self.headerConfig = data.header;
     self.libraryHeader = data.library;
     self.footer = data.footer;
+    self.layouts = data.layouts;
 
     self.mailTransporter = nodemailer.createTransport({
       'host': self.mailConfig.host,
@@ -265,16 +266,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(username, passwo
 
 /**
  *
- * @param username
- * @param password
- * @param mail
- */
-Notification.prototype.reservationsReceipt = function reservationsReceipt(username, password, mail) {
-
-};
-
-/**
- *
+ * @param type
  * @param username
  * @param password
  * @param mail
@@ -282,22 +274,23 @@ Notification.prototype.reservationsReceipt = function reservationsReceipt(userna
  * @return {*|promise}
  *   Resolved or error message on failure.
  */
-Notification.prototype.statusReceipt = function statusReceipt(username, password, mail) {
+Notification.prototype.patronReceipt = function patronReceipt(type, username, password, mail) {
   var self = this;
   var deferred = Q.defer();
+  var layout = self.layouts[type];
 
   // Listen for status notification message.
-  this.bus.once('notification.statusReceipt', function (data) {
+  this.bus.once('notification.patronReceipt', function (data) {
     // Options on what to include in the notification.
     var options = {
       includes: {
         library: self.renderLibrary(mail),
-        fines: self.renderFines(mail, data.fineItems),
-        loans: self.renderLoans(mail, 'Lån', data.chargedItems),
-        reservations: self.renderReservations(mail, data.unavailableHoldItems),
-        reservations_ready: self.renderReadyReservations(mail, data.holdItems),
         footer: self.renderFooter(mail),
-        pokemon: 'true'
+        fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
+        loans: layout.loans ? self.renderLoans(mail, 'Lån', data.chargedItems) : '',
+        reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
+        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
+        pokemon: layout.pokemon ? 'true' : ''
       }
     };
 
@@ -311,7 +304,11 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
     if (mail) {
       result = Mark.up(self.mailTemplate, context, options);
 
-      deferred.resolve(self.sendMail(data.emailAddress, result));
+      self.sendMail(data.emailAddress, result).then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
+      });
     }
     else {
       result = Mark.up(self.textTemplate, context, options);
@@ -319,8 +316,8 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
       // Remove empty lines (from template engine if statements).
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
-      // @TODO: PRINT IT.
-
+      // Print it.
+      self.print(result);
       deferred.resolve();
     }
   });
@@ -329,7 +326,7 @@ Notification.prototype.statusReceipt = function statusReceipt(username, password
   this.bus.emit('fbs.patron', {
     'username': username,
     'password': password,
-    'busEvent': 'notification.statusReceipt'
+    'busEvent': 'notification.patronReceipt'
   });
 
   return deferred.promise;
@@ -360,10 +357,24 @@ Notification.prototype.sendMail = function sendMail(to, content) {
       self.bus.emit('logger.err', error);
       deferred.reject(error);
     }
-    deferred.resolve();
+    else {
+      self.bus.emit('logger.info', 'Mail sent to: ' + to);
+      deferred.resolve();
+    }
   });
 
   return deferred.promise;
+};
+
+/**
+ * Print receipt.
+ *
+ * @param content
+ */
+Notification.prototype.print = function print(content) {
+  /**
+   * @TODO: Print the receipt.
+   */
 };
 
 /**
@@ -377,7 +388,8 @@ module.exports = function (options, imports, register) {
    * Listen status receipt events.
    */
   bus.on('notification.status', function (data) {
-    notification.statusReceipt(data.username, data.password, data.mail).then(
+    console.log(data);
+    notification.patronReceipt('status', data.username, data.password, data.mail).then(
       function () {
         bus.emit(data.busEvent, true);
       },
@@ -387,7 +399,22 @@ module.exports = function (options, imports, register) {
     );
   });
 
-  //notification.statusReceipt('3208100032', '12345', true);
+  /**
+   * Listen status receipt events.
+   */
+  bus.on('notification.reservations', function (data) {
+    console.log(data);
+    notification.patronReceipt('reservations', data.username, data.password, data.mail).then(
+      function () {
+        bus.emit(data.busEvent, true);
+      },
+      function (err) {
+        bus.emit(data.busEvent, err);
+      }
+    );
+  });
+
+  //bus.emit('notification.status', { 'username': '3208100032', 'password': '12345', 'mail': true, 'busEvent': 'test'});
 
   register(null, {
     "notification": notification

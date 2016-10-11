@@ -79,8 +79,18 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
     /**
      * Print receipt.
      */
-    $scope.receipt = function receipt() {
-      alert('Not supported yet!');
+    $scope.receipt = function receipt(type) {
+      var credentials = userService.getCredentials();
+
+      // @TODO: handel error etc.
+      receiptService.status(credentials.username, credentials.password, type).then(
+        function(status) {
+          alert('mail sent');
+        },
+        function(err) {
+          alert(err);
+        }
+      );
     };
 
     /**

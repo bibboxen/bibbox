@@ -24,7 +24,7 @@
       "^fbs.checkin.[\\w]+$",
       "^fbs.renew.[\\w]+$",
       "^fbs.renew.all.[\\w]+$",
-      "^notification.status.sent$"
+      "^notification.response$"
     ],
     "whitelistedSocketEvents": [
       "^barcode.start$",
@@ -39,7 +39,8 @@
       "^fbs.checkin$",
       "^fbs.renew$",
       "^fbs.renew.all$",
-      "^notification.status$"
+      "^notification.status$",
+      "^notification.reservations$"
     ]
   },
   "translation": {
