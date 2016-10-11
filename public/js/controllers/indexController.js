@@ -46,6 +46,9 @@ angular.module('BibBox').controller('IndexController', [
       }
     );
 
+    /**
+     * Check if fbs is online.
+     */
     var fbsOnline = function () {
       var uniqueId = CryptoJS.MD5("indexController" + Date.now());
 
@@ -62,6 +65,9 @@ angular.module('BibBox').controller('IndexController', [
     };
     fbsOnline();
 
+    /**
+     * Register interval checking of fbs connectivity.
+     */
     onlineInterval = $interval(
       fbsOnline,
       config.testFbsConnectionInterval
@@ -77,6 +83,11 @@ angular.module('BibBox').controller('IndexController', [
       tmhDynamicLocale.set(langKey);
     };
 
+    /**
+     * on Destroy.
+     *
+     * Cleanup
+     */
     $scope.$on('destroy', function () {
       // Remove online interval.
       if (angular.isDefined(onlineInterval)) {

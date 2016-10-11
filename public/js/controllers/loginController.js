@@ -200,8 +200,9 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
             $scope.loading = false;
           }
         },
-        function error() {
+        function error(reason) {
           // @TODO: Show error.
+          console.log('login error: ', reason);
           resetScope();
           gotoStep('default');
 

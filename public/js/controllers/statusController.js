@@ -61,14 +61,12 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
 
           // Add overdue items.
           for (i = 0; i < patron.overdueItems.length; i++) {
-            item = angular.copy(patron.overdueItems[i]);
-            $scope.materials.push(item);
-          }
-
-          // Add recall items.
-          for (i = 0; i < patron.recallItems.length; i++) {
-            item = angular.copy(patron.recallItems[i]);
-            $scope.materials.push(item);
+            for (var j = 0; j < $scope.materials.length; j++) {
+              if ($scope.materials[j].id === patron.overdueItems[i].id) {
+                $scope.materials[j].overdue = true;
+                $scope.materials[j].information = 'status.overdue';
+              }
+            }
           }
 
           // Add fines to items.
@@ -113,6 +111,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
 
           if (data.renewalOk === 'Y') {
             material.newDate = data.dueDate;
+            material.overdue = false;
             material.information = "status.renew.ok";
           }
           else {

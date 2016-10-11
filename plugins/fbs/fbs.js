@@ -213,11 +213,18 @@ module.exports = function (options, imports, register) {
    */
   bus.on('fbs.login', function (data) {
     fbs.login(data.username, data.password).then(function (isLoggedIn) {
+      console.log(isLoggedIn);
+
       bus.emit(data.busEvent, isLoggedIn);
     },
     function (err) {
       bus.emit('fbs.err', err);
-      bus.emit(data.busEvent, false);
+
+      if (data.errorEvent) {
+        bus.emit(data.errorEvent, {
+          "message": err.message
+        });
+      }
     });
   });
 
