@@ -26,6 +26,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
         password: ''
       };
 
+      $scope.invalidLoginError = false;
       $scope.passwordValidationError = false;
       $scope.usernameValidationError = false;
     };
@@ -156,6 +157,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
         stopBarcode();
 
         $scope.usernameValidationError = false;
+        $scope.invalidLoginError = false;
         $scope.display = 'password';
       }
     };
@@ -191,7 +193,11 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
             $location.path("/" + $routeParams.redirectUrl);
           }
           else {
-            $scope.passwordValidationError = true;
+            resetScope();
+            gotoStep('default');
+
+            $scope.invalidLoginError = true;
+            $scope.loading = false;
           }
         },
         function error() {
