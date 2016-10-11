@@ -70,5 +70,75 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
 
       return deferred.promise;
     };
+
+    /**
+     * Borrow receipt.
+     *
+     * @param user
+     *   Username to get receipt data for.
+     * @param pass
+     *   Password for that user.
+     * @param counter
+     *   ?????
+     * @param items
+     *   The items to
+     * @param type
+     *   The type of receipt.
+     *
+     * @returns {Function}
+     */
+    this.borrow = function borrow(user, pass, counter, items, type) {
+      var deferred = $q.defer();
+
+      proxyService.emitEvent('notification.borrow', 'notification.response', null, {
+        'username': user,
+        'password': pass,
+        'mail': type === 'mail',
+        'counter': counter,
+        'items': items,
+        'busEvent': 'notification.response'
+      }).then(
+        function success(status) {
+          deferred.resolve(status);
+        },
+        function error(err) {
+          deferred.reject(err);
+        }
+      );
+
+      return deferred.promise;
+    };
+
+    /**
+     * Return receipt.
+     *
+     * @param counter
+     *   ?????
+     * @param items
+     *   The items to
+     * @param type
+     *   The type of receipt.
+     *
+     * @returns {Function}
+     */
+    this.returnReceipt = function returnReceipt(counter, items, type) {
+      var deferred = $q.defer();
+
+      proxyService.emitEvent('notification.return', 'notification.response', null, {
+        'mail': type === 'mail',
+        'counter': counter,
+        'items': items,
+        'busEvent': 'notification.response'
+      }).then(
+        function success(status) {
+          deferred.resolve(status);
+        },
+        function error(err) {
+          deferred.reject(err);
+        }
+      );
+
+      return deferred.promise;
+    };
   }
 ]);

@@ -1,8 +1,8 @@
 /**
  * Reservations page controller.
  */
-angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'Idle',
-  function($scope, $location, $timeout, userService, Idle) {
+angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'Idle', 'receiptService',
+  function($scope, $location, $timeout, userService, Idle, receiptService) {
     "use strict";
 
     $scope.loading = true;
@@ -43,6 +43,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
 
         // If patron exists, get reservations.
         if (patron) {
+          $scope.currentPatron = patron;
+
           var i, item;
 
           // Add available items
@@ -82,12 +84,12 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
     $scope.receipt = function receipt(type) {
       var credentials = userService.getCredentials();
 
-      // @TODO: handel error etc.
-      receiptService.status(credentials.username, credentials.password, type).then(
+      receiptService.reservations(credentials.username, credentials.password, type).then(
         function(status) {
           alert('mail sent');
         },
         function(err) {
+          // @TODO: handel error etc.
           alert(err);
         }
       );

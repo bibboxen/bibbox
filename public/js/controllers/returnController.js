@@ -1,8 +1,8 @@
 /**
  * Return page controller.
  */
-angular.module('BibBox').controller('ReturnController', ['$scope', '$location', '$timeout', 'proxyService', 'Idle',
-  function($scope, $location, $timeout, proxyService, Idle) {
+angular.module('BibBox').controller('ReturnController', ['$scope', '$location', '$timeout', 'proxyService', 'Idle', 'receiptService',
+  function($scope, $location, $timeout, proxyService, Idle, receiptService) {
     'use strict';
 
     var barcodeRunning = false;
@@ -132,6 +132,21 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
           }
         );
       }
+    };
+
+    /**
+     * Print receipt.
+     */
+    $scope.receipt = function receipt() {
+      receiptService.returnReceipt($scope.materials.length, $scope.materials, 'printer').then(
+        function(status) {
+          alert('mail sent');
+        },
+        function(err) {
+          // @TODO: handel error etc.
+          alert(err);
+        }
+      );
     };
 
     // Start looking for material.

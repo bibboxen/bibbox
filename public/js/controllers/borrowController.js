@@ -1,14 +1,38 @@
 /**
  * Borrow page controller.
  */
-angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'proxyService', 'Idle',
-  function ($scope, $location, $timeout, userService, proxyService, Idle) {
+angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'proxyService', 'Idle', 'receiptService',
+  function ($scope, $location, $timeout, userService, proxyService, Idle, receiptService) {
     'use strict';
 
     if (!userService.userLoggedIn()) {
       $location.path('/');
       return;
     }
+
+    $scope.loading = true;
+
+    userService.patron().then(
+      function (patron) {
+        $scope.loading = false;
+
+        console.log(patron);
+
+        // If patron exists, get reservations.
+        if (patron) {
+          $scope.currentPatron = patron;
+        }
+        else {
+          // @TODO: Report error.
+          console.log(err);
+        }
+      },
+      function (err) {
+        $scope.loading = false;
+        // @TODO: Report error.
+        console.log(err);
+      }
+    );
 
     // Restart idle service if not running.
     Idle.watch();
@@ -146,6 +170,26 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
           }
         );
       }
+    };
+
+    /**
+     * Print receipt.
+     *
+     * @param type
+     *   'mail' or 'printer'
+     */
+    $scope.receipt = function receipt(type) {
+      var credentials = userService.getCredentials();
+
+      receiptService.borrow(credentials.username, credentials.password, $scope.materials.length, $scope.materials, type).then(
+        function(status) {
+          alert('mail sent');
+        },
+        function(err) {
+          // @TODO: handel error etc.
+          alert(err);
+        }
+      );
     };
 
     // Start looking for material.
