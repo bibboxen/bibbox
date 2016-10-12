@@ -88,7 +88,7 @@ var CTRL = function CTRL(app, bus, allowed) {
         'status': {
           'fines': true,
           'loans': true,
-          'loans_new': true,
+          'loans_new': false,
           'reservations': true,
           'reservations_ready': true,
           'check_ins': false,
@@ -97,7 +97,7 @@ var CTRL = function CTRL(app, bus, allowed) {
         'checkIn': {
           'fines': true,
           'loans': true,
-          'loans_new': true,
+          'loans_new': false,
           'reservations': true,
           'reservations_ready': true,
           'check_ins': true,
@@ -105,11 +105,11 @@ var CTRL = function CTRL(app, bus, allowed) {
         },
         'checkOut': {
           'fines': true,
-          'loans': true,
+          'loans': false,
           'loans_new': true,
-          'reservations': true,
+          'reservations': false,
           'reservations_ready': true,
-          'check_ins': true,
+          'check_ins': false,
           'pokemon': true
         },
         'reservations': {

@@ -47,6 +47,10 @@ var Notification = function Notification(bus) {
   this.mailLoansTemplate = fs.readFileSync(__dirname + '/templates/loans.html', 'utf8');
   this.textLoansTemplate = fs.readFileSync(__dirname + '/templates/loans.txt', 'utf8');
 
+  // Load loans templates.
+  this.mailLoansNewTemplate = fs.readFileSync(__dirname + '/templates/loans_new.html', 'utf8');
+  this.textLoansNewTemplate = fs.readFileSync(__dirname + '/templates/loans_new.txt', 'utf8');
+
   // Load reservations ready templates.
   this.mailReservationsReadyTemplate = fs.readFileSync(__dirname + '/templates/reservations_ready.html', 'utf8');
   this.textReservationsReadyTemplate = fs.readFileSync(__dirname + '/templates/reservations_ready.txt', 'utf8');
@@ -177,6 +181,33 @@ Notification.prototype.renderLoans = function renderLoans(html, title, loans, ov
 };
 
 /**
+ * Render new loans list.
+ *
+ * @param html
+ *   If TRUE HTML is outputted else clean text.
+ * @param title
+ *   Section title.
+ * @param items
+ *   The new loan items.
+ *
+ * @returns {*}
+ */
+Notification.prototype.renderNewLoans = function renderNewLoans(html, title, items){
+  if (html) {
+    return Mark.up(this.mailLoansNewTemplate, {
+      'title': title,
+      'items': items
+    });
+  }
+  else {
+    return Mark.up(this.textLoansNewTemplate, {
+      'title': title,
+      'items': items
+    });
+  }
+};
+
+/**
  * Render reservations ready for pick-up.
  *
  * @param html
@@ -185,7 +216,6 @@ Notification.prototype.renderLoans = function renderLoans(html, title, loans, ov
  *   The reservation elements to render.
  *
  * @returns {*}
- *
  */
 Notification.prototype.renderReadyReservations = function renderReadyReservations(html, reservations) {
   if (html) {
@@ -260,61 +290,71 @@ Notification.prototype.renderFooter = function renderFooter(html) {
  *   If TRUE send mail else print receipt.
  */
 Notification.prototype.itemsReceipt = function itemsReceipt(type, mail, items, username, password) {
-  console.log(items);
   var self = this;
   var deferred = Q.defer();
   var layout = self.layouts[type];
-  //
-  // // Listen for status notification message.
-  // this.bus.once('notification.patronReceipt', function (data) {
-  //   // Options on what to include in the notification.
-  //   var options = {
-  //     includes: {
-  //       library: self.renderLibrary(mail),
-  //       footer: self.renderFooter(mail),
-  //       fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
-  //       loans: layout.loans ? self.renderLoans(mail, 'Lån', data.chargedItems) : '',
-  //       reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
-  //       reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
-  //       pokemon: layout.pokemon ? 'true' : ''
-  //     }
-  //   };
-  //
-  //   // Data for the main render.
-  //   var context = {
-  //     'name': data.homeAddress.Name,
-  //     'header': self.headerConfig
-  //   };
-  //
-  //   var result = '';
-  //   if (mail) {
-  //     result = Mark.up(self.mailTemplate, context, options);
-  //
-  //     self.sendMail(data.emailAddress, result).then(function () {
-  //       deferred.resolve();
-  //     }, function (err) {
-  //       deferred.reject(err);
-  //     });
-  //   }
-  //   else {
-  //     result = Mark.up(self.textTemplate, context, options);
-  //
-  //     // Remove empty lines (from template engine if statements).
-  //     result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-  //
-  //     // Print it.
-  //     self.print(result);
+
+  // At "check-in" clean out error elements.
+  if (type === 'checkOut') {
+    // Filter out failed loans.
+    items.map(function (item, index) {
+      if (item.status === 'borrow.error') {
+        items.splice(index, 1);
+      }
+    });
+  }
+
+  // Listen for status notification message.
+  this.bus.once('notification.patronReceipt', function (data) {
+    // Options on what to include in the notification.
+    var options = {
+      includes: {
+        library: self.renderLibrary(mail),
+        footer: self.renderFooter(mail),
+        fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
+        loans_new: layout.loans_new ? self.renderNewLoans(mail, 'Lån', items) : '',
+        loans: layout.loans ? self.renderLoans(mail, 'Lån', data.chargedItems) : '',
+        reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
+        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
+        pokemon: layout.pokemon ? 'true' : ''
+      }
+    };
+
+    // Data for the main render.
+    var context = {
+      'name': data.homeAddress.Name,
+      'header': self.headerConfig
+    };
+
+    var result = '';
+    if (mail) {
+      result = Mark.up(self.mailTemplate, context, options);
+
+      self.sendMail(data.emailAddress, result).then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
+      });
+    }
+    else {
+      result = Mark.up(self.textTemplate, context, options);
+
+      // Remove empty lines (from template engine if statements).
+      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+
+      // Print it.
+       self.print(result);
       deferred.resolve();
-  //   }
-  // });
-  //
-  // // Request the data to use in the notification.
-  // this.bus.emit('fbs.patron', {
-  //   'username': username,
-  //   'password': password,
-  //   'busEvent': 'notification.patronReceipt'
-  // });
-  //
+     }
+   });
+
+   // Request the data to use in the notification.
+   this.bus.emit('fbs.patron', {
+     'username': username,
+     'password': password,
+     'busEvent': 'notification.patronReceipt'
+   });
+
   return deferred.promise;
 };
 
@@ -442,7 +482,6 @@ module.exports = function (options, imports, register) {
    * Listen status receipt events.
    */
   bus.on('notification.status', function (data) {
-    console.log(data);
     notification.patronReceipt('status', data.mail, data.username, data.password).then(
       function () {
         bus.emit(data.busEvent, true);
@@ -457,7 +496,6 @@ module.exports = function (options, imports, register) {
    * Listen status receipt events.
    */
   bus.on('notification.reservations', function (data) {
-    console.log(data);
     notification.patronReceipt('reservations', data.mail, data.username, data.password).then(
       function () {
         bus.emit(data.busEvent, true);
@@ -472,7 +510,6 @@ module.exports = function (options, imports, register) {
    * Listen check-in (loans) receipt events.
    */
   bus.on('notification.checkIn', function (data) {
-    console.log(data);
     notification.itemsReceipt('checkin', data.mail, data.items, data.username, data.password).then(
       function () {
         bus.emit(data.busEvent, true);
@@ -487,7 +524,6 @@ module.exports = function (options, imports, register) {
    * Listen checkout (returns) receipt events.
    */
   bus.on('notification.checkOut', function (data) {
-    console.log(data);
     notification.itemsReceipt('checkin', data.mail, data.items, null, null).then(
       function () {
         bus.emit(data.busEvent, true);

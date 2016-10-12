@@ -350,7 +350,6 @@ Response.prototype.parseVariables = function parseVariables() {
         case 'BM':
           val = val.split('%');
           if (val.length > 1) {
-            consoel.log(val);
             self[keyTrans].push({
               'id': val.shift(),
               'dueDate': self.parseDate(val.shift()),

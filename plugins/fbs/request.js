@@ -7,6 +7,9 @@ var handlebars = require('handlebars');
 var fs = require('fs');
 var Q = require('q');
 
+var debug = require('debug')('FBS');
+
+
 var Response = require('./response.js');
 
 /**
@@ -125,11 +128,13 @@ Request.prototype.send = function send(message, firstVar, callback) {
 
         var request = require('request');
         request.post(options, function (error, response, body) {
-          console.log(response.statusCode);
+
+          // Send debug message.
+          debug(response.statusCode + ':' + message.substr(0,2));
+
           if (error || response.statusCode !== 200) {
             // Log error message from FBS.
             self.bus.emit('logger.error', 'FBS error: ' + error + ' <-> ' + response.statusCode);
-            console.log(error);
             callback(error, null);
           }
           else {
