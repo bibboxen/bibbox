@@ -114,6 +114,7 @@ Response.prototype.parseEncoding = function parseEncoding() {
       mappings.push(['renewalOk', 1]);
       mappings.push(['magneticMedia', 1]);
       mappings.push(['desensitize', 1]);
+      mappings.push(['transactionDate', 18]);
       break;
 
     // Hold Response (may have a expiration date BW).
@@ -498,6 +499,11 @@ Response.prototype.parseVariables = function parseVariables() {
               'DK5': val.shift()
             };
           }
+          break;
+
+        // Due date.
+        case 'AH':
+          self[keyTrans] = self.parseDate(val);
           break;
 
         default:

@@ -107,7 +107,6 @@ Request.prototype.buildXML = function buildXML(message) {
  */
 Request.prototype.send = function send(message, firstVar, callback) {
   var self = this;
-
   self.bus.once('fbs.sip2.online', function (online) {
     if (online) {
       self.buildXML(message).then(function (xml) {
@@ -126,10 +125,11 @@ Request.prototype.send = function send(message, firstVar, callback) {
 
         var request = require('request');
         request.post(options, function (error, response, body) {
+          console.log(response.statusCode);
           if (error || response.statusCode !== 200) {
             // Log error message from FBS.
             self.bus.emit('logger.error', 'FBS error: ' + error + ' <-> ' + response.statusCode);
-
+            console.log(error);
             callback(error, null);
           }
           else {

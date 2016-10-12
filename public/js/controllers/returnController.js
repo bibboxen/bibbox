@@ -45,10 +45,11 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
           "loading": true
         });
 
-        var uniqueId = CryptoJS.MD5("returnControllerReturn" + Date.now());
-
-        proxyService.emitEvent('fbs.checkin', 'fbs.checkin.success' + uniqueId, 'fbs.error', {
-          "busEvent": "fbs.checkin.success" + uniqueId,
+        /**
+         * @TODO: Move to service so it the same for checkin and checkout.
+         */
+        proxyService.emitEvent('fbs.checkin', 'fbs.checkin.success' + id, 'fbs.error', {
+          "busEvent": "fbs.checkin.success" + id,
           "itemIdentifier": id
         }).then(
           function success(result) {
@@ -151,6 +152,11 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
 
     // Start looking for material.
     startBarcode();
+
+    // $timeout(function () {itemScannedResult('3846646417');}, 3000);
+    // $timeout(function () {itemScannedResult('3846469957');}, 3000);
+    // $timeout(function () {itemScannedResult('5010941603');}, 3000);
+
 
     /**
      * On destroy.

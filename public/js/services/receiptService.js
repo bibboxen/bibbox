@@ -121,7 +121,6 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
 
       proxyService.emitEvent('notification.checkOut', 'notification.response', null, {
         'mail': type === 'mail',
-        'counter': counter,
         'items': items,
         'busEvent': 'notification.response'
       }).then(

@@ -77,6 +77,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
 
         userService.borrow(id).then(
           function success(result) {
+            console.log(result);
             if (result.ok === "0") {
               for (var i = 0; i < $scope.materials.length; i++) {
                 if ($scope.materials[i].id === result.itemIdentifier) {
@@ -194,6 +195,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
 
     // Start looking for material.
     startBarcode();
+
+    // $timeout(function () {itemScannedResult('3846646417');}, 3000);
+    // $timeout(function () {itemScannedResult('3846469957');}, 3000);
+    // $timeout(function () {itemScannedResult('5010941603');}, 3000);
 
     /**
      * On destroy.
