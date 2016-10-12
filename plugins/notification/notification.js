@@ -253,16 +253,17 @@ Notification.prototype.renderFooter = function renderFooter(html) {
  * Check out receipt.
  *
  * @param type
+ * @param mail
+ * @param items
  * @param username
  * @param password
- * @param items
- * @param mail
  *   If TRUE send mail else print receipt.
  */
-Notification.prototype.itemsReceipt = function itemsReceipt(type, username, password, items, mail) {
-  // var self = this;
-  // var deferred = Q.defer();
-  // var layout = self.layouts[type];
+Notification.prototype.itemsReceipt = function itemsReceipt(type, mail, items, username, password) {
+  console.log(items);
+  var self = this;
+  var deferred = Q.defer();
+  var layout = self.layouts[type];
   //
   // // Listen for status notification message.
   // this.bus.once('notification.patronReceipt', function (data) {
@@ -303,7 +304,7 @@ Notification.prototype.itemsReceipt = function itemsReceipt(type, username, pass
   //
   //     // Print it.
   //     self.print(result);
-  //     deferred.resolve();
+      deferred.resolve();
   //   }
   // });
   //
@@ -314,20 +315,20 @@ Notification.prototype.itemsReceipt = function itemsReceipt(type, username, pass
   //   'busEvent': 'notification.patronReceipt'
   // });
   //
-  // return deferred.promise;
+  return deferred.promise;
 };
 
 /**
  *
  * @param type
+ * @param mail
  * @param username
  * @param password
- * @param mail
  *
  * @return {*|promise}
  *   Resolved or error message on failure.
  */
-Notification.prototype.patronReceipt = function patronReceipt(type, username, password, mail) {
+Notification.prototype.patronReceipt = function patronReceipt(type, mail, username, password) {
   var self = this;
   var deferred = Q.defer();
   var layout = self.layouts[type];
@@ -442,7 +443,7 @@ module.exports = function (options, imports, register) {
    */
   bus.on('notification.status', function (data) {
     console.log(data);
-    notification.patronReceipt('status', data.username, data.password, data.mail).then(
+    notification.patronReceipt('status', data.mail, data.username, data.password).then(
       function () {
         bus.emit(data.busEvent, true);
       },
@@ -457,7 +458,7 @@ module.exports = function (options, imports, register) {
    */
   bus.on('notification.reservations', function (data) {
     console.log(data);
-    notification.patronReceipt('reservations', data.username, data.password, data.mail).then(
+    notification.patronReceipt('reservations', data.mail, data.username, data.password).then(
       function () {
         bus.emit(data.busEvent, true);
       },
@@ -467,7 +468,35 @@ module.exports = function (options, imports, register) {
     );
   });
 
-  //bus.emit('notification.status', { 'username': '3208100032', 'password': '12345', 'mail': true, 'busEvent': 'test'});
+  /**
+   * Listen check-in (loans) receipt events.
+   */
+  bus.on('notification.checkIn', function (data) {
+    console.log(data);
+    notification.itemsReceipt('checkin', data.mail, data.items, data.username, data.password).then(
+      function () {
+        bus.emit(data.busEvent, true);
+      },
+      function (err) {
+        bus.emit(data.busEvent, err);
+      }
+    );
+  });
+
+  /**
+   * Listen checkout (returns) receipt events.
+   */
+  bus.on('notification.checkOut', function (data) {
+    console.log(data);
+    notification.itemsReceipt('checkin', data.mail, data.items, null, null).then(
+      function () {
+        bus.emit(data.busEvent, true);
+      },
+      function (err) {
+        bus.emit(data.busEvent, err);
+      }
+    );
+  });
 
   register(null, {
     "notification": notification

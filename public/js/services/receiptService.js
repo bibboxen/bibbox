@@ -88,7 +88,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
     this.borrow = function borrow(user, pass, items, type) {
       var deferred = $q.defer();
 
-      proxyService.emitEvent('notification.borrow', 'notification.response', null, {
+      proxyService.emitEvent('notification.checkIn', 'notification.response', null, {
         'username': user,
         'password': pass,
         'mail': type === 'mail',
@@ -119,7 +119,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
     this.returnReceipt = function returnReceipt(items, type) {
       var deferred = $q.defer();
 
-      proxyService.emitEvent('notification.return', 'notification.response', null, {
+      proxyService.emitEvent('notification.checkOut', 'notification.response', null, {
         'mail': type === 'mail',
         'counter': counter,
         'items': items,
