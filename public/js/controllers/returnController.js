@@ -6,31 +6,48 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     'use strict';
 
     var barcodeRunning = false;
+    var registeredEvents = [];
+
+    $scope.materials = [];
 
     // Restart idle service if not running.
     Idle.watch();
 
+    /**
+     * Listen for idle warning.
+     */
     $scope.$on('IdleWarn', function (e, countdown) {
       $scope.$apply(function () {
         $scope.countdown = countdown;
       });
     });
 
+    /**
+     * Listen for idle timeout.
+     */
     $scope.$on('IdleTimeout', function () {
       $scope.$evalAsync(function () {
         $location.path('/');
       });
     });
 
+    /**
+     * Listen for idle end.
+     */
     $scope.$on('IdleEnd', function () {
       $scope.$apply(function () {
         $scope.countdown = null;
       });
     });
 
-    $scope.materials = [];
-
+    /**
+     * Processes a scanned item.
+     *
+     * @param id
+     *   The id of the material.
+     */
     var itemScannedResult = function itemScannedResult(id) {
+      // Check if item has already been added.
       var itemNotAdded = true;
       for (var i = 0; i < $scope.materials.length; i++) {
         if ($scope.materials[i].id === id) {
@@ -38,6 +55,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
           break;
         }
       }
+      
       if (itemNotAdded) {
         $scope.materials.push({
           "id": id,
@@ -47,8 +65,13 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
 
         var uniqueId = CryptoJS.MD5("returnControllerReturn" + Date.now());
 
-        proxyService.emitEvent('fbs.checkin', 'fbs.checkin.success' + uniqueId, 'fbs.error', {
-          "busEvent": "fbs.checkin.success" + uniqueId,
+        var resultEvent = 'fbs.checkin.success' + uniqueId;
+
+        registeredEvents.push(resultEvent);
+        registeredEvents.push('fbs.error');
+
+        proxyService.emitEvent('fbs.checkin', resultEvent, 'fbs.error', {
+          "busEvent": resultEvent,
           "itemIdentifier": id
         }).then(
           function success(result) {
@@ -104,6 +127,8 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     var startBarcode = function scanBarcode() {
       barcodeRunning = true;
 
+      registeredEvents.push('barcode.data', 'barcode.err');
+
       proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
         function success(data) {
           itemScannedResult(data);
@@ -138,13 +163,16 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
      * Print receipt.
      */
     $scope.receipt = function receipt() {
+      console.log("returnController - receipt sending", $scope.materials);
+
       receiptService.returnReceipt($scope.materials.length, $scope.materials, 'printer').then(
         function(status) {
-          alert('mail sent');
+          console.log('returnController - receipt', status);
+          $location.path('/');
         },
         function(err) {
           // @TODO: handel error etc.
-          alert(err);
+          console.log('returnController - receipt', err);
         }
       );
     };
@@ -158,6 +186,11 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
      * Stop listening for barcode.
      */
     $scope.$on("$destroy", function() {
+      // Remove registered event listeners.
+      for (var i = 0; i < registeredEvents.length; i++) {
+        proxyService.removeAllEventlisteners(registeredEvents[i]);
+      }
+
       stopBarcode();
     });
   }

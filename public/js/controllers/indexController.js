@@ -38,6 +38,13 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
     $scope.changeLanguage = function changeLanguage(langKey) {
       $translate.use(langKey);
       tmhDynamicLocale.set(langKey);
-    }
+    };
+
+    /**
+     * On destroy. Cleanup here.
+     */
+    $scope.$on('destroy', function () {
+
+    });
   }
 ]);

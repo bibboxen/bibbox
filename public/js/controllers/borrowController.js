@@ -110,8 +110,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
               }
             }
 
-            //$scope.materials.push(item);
-
             startBarcode();
           },
           function error(err) {
