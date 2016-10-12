@@ -181,7 +181,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     $scope.receipt = function receipt(type) {
       var credentials = userService.getCredentials();
 
-      receiptService.borrow(credentials.username, credentials.password, $scope.materials.length, $scope.materials, type).then(
+      receiptService.borrow(credentials.username, credentials.password, $scope.materials, type).then(
         function(status) {
           alert('mail sent');
         },

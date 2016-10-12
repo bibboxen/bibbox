@@ -147,10 +147,21 @@ Notification.prototype.renderFines = function renderFines(html, fines) {
  *   Section title.
  * @param loans
  *   The fine elements to render.
+ * @param overdue
+ *   Loan that is overdue
  *
  * @returns {*}
  */
-Notification.prototype.renderLoans = function renderLoans(html, title, loans) {
+Notification.prototype.renderLoans = function renderLoans(html, title, loans, overdue) {
+  // Merge information about overdue loans into loans objects.
+  overdue.map(function (overdueLoan) {
+    loans.find(function (obj) {
+      if (obj.id === overdueLoan.id) {
+        obj.overdue = true;
+      }
+    });
+  });
+
   if (html) {
     return Mark.up(this.mailLoansTemplate, {
       'title': title,
@@ -241,27 +252,69 @@ Notification.prototype.renderFooter = function renderFooter(html) {
 /**
  * Check out receipt.
  *
+ * @param type
  * @param username
  * @param password
- * @param counter
  * @param items
  * @param mail
  *   If TRUE send mail else print receipt.
  */
-Notification.prototype.checkOutReceipt = function checkOutReceipt(username, password, counter, items, mail) {
-
-};
-
-/**
- *
- * @param username
- * @param password
- * @param counter
- * @param items
- * @param mail
- */
-Notification.prototype.checkInReceipt = function checkInReceipt(username, password, counter, items, mail) {
-
+Notification.prototype.itemsReceipt = function itemsReceipt(type, username, password, items, mail) {
+  // var self = this;
+  // var deferred = Q.defer();
+  // var layout = self.layouts[type];
+  //
+  // // Listen for status notification message.
+  // this.bus.once('notification.patronReceipt', function (data) {
+  //   // Options on what to include in the notification.
+  //   var options = {
+  //     includes: {
+  //       library: self.renderLibrary(mail),
+  //       footer: self.renderFooter(mail),
+  //       fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
+  //       loans: layout.loans ? self.renderLoans(mail, 'Lån', data.chargedItems) : '',
+  //       reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
+  //       reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
+  //       pokemon: layout.pokemon ? 'true' : ''
+  //     }
+  //   };
+  //
+  //   // Data for the main render.
+  //   var context = {
+  //     'name': data.homeAddress.Name,
+  //     'header': self.headerConfig
+  //   };
+  //
+  //   var result = '';
+  //   if (mail) {
+  //     result = Mark.up(self.mailTemplate, context, options);
+  //
+  //     self.sendMail(data.emailAddress, result).then(function () {
+  //       deferred.resolve();
+  //     }, function (err) {
+  //       deferred.reject(err);
+  //     });
+  //   }
+  //   else {
+  //     result = Mark.up(self.textTemplate, context, options);
+  //
+  //     // Remove empty lines (from template engine if statements).
+  //     result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+  //
+  //     // Print it.
+  //     self.print(result);
+  //     deferred.resolve();
+  //   }
+  // });
+  //
+  // // Request the data to use in the notification.
+  // this.bus.emit('fbs.patron', {
+  //   'username': username,
+  //   'password': password,
+  //   'busEvent': 'notification.patronReceipt'
+  // });
+  //
+  // return deferred.promise;
 };
 
 /**
@@ -287,7 +340,7 @@ Notification.prototype.patronReceipt = function patronReceipt(type, username, pa
         library: self.renderLibrary(mail),
         footer: self.renderFooter(mail),
         fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
-        loans: layout.loans ? self.renderLoans(mail, 'Lån', data.chargedItems) : '',
+        loans: layout.loans ? self.renderLoans(mail, 'Lån', data.chargedItems, data.overdueItems) : '',
         reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
         reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
         pokemon: layout.pokemon ? 'true' : ''

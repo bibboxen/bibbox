@@ -138,7 +138,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
      * Print receipt.
      */
     $scope.receipt = function receipt() {
-      receiptService.returnReceipt($scope.materials.length, $scope.materials, 'printer').then(
+      receiptService.returnReceipt($scope.materials, 'printer').then(
         function(status) {
           alert('mail sent');
         },

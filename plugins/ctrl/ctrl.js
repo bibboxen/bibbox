@@ -171,7 +171,6 @@ var CTRL = function CTRL(app, bus, allowed) {
     ]);
   });
 
-  // @TODO: Temporary code.
   // @TODO: Remove all this translations code when it receives translations from administration.
   var trans = {
     "da": {
