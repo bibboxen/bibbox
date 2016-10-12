@@ -88,18 +88,11 @@ var CTRL = function CTRL(app, bus, allowed) {
         'status': {
           'fines': true,
           'loans': true,
-          'loans_new': false,
           'reservations': true,
           'reservations_ready': true,
-          'check_ins': false,
           'pokemon': true
         },
         'checkIn': {
-          'fines': true,
-          'loans': true,
-          'loans_new': false,
-          'reservations': true,
-          'reservations_ready': true,
           'check_ins': true,
           'pokemon': true
         },

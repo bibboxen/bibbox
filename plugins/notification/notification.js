@@ -47,7 +47,7 @@ var Notification = function Notification(bus) {
   this.mailLoansTemplate = fs.readFileSync(__dirname + '/templates/loans.html', 'utf8');
   this.textLoansTemplate = fs.readFileSync(__dirname + '/templates/loans.txt', 'utf8');
 
-  // Load loans templates.
+  // Load new loans templates.
   this.mailLoansNewTemplate = fs.readFileSync(__dirname + '/templates/loans_new.html', 'utf8');
   this.textLoansNewTemplate = fs.readFileSync(__dirname + '/templates/loans_new.txt', 'utf8');
 
@@ -59,9 +59,13 @@ var Notification = function Notification(bus) {
   this.mailReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.html', 'utf8');
   this.textReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.txt', 'utf8');
 
+  // Load checkin templates.
+  this.mailReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.html', 'utf8');
+  this.textReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.txt', 'utf8');
+
   // Load footer templates.
-  this.mailFooterTemplate = fs.readFileSync(__dirname + '/templates/footer.html', 'utf8');
-  this.textFooterTemplate = fs.readFileSync(__dirname + '/templates/footer.txt', 'utf8');
+  this.mailCheckInTemplate = fs.readFileSync(__dirname + '/templates/checkin.html', 'utf8');
+  this.textCheckInTemplate = fs.readFileSync(__dirname + '/templates/checkin.txt', 'utf8');
 
   // Add data MarkupJS pipe format.
   Mark.pipes.date = this.formatDate;
@@ -247,6 +251,25 @@ Notification.prototype.renderReservations = function renderReservations(html, re
 };
 
 /**
+ * Render checked in items.
+ *
+ * @param html
+ *   If TRUE HTML is outputted else clean text.
+ * @param items
+ *   Returned items.
+ *
+ * @returns {*}
+ */
+Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
+  if (html) {
+    return Mark.up(this.mailCheckInTemplate, {'items': item});
+  }
+  else {
+    return Mark.up(this.textCheckInTemplate, {'items': items});
+  }
+};
+
+/**
  * Render footer.
  *
  * @param html
@@ -280,29 +303,71 @@ Notification.prototype.renderFooter = function renderFooter(html) {
 };
 
 /**
- * Check out receipt.
+ * Check in receipt (return items).
  *
- * @param type
  * @param mail
- * @param items
- * @param username
- * @param password
  *   If TRUE send mail else print receipt.
+ * @param items
  */
-Notification.prototype.itemsReceipt = function itemsReceipt(type, mail, items, username, password) {
+Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, address) {
   var self = this;
   var deferred = Q.defer();
   var layout = self.layouts[type];
 
-  // At "check-in" clean out error elements.
-  if (type === 'checkOut') {
-    // Filter out failed loans.
-    items.map(function (item, index) {
-      if (item.status === 'borrow.error') {
-        items.splice(index, 1);
-      }
+  // Options on what to include in the notification.
+  var options = {
+    includes: {
+      library: self.renderLibrary(mail),
+      footer: self.renderFooter(mail),
+      checkins: self.renderCheckIn(mail, items),
+      pokemon: layout.pokemon ? 'true' : ''
+    }
+  };
+
+  var result = '';
+  if (mail) {
+    result = Mark.up(self.mailTemplate, context, options);
+
+    self.sendMail(emailAddress, result).then(function () {
+      deferred.resolve();
+    }, function (err) {
+      deferred.reject(err);
     });
   }
+  else {
+    result = Mark.up(self.textTemplate, context, options);
+
+    // Remove empty lines (from template engine if statements).
+    result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+
+    // Print it.
+    self.print(result);
+    deferred.resolve();
+  }
+
+  return deferred.promise;
+};
+
+/**
+ * Check out receipt (loan items).
+ *
+ * @param mail
+ *   If TRUE send mail else print receipt.
+ * @param items
+ * @param username
+ * @param password
+ */
+Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, username, password) {
+  var self = this;
+  var deferred = Q.defer();
+  var layout = self.layouts[type];
+
+  // Filter out failed loans.
+  items.map(function (item, index) {
+    if (item.status === 'borrow.error') {
+      items.splice(index, 1);
+    }
+  });
 
   // Listen for status notification message.
   this.bus.once('notification.patronReceipt', function (data) {
@@ -362,6 +427,7 @@ Notification.prototype.itemsReceipt = function itemsReceipt(type, mail, items, u
  *
  * @param type
  * @param mail
+ *   If TRUE send mail else print receipt.
  * @param username
  * @param password
  *
@@ -507,10 +573,10 @@ module.exports = function (options, imports, register) {
   });
 
   /**
-   * Listen check-in (loans) receipt events.
+   * Listen check-out (loans) receipt events.
    */
-  bus.on('notification.checkIn', function (data) {
-    notification.itemsReceipt('checkin', data.mail, data.items, data.username, data.password).then(
+  bus.on('notification.checkOut', function (data) {
+    notification.checkOutReceipt(data.mail, data.items, data.username, data.password).then(
       function () {
         bus.emit(data.busEvent, true);
       },
@@ -521,10 +587,10 @@ module.exports = function (options, imports, register) {
   });
 
   /**
-   * Listen checkout (returns) receipt events.
+   * Listen check-in (returns) receipt events.
    */
-  bus.on('notification.checkOut', function (data) {
-    notification.itemsReceipt('checkin', data.mail, data.items, null, null).then(
+  bus.on('notification.checkIn', function (data) {
+    notification.checkInReceipt(data.mail, data.items).then(
       function () {
         bus.emit(data.busEvent, true);
       },
