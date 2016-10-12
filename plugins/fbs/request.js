@@ -7,8 +7,7 @@ var handlebars = require('handlebars');
 var fs = require('fs');
 var Q = require('q');
 
-var debug = require('debug')('FBS');
-
+var debug = require('debug')('FBS:request');
 
 var Response = require('./response.js');
 

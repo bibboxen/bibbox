@@ -6,6 +6,8 @@
 var util = require('util');
 var eventEmitter = require('events').EventEmitter;
 
+var debug = require('debug')('FBS:response');
+
 var Entities = require('html-entities').AllHtmlEntities;
 
 /**

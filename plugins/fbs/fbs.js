@@ -6,7 +6,7 @@ var util = require('util');
 var eventEmitter = require('events').EventEmitter;
 var Q = require('q');
 
-var debug = require('debug')('FBS');
+var debug = require('debug')('FBS:main');
 
 var Request = require('./request.js');
 
