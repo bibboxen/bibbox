@@ -2,8 +2,8 @@
  * Status page controller.
  */
 angular.module('BibBox').controller('StatusController', [
-  '$scope', '$location', '$translate', '$timeout', 'userService', 'receiptService', 'Idle',
-  function ($scope, $location, $translate, $timeout, userService, receiptService, Idle) {
+  '$scope', '$location', '$translate', '$timeout', 'userService', 'receiptService', 'Idle', '$modal',
+  function ($scope, $location, $translate, $timeout, userService, receiptService, Idle, $modal) {
     "use strict";
 
     $scope.loading = true;
@@ -179,6 +179,22 @@ angular.module('BibBox').controller('StatusController', [
     };
 
     /**
+     * Setup fines modal.
+     */
+    var finesModal = $modal({scope: $scope, templateUrl: './views/modal_fines.html', show: false });
+    $scope.showFinesModal = function() {
+      finesModal.$promise.then(finesModal.show);
+    };
+
+    /**
+     * Setup receipt modal.
+     */
+    var receiptModal = $modal({scope: $scope, templateUrl: './views/modal_receipt.html', show: false });
+    $scope.showReceiptModal = function() {
+      receiptModal.$promise.then(receiptModal.show);
+    };
+
+    /**
      * Print receipt.
      *
      * @param type
@@ -214,6 +230,10 @@ angular.module('BibBox').controller('StatusController', [
      */
     $scope.$on("$destroy", function () {
       userService.logout();
+
+      // Close modals
+      receiptModal.hide();
+      finesModal.hide();
     });
   }
 ]);

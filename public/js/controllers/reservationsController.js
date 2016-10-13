@@ -1,8 +1,8 @@
 /**
  * Reservations page controller.
  */
-angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'Idle', 'receiptService',
-  function($scope, $location, $timeout, userService, Idle, receiptService) {
+angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal',
+  function($scope, $location, $timeout, userService, Idle, receiptService, $modal) {
     "use strict";
 
     $scope.loading = true;
@@ -78,6 +78,15 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
       }
     );
 
+
+    /**
+     * Setup receipt modal.
+     */
+    var receiptModal = $modal({scope: $scope, templateUrl: './views/modal_receipt.html', show: false });
+    $scope.showReceiptModal = function() {
+      receiptModal.$promise.then(receiptModal.show);
+    };
+
     /**
      * Print receipt.
      */
@@ -110,6 +119,9 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
      */
     $scope.$on("$destroy", function() {
       userService.logout();
+
+      // Close modals
+      receiptModal.hide();
     });
   }
 ]);
