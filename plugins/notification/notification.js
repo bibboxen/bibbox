@@ -340,7 +340,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items) {
     };
 
     var result = '';
-    if (mail) {
+    if (mail && (data.hasOwnProperty('emailAddress') && data.emailAddress !== '')) {
       result = Mark.up(self.mailTemplate, context, options);
 
       self.sendMail(data.emailAddress, result).then(function () {
@@ -359,6 +359,8 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items) {
       self.print(result);
       deferred.resolve();
     }
+  }, function (err) {
+    deferred.reject(err);
   });
 
   //console.log(items);
@@ -417,7 +419,7 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
     };
 
     var result = '';
-    if (mail) {
+    if (mail && (data.hasOwnProperty('emailAddress') && data.emailAddress !== '')) {
       result = Mark.up(self.mailTemplate, context, options);
 
       self.sendMail(data.emailAddress, result).then(function () {
@@ -433,10 +435,12 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
       // Print it.
-       self.print(result);
+      self.print(result);
       deferred.resolve();
      }
-   });
+   }, function (err) {
+     deferred.reject(err);
+  });
 
    // Request the data to use in the notification.
    this.bus.emit('fbs.patron', {
@@ -486,7 +490,7 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
     };
 
     var result = '';
-    if (mail) {
+    if (mail && (data.hasOwnProperty('emailAddress') && data.emailAddress !== '')) {
       result = Mark.up(self.mailTemplate, context, options);
 
       self.sendMail(data.emailAddress, result).then(function () {
@@ -505,6 +509,8 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       self.print(result);
       deferred.resolve();
     }
+  }, function (err) {
+    deferred.reject(err);
   });
 
   // Request the data to use in the notification.
