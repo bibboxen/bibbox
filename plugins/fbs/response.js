@@ -265,6 +265,9 @@ Response.prototype.parseXML = function parseXML() {
         var id = this.xml.match(/(<correlationId>)(.*)(<\/correlationId>)/);
         this.error = err[2] + ' - ' + (id.length ? id[2] : 'Unknown correlation id');
       }
+      else {
+        this.error = 'Unknown error';
+      }
     }
   }
 };
