@@ -1,8 +1,8 @@
 /**
  * Borrow page controller.
  */
-angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'proxyService', 'Idle', 'receiptService',
-  function ($scope, $location, $timeout, userService, proxyService, Idle, receiptService) {
+angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'proxyService', 'Idle', 'receiptService', '$modal',
+  function ($scope, $location, $timeout, userService, proxyService, Idle, receiptService, $modal) {
     'use strict';
 
     if (!userService.userLoggedIn()) {
@@ -173,6 +173,14 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     };
 
     /**
+     * Setup receipt modal.
+     */
+    var receiptModal = $modal({scope: $scope, templateUrl: './views/modal_receipt.html', show: false });
+    $scope.showReceiptModal = function() {
+      receiptModal.$promise.then(receiptModal.show);
+    };
+
+    /**
      * Print receipt.
      *
      * @param type
@@ -204,6 +212,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     $scope.$on("$destroy", function () {
       userService.logout();
       stopBarcode();
+
+      // Close modals
+      receiptModal.hide();
     });
   }
 ]);
