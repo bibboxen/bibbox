@@ -28,8 +28,18 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
       });
     });
 
+    // List materials on screen.
     $scope.materials = [];
 
+    // Store raw check-in responses as it's need to print receipt.
+    var raw_materials = [];
+
+    /**
+     * Check-in scanned result.
+     *
+     * @param id
+     *   The ID of material to check-in (return).
+     */
     var itemScannedResult = function itemScannedResult(id) {
       var itemNotAdded = true;
       for (var i = 0; i < $scope.materials.length; i++) {
@@ -46,14 +56,15 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
         });
 
         /**
-         * @TODO: Move to service so it the same for checkin and checkout.
+         * @TODO: Move to service so it the same for check-in and checkout.
          */
         proxyService.emitEvent('fbs.checkin', 'fbs.checkin.success' + id, 'fbs.error', {
           "busEvent": "fbs.checkin.success" + id,
           "itemIdentifier": id
         }).then(
           function success(result) {
-            console.log(result);
+            // Store the raw result (it's used to send with receipts).
+            raw_materials.push(result);
 
             if (result.ok === '1') {
               for (var i = 0; i < $scope.materials.length; i++) {
@@ -139,7 +150,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
      * Print receipt.
      */
     $scope.receipt = function receipt() {
-      receiptService.returnReceipt($scope.materials, 'printer').then(
+      receiptService.returnReceipt(raw_materials, 'printer').then(
         function(status) {
           alert('mail sent');
         },

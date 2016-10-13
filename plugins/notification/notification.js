@@ -309,41 +309,66 @@ Notification.prototype.renderFooter = function renderFooter(html) {
  *   If TRUE send mail else print receipt.
  * @param items
  */
-Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, address) {
+Notification.prototype.checkInReceipt = function checkInReceipt(mail, items) {
   var self = this;
   var deferred = Q.defer();
-  var layout = self.layouts[type];
+  var layout = self.layouts.checkIn;
 
-  // Options on what to include in the notification.
-  var options = {
-    includes: {
-      library: self.renderLibrary(mail),
-      footer: self.renderFooter(mail),
-      checkins: self.renderCheckIn(mail, items),
-      pokemon: layout.pokemon ? 'true' : ''
+  // Listen for status notification message.
+  this.bus.once('notification.patronReceipt', function (data) {
+    //console.log(data);
+
+    // Options on what to include in the notification.
+    var options = {
+      includes: {
+        library: self.renderLibrary(mail),
+        footer: self.renderFooter(mail),
+        checkins: layout.check_ins ? self.renderCheckIn(mail, items) : '',
+        fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
+        loans_new: layout.loans_new ? self.renderNewLoans(mail, 'Lån', items) : '',
+        loans: layout.loans ? self.renderLoans(mail, 'Lån', data.chargedItems) : '',
+        reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
+        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
+        pokemon: layout.pokemon ? 'true' : ''
+      }
+    };
+
+    // Data for the main render.
+    var context = {
+      'name': data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
+      'header': self.headerConfig
+    };
+
+    var result = '';
+    if (mail) {
+      result = Mark.up(self.mailTemplate, context, options);
+
+      self.sendMail(data.emailAddress, result).then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
+      });
     }
-  };
+    else {
+      result = Mark.up(self.textTemplate, context, options);
 
-  var result = '';
-  if (mail) {
-    result = Mark.up(self.mailTemplate, context, options);
+      // Remove empty lines (from template engine if statements).
+      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
-    self.sendMail(emailAddress, result).then(function () {
+      // Print it.
+      self.print(result);
       deferred.resolve();
-    }, function (err) {
-      deferred.reject(err);
-    });
-  }
-  else {
-    result = Mark.up(self.textTemplate, context, options);
+    }
+  });
 
-    // Remove empty lines (from template engine if statements).
-    result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+  //console.log(items);
 
-    // Print it.
-    self.print(result);
-    deferred.resolve();
-  }
+  // Request the data to use in the notification.
+  this.bus.emit('fbs.patron', {
+    'username': items[0].patronIdentifier,
+    'password': 'xxxxx', // Fake password to get info.
+    'busEvent': 'notification.patronReceipt'
+  });
 
   return deferred.promise;
 };
@@ -360,7 +385,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, add
 Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, username, password) {
   var self = this;
   var deferred = Q.defer();
-  var layout = self.layouts[type];
+  var layout = self.layouts.checkOut;
 
   // Filter out failed loans.
   items.map(function (item, index) {
@@ -387,7 +412,7 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
 
     // Data for the main render.
     var context = {
-      'name': data.homeAddress.Name,
+      'name': data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
       'header': self.headerConfig
     };
 
@@ -456,7 +481,7 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
 
     // Data for the main render.
     var context = {
-      'name': data.homeAddress.Name,
+      'name': data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
       'header': self.headerConfig
     };
 
