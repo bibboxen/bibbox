@@ -204,9 +204,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     // Start looking for material.
     startBarcode();
 
-    $timeout(function () {itemScannedResult('3846646417');}, 1000);
-    $timeout(function () {itemScannedResult('3846469957');}, 2000);
-    $timeout(function () {itemScannedResult('5010941603');}, 3000);
+    // $timeout(function () {itemScannedResult('3846646417');}, 1000);
+    // $timeout(function () {itemScannedResult('3846469957');}, 2000);
+    // $timeout(function () {itemScannedResult('5010941603');}, 3000);
 
     /**
      * On destroy.

@@ -120,7 +120,17 @@ Request.prototype.send = function send(message, firstVar, callback) {
         // Send debug message.
         debug(response.statusCode + ':' + message.substr(0,2));
 
+        var res = null;
         if (error || response.statusCode !== 200) {
+          if (!error) {
+            res = new Response(body, firstVar);
+            if (res.hasError()) {
+              error = new Error(res.getError());
+            }
+            else {
+              error = new Error('Unknown error', response.statusCode());
+            }
+          }
           // Log error message from FBS.
           self.bus.emit('logger.error', 'FBS error: ' + error + ' <-> ' + response.statusCode);
           callback(error, null);
@@ -130,9 +140,9 @@ Request.prototype.send = function send(message, firstVar, callback) {
           self.bus.emit('logger.debug', 'FBS response: ' + body);
 
           var err = null;
-          var res = new Response(body, firstVar);
+          res = new Response(body, firstVar);
           if (res.hasError()) {
-            err = res.getError();
+            err = new Error(res.getError());
             self.bus.emit('logger.error', 'FBS error: ' + err);
           }
 
