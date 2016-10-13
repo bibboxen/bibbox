@@ -29,12 +29,12 @@ var setup = function setup() {
 	return app;
 };
 
-it('Default printer - exists', function() {
-	return setup().then(function (app) {
-		var data = app.services.notification.getDefaultPrinterName();
-		data.should.be.string();
-	});
-});
+// it('Default printer - exists', function() {
+// 	return setup().then(function (app) {
+// 		var data = app.services.notification.getDefaultPrinterName();
+// 		data.should.be.string();
+// 	});
+// });
 
 it('Teardown', function(done) {
 	setup().then(function (app) {

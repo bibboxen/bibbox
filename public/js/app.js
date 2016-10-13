@@ -4,7 +4,7 @@
  */
 
 // Define the angular application.
-angular.module('BibBox', ['ngRoute', 'pascalprecht.translate', 'tmh.dynamicLocale', 'ngIdle']);
+angular.module('BibBox', ['ngRoute', 'pascalprecht.translate', 'tmh.dynamicLocale', 'ngIdle', 'mgcrea.ngStrap.modal', 'ngAnimate']);
 
 // Set path for dynamic locale loading.
 angular.module('BibBox').config(['tmhDynamicLocaleProvider', 'IdleProvider',

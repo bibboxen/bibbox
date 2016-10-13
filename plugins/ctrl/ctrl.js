@@ -83,6 +83,37 @@ var CTRL = function CTRL(app, bus, allowed) {
       'footer': {
         'html': 'Åbningstider: se <a href="https://www.aakb.dk" target="_blank">www.aakb.dk</a>',
         'text': 'Åbningstider: se www.aakb.dk'
+      },
+      'layouts': {
+        'status': {
+          'fines': true,
+          'loans': true,
+          'reservations': true,
+          'reservations_ready': true,
+          'pokemon': true
+        },
+        'checkIn': {
+          'check_ins': true,
+          'pokemon': true
+        },
+        'checkOut': {
+          'fines': true,
+          'loans': false,
+          'loans_new': true,
+          'reservations': false,
+          'reservations_ready': true,
+          'check_ins': false,
+          'pokemon': true
+        },
+        'reservations': {
+          'fines': true,
+          'loans': false,
+          'loans_new': false,
+          'reservations': false,
+          'reservations_ready': true,
+          'check_ins': false,
+          'pokemon': true
+        }
       }
     });
   });
@@ -137,7 +168,6 @@ var CTRL = function CTRL(app, bus, allowed) {
     ]);
   });
 
-  // @TODO: Temporary code.
   // @TODO: Remove all this translations code when it receives translations from administration.
   var trans = {
     "da": {

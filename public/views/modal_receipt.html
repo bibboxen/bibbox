@@ -1,0 +1,21 @@
+<div class="modal text-center">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="receiptModalLabel">{{ 'receipt.heading' | translate }}</h2>
+      </div>
+      <div class="modal-body">
+        <button type="button" class="btn btn-success button" aria-label="Left Align" data-ng-click="receipt('mail')">
+          <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> {{ 'receipt.button.receipt_mail' | translate }}
+        </button>
+        <button type="button" class="btn btn-success button" aria-label="Left Align" data-ng-click="receipt('printer')">
+          <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'receipt.button.receipt_printer' | translate }}
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger button" data-ng-click="$hide()">{{ 'receipt.button.close' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

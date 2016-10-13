@@ -1,8 +1,8 @@
 /**
  * Reservations page controller.
  */
-angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'Idle',
-  function($scope, $location, $timeout, userService, Idle) {
+angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal',
+  function($scope, $location, $timeout, userService, Idle, receiptService, $modal) {
     "use strict";
 
     $scope.loading = true;
@@ -43,6 +43,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
 
         // If patron exists, get reservations.
         if (patron) {
+          $scope.currentPatron = patron;
+
           var i, item;
 
           // Add available items
@@ -76,11 +78,30 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
       }
     );
 
+
+    /**
+     * Setup receipt modal.
+     */
+    var receiptModal = $modal({scope: $scope, templateUrl: './views/modal_receipt.html', show: false });
+    $scope.showReceiptModal = function() {
+      receiptModal.$promise.then(receiptModal.show);
+    };
+
     /**
      * Print receipt.
      */
-    $scope.receipt = function receipt() {
-      alert('Not supported yet!');
+    $scope.receipt = function receipt(type) {
+      var credentials = userService.getCredentials();
+
+      receiptService.reservations(credentials.username, credentials.password, type).then(
+        function(status) {
+          alert('mail sent');
+        },
+        function(err) {
+          // @TODO: handel error etc.
+          alert(err);
+        }
+      );
     };
 
     /**
@@ -98,6 +119,9 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
      */
     $scope.$on("$destroy", function() {
       userService.logout();
+
+      // Close modals
+      receiptModal.hide();
     });
   }
 ]);

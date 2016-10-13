@@ -31,8 +31,8 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      */
     this.getCredentials = function getCredentials() {
       return {
-        'username': this.username,
-        'password': this.password
+        'username': username,
+        'password': password
       }
     };
 
@@ -109,10 +109,8 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     this.borrow = function borrow(itemIdentifier) {
       var deferred = $q.defer();
 
-      var uniqueId = CryptoJS.MD5("userServiceBorrow" + Date.now());
-
-      proxyService.emitEvent('fbs.checkout', 'fbs.checkout.success' + uniqueId, 'fbs.error', {
-        "busEvent": "fbs.checkout.success" + uniqueId,
+      proxyService.emitEvent('fbs.checkout', 'fbs.checkout.success' + itemIdentifier, 'fbs.error', {
+        "busEvent": "fbs.checkout.success" + itemIdentifier,
         "username": username,
         "password": password,
         "itemIdentifier": itemIdentifier
@@ -137,10 +135,8 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     this.renew = function renew(itemIdentifier) {
       var deferred = $q.defer();
 
-      var uniqueId = CryptoJS.MD5("userServiceRenew" + Date.now());
-
-      proxyService.emitEvent('fbs.renew', 'fbs.renew.success' + uniqueId, 'fbs.error', {
-        "busEvent": "fbs.renew.success" + uniqueId,
+      proxyService.emitEvent('fbs.renew', 'fbs.renew.success' + itemIdentifier, 'fbs.error', {
+        "busEvent": "fbs.renew.success" + itemIdentifier,
         "username": username,
         "password": password,
         "itemIdentifier": itemIdentifier
@@ -195,9 +191,9 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
       var uniqueId = CryptoJS.MD5("userServicePatron" + Date.now());
 
       proxyService.emitEvent('fbs.patron', 'fbs.patron.success' + uniqueId, 'fbs.patron.error', {
+        "busEvent": "fbs.patron.success" + uniqueId,
         "username": username,
-        "password": password,
-        "busEvent": "fbs.patron.success" + uniqueId
+        "password": password
       }).then(
         function success(patron) {
           deferred.resolve(patron);

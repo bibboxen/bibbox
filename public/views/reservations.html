@@ -37,11 +37,14 @@
   </div>
 
   <div class="buttons-bottom">
-    <a type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="gotoFront()">
+    <button type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="gotoFront()">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
-    </a>
-    <a type="button" class="btn btn-success button button-left" aria-label="Left Align" data-ng-click="receipt()">
-      <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
-    </a>
+    </button>
+    <button type="button" class="btn btn-success button button-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress">
+      <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'reservations.button.receipt' | translate }}
+    </button>
+    <button type="button" class="btn btn-success button button-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress">
+      <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'reservations.button.receipt' | translate }}
+    </button>
   </div>
 </div>

@@ -45,21 +45,15 @@ var setup = function setup() {
 	return app;
 };
 
-it('XML build', function(done) {
-  setup().then(function (app) {
+it('XML build', function() {
+  return setup().then(function (app) {
     var req = new Request(app.services.bus);
-    req.buildXML('990xxx2.00').then(function (xml) {
-      try {
-        // Remove newlines to match string below.
-        xml = xml.replace(/(\r\n|\n|\r)/gm, '');
-        xml.should.equal("<?xml version=\"1.0\" encoding=\"UTF-8\"?><ns1:sip password=\"password\" login=\"sip2\" xsi:schemaLocation=\"http://axiell.com/Schema/sip.xsd\" xmlns:ns1=\"http://axiell.com/Schema/sip.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">  <request>990xxx2.00</request></ns1:sip>");
-        done();
-      }
-      catch (err) {
-        done(err);
-      }
-    }, done);
-  }, done);
+    var xml = req.buildXML('990xxx2.00');
+
+    // Remove newlines to match string below.
+    xml = xml.replace(/(\r\n|\n|\r)/gm, '');
+    xml.should.equal("<?xml version=\"1.0\" encoding=\"UTF-8\"?><ns1:sip password=\"password\" login=\"sip2\" xsi:schemaLocation=\"http://axiell.com/Schema/sip.xsd\" xmlns:ns1=\"http://axiell.com/Schema/sip.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">  <request>990xxx2.00</request></ns1:sip>");
+  });
 });
 
 it('XML parser (error)', function(done) {

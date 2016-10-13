@@ -1,8 +1,9 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('StatusController', ['$scope', '$location', '$translate', '$timeout', 'userService', 'receiptService', 'Idle',
-  function($scope, $location, $translate, $timeout, userService, receiptService, Idle) {
+angular.module('BibBox').controller('StatusController', [
+  '$scope', '$location', '$translate', '$timeout', 'userService', 'receiptService', 'Idle', '$modal',
+  function ($scope, $location, $translate, $timeout, userService, receiptService, Idle, $modal) {
     "use strict";
 
     $scope.loading = true;
@@ -54,7 +55,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
           var i, item;
 
           // Add charged items.
-          for (i = 0; i < patron.chargedItems.length; i++) {
+          for (i = 0; i < patron.chargedItems.length; i++) {
             item = angular.copy(patron.chargedItems[i]);
             $scope.materials.push(item);
           }
@@ -150,6 +151,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
                   if (material.id === data.renewedItems[i].id) {
                     material.loading = false;
                     material.information = 'status.renew.ok';
+                    material.overdue = false;
                     material.renewed = true;
                     break;
                   }
@@ -190,6 +192,22 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
     };
 
     /**
+     * Setup fines modal.
+     */
+    var finesModal = $modal({scope: $scope, templateUrl: './views/modal_fines.html', show: false });
+    $scope.showFinesModal = function() {
+      finesModal.$promise.then(finesModal.show);
+    };
+
+    /**
+     * Setup receipt modal.
+     */
+    var receiptModal = $modal({scope: $scope, templateUrl: './views/modal_receipt.html', show: false });
+    $scope.showReceiptModal = function() {
+      receiptModal.$promise.then(receiptModal.show);
+    };
+
+    /**
      * Print receipt.
      *
      * @param type
@@ -199,11 +217,12 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
       var credentials = userService.getCredentials();
 
       // @TODO: handel error etc.
-      receiptService.status(credentials.username, credentials.password, type).then(
-        function(status) {
+      receiptService.status(credentials.username, credentials.password, type)
+      .then(
+        function (status) {
           alert('mail sent');
         },
-        function(err) {
+        function (err) {
           alert(err);
         }
       );
@@ -222,8 +241,12 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
      *
      * Log out of user service.
      */
-    $scope.$on("$destroy", function() {
+    $scope.$on("$destroy", function () {
       userService.logout();
+
+      // Close modals
+      receiptModal.hide();
+      finesModal.hide();
     });
   }
 ]);

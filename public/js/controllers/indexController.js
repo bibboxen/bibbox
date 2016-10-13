@@ -1,8 +1,7 @@
 /**
  * Index page controller.
  */
-angular.module('BibBox').controller('IndexController', [
-  '$scope', '$http', '$window', '$location', '$translate', 'proxyService', 'config', 'tmhDynamicLocale', '$interval',
+angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$window', '$location', '$translate', 'proxyService', 'config', 'tmhDynamicLocale', '$interval',
   function ($scope, $http, $window, $location, $translate, proxyService, config, tmhDynamicLocale, $interval) {
     "use strict";
 

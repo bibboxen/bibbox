@@ -1,14 +1,38 @@
 /**
  * Borrow page controller.
  */
-angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'proxyService', 'Idle',
-  function ($scope, $location, $timeout, userService, proxyService, Idle) {
+angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'proxyService', 'Idle', 'receiptService', '$modal',
+  function ($scope, $location, $timeout, userService, proxyService, Idle, receiptService, $modal) {
     'use strict';
 
     if (!userService.userLoggedIn()) {
       $location.path('/');
       return;
     }
+
+    $scope.loading = true;
+
+    userService.patron().then(
+      function (patron) {
+        $scope.loading = false;
+
+        console.log(patron);
+
+        // If patron exists, get reservations.
+        if (patron) {
+          $scope.currentPatron = patron;
+        }
+        else {
+          // @TODO: Report error.
+          console.log(err);
+        }
+      },
+      function (err) {
+        $scope.loading = false;
+        // @TODO: Report error.
+        console.log(err);
+      }
+    );
 
     // Restart idle service if not running.
     Idle.watch();
@@ -53,6 +77,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
 
         userService.borrow(id).then(
           function success(result) {
+            console.log(result);
             if (result.ok === "0") {
               for (var i = 0; i < $scope.materials.length; i++) {
                 if ($scope.materials[i].id === result.itemIdentifier) {
@@ -148,8 +173,40 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       }
     };
 
+    /**
+     * Setup receipt modal.
+     */
+    var receiptModal = $modal({scope: $scope, templateUrl: './views/modal_receipt.html', show: false });
+    $scope.showReceiptModal = function() {
+      receiptModal.$promise.then(receiptModal.show);
+    };
+
+    /**
+     * Print receipt.
+     *
+     * @param type
+     *   'mail' or 'printer'
+     */
+    $scope.receipt = function receipt(type) {
+      var credentials = userService.getCredentials();
+
+      receiptService.borrow(credentials.username, credentials.password, $scope.materials, type).then(
+        function(status) {
+          alert('mail sent');
+        },
+        function(err) {
+          // @TODO: handel error etc.
+          alert(err);
+        }
+      );
+    };
+
     // Start looking for material.
     startBarcode();
+
+    $timeout(function () {itemScannedResult('3846646417');}, 1000);
+    $timeout(function () {itemScannedResult('3846469957');}, 2000);
+    $timeout(function () {itemScannedResult('5010941603');}, 3000);
 
     /**
      * On destroy.
@@ -160,6 +217,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     $scope.$on("$destroy", function () {
       userService.logout();
       stopBarcode();
+
+      // Close modals
+      receiptModal.hide();
     });
   }
 ]);
