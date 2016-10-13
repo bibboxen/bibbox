@@ -88,28 +88,21 @@ var CTRL = function CTRL(app, bus, allowed) {
         'status': {
           'fines': true,
           'loans': true,
-          'loans_new': true,
           'reservations': true,
           'reservations_ready': true,
-          'check_ins': false,
           'pokemon': true
         },
         'checkIn': {
-          'fines': true,
-          'loans': true,
-          'loans_new': true,
-          'reservations': true,
-          'reservations_ready': true,
           'check_ins': true,
           'pokemon': true
         },
         'checkOut': {
           'fines': true,
-          'loans': true,
+          'loans': false,
           'loans_new': true,
-          'reservations': true,
+          'reservations': false,
           'reservations_ready': true,
-          'check_ins': true,
+          'check_ins': false,
           'pokemon': true
         },
         'reservations': {
@@ -171,7 +164,6 @@ var CTRL = function CTRL(app, bus, allowed) {
     ]);
   });
 
-  // @TODO: Temporary code.
   // @TODO: Remove all this translations code when it receives translations from administration.
   var trans = {
     "da": {
