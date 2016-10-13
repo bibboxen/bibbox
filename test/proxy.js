@@ -90,6 +90,65 @@ it('Proxy event should return a bus event', function (done) {
   setTimeout(finish, 1500);
 });
 
+it('Should unregister previous bus events, if new connection', function (done) {
+  // Track if bus.event2 has been fired.
+  var eventFired = 0;
+
+  // Call this when the desired event has finished.
+  var finish = function () {
+    // Make sure the event has only been fired once.
+    assert.equal(eventFired, 1, 'bus.event1 should have been fired exactly 1 time, ' + eventFired + ' times detected.');
+
+    // Finish test.
+    done();
+  };
+
+  setup().then(function (app) {
+    // Setup a socket.io client
+    var io = require('socket.io-client');
+    var socketURL = 'http://127.0.0.1:3011';
+    var options = {
+      transports: ['websocket'],
+      'force new connection': true
+    };
+
+    // Connect the socket client.
+    var client1 = io.connect(socketURL, options);
+
+    // Register events.
+    client1.on('connect', function () {
+      client1.on('bus.event1', function () {
+        eventFired++;
+      })
+    });
+
+    // Wait 1.5 second to make sure the events have fired.
+    setTimeout(finish, 1500);
+    setTimeout(function () {
+      // Setup a socket.io client
+      var io = require('socket.io-client');
+      var socketURL = 'http://127.0.0.1:3011';
+      var options = {
+        transports: ['websocket'],
+        'force new connection': true
+      };
+
+      // Connect the socket client.
+      var client2 = io.connect(socketURL, options);
+
+      // Register events.
+      client2.on('connect', function () {
+        client2.on('bus.event1', function () {
+          eventFired++;
+        });
+
+        app.services.bus.emit('bus.event1');
+      });
+    },100);
+  });
+});
+
+
 it('Teardown', function(done) {
   setup().then(function (app) {
     app.destroy();
