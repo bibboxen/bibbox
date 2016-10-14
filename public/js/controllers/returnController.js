@@ -6,7 +6,8 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     'use strict';
 
     var barcodeRunning = false;
-    var registeredEvents = [];
+    // Store raw check-in responses as it's need to print receipt.
+    var raw_materials = [];
 
     $scope.materials = [];
 
@@ -40,11 +41,12 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
       });
     });
 
+
     /**
-     * Processes a scanned item.
+     * Check-in scanned result.
      *
      * @param id
-     *   The id of the material.
+     *   The ID of material to check-in (return).
      */
     var itemScannedResult = function itemScannedResult(id) {
       // Check if item has already been added.
@@ -67,15 +69,16 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
 
         var resultEvent = 'fbs.checkin.success' + uniqueId;
 
-        registeredEvents.push(resultEvent);
-        registeredEvents.push('fbs.error');
-
-        proxyService.emitEvent('fbs.checkin', resultEvent, 'fbs.error', {
-          "busEvent": resultEvent,
+        /**
+         * @TODO: Move to service so it the same for check-in and checkout.
+         */
+        proxyService.emitEvent('fbs.checkin', 'fbs.checkin.success' + id, 'fbs.error', {
+          "busEvent": "fbs.checkin.success" + id,
           "itemIdentifier": id
         }).then(
           function success(result) {
-            console.log(result);
+            // Store the raw result (it's used to send with receipts).
+            raw_materials.push(result);
 
             if (result.ok === '1') {
               for (var i = 0; i < $scope.materials.length; i++) {
@@ -127,8 +130,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     var startBarcode = function scanBarcode() {
       barcodeRunning = true;
 
-      registeredEvents.push('barcode.data', 'barcode.err');
-
       proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
         function success(data) {
           itemScannedResult(data);
@@ -163,9 +164,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
      * Print receipt.
      */
     $scope.receipt = function receipt() {
-      console.log("returnController - receipt sending", $scope.materials);
-
-      receiptService.returnReceipt($scope.materials.length, $scope.materials, 'printer').then(
+      receiptService.returnReceipt(raw_materials, 'printer').then(
         function(status) {
           console.log('returnController - receipt', status);
           $location.path('/');
@@ -180,16 +179,17 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     // Start looking for material.
     startBarcode();
 
+    // $timeout(function () {itemScannedResult('3846646417');}, 1000);
+    // $timeout(function () {itemScannedResult('3846469957');}, 2000);
+    // $timeout(function () {itemScannedResult('5010941603');}, 3000);
+
     /**
      * On destroy.
      *
      * Stop listening for barcode.
      */
     $scope.$on("$destroy", function() {
-      // Remove registered event listeners.
-      for (var i = 0; i < registeredEvents.length; i++) {
-        proxyService.removeAllEventlisteners(registeredEvents[i]);
-      }
+      proxyService.cleanup();
 
       stopBarcode();
     });

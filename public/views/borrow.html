@@ -39,33 +39,11 @@
     <button type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="gotoFront()">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
     </button>
-    <button type="button" class="btn btn-success button button-left" data-toggle="modal" data-target="#receiptModal" data-ng-click="startTimer()" data-ng-if="currentPatron && currentPatron.emailAddress">
+    <button type="button" class="btn btn-success button button-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress">
       <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'borrow.button.receipt' | translate }}
     </button>
-    <button type="button" class="btn btn-success button button-left" data-ng-click="receipt('printer')" data-ng-click="startTimer()" data-ng-if="currentPatron && !currentPatron.emailAddress">
+    <button type="button" class="btn btn-success button button-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress">
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'borrow.button.receipt' | translate }}
     </button>
-  </div>
-
-  <!-- Receipt modal -->
-  <div class="modal fade" id="receiptModal" tabindex="-1" role="dialog" aria-labelledby="receiptModalLabel">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title" id="receiptModalLabel">{{ 'borrow.receipt.heading' | translate }}</h2>
-        </div>
-        <div class="modal-body">
-          <button type="button" class="btn btn-success button" aria-label="Left Align" data-ng-click="receipt('mail')">
-            <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> {{ 'borrow.button.receipt_mail' | translate }}
-          </button>
-          <button type="button" class="btn btn-success button" aria-label="Left Align" data-ng-click="receipt('printer')">
-            <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'borrow.button.receipt_printer' | translate }}
-          </button>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger button" data-dismiss="modal" data-ng-click="startTimer()">{{ 'borrow.button.close' | translate }}</button>
-        </div>
-      </div>
-    </div>
   </div>
 </div>

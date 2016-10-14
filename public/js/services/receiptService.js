@@ -78,8 +78,6 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
      *   Username to get receipt data for.
      * @param pass
      *   Password for that user.
-     * @param counter
-     *   ?????
      * @param items
      *   The items to
      * @param type
@@ -87,14 +85,13 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
      *
      * @returns {Function}
      */
-    this.borrow = function borrow(user, pass, counter, items, type) {
+    this.borrow = function borrow(user, pass, items, type) {
       var deferred = $q.defer();
 
-      proxyService.emitEvent('notification.borrow', 'notification.response', null, {
+      proxyService.emitEvent('notification.checkOut', 'notification.response', null, {
         'username': user,
         'password': pass,
         'mail': type === 'mail',
-        'counter': counter,
         'items': items,
         'busEvent': 'notification.response'
       }).then(
@@ -112,8 +109,6 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
     /**
      * Return receipt.
      *
-     * @param counter
-     *   ?????
      * @param items
      *   The items to
      * @param type
@@ -121,12 +116,11 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
      *
      * @returns {Function}
      */
-    this.returnReceipt = function returnReceipt(counter, items, type) {
+    this.returnReceipt = function returnReceipt(items, type) {
       var deferred = $q.defer();
 
-      proxyService.emitEvent('notification.return', 'notification.response', null, {
+      proxyService.emitEvent('notification.checkIn', 'notification.response', null, {
         'mail': type === 'mail',
-        'counter': counter,
         'items': items,
         'busEvent': 'notification.response'
       }).then(

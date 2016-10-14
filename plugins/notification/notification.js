@@ -47,6 +47,10 @@ var Notification = function Notification(bus) {
   this.mailLoansTemplate = fs.readFileSync(__dirname + '/templates/loans.html', 'utf8');
   this.textLoansTemplate = fs.readFileSync(__dirname + '/templates/loans.txt', 'utf8');
 
+  // Load new loans templates.
+  this.mailLoansNewTemplate = fs.readFileSync(__dirname + '/templates/loans_new.html', 'utf8');
+  this.textLoansNewTemplate = fs.readFileSync(__dirname + '/templates/loans_new.txt', 'utf8');
+
   // Load reservations ready templates.
   this.mailReservationsReadyTemplate = fs.readFileSync(__dirname + '/templates/reservations_ready.html', 'utf8');
   this.textReservationsReadyTemplate = fs.readFileSync(__dirname + '/templates/reservations_ready.txt', 'utf8');
@@ -55,9 +59,13 @@ var Notification = function Notification(bus) {
   this.mailReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.html', 'utf8');
   this.textReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.txt', 'utf8');
 
+  // Load checkin templates.
+  this.mailReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.html', 'utf8');
+  this.textReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.txt', 'utf8');
+
   // Load footer templates.
-  this.mailFooterTemplate = fs.readFileSync(__dirname + '/templates/footer.html', 'utf8');
-  this.textFooterTemplate = fs.readFileSync(__dirname + '/templates/footer.txt', 'utf8');
+  this.mailCheckInTemplate = fs.readFileSync(__dirname + '/templates/checkin.html', 'utf8');
+  this.textCheckInTemplate = fs.readFileSync(__dirname + '/templates/checkin.txt', 'utf8');
 
   // Add data MarkupJS pipe format.
   Mark.pipes.date = this.formatDate;
@@ -147,10 +155,21 @@ Notification.prototype.renderFines = function renderFines(html, fines) {
  *   Section title.
  * @param loans
  *   The fine elements to render.
+ * @param overdue
+ *   Loan that is overdue
  *
  * @returns {*}
  */
-Notification.prototype.renderLoans = function renderLoans(html, title, loans) {
+Notification.prototype.renderLoans = function renderLoans(html, title, loans, overdue) {
+  // Merge information about overdue loans into loans objects.
+  overdue.map(function (overdueLoan) {
+    loans.find(function (obj) {
+      if (obj.id === overdueLoan.id) {
+        obj.overdue = true;
+      }
+    });
+  });
+
   if (html) {
     return Mark.up(this.mailLoansTemplate, {
       'title': title,
@@ -166,6 +185,33 @@ Notification.prototype.renderLoans = function renderLoans(html, title, loans) {
 };
 
 /**
+ * Render new loans list.
+ *
+ * @param html
+ *   If TRUE HTML is outputted else clean text.
+ * @param title
+ *   Section title.
+ * @param items
+ *   The new loan items.
+ *
+ * @returns {*}
+ */
+Notification.prototype.renderNewLoans = function renderNewLoans(html, title, items){
+  if (html) {
+    return Mark.up(this.mailLoansNewTemplate, {
+      'title': title,
+      'items': items
+    });
+  }
+  else {
+    return Mark.up(this.textLoansNewTemplate, {
+      'title': title,
+      'items': items
+    });
+  }
+};
+
+/**
  * Render reservations ready for pick-up.
  *
  * @param html
@@ -174,7 +220,6 @@ Notification.prototype.renderLoans = function renderLoans(html, title, loans) {
  *   The reservation elements to render.
  *
  * @returns {*}
- *
  */
 Notification.prototype.renderReadyReservations = function renderReadyReservations(html, reservations) {
   if (html) {
@@ -202,6 +247,25 @@ Notification.prototype.renderReservations = function renderReservations(html, re
   }
   else {
     return Mark.up(this.textReservationsTemplate, {'items': reservations});
+  }
+};
+
+/**
+ * Render checked in items.
+ *
+ * @param html
+ *   If TRUE HTML is outputted else clean text.
+ * @param items
+ *   Returned items.
+ *
+ * @returns {*}
+ */
+Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
+  if (html) {
+    return Mark.up(this.mailCheckInTemplate, {'items': item});
+  }
+  else {
+    return Mark.up(this.textCheckInTemplate, {'items': items});
   }
 };
 
@@ -239,54 +303,29 @@ Notification.prototype.renderFooter = function renderFooter(html) {
 };
 
 /**
- * Check out receipt.
+ * Check in receipt (return items).
  *
- * @param username
- * @param password
- * @param counter
- * @param items
  * @param mail
  *   If TRUE send mail else print receipt.
- */
-Notification.prototype.checkOutReceipt = function checkOutReceipt(username, password, counter, items, mail) {
-
-};
-
-/**
- *
- * @param username
- * @param password
- * @param counter
  * @param items
- * @param mail
  */
-Notification.prototype.checkInReceipt = function checkInReceipt(username, password, counter, items, mail) {
-
-};
-
-/**
- *
- * @param type
- * @param username
- * @param password
- * @param mail
- *
- * @return {*|promise}
- *   Resolved or error message on failure.
- */
-Notification.prototype.patronReceipt = function patronReceipt(type, username, password, mail) {
+Notification.prototype.checkInReceipt = function checkInReceipt(mail, items) {
   var self = this;
   var deferred = Q.defer();
-  var layout = self.layouts[type];
+  var layout = self.layouts.checkIn;
 
   // Listen for status notification message.
   this.bus.once('notification.patronReceipt', function (data) {
+    //console.log(data);
+
     // Options on what to include in the notification.
     var options = {
       includes: {
         library: self.renderLibrary(mail),
         footer: self.renderFooter(mail),
+        checkins: layout.check_ins ? self.renderCheckIn(mail, items) : '',
         fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
+        loans_new: layout.loans_new ? self.renderNewLoans(mail, 'Lån', items) : '',
         loans: layout.loans ? self.renderLoans(mail, 'Lån', data.chargedItems) : '',
         reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
         reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
@@ -296,12 +335,12 @@ Notification.prototype.patronReceipt = function patronReceipt(type, username, pa
 
     // Data for the main render.
     var context = {
-      'name': data.homeAddress.Name,
+      'name': data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
       'header': self.headerConfig
     };
 
     var result = '';
-    if (mail) {
+    if (mail && (data.hasOwnProperty('emailAddress') && data.emailAddress !== '')) {
       result = Mark.up(self.mailTemplate, context, options);
 
       self.sendMail(data.emailAddress, result).then(function () {
@@ -320,6 +359,158 @@ Notification.prototype.patronReceipt = function patronReceipt(type, username, pa
       self.print(result);
       deferred.resolve();
     }
+  }, function (err) {
+    deferred.reject(err);
+  });
+
+  //console.log(items);
+
+  // Request the data to use in the notification.
+  this.bus.emit('fbs.patron', {
+    'username': items[0].patronIdentifier,
+    'password': 'xxxxx', // Fake password to get info.
+    'busEvent': 'notification.patronReceipt'
+  });
+
+  return deferred.promise;
+};
+
+/**
+ * Check out receipt (loan items).
+ *
+ * @param mail
+ *   If TRUE send mail else print receipt.
+ * @param items
+ * @param username
+ * @param password
+ */
+Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, username, password) {
+  var self = this;
+  var deferred = Q.defer();
+  var layout = self.layouts.checkOut;
+
+  // Filter out failed loans.
+  items.map(function (item, index) {
+    if (item.status === 'borrow.error') {
+      items.splice(index, 1);
+    }
+  });
+
+  // Listen for status notification message.
+  this.bus.once('notification.patronReceipt', function (data) {
+    // Options on what to include in the notification.
+    var options = {
+      includes: {
+        library: self.renderLibrary(mail),
+        footer: self.renderFooter(mail),
+        fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
+        loans_new: layout.loans_new ? self.renderNewLoans(mail, 'Lån', items) : '',
+        loans: layout.loans ? self.renderLoans(mail, 'Lån', data.chargedItems) : '',
+        reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
+        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
+        pokemon: layout.pokemon ? 'true' : ''
+      }
+    };
+
+    // Data for the main render.
+    var context = {
+      'name': data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
+      'header': self.headerConfig
+    };
+
+    var result = '';
+    if (mail && (data.hasOwnProperty('emailAddress') && data.emailAddress !== '')) {
+      result = Mark.up(self.mailTemplate, context, options);
+
+      self.sendMail(data.emailAddress, result).then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
+      });
+    }
+    else {
+      result = Mark.up(self.textTemplate, context, options);
+
+      // Remove empty lines (from template engine if statements).
+      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+
+      // Print it.
+      self.print(result);
+      deferred.resolve();
+     }
+   }, function (err) {
+     deferred.reject(err);
+  });
+
+   // Request the data to use in the notification.
+   this.bus.emit('fbs.patron', {
+     'username': username,
+     'password': password,
+     'busEvent': 'notification.patronReceipt'
+   });
+
+  return deferred.promise;
+};
+
+/**
+ *
+ * @param type
+ * @param mail
+ *   If TRUE send mail else print receipt.
+ * @param username
+ * @param password
+ *
+ * @return {*|promise}
+ *   Resolved or error message on failure.
+ */
+Notification.prototype.patronReceipt = function patronReceipt(type, mail, username, password) {
+  var self = this;
+  var deferred = Q.defer();
+  var layout = self.layouts[type];
+
+  // Listen for status notification message.
+  this.bus.once('notification.patronReceipt', function (data) {
+    // Options on what to include in the notification.
+    var options = {
+      includes: {
+        library: self.renderLibrary(mail),
+        footer: self.renderFooter(mail),
+        fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
+        loans: layout.loans ? self.renderLoans(mail, 'Lån', data.chargedItems, data.overdueItems) : '',
+        reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
+        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
+        pokemon: layout.pokemon ? 'true' : ''
+      }
+    };
+
+    // Data for the main render.
+    var context = {
+      'name': data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
+      'header': self.headerConfig
+    };
+
+    var result = '';
+    if (mail && (data.hasOwnProperty('emailAddress') && data.emailAddress !== '')) {
+      result = Mark.up(self.mailTemplate, context, options);
+
+      self.sendMail(data.emailAddress, result).then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
+      });
+    }
+    else {
+      result = Mark.up(self.textTemplate, context, options);
+
+      // Remove empty lines (from template engine if statements).
+      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+
+      // Print it.
+      self.print(result);
+      deferred.resolve();
+    }
+  }, function (err) {
+    deferred.reject(err);
   });
 
   // Request the data to use in the notification.
@@ -388,8 +579,7 @@ module.exports = function (options, imports, register) {
    * Listen status receipt events.
    */
   bus.on('notification.status', function (data) {
-    console.log(data);
-    notification.patronReceipt('status', data.username, data.password, data.mail).then(
+    notification.patronReceipt('status', data.mail, data.username, data.password).then(
       function () {
         bus.emit(data.busEvent, true);
       },
@@ -403,8 +593,7 @@ module.exports = function (options, imports, register) {
    * Listen status receipt events.
    */
   bus.on('notification.reservations', function (data) {
-    console.log(data);
-    notification.patronReceipt('reservations', data.username, data.password, data.mail).then(
+    notification.patronReceipt('reservations', data.mail, data.username, data.password).then(
       function () {
         bus.emit(data.busEvent, true);
       },
@@ -414,7 +603,33 @@ module.exports = function (options, imports, register) {
     );
   });
 
-  //bus.emit('notification.status', { 'username': '3208100032', 'password': '12345', 'mail': true, 'busEvent': 'test'});
+  /**
+   * Listen check-out (loans) receipt events.
+   */
+  bus.on('notification.checkOut', function (data) {
+    notification.checkOutReceipt(data.mail, data.items, data.username, data.password).then(
+      function () {
+        bus.emit(data.busEvent, true);
+      },
+      function (err) {
+        bus.emit(data.busEvent, err);
+      }
+    );
+  });
+
+  /**
+   * Listen check-in (returns) receipt events.
+   */
+  bus.on('notification.checkIn', function (data) {
+    notification.checkInReceipt(data.mail, data.items).then(
+      function () {
+        bus.emit(data.busEvent, true);
+      },
+      function (err) {
+        bus.emit(data.busEvent, err);
+      }
+    );
+  });
 
   register(null, {
     "notification": notification

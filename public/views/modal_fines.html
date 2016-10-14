@@ -1,0 +1,30 @@
+<div class="modal text-center">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="fineModalLabel">{{ 'status.fines.heading' | translate }}</h2>
+      </div>
+      <div class="modal-body">
+        <h3>{{ 'status.fines.fine' | translate }} {{ currentPatron.feeAmount | currency: ( currentPatron.currencyType | translate ) }}</h3>
+
+        <div class="panel panel-default">
+          <table class="table">
+            <tr>
+              <th></th>
+              <th>{{ 'status.material' | translate }}</th>
+              <th>{{ 'status.fine' | translate }}</th>
+            </tr>
+            <tr data-ng-repeat="material in fineItems" data-ng-class="{'bg-success': material.renewed}">
+              <td class="vert-align">{{ $index + 1 }}</td>
+              <td class="vert-align">{{ material.title ? material.title : ('status.fine.material_not_specified' | translate) }}</td>
+              <td class="vert-align">{{ material.fineAmount | currency: ( currentPatron.currencyType | translate )  }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info button" data-ng-click="$hide()">{{ 'status.button.ok' | translate }}</button>
+      </div>
+    </div>
+  </div>
+</div>

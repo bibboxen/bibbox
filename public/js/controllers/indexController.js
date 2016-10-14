@@ -1,8 +1,8 @@
 /**
  * Index page controller.
  */
-angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$window', '$location', '$translate', 'proxyService', 'config', 'tmhDynamicLocale',
-  function ($scope, $http, $window, $location, $translate, proxyService, config, tmhDynamicLocale) {
+angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$window', '$location', '$translate', 'proxyService', 'config', 'tmhDynamicLocale', '$modal',
+  function ($scope, $http, $window, $location, $translate, proxyService, config, tmhDynamicLocale, $modal) {
     "use strict";
 
     $scope.loading = true;

@@ -5,7 +5,8 @@
 var util = require('util');
 var handlebars = require('handlebars');
 var fs = require('fs');
-var Q = require('q');
+
+var debug = require('debug')('FBS:request');
 
 var Response = require('./response.js');
 
@@ -18,6 +19,10 @@ var Response = require('./response.js');
 var Request = function Request(bus) {
   var self = this;
   self.bus = bus;
+
+  // Load template used for the XMl request.
+  var source = fs.readFileSync(__dirname + '/templates/sip2_message.xml', 'utf8');
+  self.template = handlebars.compile(source);
 
   bus.once('config.fbs.res', function fbsConfig(data) {
     self.username = data.username;
@@ -68,30 +73,16 @@ Request.prototype.encodeTime = function encodeTime(timestamp) {
  * @param message
  *   Message to wrap in XML.
  *
- * @returns {*|promise}
- *   XML message or error on failure.
+ * @returns {string}
+ *   XML message.
  */
 Request.prototype.buildXML = function buildXML(message) {
-  var deferred = Q.defer();
   var self = this;
-
-  fs.readFile(__dirname + '/templates/sip2_message.xml', 'utf-8', function (error, source) {
-    if (error) {
-      deferred.reject(err);
-    }
-    else {
-      var template = handlebars.compile(source);
-      var xml = template({
-        'username': self.username,
-        'password': self.password,
-        'message': message
-      });
-
-      deferred.resolve(xml);
-    }
+  return self.template({
+    'username': self.username,
+    'password': self.password,
+    'message': message
   });
-
-  return deferred.promise;
 };
 
 /**
@@ -107,45 +98,56 @@ Request.prototype.buildXML = function buildXML(message) {
  */
 Request.prototype.send = function send(message, firstVar, callback) {
   var self = this;
-
   self.bus.once('fbs.sip2.online', function (online) {
     if (online) {
-      self.buildXML(message).then(function (xml) {
-        // Log XML message.
-        self.bus.emit('logger.debug', 'FBS send: ' + xml);
+      // Build XML message.
+      var xml = self.buildXML(message);
+      self.bus.emit('logger.debug', 'FBS send: ' + xml);
 
-        var options = {
-          'method': 'POST',
-          'url': self.endpoint,
-          'headers': {
-            'User-Agent': 'bibbox',
-            'Content-Type': 'application/xml'
-          },
-          'body': xml
-        };
+      var options = {
+        'method': 'POST',
+        'url': self.endpoint,
+        'headers': {
+          'User-Agent': 'bibbox',
+          'Content-Type': 'application/xml'
+        },
+        'body': xml
+      };
 
-        var request = require('request');
-        request.post(options, function (error, response, body) {
-          if (error || response.statusCode !== 200) {
-            // Log error message from FBS.
-            self.bus.emit('logger.error', 'FBS error: ' + error + ' <-> ' + response.statusCode);
+      var request = require('request');
+      request.post(options, function (error, response, body) {
 
-            callback(error, null);
-          }
-          else {
-            // Log message from FBS.
-            self.bus.emit('logger.debug', 'FBS response: ' + body);
+        // Send debug message.
+        debug(response.statusCode + ':' + message.substr(0,2));
 
-            var err = null;
-            var res = new Response(body, firstVar);
+        var res = null;
+        if (error || response.statusCode !== 200) {
+          if (!error) {
+            res = new Response(body, firstVar);
             if (res.hasError()) {
-              err = res.getError();
-              self.bus.emit('logger.error', 'FBS error: ' + err);
+              error = new Error(res.getError());
             }
-
-            callback(err, res);
+            else {
+              error = new Error('Unknown error', response.statusCode());
+            }
           }
-        });
+          // Log error message from FBS.
+          self.bus.emit('logger.error', 'FBS error: ' + error + ' <-> ' + response.statusCode);
+          callback(error, null);
+        }
+        else {
+          // Log message from FBS.
+          self.bus.emit('logger.debug', 'FBS response: ' + body);
+
+          var err = null;
+          res = new Response(body, firstVar);
+          if (res.hasError()) {
+            err = new Error(res.getError());
+            self.bus.emit('logger.error', 'FBS error: ' + err);
+          }
+
+          callback(err, res);
+        }
       });
     }
     else {

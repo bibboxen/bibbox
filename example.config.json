@@ -40,7 +40,9 @@
       "^fbs.renew$",
       "^fbs.renew.all$",
       "^notification.status$",
-      "^notification.reservations$"
+      "^notification.reservations$",
+      "^notification.checkIn$",
+      "^notification.checkOut$"
     ]
   },
   "translation": {
