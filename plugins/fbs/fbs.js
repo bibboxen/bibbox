@@ -266,12 +266,13 @@ module.exports = function (options, imports, register) {
         var material = {
           "itemIdentifier": data.itemIdentifier,
           "offline": true,
-          "ok": true,
-          "renewalOk": false,
+          "ok": "1",
           "itemProperties": {
             "title": data.itemIdentifier
           }
         };
+
+        // @TODO: Save in storage for delivery later.
 
         bus.emit(data.busEvent, material);
         console.log("accepted offline borrow");
@@ -296,12 +297,29 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, res);
     },
     function (err) {
-      bus.emit('fbs.err', err);
+      if (err.message === 'FBS is offline') {
+        var material = {
+          "itemIdentifier": data.itemIdentifier,
+          "offline": true,
+          "ok": "1",
+          "itemProperties": {
+            "title": data.itemIdentifier
+          }
+        };
 
-      if (data.errorEvent) {
-        bus.emit(data.errorEvent, {
-          "message": err.message
-        });
+        // @TODO: Save in storage for delivery later.
+
+        bus.emit(data.busEvent, material);
+        console.log("accepted offline borrow");
+      }
+      else {
+        bus.emit('fbs.err', err);
+
+        if (data.errorEvent) {
+          bus.emit(data.errorEvent, {
+            "message": err.message
+          });
+        }
       }
     });
   });
