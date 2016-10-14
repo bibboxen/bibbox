@@ -46,6 +46,9 @@ angular.module('BibBox').controller('StatusController', [
 
         console.log(patron);
 
+        // Restart idle service if not running.
+        Idle.watch();
+
         $scope.currentPatron = patron;
 
         $scope.fineItems = patron.fineItems;
@@ -86,6 +89,9 @@ angular.module('BibBox').controller('StatusController', [
         }
       },
       function (err) {
+        // Restart idle service if not running.
+        Idle.watch();
+
         // @TODO: Report error
         console.log(err);
       }
@@ -103,6 +109,9 @@ angular.module('BibBox').controller('StatusController', [
         function success(data) {
           material.loading = false;
           console.log(data);
+
+          // Restart idle service if not running.
+          Idle.watch();
 
           if (!data) {
             material.information = 'status.renew.failed';
@@ -125,6 +134,9 @@ angular.module('BibBox').controller('StatusController', [
           material.information = 'status.renew.failed';
           material.renewed = false;
           console.log(err);
+
+          // Restart idle service if not running.
+          Idle.watch();
         }
       );
     };
@@ -140,6 +152,9 @@ angular.module('BibBox').controller('StatusController', [
       userService.renewAll().then(
         function success(data) {
           console.log(data);
+
+          // Restart idle service if not running.
+          Idle.watch();
 
           if (data.ok === '1') {
             // Update renewed items.
@@ -187,6 +202,9 @@ angular.module('BibBox').controller('StatusController', [
         function error(err) {
           // @TODO: Handle error!
           console.log(err);
+
+          // Restart idle service if not running.
+          Idle.watch();
         }
       );
     };
@@ -221,9 +239,13 @@ angular.module('BibBox').controller('StatusController', [
       .then(
         function (status) {
           alert('mail sent');
+
+          // @TODO: Redirect to frontpage.
         },
         function (err) {
           alert(err);
+
+          // @TODO: Handle error.
         }
       );
     };

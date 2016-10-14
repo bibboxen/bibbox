@@ -243,6 +243,11 @@ var CTRL = function CTRL(app, bus, allowed) {
       "return.information": "Information",
       "return.was_successful": "Materialet er afleveret",
 
+      "receipt.heading": "Kvittering",
+      "receipt.button.receipt_mail": "Mail",
+      "receipt.button.receipt_printer": "Print",
+      "receipt.button.close": "Luk",
+
       "numpad.back": "Slet",
       "numpad.enter": "Enter",
       "numpad.one": "1",

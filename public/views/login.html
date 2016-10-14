@@ -19,8 +19,7 @@
   <div data-ng-include="'views/login-' + display + '.html'" class="login-container"></div>
 
   <div class="buttons-bottom">
-    <a type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="useManualLogin(false)"
-       data-ng-if="display !== 'default'">
+    <a type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="back()">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
     </a>
   </div>
