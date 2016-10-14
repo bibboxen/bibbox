@@ -1,8 +1,8 @@
-{{ title }}
+{{ headline|translate }}
 -----------------------------------------------
-{{items|sort>interestDate}}
-Materialnr.: {{ id }}
-{{ title }}{{if author}}
-{{ author }}{{/if}}
-Afleveres senest.: {{ returnDate|date }}
-{{/items}}
+{% for item in items|sort %}
+Materialnr.: {{ item.id }}
+{{ item.title }}{% if item.author %}
+{{ item.author }}{% endif %}
+Afleveres senest.: {{ item.returnDate|date }}
+{% endfor %}

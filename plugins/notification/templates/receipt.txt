@@ -2,34 +2,34 @@
 
 Låner: {{ name }}
 
-{{if new_loans}}
-{{ new_loans }}
+{% if loans_new %}
+{{ loans_new }}
 -----------------------------------------------
-{{/if}}
+{% endif %}
 
-{{if loans}}
+{% if loans %}
 {{ loans }}
 -----------------------------------------------
-{{/if}}
+{% endif %}
 
-{{if reservations_ready}}
+{% if reservations_ready %}
 {{ reservations_ready }}
 -----------------------------------------------
-{{/if}}
+{% endif %}
 
-{{if reservations}}
+{% if reservations %}
 {{ reservations }}
 -----------------------------------------------
-{{/if}}
+{% endif %}
 
-{{if fines}}
+{% if fines %}
 {{ fines }}
 -----------------------------------------------
-{{/if}}
+{% endif %}
 
 
 
-{{if pokemon}}
+{% if pokemon %}
 `;-.          ___,
   `.`\_...._/`.-"`
     \        /      ,
@@ -43,4 +43,4 @@ Låner: {{ name }}
      >   \    /
     (_,-'`> .'
 jgs      (_,'
-{{/if}}
+{% endif %}

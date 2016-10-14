@@ -5,9 +5,11 @@
 
 var printer = require('printer');
 var Mark = require('markup-js');
+var twig = require('twig');
 var nodemailer = require('nodemailer');
-var Q = require('q');
+var i18n = require('i18n');
 
+var Q = require('q');
 var fs = require('fs');
 
 var Notification = function Notification(bus) {
@@ -31,73 +33,85 @@ var Notification = function Notification(bus) {
   });
   bus.emit('config.notification', {'busEvent': 'notification.config'});
 
+  // Configure I18N with supported languages.
+  i18n.configure({
+    locales:['en', 'da'],
+    defaultLocale: 'en',
+    indent: "  ",
+    autoReload: true,
+    directory: __dirname + '/locales'
+  });
+
+  twig.extendFilter('translate', function (str) {
+    return i18n.__(str);
+  });
+
   // Load template snippets.
-  this.mailTemplate = fs.readFileSync(__dirname + '/templates/receipt.html', 'utf8');
-  this.textTemplate = fs.readFileSync(__dirname + '/templates/receipt.txt', 'utf8');
+  this.mailTemplate = twig.twig({
+    'data': fs.readFileSync(__dirname + '/templates/receipt.html', 'utf8')
+  });
+  this.textTemplate = twig.twig({
+    'data': fs.readFileSync(__dirname + '/templates/receipt.txt', 'utf8')
+  });
 
   // Load library header templates.
-  this.mailLibraryTemplate = fs.readFileSync(__dirname + '/templates/library.html', 'utf8');
-  this.textLibraryTemplate = fs.readFileSync(__dirname + '/templates/library.txt', 'utf8');
+  this.mailLibraryTemplate = twig.twig({
+    'data': fs.readFileSync(__dirname + '/templates/library.html', 'utf8')
+  });
+  this.textLibraryTemplate = twig.twig({
+    'data': fs.readFileSync(__dirname + '/templates/library.txt', 'utf8')
+  });
 
   // Load fines templates.
-  this.mailFinesTemplate = fs.readFileSync(__dirname + '/templates/fines.html', 'utf8');
-  this.textFinesTemplate = fs.readFileSync(__dirname + '/templates/fines.txt', 'utf8');
+  this.mailFinesTemplate = twig.twig({
+    'data': fs.readFileSync(__dirname + '/templates/fines.html', 'utf8')
+  });
+  this.textFinesTemplate = twig.twig({
+    'data': fs.readFileSync(__dirname + '/templates/fines.txt', 'utf8')
+  });
 
   // Load loans templates.
-  this.mailLoansTemplate = fs.readFileSync(__dirname + '/templates/loans.html', 'utf8');
-  this.textLoansTemplate = fs.readFileSync(__dirname + '/templates/loans.txt', 'utf8');
+  this.mailLoansTemplate = twig.twig({
+    'data': fs.readFileSync(__dirname + '/templates/loans.html', 'utf8')
+  });
+  this.textLoansTemplate = twig.twig({
+    'data': fs.readFileSync(__dirname + '/templates/loans.txt', 'utf8')
+  });
 
   // Load new loans templates.
   this.mailLoansNewTemplate = fs.readFileSync(__dirname + '/templates/loans_new.html', 'utf8');
   this.textLoansNewTemplate = fs.readFileSync(__dirname + '/templates/loans_new.txt', 'utf8');
 
   // Load reservations ready templates.
-  this.mailReservationsReadyTemplate = fs.readFileSync(__dirname + '/templates/reservations_ready.html', 'utf8');
-  this.textReservationsReadyTemplate = fs.readFileSync(__dirname + '/templates/reservations_ready.txt', 'utf8');
+  this.mailReservationsReadyTemplate = twig.twig({
+    'data': fs.readFileSync(__dirname + '/templates/reservations_ready.html', 'utf8')
+  });
+  this.textReservationsReadyTemplate = twig.twig({
+    'data': fs.readFileSync(__dirname + '/templates/reservations_ready.txt', 'utf8')
+  });
 
   // Load reservations templates.
-  this.mailReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.html', 'utf8');
-  this.textReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.txt', 'utf8');
+  this.mailReservationsTemplate = twig.twig({
+    'data':  fs.readFileSync(__dirname + '/templates/reservations.html', 'utf8')
+  });
+  this.textReservationsTemplate = twig.twig({
+    'data': fs.readFileSync(__dirname + '/templates/reservations.txt', 'utf8')
+  });
 
   // Load check-in templates.
   this.mailCheckInTemplate = fs.readFileSync(__dirname + '/templates/checkin.html', 'utf8');
   this.textCheckInTemplate = fs.readFileSync(__dirname + '/templates/checkin.txt', 'utf8');
 
   // Load footer templates.
-  this.mailFooterTemplate = fs.readFileSync(__dirname + '/templates/footer.html', 'utf8');
-  this.textFooterTemplate = fs.readFileSync(__dirname + '/templates/footer.txt', 'utf8');
-
-  // Add data MarkupJS pipe format.
-  Mark.pipes.date = this.formatDate;
+  this.mailFooterTemplate = twig.twig({
+    'data': fs.readFileSync(__dirname + '/templates/footer.html', 'utf8')
+  });
+  this.textFooterTemplate = twig.twig({
+    'data': fs.readFileSync(__dirname + '/templates/footer.txt', 'utf8')
+  });
 
   // Get default printer name and use that as printer.
   this.defaultPrinterName = printer.getDefaultPrinterName();
-};
-
-/**
- * Date formatter.
- *
- * User as MarkupJS pipe function.
- *
- * @param milliseconds
- *   The timestamp to format.
- *
- * @returns {string}
- *   The data formatted.
- */
-Notification.prototype.formatDate = function formatDate(milliseconds) {
-  var date = new Date(milliseconds);
-
-  // Prefix month with '0';
-  var month = ('0' + (date.getMonth() + 1)).slice(-2);
-
-  // Prefix day with '0';
-  var day = ('0' + (date.getDate() + 1)).slice(-2);
-
-  // Only get latest 2 char of year.
-  var year = ('' + date.getFullYear()).slice(-2);
-
-  return '' + day + '/' + month + '/' + year;
 };
 
 /**
@@ -119,10 +133,10 @@ Notification.prototype.getDefaultPrinterName = function getDefaultPrinterName() 
  */
 Notification.prototype.renderLibrary = function renderLibrary(html) {
   if (html) {
-    return Mark.up(this.mailLibraryTemplate, this.libraryHeader);
+    return this.mailLibraryTemplate.render(this.libraryHeader);
   }
   else {
-    return Mark.up(this.textLibraryTemplate, this.libraryHeader);
+    return this.textLibraryTemplate.render(this.libraryHeader);
   }
 };
 
@@ -139,10 +153,10 @@ Notification.prototype.renderLibrary = function renderLibrary(html) {
  */
 Notification.prototype.renderFines = function renderFines(html, fines) {
   if (html) {
-    return Mark.up(this.mailFinesTemplate, {'items': fines});
+    return this.mailFinesTemplate.render({'items': fines});
   }
   else {
-    return Mark.up(this.textFinesTemplate, {'items': fines});
+    return this.textFinesTemplate.render({'items': fines});
   }
 };
 
@@ -151,7 +165,7 @@ Notification.prototype.renderFines = function renderFines(html, fines) {
  *
  * @param html
  *   If TRUE HTML is outputted else clean text.
- * @param title
+ * @param headline
  *   Section title.
  * @param loans
  *   The fine elements to render.
@@ -160,7 +174,7 @@ Notification.prototype.renderFines = function renderFines(html, fines) {
  *
  * @returns {*}
  */
-Notification.prototype.renderLoans = function renderLoans(html, title, loans, overdue) {
+Notification.prototype.renderLoans = function renderLoans(html, headline, loans, overdue) {
   // Merge information about overdue loans into loans objects.
   overdue.map(function (overdueLoan) {
     loans.find(function (obj) {
@@ -171,14 +185,14 @@ Notification.prototype.renderLoans = function renderLoans(html, title, loans, ov
   });
 
   if (html) {
-    return Mark.up(this.mailLoansTemplate, {
-      'title': title,
+    return this.mailLoansTemplate.render({
+      'headline': headline,
       'items': loans
     });
   }
   else {
-    return Mark.up(this.textLoansTemplate, {
-      'title': title,
+    return this.textLoansTemplate.render({
+      'headline': headline,
       'items': loans
     });
   }
@@ -223,10 +237,10 @@ Notification.prototype.renderNewLoans = function renderNewLoans(html, title, ite
  */
 Notification.prototype.renderReadyReservations = function renderReadyReservations(html, reservations) {
   if (html) {
-    return Mark.up(this.mailReservationsReadyTemplate, {'items': reservations});
+    return this.mailReservationsReadyTemplate.render({'items': reservations});
   }
   else {
-    return Mark.up(this.textReservationsReadyTemplate, {'items': reservations});
+    return this.textReservationsReadyTemplate.render({'items': reservations});
   }
 };
 
@@ -243,10 +257,10 @@ Notification.prototype.renderReadyReservations = function renderReadyReservation
  */
 Notification.prototype.renderReservations = function renderReservations(html, reservations) {
   if (html) {
-    return Mark.up(this.mailReservationsTemplate, {'items': reservations});
+    return this.mailReservationsTemplate.render({'items': reservations});
   }
   else {
-    return Mark.up(this.textReservationsTemplate, {'items': reservations});
+    return this.textReservationsTemplate.render({'items': reservations});
   }
 };
 
@@ -277,28 +291,11 @@ Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
  * @returns {*}
  */
 Notification.prototype.renderFooter = function renderFooter(html) {
-  var self = this;
-  // @TODO: Make util library thing for this stuff. HACK ALERT.
-  function receiptDate() {
-    function zeroPad(number) {
-      return ('0' + (number)).slice(-2)
-    }
-
-    var d = new Date();
-    return '' + zeroPad(d.getDate()) + '/' + zeroPad(d.getMonth() + 1) + '/' + d.getFullYear().toString().slice(-2) + ' ' + zeroPad(d.getHours()) + ':' + zeroPad(d.getMinutes()) + ':' + zeroPad(d.getSeconds());
-  }
-
   if (html) {
-    return Mark.up(this.mailFooterTemplate, {
-      'html': self.footer.html,
-      'date': receiptDate()
-    });
+    return this.mailFooterTemplate.render({ 'debug': true, 'content': this.footer.html });
   }
   else {
-    return Mark.up(this.textFooterTemplate, {
-      'text': self.footer.text,
-      'date': receiptDate()
-    });
+    return this.textFooterTemplate.render({ 'text': this.footer.text });
   }
 };
 
@@ -313,6 +310,8 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items) {
   var self = this;
   var deferred = Q.defer();
   var layout = self.layouts.checkIn;
+
+  // i18n.setLocale('de');
 
   // Listen for status notification message.
   this.bus.once('notification.patronReceipt', function (data) {
@@ -384,6 +383,8 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
   var self = this;
   var deferred = Q.defer();
   var layout = self.layouts.checkOut;
+
+  // i18n.setLocale('de');
 
   // Filter out failed loans.
   items.map(function (item, index) {
@@ -464,30 +465,24 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
   var deferred = Q.defer();
   var layout = self.layouts[type];
 
+  // i18n.setLocale('de');
+
   // Listen for status notification message.
   this.bus.once('notification.patronReceipt', function (data) {
-    // Options on what to include in the notification.
-    var options = {
-      includes: {
-        library: self.renderLibrary(mail),
-        footer: self.renderFooter(mail),
-        fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
-        loans: layout.loans ? self.renderLoans(mail, 'Lån', data.chargedItems, data.overdueItems) : '',
-        reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
-        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
-        pokemon: layout.pokemon ? 'true' : ''
-      }
-    };
-
-    // Data for the main render.
     var context = {
       'name': data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
-      'header': self.headerConfig
+      'header': self.headerConfig,
+      'library': self.renderLibrary(mail),
+      'fines': layout.fines ? self.renderFines(mail, data.fineItems) : '',
+      'loans': layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
+      'reservations': layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
+      'reservations_ready': layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
+      'footer': self.renderFooter(mail)
     };
 
     var result = '';
     if (mail && (data.hasOwnProperty('emailAddress') && data.emailAddress !== undefined)) {
-      result = Mark.up(self.mailTemplate, context, options);
+      result = self.mailTemplate.render(context);
 
       self.sendMail(data.emailAddress, result).then(function () {
         deferred.resolve();
@@ -496,7 +491,7 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       });
     }
     else {
-      result = Mark.up(self.textTemplate, context, options);
+      result = self.textTemplate.render(context);
 
       // Remove empty lines (from template engine if statements).
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
@@ -626,6 +621,8 @@ module.exports = function (options, imports, register) {
       }
     );
   });
+
+  notification.patronReceipt('status', true, '3208100032', '12345');
 
   register(null, {
     "notification": notification
