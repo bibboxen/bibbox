@@ -1,8 +1,8 @@
 {{ title }}
 -----------------------------------------------
-{{items|sort>dueDate}}
-Materialnr.: {{ id }}
-{{ title }}{{if author}}
-{{ author }}{{/if}}
-Afleveres senest.: {{ dueDate|date }}
+{{items|sort>transactionDate}}
+Materialnr.: {{ itemIdentifier }}
+{{ itemProperties.title }}{{if itemProperties.author}}
+{{ itemProperties.author }}{{/if}}
+Afleveret: {{ transactionDate|date }}
 {{/items}}

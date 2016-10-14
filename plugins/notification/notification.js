@@ -59,13 +59,13 @@ var Notification = function Notification(bus) {
   this.mailReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.html', 'utf8');
   this.textReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.txt', 'utf8');
 
-  // Load checkin templates.
-  this.mailReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.html', 'utf8');
-  this.textReservationsTemplate = fs.readFileSync(__dirname + '/templates/reservations.txt', 'utf8');
-
-  // Load footer templates.
+  // Load check-in templates.
   this.mailCheckInTemplate = fs.readFileSync(__dirname + '/templates/checkin.html', 'utf8');
   this.textCheckInTemplate = fs.readFileSync(__dirname + '/templates/checkin.txt', 'utf8');
+
+  // Load footer templates.
+  this.mailFooterTemplate = fs.readFileSync(__dirname + '/templates/footer.html', 'utf8');
+  this.textFooterTemplate = fs.readFileSync(__dirname + '/templates/footer.txt', 'utf8');
 
   // Add data MarkupJS pipe format.
   Mark.pipes.date = this.formatDate;
@@ -262,7 +262,7 @@ Notification.prototype.renderReservations = function renderReservations(html, re
  */
 Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
   if (html) {
-    return Mark.up(this.mailCheckInTemplate, {'items': item});
+    return Mark.up(this.mailCheckInTemplate, {'items': items});
   }
   else {
     return Mark.up(this.textCheckInTemplate, {'items': items});
@@ -316,14 +316,12 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items) {
 
   // Listen for status notification message.
   this.bus.once('notification.patronReceipt', function (data) {
-    //console.log(data);
-
     // Options on what to include in the notification.
     var options = {
       includes: {
         library: self.renderLibrary(mail),
         footer: self.renderFooter(mail),
-        checkins: layout.check_ins ? self.renderCheckIn(mail, items) : '',
+        check_ins: layout.check_ins ? self.renderCheckIn(mail, items) : '',
         fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
         loans_new: layout.loans_new ? self.renderNewLoans(mail, 'Lån', items) : '',
         loans: layout.loans ? self.renderLoans(mail, 'Lån', data.chargedItems) : '',
@@ -340,7 +338,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items) {
     };
 
     var result = '';
-    if (mail && (data.hasOwnProperty('emailAddress') && data.emailAddress !== '')) {
+    if (mail && (data.hasOwnProperty('emailAddress') && data.emailAddress !== undefined)) {
       result = Mark.up(self.mailTemplate, context, options);
 
       self.sendMail(data.emailAddress, result).then(function () {
@@ -363,12 +361,10 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items) {
     deferred.reject(err);
   });
 
-  //console.log(items);
-
   // Request the data to use in the notification.
   this.bus.emit('fbs.patron', {
     'username': items[0].patronIdentifier,
-    'password': 'xxxxx', // Fake password to get info.
+    'password': '',
     'busEvent': 'notification.patronReceipt'
   });
 
@@ -419,7 +415,7 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
     };
 
     var result = '';
-    if (mail && (data.hasOwnProperty('emailAddress') && data.emailAddress !== '')) {
+    if (mail && (data.hasOwnProperty('emailAddress') && data.emailAddress !== undefined)) {
       result = Mark.up(self.mailTemplate, context, options);
 
       self.sendMail(data.emailAddress, result).then(function () {
@@ -490,7 +486,7 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
     };
 
     var result = '';
-    if (mail && (data.hasOwnProperty('emailAddress') && data.emailAddress !== '')) {
+    if (mail && (data.hasOwnProperty('emailAddress') && data.emailAddress !== undefined)) {
       result = Mark.up(self.mailTemplate, context, options);
 
       self.sendMail(data.emailAddress, result).then(function () {
