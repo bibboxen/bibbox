@@ -255,7 +255,20 @@ Response.prototype.parseXML = function parseXML() {
   }
   else {
     var err = this.xml.match(/(<error>)(.*)(<\/error>)/);
-    this.error = err[2];
+    if (err) {
+      this.error = err[2];
+    }
+    else {
+      // It might be a reset service error.
+      var err = this.xml.match(/(<errorCode>)(.*)(<\/errorCode>)/);
+      if (err) {
+        var id = this.xml.match(/(<correlationId>)(.*)(<\/correlationId>)/);
+        this.error = err[2] + ' - ' + (id.length ? id[2] : 'Unknown correlation id');
+      }
+      else {
+        this.error = 'Unknown error';
+      }
+    }
   }
 };
 
