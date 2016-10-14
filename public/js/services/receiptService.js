@@ -3,8 +3,8 @@
  * Handles request for receipt(s) (printed) and notifications (mailed).
  */
 
-angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
-  function ($q, proxyService) {
+angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'proxyService',
+  function ($q, tmhDynamicLocale, proxyService) {
     'use strict';
 
     /**
@@ -26,6 +26,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
         'username': user,
         'password': pass,
         'mail': type === 'mail',
+        'lang': tmhDynamicLocale.get(),
         'busEvent': 'notification.response'
       }).then(
         function success(status) {
@@ -58,6 +59,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
         'username': user,
         'password': pass,
         'mail': type === 'mail',
+        'lang': tmhDynamicLocale.get(),
         'busEvent': 'notification.response'
       }).then(
         function success(status) {
@@ -92,6 +94,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
         'username': user,
         'password': pass,
         'mail': type === 'mail',
+        'lang': tmhDynamicLocale.get(),
         'items': items,
         'busEvent': 'notification.response'
       }).then(
@@ -121,6 +124,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
 
       proxyService.emitEvent('notification.checkIn', 'notification.response', null, {
         'mail': type === 'mail',
+        'lang': tmhDynamicLocale.get(),
         'items': items,
         'busEvent': 'notification.response'
       }).then(

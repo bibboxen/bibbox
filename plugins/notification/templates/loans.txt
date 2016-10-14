@@ -1,8 +1,8 @@
 {{ headline|translate }}
 -----------------------------------------------
 {% for item in items|sort %}
-Materialnr.: {{ item.id }}
+{{ 'receipt.loans.id'|translate }} {{ item.id }}
 {{ item.title }}{% if item.author %}
 {{ item.author }}{% endif %}
-Afleveres senest.: {{ item.returnDate|date }}
+{{ 'receipt.loans.returnDate'|translate }} {{ item.returnDate|date }}
 {% endfor %}

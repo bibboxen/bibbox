@@ -1,22 +1,24 @@
-{{if items}}
-<h2 style="color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: bold;padding: 0;margin: 0;text-align: left;line-height: 1.3;word-break: normal;margin-bottom: 0;font-size: 22px;">Afleveret</h2>
+{% if items %}
+<h2 style="color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: bold;padding: 0;margin: 0;text-align: left;line-height: 1.3;word-break: normal;margin-bottom: 0;font-size: 22px;">{{ 'receipt.checkin.headline'|translate }}</h2>
 
-{{items|sort>transactionDate}}
+{% for item in items|sort %}
 <table class="six columns" style="border-spacing: 0;border-collapse: collapse;padding: 0;vertical-align: top;text-align: left;margin: 0 auto;width: 580px;">
   <tr style="padding: 0;vertical-align: top;text-align: left;">
     <td class="panel" style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;background: #eeeeee;border: 1px solid #cccccc;border-bottom: 0;border-collapse: collapse !important;">
       <table style="border-spacing: 0;border-collapse: collapse;padding: 0;vertical-align: top;text-align: left;border-top: 1px solid #ffffff;border-bottom: 1px solid #cccccc;width: 100%;">
         <tr style="padding: 0;vertical-align: top;text-align: left;">
           <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 10px;vertical-align: top;text-align: left;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 1.4em;font-size: 14px;border-collapse: collapse !important;">
-            <strong>Materialnr.:</strong> {{ itemIdentifier }}<br/>
-            <strong>Titel:</strong> {{ itemProperties.title }}<br/>{{if itemProperties.author}}
-            <strong>Forfatter:</strong> {{ itemProperties.author }}<br/>{{/if}}
-            <strong>Afleveret:</strong> {{ transactionDate|date  }}
+            <strong>{{ 'receipt.checkin.id'|translate }}</strong> {{ item.itemIdentifier }}<br/>
+            <strong>{{ 'receipt.checkin.title'|translate }}</strong> {{ item.itemProperties.title }}<br/>
+            {% if item.itemProperties.author %}
+            <strong>{{ 'receipt.checkin.author'|translate }}</strong> {{ item.itemProperties.author }}<br/>
+            {% endif %}
+            <strong>{{ 'receipt.checkin.transactionDate'|translate }}</strong> {{ (item.transactionDate/1000)|date('d/m/y') }}
           </td>
       </table>
     </td>
     <td class="expander" style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0 !important;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;visibility: hidden;width: 0px;border-collapse: collapse !important;"></td>
   </tr>
 </table>
-{{/items}}
-{{/if}}
+{% endfor %}
+{% endif %}

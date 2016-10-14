@@ -81,6 +81,8 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
       $translate.use(langKey);
       tmhDynamicLocale.set(langKey);
     };
+    // @TODO: default language from config.
+    tmhDynamicLocale.set('da');
 
     /**
      * on Destroy.

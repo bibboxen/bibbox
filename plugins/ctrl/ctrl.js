@@ -60,6 +60,10 @@ var CTRL = function CTRL(app, bus, allowed) {
    */
   bus.on('config.notification', function libraryConfig(data) {
     bus.emit(data.busEvent, {
+      'config': {
+        'default_lang': 'da',
+        'date_format': 'd/m/y'
+      },
       'mailer': {
         'host': 'smtp.aarhuskommune.local',
         'port': 25,

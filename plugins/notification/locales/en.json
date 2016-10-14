@@ -25,5 +25,15 @@
   "receipt.reservations.ready.pickupId": "Pickup ID:",
   "receipt.reservations.ready.id": "Material Nr.:",
   "receipt.reservations.ready.title": "Title:",
-  "receipt.reservations.ready.author": "Author:"
+  "receipt.reservations.ready.author": "Author:",
+  "receipt.checkin.headline": "Returned materials",
+  "receipt.checkin.id": "Material Nr.:",
+  "receipt.checkin.transactionDate": "Transaction date:",
+  "receipt.checkin.title": "Title:",
+  "receipt.checkin.author": "Author:",
+  "receipt.loans.new.headline": "New loans",
+  "receipt.loans.new.id": "Material Nr.:",
+  "receipt.loans.new.title": "Title:",
+  "receipt.loans.new.dueDate": "Due date:",
+  "receipt.loans.new.author": "Author:"
 }
