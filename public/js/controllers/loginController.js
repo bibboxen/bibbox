@@ -217,6 +217,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * On destroy.
      */
     $scope.$on("$destroy", function() {
+      proxyService.cleanup();
       stopBarcode();
     });
   }

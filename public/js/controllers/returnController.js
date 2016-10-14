@@ -6,33 +6,41 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     'use strict';
 
     var barcodeRunning = false;
+    // Store raw check-in responses as it's need to print receipt.
+    var raw_materials = [];
+
+    $scope.materials = [];
 
     // Restart idle service if not running.
     Idle.watch();
 
+    /**
+     * Listen for idle warning.
+     */
     $scope.$on('IdleWarn', function (e, countdown) {
       $scope.$apply(function () {
         $scope.countdown = countdown;
       });
     });
 
+    /**
+     * Listen for idle timeout.
+     */
     $scope.$on('IdleTimeout', function () {
       $scope.$evalAsync(function () {
         $location.path('/');
       });
     });
 
+    /**
+     * Listen for idle end.
+     */
     $scope.$on('IdleEnd', function () {
       $scope.$apply(function () {
         $scope.countdown = null;
       });
     });
 
-    // List materials on screen.
-    $scope.materials = [];
-
-    // Store raw check-in responses as it's need to print receipt.
-    var raw_materials = [];
 
     /**
      * Check-in scanned result.
@@ -41,6 +49,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
      *   The ID of material to check-in (return).
      */
     var itemScannedResult = function itemScannedResult(id) {
+      // Check if item has already been added.
       var itemNotAdded = true;
       for (var i = 0; i < $scope.materials.length; i++) {
         if ($scope.materials[i].id === id) {
@@ -48,12 +57,17 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
           break;
         }
       }
+      
       if (itemNotAdded) {
         $scope.materials.push({
           "id": id,
           "title": id,
           "loading": true
         });
+
+        var uniqueId = CryptoJS.MD5("returnControllerReturn" + Date.now());
+
+        var resultEvent = 'fbs.checkin.success' + uniqueId;
 
         /**
          * @TODO: Move to service so it the same for check-in and checkout.
@@ -152,11 +166,12 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     $scope.receipt = function receipt() {
       receiptService.returnReceipt(raw_materials, 'printer').then(
         function(status) {
-          alert('mail sent');
+          console.log('returnController - receipt', status);
+          $location.path('/');
         },
         function(err) {
           // @TODO: handel error etc.
-          alert(err);
+          console.log('returnController - receipt', err);
         }
       );
     };
@@ -174,6 +189,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
      * Stop listening for barcode.
      */
     $scope.$on("$destroy", function() {
+      proxyService.cleanup();
       stopBarcode();
     });
   }

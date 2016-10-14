@@ -111,8 +111,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
               }
             }
 
-            //$scope.materials.push(item);
-
             startBarcode();
           },
           function error(err) {
@@ -215,10 +213,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
      * Stop listening for barcode.
      */
     $scope.$on("$destroy", function () {
+      proxyService.cleanup();
       userService.logout();
       stopBarcode();
-
-      // Close modals
       receiptModal.hide();
     });
   }

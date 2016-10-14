@@ -2,8 +2,8 @@
  * Status page controller.
  */
 angular.module('BibBox').controller('StatusController', [
-  '$scope', '$location', '$translate', '$timeout', 'userService', 'receiptService', 'Idle', '$modal',
-  function ($scope, $location, $translate, $timeout, userService, receiptService, Idle, $modal) {
+  '$scope', '$location', '$translate', '$timeout', 'userService', 'receiptService', 'Idle', '$modal', 'proxyService',
+  function ($scope, $location, $translate, $timeout, userService, receiptService, Idle, $modal, proxyService) {
     "use strict";
 
     $scope.loading = true;
@@ -229,9 +229,8 @@ angular.module('BibBox').controller('StatusController', [
      * Log out of user service.
      */
     $scope.$on("$destroy", function () {
+      proxyService.cleanup();
       userService.logout();
-
-      // Close modals
       receiptModal.hide();
       finesModal.hide();
     });
