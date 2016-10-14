@@ -190,7 +190,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
      */
     $scope.$on("$destroy", function() {
       proxyService.cleanup();
-
       stopBarcode();
     });
   }
