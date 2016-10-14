@@ -13,6 +13,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     var username = null;
     var password = null;
     var loggedIn = false;
+    var offline = null;
 
     /**
      * Is user logged in?
@@ -51,24 +52,38 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
 
       var uniqueId = CryptoJS.MD5("userServiceLogin" + Date.now());
 
-      proxyService.emitEvent('fbs.login', 'fbs.login.success' + uniqueId, 'fbs.login.error', {
+      proxyService.emitEvent('fbs.login', 'fbs.login.success' + uniqueId, 'fbs.login.err' + uniqueId, {
         "username": user,
         "password": pass,
-        "busEvent": "fbs.login.success" + uniqueId
+        "busEvent": "fbs.login.success" + uniqueId,
+        "errorEvent": "fbs.login.err" + uniqueId
       }).then(
         function success(loggedInSuccess) {
           username = user;
           password = pass;
           loggedIn = loggedInSuccess;
+          offline = false;
 
           deferred.resolve(loggedInSuccess);
         },
         function error(err) {
-          username = null;
-          password = null;
-          loggedIn = false;
+          if (err.message === 'FBS is offline') {
+            console.log('User logged in, in offline mode.');
+            username = user;
+            password = pass;
+            loggedIn = true;
+            offline = true;
 
-          deferred.reject(err);
+            deferred.resolve(true);
+          }
+          else {
+            username = null;
+            password = null;
+            loggedIn = false;
+            offline = null;
+
+            deferred.reject(err);
+          }
         }
       );
 
@@ -84,6 +99,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
       username = null;
       password = null;
       loggedIn = false;
+      offline = null;
     };
 
     /**
@@ -94,8 +110,9 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     this.borrow = function borrow(itemIdentifier) {
       var deferred = $q.defer();
 
-      proxyService.emitEvent('fbs.checkout', 'fbs.checkout.success' + itemIdentifier, 'fbs.error', {
+      proxyService.emitEvent('fbs.checkout', 'fbs.checkout.success' + itemIdentifier, 'fbs.checkout.error' + itemIdentifier, {
         "busEvent": "fbs.checkout.success" + itemIdentifier,
+        "errorEvent": 'fbs.checkout.error' + itemIdentifier,
         "username": username,
         "password": password,
         "itemIdentifier": itemIdentifier

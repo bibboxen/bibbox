@@ -61,7 +61,7 @@ angular.module('BibBox').controller('StatusController', [
           }
 
           // Add overdue items.
-          for (i = 0; i < patron.overdueItems.length; i++) {
+          for (i = 0; i < patron.overdueItems.length; i++) {
             for (var j = 0; j < $scope.materials.length; j++) {
               if ($scope.materials[j].id === patron.overdueItems[i].id) {
                 $scope.materials[j].overdue = true;
@@ -104,6 +104,12 @@ angular.module('BibBox').controller('StatusController', [
           material.loading = false;
           console.log(data);
 
+          if (!data) {
+            material.information = 'status.renew.failed';
+            material.renewed = false;
+            return;
+          }
+
           if (data.renewalOk === 'Y') {
             material.newDate = data.dueDate;
             material.overdue = false;
@@ -111,12 +117,13 @@ angular.module('BibBox').controller('StatusController', [
           }
           else {
             material.information = data.screenMessage;
+            material.renewed = false;
           }
         },
         function error(err) {
           material.loading = false;
-
-          // @TODO: Handle error.
+          material.information = 'status.renew.failed';
+          material.renewed = false;
           console.log(err);
         }
       );
@@ -169,10 +176,16 @@ angular.module('BibBox').controller('StatusController', [
             }
           }
           else {
-            console.log("not ok");
+            for (var material in $scope.materials) {
+              material = $scope.materials[material];
+              material.loading = false;
+              material.information = 'status.renew.failed';
+              material.renewed = false;
+            }
           }
         },
         function error(err) {
+          // @TODO: Handle error!
           console.log(err);
         }
       );

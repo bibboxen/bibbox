@@ -24,6 +24,7 @@
       "^fbs.checkin.[\\w]+$",
       "^fbs.renew.[\\w]+$",
       "^fbs.renew.all.[\\w]+$",
+      "^fbs.online.[\\w]+$",
       "^notification.response$"
     ],
     "whitelistedSocketEvents": [
@@ -39,6 +40,7 @@
       "^fbs.checkin$",
       "^fbs.renew$",
       "^fbs.renew.all$",
+      "^fbs.online$",
       "^notification.status$",
       "^notification.reservations$",
       "^notification.checkIn$",

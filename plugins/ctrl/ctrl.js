@@ -125,21 +125,25 @@ var CTRL = function CTRL(app, bus, allowed) {
     bus.emit('config.features', [
       {
         "text": "menu.borrow",
+        "require_online": false,
         "url": "/#/login/borrow",
         "icon": "glyphicon-tasks"
       },
       {
         "text": "menu.status",
+        "require_online": true,
         "url": "/#/login/status",
         "icon": "glyphicon-refresh"
       },
       {
         "text": "menu.reservations",
+        "require_online": true,
         "url": "/#/login/reservations",
         "icon": "glyphicon-list-alt"
       },
       {
         "text": "menu.return",
+        "require_online": false,
         "url": "/#/return",
         "icon": "glyphicon-time"
       }

@@ -22,7 +22,7 @@
         <th>{{ 'status.information' | translate }}</th>
         <th>{{ 'status.actions' | translate }}</th>
       </tr>
-      <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.renewed}">
+      <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.renewed, 'bg-warning': material.overdue}">
         <td class="vert-align">{{ $index + 1 }}</td>
         <td class="vert-align">{{ material.title }}</td>
         <td class="vert-align">{{ material.returnDate | date }}</td>

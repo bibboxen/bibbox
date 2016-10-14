@@ -23,8 +23,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
           $scope.currentPatron = patron;
         }
         else {
+          $scope.loading = false;
           // @TODO: Report error.
-          console.log(err);
+          console.log('patron not defined.');
         }
       },
       function (err) {
@@ -78,34 +79,46 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
         userService.borrow(id).then(
           function success(result) {
             console.log(result);
-            if (result.ok === "0") {
-              for (var i = 0; i < $scope.materials.length; i++) {
-                if ($scope.materials[i].id === result.itemIdentifier) {
-                  $scope.materials[i].loading = false;
-                  $scope.materials[i].information = result.screenMessage;
-                  $scope.materials[i].status = 'borrow.error';
+            if (result) {
+              if (result.ok === "0") {
+                for (var i = 0; i < $scope.materials.length; i++) {
+                  if ($scope.materials[i].id === result.itemIdentifier) {
+                    $scope.materials[i].loading = false;
+                    $scope.materials[i].information = result.screenMessage;
+                    $scope.materials[i].status = 'borrow.error';
 
-                  if (result.itemProperties) {
-                    $scope.materials[i].title = result.itemProperties.title;
-                    $scope.materials[i].author = result.itemProperties.author;
+                    if (result.itemProperties) {
+                      $scope.materials[i].title = result.itemProperties.title;
+                      $scope.materials[i].author = result.itemProperties.author;
+                    }
+
+                    break;
                   }
-
-                  break;
+                }
+              }
+              else {
+                for (var i = 0; i < $scope.materials.length; i++) {
+                  if ($scope.materials[i].id === result.itemIdentifier) {
+                    $scope.materials[i] = {
+                      "id": result.itemIdentifier,
+                      "title": result.itemProperties.title,
+                      "author": result.itemProperties.author,
+                      "status": "borrow.success",
+                      "information": "borrow.was_successful",
+                      "dueDate": result.dueDate,
+                      "loading": false
+                    };
+                    break;
+                  }
                 }
               }
             }
             else {
               for (var i = 0; i < $scope.materials.length; i++) {
-                if ($scope.materials[i].id === result.itemIdentifier) {
-                  $scope.materials[i] = {
-                    "id": result.itemIdentifier,
-                    "title": result.itemProperties.title,
-                    "author": result.itemProperties.author,
-                    "status": "borrow.success",
-                    "information": "borrow.was_successful",
-                    "dueDate": result.dueDate,
-                    "loading": false
-                  };
+                if ($scope.materials[i].id === id) {
+                  $scope.materials[i].status = "borrow.error";
+                  $scope.materials[i].information = "borrow.was_not_successful";
+                  $scope.materials[i].loading = false;
                   break;
                 }
               }
@@ -114,6 +127,15 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
             startBarcode();
           },
           function error(err) {
+            for (var i = 0; i < $scope.materials.length; i++) {
+              if ($scope.materials[i].id === id) {
+                $scope.materials[i].status = "borrow.error";
+                $scope.materials[i].information = "borrow.was_not_successful";
+                $scope.materials[i].loading = false;
+                break;
+              }
+            }
+
             // @TODO: Handle error.
             console.log(err);
 

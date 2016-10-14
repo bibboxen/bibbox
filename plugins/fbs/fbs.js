@@ -219,7 +219,12 @@ module.exports = function (options, imports, register) {
     },
     function (err) {
       bus.emit('fbs.err', err);
-      bus.emit(data.busEvent, false);
+
+      if (data.errorEvent) {
+        bus.emit(data.errorEvent, {
+          "message": err.message
+        });
+      }
     });
   });
 
@@ -257,8 +262,30 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, res);
     },
     function (err) {
-      bus.emit('fbs.err', err);
-      bus.emit(data.busEvent, false);
+      if (err.message === 'FBS is offline') {
+        var material = {
+          "itemIdentifier": data.itemIdentifier,
+          "offline": true,
+          "ok": "1",
+          "itemProperties": {
+            "title": data.itemIdentifier
+          }
+        };
+
+        // @TODO: Save in storage for delivery later.
+
+        bus.emit(data.busEvent, material);
+        console.log("accepted offline borrow");
+      }
+      else {
+        bus.emit('fbs.err', err);
+
+        if (data.errorEvent) {
+          bus.emit(data.errorEvent, {
+            "message": err.message
+          });
+        }
+      }
     });
   });
 
@@ -270,8 +297,30 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, res);
     },
     function (err) {
-      bus.emit('fbs.err', err);
-      bus.emit(data.busEvent, false);
+      if (err.message === 'FBS is offline') {
+        var material = {
+          "itemIdentifier": data.itemIdentifier,
+          "offline": true,
+          "ok": "1",
+          "itemProperties": {
+            "title": data.itemIdentifier
+          }
+        };
+
+        // @TODO: Save in storage for delivery later.
+
+        bus.emit(data.busEvent, material);
+        console.log("accepted offline borrow");
+      }
+      else {
+        bus.emit('fbs.err', err);
+
+        if (data.errorEvent) {
+          bus.emit(data.errorEvent, {
+            "message": err.message
+          });
+        }
+      }
     });
   });
 
@@ -299,6 +348,24 @@ module.exports = function (options, imports, register) {
         bus.emit('fbs.err', err);
         bus.emit(data.busEvent, false);
       });
+  });
+
+  /**
+   * Listen for fbs.online events.
+   */
+  bus.on('fbs.online', function (request) {
+    bus.once('network.fbs.online', function (online) {
+      bus.emit(request.busEvent, online);
+    });
+    // When config is delivered, test for network.online with fbs server.
+    bus.once('config.fbs.online.res', function (config) {
+      bus.emit('network.online', {
+        "url": config.endpoint,
+        "busEvent": "network.fbs.online"
+      });
+    });
+    // Request config.
+    bus.emit('config.fbs', {'busEvent': 'config.fbs.online.res'});
   });
 
   register(null, { "fbs": fbs });

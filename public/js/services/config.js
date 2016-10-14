@@ -10,5 +10,6 @@ angular.module('BibBox').value('config', {
   "timeout": {
     "idleTimeout": 15,
     "IdleWarn": 5
-  }
+  },
+  "testFbsConnectionInterval": 5000
 });
