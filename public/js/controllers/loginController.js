@@ -144,6 +144,15 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
       }
     };
 
+    $scope.back = function back() {
+      if ($scope.display === 'default') {
+        $scope.gotoFront();
+      }
+      else {
+        $scope.useManualLogin(false);
+      }
+    };
+
     /**
      * Username entered.
      *
@@ -209,6 +218,14 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
           $scope.loading = false;
         }
       );
+    };
+
+    /**
+     * Go to front page.
+     */
+    $scope.gotoFront = function gotoFront() {
+      userService.logout();
+      $location.path('/');
     };
 
     // Go to start page.

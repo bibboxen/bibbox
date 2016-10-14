@@ -41,6 +41,9 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
 
         console.log(patron);
 
+        // Restart idle service if not running.
+        Idle.watch();
+
         // If patron exists, get reservations.
         if (patron) {
           $scope.currentPatron = patron;
@@ -75,6 +78,9 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
         $scope.loading = false;
         // @TODO: Report error.
         console.log(err);
+
+        // Restart idle service if not running.
+        Idle.watch();
       }
     );
 
@@ -96,6 +102,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
       receiptService.reservations(credentials.username, credentials.password, type).then(
         function(status) {
           alert('mail sent');
+
+          // @TODO: Redirect to frontpage.
         },
         function(err) {
           // @TODO: handel error etc.

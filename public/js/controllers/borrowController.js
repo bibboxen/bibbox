@@ -78,6 +78,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
 
         userService.borrow(id).then(
           function success(result) {
+            // Restart idle service if not running.
+            Idle.watch();
+
             console.log(result);
             if (result) {
               if (result.ok === "0") {
@@ -127,6 +130,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
             startBarcode();
           },
           function error(err) {
+            // Restart idle service if not running.
+            Idle.watch();
+
             for (var i = 0; i < $scope.materials.length; i++) {
               if ($scope.materials[i].id === id) {
                 $scope.materials[i].status = "borrow.error";
@@ -213,6 +219,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       receiptService.borrow(credentials.username, credentials.password, $scope.materials, type).then(
         function(status) {
           alert('mail sent');
+
+          // @TODO: Redirect to frontpage.
         },
         function(err) {
           // @TODO: handel error etc.

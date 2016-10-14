@@ -65,49 +65,59 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
           "loading": true
         });
 
-        var uniqueId = CryptoJS.MD5("returnControllerReturn" + Date.now());
-
-        var resultEvent = 'fbs.checkin.success' + uniqueId;
-
         /**
          * @TODO: Move to service so it the same for check-in and checkout.
          */
-        proxyService.emitEvent('fbs.checkin', 'fbs.checkin.success' + id, 'fbs.error', {
-          "busEvent": "fbs.checkin.success" + id,
+        var uniqueId = CryptoJS.MD5("returnControllerReturn" + Date.now());
+        proxyService.emitEvent('fbs.checkin', 'fbs.checkin.success' + uniqueId, 'fbs.error', {
+          "busEvent": "fbs.checkin.success" + uniqueId,
           "itemIdentifier": id
         }).then(
           function success(result) {
+            // Restart idle service if not running.
+            Idle.watch();
+
             // Store the raw result (it's used to send with receipts).
             raw_materials.push(result);
 
-            if (result.ok === '1') {
-              for (var i = 0; i < $scope.materials.length; i++) {
-                if ($scope.materials[i].id === result.itemIdentifier) {
-                  $scope.materials[i] = {
-                    "id": result.itemIdentifier,
-                    "title": result.itemProperties.title,
-                    "author": result.itemProperties.author,
-                    "status": 'return.success',
-                    "information": "return.was_successful",
-                    "loading": false
-                  };
-                  break;
+            if (result) {
+              if (result.ok === '1') {
+                for (var i = 0; i < $scope.materials.length; i++) {
+                  if ($scope.materials[i].id === result.itemIdentifier) {
+                    $scope.materials[i] = {
+                      "id": result.itemIdentifier,
+                      "title": result.itemProperties.title,
+                      "author": result.itemProperties.author,
+                      "status": 'return.success',
+                      "information": "return.was_successful",
+                      "loading": false
+                    };
+                    break;
+                  }
+                }
+              }
+              else {
+                for (var i = 0; i < $scope.materials.length; i++) {
+                  if ($scope.materials[i].id === result.itemIdentifier) {
+                    $scope.materials[i].loading = false;
+                    $scope.materials[i].information = result.screenMessage;
+                    $scope.materials[i].status = 'return.error';
+
+                    break;
+                  }
                 }
               }
             }
             else {
-              for (var i = 0; i < $scope.materials.length; i++) {
-                if ($scope.materials[i].id === result.itemIdentifier) {
-                  $scope.materials[i].loading = false;
-                  $scope.materials[i].information = result.screenMessage;
-                  $scope.materials[i].status = 'return.error';
-
-                  break;
-                }
-              }
+              // @TODO: Handle error.
+              console.log('result === false');
             }
           },
           function error(err) {
+            // Restart idle service if not running.
+            Idle.watch();
+
+            // @TODO: Handle error.
             console.log(err);
           }
         );
