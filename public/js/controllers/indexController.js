@@ -87,7 +87,7 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
      *
      * Cleanup
      */
-    $scope.$on('destroy', function () {
+    $scope.$on('$destroy', function () {
       // Remove online interval.
       if (angular.isDefined(onlineInterval)) {
         $interval.cancel(onlineInterval);

@@ -215,8 +215,6 @@ module.exports = function (options, imports, register) {
    */
   bus.on('fbs.login', function (data) {
     fbs.login(data.username, data.password).then(function (isLoggedIn) {
-      console.log(isLoggedIn);
-
       bus.emit(data.busEvent, isLoggedIn);
     },
     function (err) {
@@ -264,8 +262,29 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, res);
     },
     function (err) {
-      bus.emit('fbs.err', err);
-      bus.emit(data.busEvent, false);
+      if (err.message === 'FBS is offline') {
+        var material = {
+          "itemIdentifier": data.itemIdentifier,
+          "offline": true,
+          "ok": true,
+          "renewalOk": false,
+          "itemProperties": {
+            "title": data.itemIdentifier
+          }
+        };
+
+        bus.emit(data.busEvent, material);
+        console.log("accepted offline borrow");
+      }
+      else {
+        bus.emit('fbs.err', err);
+
+        if (data.errorEvent) {
+          bus.emit(data.errorEvent, {
+            "message": err.message
+          });
+        }
+      }
     });
   });
 
@@ -278,7 +297,12 @@ module.exports = function (options, imports, register) {
     },
     function (err) {
       bus.emit('fbs.err', err);
-      bus.emit(data.busEvent, false);
+
+      if (data.errorEvent) {
+        bus.emit(data.errorEvent, {
+          "message": err.message
+        });
+      }
     });
   });
 

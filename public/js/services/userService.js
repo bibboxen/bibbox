@@ -68,6 +68,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
         },
         function error(err) {
           if (err.message === 'FBS is offline') {
+            console.log('User logged in, in offline mode.');
             username = user;
             password = pass;
             loggedIn = true;
@@ -109,8 +110,9 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     this.borrow = function borrow(itemIdentifier) {
       var deferred = $q.defer();
 
-      proxyService.emitEvent('fbs.checkout', 'fbs.checkout.success' + itemIdentifier, 'fbs.error', {
+      proxyService.emitEvent('fbs.checkout', 'fbs.checkout.success' + itemIdentifier, 'fbs.checkout.error' + itemIdentifier, {
         "busEvent": "fbs.checkout.success" + itemIdentifier,
+        "errorEvent": 'fbs.checkout.error' + itemIdentifier,
         "username": username,
         "password": password,
         "itemIdentifier": itemIdentifier
