@@ -4,7 +4,6 @@
  */
 
 var printer = require('printer');
-var Mark = require('markup-js');
 var twig = require('twig');
 var nodemailer = require('nodemailer');
 var i18n = require('i18n');
@@ -365,7 +364,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
       // Print it.
-      self.print(result);
+      self.printReceipt(result);
       deferred.resolve();
     }
   }, function (err) {
@@ -450,7 +449,7 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
       // Print it.
-      self.print(result);
+      self.printReceipt(result);
       deferred.resolve();
      }
    }, function (err) {
@@ -489,8 +488,6 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
   var deferred = Q.defer();
   var layout = self.layouts[type];
 
-  console.log(lang);
-
   // Set current language.
   i18n.setLocale(lang ? lang : self.config.default_lang);
 
@@ -512,19 +509,11 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       if (data.hasOwnProperty('emailAddress') && data.emailAddress !== undefined) {
         result = self.mailTemplate.render(context);
 
-        fs.writeFile(__dirname + "/test1.html", result, function(err) {
-          if(err) {
-            return console.log(err);
-          }
-
-          console.log("The file was saved!");
-        });
-
-//        self.sendMail(data.emailAddress, result).then(function () {
+        self.sendMail(data.emailAddress, result).then(function () {
           deferred.resolve();
- //       }, function (err) {
-   //       deferred.reject(err);
-     //   });
+        }, function (err) {
+          deferred.reject(err);
+        });
       }
       else {
         deferred.reject(new Error('No mail address'));
@@ -537,7 +526,7 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
       // Print it.
-      self.print(result);
+      self.printReceipt(result);
       deferred.resolve();
     }
   }, function (err) {
@@ -593,7 +582,7 @@ Notification.prototype.sendMail = function sendMail(to, content) {
  *
  * @param content
  */
-Notification.prototype.print = function print(content) {
+Notification.prototype.printReceipt = function printReceipt(content) {
   /**
    * @TODO: Print the receipt.
    */
