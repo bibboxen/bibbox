@@ -45,10 +45,10 @@ var CTRL = function CTRL(app, bus, allowed) {
    */
   bus.on('config.fbs', function sip2config(data) {
     bus.emit(data.busEvent, {
-      'username': 'TroelsOgJesper',
-      'password': 'HaveNisse94Molslinjenq',
-      'endpoint': 'https://Cicero-fbs.com/rest/sip2/DK-675100',
-      'agency': 'DK-675100',
+      'username': 'sip2',
+      'password': 'password',
+      'endpoint': 'https://ET.Cicero-fbs.com/rest/sip2/DK-761500',
+      'agency': 'DK-761500',
       'location': 'hb'
     });
   });
