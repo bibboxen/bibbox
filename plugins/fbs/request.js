@@ -6,7 +6,7 @@ var util = require('util');
 var handlebars = require('handlebars');
 var fs = require('fs');
 
-var debug = require('debug')('FBS:request');
+var debug = require('debug')('bibbox:FBS:request');
 
 var Response = require('./response.js');
 
@@ -116,10 +116,6 @@ Request.prototype.send = function send(message, firstVar, callback) {
 
       var request = require('request');
       request.post(options, function (error, response, body) {
-
-        // Send debug message.
-        debug(response.statusCode + ':' + message.substr(0,2));
-
         var res = null;
         if (error || response.statusCode !== 200) {
           if (!error) {
@@ -132,10 +128,13 @@ Request.prototype.send = function send(message, firstVar, callback) {
             }
           }
           // Log error message from FBS.
-          self.bus.emit('logger.error', 'FBS error: ' + error + ' <-> ' + response.statusCode);
+          self.bus.emit('logger.error', 'FBS error: ' + error);
           callback(error, null);
         }
         else {
+          // Send debug message.
+          debug(response.statusCode + ':' + message.substr(0,2));
+
           // Log message from FBS.
           self.bus.emit('logger.debug', 'FBS response: ' + body);
 

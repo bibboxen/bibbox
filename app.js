@@ -65,3 +65,10 @@ architect.createApp(config, function (err, app) {
     throw err;
   }
 });
+
+// If process is forked from bootstrap send keep-alive events back.
+setInterval(function () {
+  if (process.send) {
+    process.send({'ping': new Date().getTime()});
+  }
+}, 1000);

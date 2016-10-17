@@ -6,7 +6,7 @@
 var util = require('util');
 var eventEmitter = require('events').EventEmitter;
 
-var debug = require('debug')('FBS:response');
+var debug = require('debug')('bibbox:FBS:response');
 
 var Entities = require('html-entities').AllHtmlEntities;
 
