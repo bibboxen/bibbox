@@ -8,6 +8,8 @@
 var Request = require('./../plugins/fbs/request');
 var Response = require('./../plugins/fbs/response');
 
+var config = require(__dirname + '/config.json');
+
 var Q = require('q');
 
 var app = null;
@@ -54,7 +56,7 @@ it('Build XML message', function() {
 
     // Remove newlines to match string below.
     xml = xml.replace(/(\r\n|\n|\r)/gm, '');
-    xml.should.equal("<?xml version=\"1.0\" encoding=\"UTF-8\"?><ns1:sip password=\"password\" login=\"sip2\" xsi:schemaLocation=\"http://axiell.com/Schema/sip.xsd\" xmlns:ns1=\"http://axiell.com/Schema/sip.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">  <request>990xxx2.00</request></ns1:sip>");
+    xml.should.equal("<?xml version=\"1.0\" encoding=\"UTF-8\"?><ns1:sip password=\"" + config.fbs_password + "\" login=\"" + config.fbs_username + "\" xsi:schemaLocation=\"http://axiell.com/Schema/sip.xsd\" xmlns:ns1=\"http://axiell.com/Schema/sip.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">  <request>990xxx2.00</request></ns1:sip>");
   });
 });
 
@@ -137,7 +139,7 @@ it('Check the response date parser', function(done) {
 
 it('Login with test use', function(done) {
 	setup().then(function (app) {
-		app.services.fbs.login('1234567890', '1234').then(function (val) {
+		app.services.fbs.login(config.username, config.pin).then(function (val) {
 			try {
 				val.should.be.true();
 				done();
@@ -151,7 +153,7 @@ it('Login with test use', function(done) {
 
 it('Login with a user that not valid - test that it fails', function(done) {
 	setup().then(function (app) {
-		app.services.fbs.login('1234567890', '12345').then(function (val) {
+		app.services.fbs.login('3210519792', '54321').then(function (val) {
 			try {
 				val.should.be.false();
 				done();
@@ -168,7 +170,7 @@ it('Request library status', function(done) {
     app.services.fbs.libraryStatus().then(function (res) {
       try {
         res.error.should.equal('');
-        res.institutionId.should.equal('DK-761500');
+        res.institutionId.should.equal('DK-675100');
         done();
       }
       catch (err) {
@@ -183,10 +185,10 @@ it('Load patron information', function(done) {
   this.timeout('4000');
 
   setup().then(function (app) {
-    app.services.fbs.patronInformation('3208100032', '12345').then(function (res) {
+    app.services.fbs.patronInformation(config.username, config.pin).then(function (res) {
       try {
-        res.institutionId.should.equal('DK-761500');
-        res.patronIdentifier.should.equal('LN:3208100032');
+        res.institutionId.should.equal('DK-675100');
+        res.patronIdentifier.should.equal('LN:' + config.username);
         done();
       }
       catch (err) {
@@ -196,9 +198,9 @@ it('Load patron information', function(done) {
   }, done);
 });
 
-it('Checkout (loan) book with id "5010941603"', function(done) {
+it('Checkout (loan) book with id "0000001245"', function(done) {
   setup().then(function (app) {
-    app.services.fbs.checkout('3208100032', '12345', '5010941603').then(function (res) {
+    app.services.fbs.checkout(config.username, config.pin, '0000001245').then(function (res) {
       try {
         res.ok.should.equal('1');
         done();
@@ -210,9 +212,9 @@ it('Checkout (loan) book with id "5010941603"', function(done) {
   }, done);
 });
 
-it('Checkout (loan) book with id "5010941603" - check that for error as it have been loaned', function(done) {
+it('Checkout (loan) book with id "0000001245" - check that for error as it have been loaned', function(done) {
   setup().then(function (app) {
-    app.services.fbs.checkout('3208100032', '12345', '5010941603').then(function (res) {
+    app.services.fbs.checkout(config.username, config.pin, '0000001245').then(function (res) {
       try {
         res.ok.should.equal('0');
         res.screenMessage.should.equal('[BEFORE_RENEW_PERIOD]');
@@ -225,9 +227,9 @@ it('Checkout (loan) book with id "5010941603" - check that for error as it have 
   }, done);
 });
 
-it('Renew book with is "5010941603"', function(done) {
+it('Renew book with is "0000001245"', function(done) {
   setup().then(function (app) {
-    app.services.fbs.renew('3208100032', '12345', '5010941603').then(function (res) {
+    app.services.fbs.renew(config.username, config.pin, '0000001245').then(function (res) {
       try {
         // This renew will always fail as we only can renew item after due
         // data. But the fact that it say that we can't means that the message
@@ -245,9 +247,9 @@ it('Renew book with is "5010941603"', function(done) {
 
 it('Renew all books all', function(done) {
   setup().then(function (app) {
-    app.services.fbs.renewAll('3208100032', '12345').then(function (res) {
+    app.services.fbs.renewAll(config.username, config.pin).then(function (res) {
       try {
-        res.unrenewedItems.pop().id.should.equal('5010941603');
+        res.unrenewedItems.pop().id.should.equal('0000001245');
         res.ok.should.equal('1');
         done();
       }
@@ -259,9 +261,9 @@ it('Renew all books all', function(done) {
 });
 
 
-it('Check-in (return) book with id "5010941603"', function(done) {
+it('Check-in (return) book with id "0000001245"', function(done) {
   setup().then(function (app) {
-    app.services.fbs.checkIn('5010941603').then(function (res) {
+    app.services.fbs.checkIn('0000001245').then(function (res) {
       try {
         res.ok.should.equal('1');
         done();
@@ -275,32 +277,32 @@ it('Check-in (return) book with id "5010941603"', function(done) {
 
 // Defined loans array used in the next tests.
 var loans = [
-  '5010941603',
-  '3846646417',
-  '3846469957',
-  '5055601439',
-  '5010931020',
-  '5007289776',
-  '5006643975',
-  '5004953608',
-  '4213755485',
-  '3777922962'
+  '0000003225',
+  '0000007889',
+  '0000003572',
+  '0000002244',
+  '0000006396',
+  '0000006584',
+  '0000005724',
+  '0000007841',
+  '0000009685',
+  '0000001245'
 ];
 
 it('Check-out (loan) of 10 books fast', function(done) {
   this.timeout(10000);
   setup().then(function (app) {
     Q.all([
-      app.services.fbs.checkout('3208100032', '12345', loans[0]),
-      app.services.fbs.checkout('3208100032', '12345', loans[1]),
-      app.services.fbs.checkout('3208100032', '12345', loans[2]),
-      app.services.fbs.checkout('3208100032', '12345', loans[3]),
-      app.services.fbs.checkout('3208100032', '12345', loans[4]),
-      app.services.fbs.checkout('3208100032', '12345', loans[5]),
-      app.services.fbs.checkout('3208100032', '12345', loans[6]),
-      app.services.fbs.checkout('3208100032', '12345', loans[7]),
-      app.services.fbs.checkout('3208100032', '12345', loans[8]),
-      app.services.fbs.checkout('3208100032', '12345', loans[9])
+      app.services.fbs.checkout(config.username, config.pin, loans[0]),
+      app.services.fbs.checkout(config.username, config.pin, loans[1]),
+      app.services.fbs.checkout(config.username, config.pin, loans[2]),
+      app.services.fbs.checkout(config.username, config.pin, loans[3]),
+      app.services.fbs.checkout(config.username, config.pin, loans[4]),
+      app.services.fbs.checkout(config.username, config.pin, loans[5]),
+      app.services.fbs.checkout(config.username, config.pin, loans[6]),
+      app.services.fbs.checkout(config.username, config.pin, loans[7]),
+      app.services.fbs.checkout(config.username, config.pin, loans[8]),
+      app.services.fbs.checkout(config.username, config.pin, loans[9])
     ]).then(function (res) {
       try {
         res.length.should.equal(10);
