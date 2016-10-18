@@ -9,6 +9,9 @@
 (function () {
   'use strict';
 
+  /**
+   * @TODO: Missing documentation and why global?
+   */
   angular.module('BibBox').directive('spinnerGlobal', [
     function () {
       return {
@@ -19,6 +22,9 @@
     }
   ]);
 
+  /**
+   * @TODO: Missing documentation?
+   */
   angular.module('BibBox').directive('spinner', [
     function () {
       return {

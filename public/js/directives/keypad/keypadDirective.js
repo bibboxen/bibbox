@@ -1,6 +1,8 @@
 /**
  * @file
  * Contains the keypadDirective.
+ *
+ * @TODO: Could use more documentation about how to use it?
  */
 
 /**

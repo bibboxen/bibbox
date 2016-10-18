@@ -30,7 +30,6 @@ angular.module('BibBox').config(function ($routeProvider) {
       controller: 'ReturnController',
       templateUrl: 'views/return.html'
     })
-
     .otherwise({
       controller: 'IndexController',
       templateUrl: 'views/index.html'

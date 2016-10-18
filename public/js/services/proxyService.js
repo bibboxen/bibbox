@@ -15,6 +15,7 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
      * Wrapped in function to allow testing.
      *
      * @returns {*}
+     *   The connected socket as an object.
      */
     self.getSocket = function getSocket() {
       return io.connect(location.protocol + '//' + location.hostname + (location.port ? ':'+location.port: ''), {
@@ -108,14 +109,6 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
         $location.path('/');
         $route.reload();
       });
-
-      // /**
-      //  * Sets translations on config.translations event.
-      //  */
-      // socket.on('translations.update', function (translations) {
-      //   config.translations = angular.copy(translations);
-      //   $translate.refresh();
-      // });
     };
 
     // Initialize.

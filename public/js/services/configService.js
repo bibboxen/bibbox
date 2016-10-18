@@ -7,9 +7,14 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
   function ($rootScope, $translate, tmhDynamicLocale, proxyService, config) {
     'use strict';
 
-    // @TODO: default language from config.
-    tmhDynamicLocale.set('da');
+    // Set default language from config. It's need when requesting receipts.
+    tmhDynamicLocale.set(config.default_lang);
 
+    /**
+     * Listen for UI configuration changes.
+     *
+     * Emits 'config.updated' into the $rootScope when updated.
+     */
     proxyService.onEvent('config.ui.update', function (data) {
       config.initialized = true;
 
@@ -17,6 +22,12 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
       $rootScope.$emit('config.updated');
     });
 
+    /**
+     * Listen to translations update.
+     *
+     * A $rootScope event (config.translations.updated) is emitted and the
+     * translations are refreshed.
+     */
     proxyService.onEvent('config.ui.translations.update', function (data) {
       config.initialized = true;
 
@@ -27,7 +38,14 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
   }
 ]);
 
+/**
+ * Configuration object.
+ *
+ * Used to store configuration when pushed from the backend. It also contains
+ * default value before configuration is loaded.
+ */
 angular.module('BibBox').value('config', {
+  "default_lang": 'da',
   "initialized": false,
   "translations": {},
   "languages": [],
