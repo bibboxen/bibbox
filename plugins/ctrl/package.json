@@ -12,5 +12,8 @@
     "provides": [
       "ctrl"
     ]
+  },
+  "dependencies": {
+    "q": "^1.4.1"
   }
 }

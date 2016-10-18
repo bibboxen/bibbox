@@ -3,21 +3,27 @@
  * proxyService for communication with backend.
  */
 
-angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', 'config', '$translate', 'Idle',
-  function ($q, $location, $route, config, $translate, idle) {
+angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location', '$route', 'config', '$translate',
+  function ($rootScope, $q, $location, $route, config, $translate) {
     'use strict';
 
     var self = this;
 
     /**
-     * Get socket.
+     * Get socket connection back to the host that load the page.
      *
      * Wrapped in function to allow testing.
      *
      * @returns {*}
      */
     self.getSocket = function getSocket() {
-      return io();
+      return io.connect(location.protocol + '//' + location.hostname + (location.port ? ':'+location.port: ''), {
+        'forceNew': true,
+        'reconnection': true,
+        'reconnectionDelay': 1000,
+        'reconnectionDelayMax' : 5000,
+        'reconnectionAttempts': Infinity
+      });
     };
 
     /**
@@ -63,6 +69,23 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
     };
 
     /**
+     * Handled events from the socket connection.
+     *
+     * @param eventName
+     *   Name of the event.
+     * @param callback
+     *   The callback to call when the event is fired.
+     */
+    this.onEvent = function onEvent(eventName, callback) {
+      socket.on(eventName, function() {
+        var args = arguments;
+        $rootScope.$apply(function() {
+          callback.apply(socket, args);
+        });
+      });
+    };
+
+    /**
      * Cleanup event listeners.
      *
      * And re-register event listeners.
@@ -86,36 +109,13 @@ angular.module('BibBox').service('proxyService', ['$q', '$location', '$route', '
         $route.reload();
       });
 
-      /**
-       * Sets translations on config.translations event.
-       */
-      socket.on('config.translations', function (translations) {
-        config.translations = angular.copy(translations);
-        $translate.refresh();
-      });
-
-      /**
-       * Sets languages on config.languages event.
-       */
-      socket.on('config.languages', function (languages) {
-        config.languages = angular.copy(languages);
-      });
-
-      /**
-       * Sets features on config.features event.
-       */
-      socket.on('config.features', function (features) {
-        config.features = angular.copy(features);
-      });
-
-      /**
-       * Sets idle timeouts on config.
-       */
-      socket.on('config.idle_config', function (idleConfig) {
-        config.idle = angular.copy(idleConfig);
-        idle.setIdle(config.idle.idleTimeout);
-        idle.setTimeout(config.idle.idleWarn);
-      });
+      // /**
+      //  * Sets translations on config.translations event.
+      //  */
+      // socket.on('translations.update', function (translations) {
+      //   config.translations = angular.copy(translations);
+      //   $translate.refresh();
+      // });
     };
 
     // Initialize.

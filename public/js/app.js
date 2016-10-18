@@ -11,9 +11,9 @@ angular.module('BibBox').config(['tmhDynamicLocaleProvider', 'IdleProvider',
     function (tmhDynamicLocaleProvider, IdleProvider) {
       tmhDynamicLocaleProvider.localeLocationPattern('/js/lib/locales/angular-locale_{{locale}}.js');
 
-      // configure Idle settings, defaults.
-      IdleProvider.idle(10);   // in seconds
-      IdleProvider.timeout(5); // in seconds
+      // Configure Idle settings, defaults.
+      IdleProvider.idle(10);
+      IdleProvider.timeout(5);
     }
   ]
 )

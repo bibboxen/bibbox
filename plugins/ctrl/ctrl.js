@@ -3,6 +3,8 @@
  * Handles communication with the application and provides config.
  */
 
+var Q = require('q');
+
 var allowed = ['127.0.0.1'];
 
 var CTRL = function CTRL(app, bus, allowed) {
@@ -121,12 +123,37 @@ var CTRL = function CTRL(app, bus, allowed) {
       }
     });
   });
+};
 
-  /**
-   * @TODO: Move to separate configurable file.
-   */
-  bus.on('config.features.request', function () {
-    bus.emit('config.features', [
+/**
+ * Access check based on IP.
+ *
+ * @param req
+ *   The express request.
+
+ * @returns {boolean}
+ *   If allowed TRUE else FALSE.
+ */
+CTRL.prototype.checkAccess = function checkAccess(req) {
+  var ip = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress;
+  var ret = this.allowed.indexOf(ip) > -1;
+
+  this.bus.emit('logger.info', 'CTRL: ' + ip + ' requested have accessed to ' + req.url + (ret ? ' (allowed)' : ' (denied)'));
+
+  return ret;
+};
+
+/**
+ * Get the front-end (UI) configuration.
+ *
+ * NOTE: It uses a promise even though it don't needs to. This is to keep the
+ *       code stream lined.
+ */
+CTRL.prototype.getUiConfig = function getUiConfig() {
+  var deferred = Q.defer();
+
+  deferred.resolve({
+    "features": [
       {
         "text": "menu.borrow",
         "require_online": false,
@@ -151,14 +178,8 @@ var CTRL = function CTRL(app, bus, allowed) {
         "url": "/#/return",
         "icon": "glyphicon-time"
       }
-    ]);
-  });
-
-  /**
-   * @TODO: Move to separate configurable file.
-   */
-  bus.on('config.languages.request', function () {
-    bus.emit('config.languages', [
+    ],
+    "languages": [
       {
         "text": "language.da",
         "langKey": "da",
@@ -169,200 +190,26 @@ var CTRL = function CTRL(app, bus, allowed) {
         "langKey": "en",
         "icon": "img/flags/GB.png"
       }
-    ]);
+    ],
+    "timeout": {
+      "idleTimeout": 15,
+        "idleWarn": 7
+    }
   });
 
-  // @TODO: Remove all this translations code when it receives translations from administration.
-  var trans = {
-    "da": {
-      "menu.borrow": "Lån",
-      "menu.status": "Status / Forny",
-      "menu.reservations": "Reservationer",
-      "menu.return": "Aflevering",
-
-      "common.back": "Tilbage",
-      "common.loading": "Indlæser",
-      "common.kr": "kr.",
-
-      "index.heading": "Vælg ønsket funktion",
-
-      "language.en": "Engelsk",
-      "language.da": "Dansk",
-
-      "login.heading": "Log ind",
-      "login.scan": "Skan dit sygesikringskort eller lånerkort",
-      "login.button.manual_login": "Indtast via tastatur - tryk her!",
-      "login.username": "CPR-nummer",
-      "login.username_short": "CPR",
-      "login.username_help": "Indtast CPR-nummer og tryk Enter",
-      "login.username_validation_error": "Ikke gyldigt cpr-nummer",
-      "login.password": "Kodeord",
-      "login.password_short": "Kode",
-      "login.password_help": "Indtast kodeord og tryk Enter",
-      "login.password_validation_error": "Ikke gyldigt kodeord",
-      "login.invalid_login_error": "Login fejl",
-
-      "reservations.heading": "Reservationer",
-      "reservations.bibliographic_id": "Stregkode",
-      "reservations.interest_date": "Interessedato",
-      "reservations.title": "Titel",
-      "reservations.ready": "Til rådighed",
-      "reservations.reservation_number": "Kø-nummer",
-      "reservations.pickup_location": "Afhentningssted",
-
-      "status.heading": "Status / Forny",
-      "status.title": "Titel",
-      "status.return_date": "Afleveringsdato",
-      "status.fine": "Gebyr",
-      "status.new_date": "Ny dato",
-      "status.information": "Information",
-      "status.actions": "Handlinger",
-      "status.button.renew": "Forny",
-      "status.button.renew_all": "Forny alle",
-      "status.button.fines": "Gebyr",
-      "status.button.receipt": "Kvittering",
-      "status.button.ok": "Ok",
-      "status.button.close": "Luk",
-      "status.button.receipt_mail": "Email",
-      "status.button.receipt_printer": "Print",
-      "status.renew.ok": "Materiale fornyet",
-      "status.receipt.heading": "Kvittering",
-      "status.fines.heading": "Gebyr",
-      "status.fines.fine": "Gebyr",
-
-      "borrow.heading": "Lån",
-      "borrow.title": "Titel",
-      "borrow.return_date": "Afleveringsdato",
-      "borrow.status": "Status",
-      "borrow.information": "Information",
-      "borrow.was_successful": "Materialelån gennemført",
-
-      "return.heading": "Aflever",
-      "return.title": "Titel",
-      "return.status": "Status",
-      "return.information": "Information",
-      "return.was_successful": "Materialet er afleveret",
-
-      "receipt.heading": "Kvittering",
-      "receipt.button.receipt_mail": "Mail",
-      "receipt.button.receipt_printer": "Print",
-      "receipt.button.close": "Luk",
-
-      "numpad.back": "Slet",
-      "numpad.enter": "Enter",
-      "numpad.one": "1",
-      "numpad.two": "2",
-      "numpad.three": "3",
-      "numpad.four": "4",
-      "numpad.five": "5",
-      "numpad.six": "6",
-      "numpad.seven": "7",
-      "numpad.eight": "8",
-      "numpad.nine": "9",
-      "numpad.zero": "0",
-
-      "[BEFORE_RENEW_PERIOD]": "For tidligt fornyet",
-      "UNSUCCESSFUL": "Lykkedes ikke",
-      "MATERIAL_NOT_FOUND": "Materialet blev ikke fundet",
-      "[MATERIAL_NOT_FOUND]": "Materialet blev ikke fundet",
-
-      "DKK": "kr."
-    },
-    "en": {
-      "menu.borrow": "Borrow",
-      "menu.status": "Status / Renew",
-      "menu.reservations": "Reservations",
-      "menu.return": "Return",
-
-      "common.back": "Back",
-      "common.loading": "Loading",
-
-      "index.heading": "Choose the desired function",
-
-      "language.en": "English",
-      "language.da": "Danish",
-
-      "login.heading": "Login",
-      "login.scan": "Scan your social security card or library card",
-      "login.button.manual_login": "Enter with keyboard - press here!",
-      "login.username": "CPR-number",
-      "login.username_short": "CPR",
-      "login.username_help": "Enter your CPR-number and press enter",
-      "login.username_validation_error": "Not valid CPR-number",
-      "login.password": "Password",
-      "login.password_short": "Pass",
-      "login.password_help": "Enter your password and press enter",
-      "login.password_validation_error": "Not valid password",
-
-      "reservations.heading": "Reservations",
-      "reservations.bibliographic_id": "Barcode",
-      "reservations.interest_date": "Interest date",
-      "reservations.title": "Title",
-      "reservations.ready": "Available",
-      "reservations.reservation_number": "Number in Queue",
-      "reservations.pickup_location": "Pickup Location",
-
-      "status.heading": "Status / Renew",
-      "status.title": "Title",
-      "status.return_date": "Return date",
-      "status.fine": "Fine",
-      "status.new_date": "New date",
-      "status.information": "Information",
-      "status.actions": "Actions",
-      "status.button.renew": "Renew",
-
-      "borrow.heading": "Borrow",
-      "borrow.title": "Title",
-      "borrow.return_date": "Return date",
-      "borrow.status": "Status",
-      "borrow.information": "Information",
-
-      "numpad.back": "Delete",
-      "numpad.enter": "Enter",
-      "numpad.one": "1",
-      "numpad.two": "2",
-      "numpad.three": "3",
-      "numpad.four": "4",
-      "numpad.five": "5",
-      "numpad.six": "6",
-      "numpad.seven": "7",
-      "numpad.eight": "8",
-      "numpad.nine": "9",
-      "numpad.zero": "0",
-
-      "[BEFORE_RENEW_PERIOD]": "Before renew period"
-    }
-  };
-  // @TODO: Temporary code.
-  setTimeout(function () {
-    bus.emit('config.translations.update', {
-      "translations": trans,
-      "busEvent": "config.translations"
-    });
-
-    bus.emit('config.idle_config', {
-      "idleTimeout": 15,
-      "idleWarn": 7
-    });
-  }, 3000);
+  return deferred.promise;
 };
 
-/**
- * Access check based on IP.
- *
- * @param req
- *   The express request.
+CTRL.prototype.getTranslations = function getTranslations() {
+  var deferred = Q.defer();
 
- * @returns {boolean}
- *   If allowed TRUE else FALSE.
- */
-CTRL.prototype.checkAccess = function checkAccess(req) {
-  var ip = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress;
-  var ret = this.allowed.indexOf(ip) > -1;
+  this.bus.on('translations.request.languages', function(data) {
+    deferred.resolve(data);
+  });
+  this.bus.emit('translations.request', { 'busEvent': 'translations.request.languages' });
 
-  this.bus.emit('logger.info', 'CTRL: ' + ip + ' requested have accessed to ' + req.url + (ret ? ' (allowed)' : ' (denied)'));
 
-  return ret;
+  return deferred.promise;
 };
 
 /**
@@ -370,7 +217,34 @@ CTRL.prototype.checkAccess = function checkAccess(req) {
  */
 module.exports = function (options, imports, register) {
 
-  var ctrl = new CTRL(imports.app, imports.bus, options.allowed);
+  var bus = imports.bus;
+  var ctrl = new CTRL(imports.app, bus, options.allowed);
+
+  /**
+   * Handle front-end (UI) configuration requests.
+   */
+  bus.on('ctrl.config.ui', function(data) {
+    ctrl.getUiConfig().then(function (res) {
+      bus.emit(data.busEvent, res);
+    },
+    function (err) {
+      bus.emit('logger.err', 'CTRL: ' + err);
+      bus.emit(data.busEvent, false);
+    });
+  });
+
+  /**
+   * Handle front-end (UI) translations requests.
+   */
+  bus.on('ctrl.config.ui.translations', function(data) {
+    ctrl.getTranslations().then(function (translations) {
+        bus.emit(data.busEvent, { 'translations': translations });
+      },
+      function (err) {
+        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit(data.busEvent, false);
+      });
+  });
 
   register(null, { "ctrl": ctrl });
 };

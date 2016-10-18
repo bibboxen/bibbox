@@ -116,6 +116,11 @@ Request.prototype.send = function send(message, firstVar, callback) {
 
       var request = require('request');
       request.post(options, function (error, response, body) {
+        // Log message from FBS.
+        if (body) {
+          self.bus.emit('logger.debug', 'FBS response: ' + body);
+        }
+
         var res = null;
         if (error || response.statusCode !== 200) {
           if (!error) {
@@ -134,9 +139,6 @@ Request.prototype.send = function send(message, firstVar, callback) {
         else {
           // Send debug message.
           debug(response.statusCode + ':' + message.substr(0,2));
-
-          // Log message from FBS.
-          self.bus.emit('logger.debug', 'FBS response: ' + body);
 
           var err = null;
           res = new Response(body, firstVar);

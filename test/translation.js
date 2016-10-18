@@ -28,39 +28,22 @@ var setup = function setup() {
   return app;
 };
 
-it('config.translation should return an object, with at least da and en translations', function (done) {
-  this.timeout = 1500;
+it('All translations should be returned', function () {
+  return setup().then(function (app) {
+    var translations = app.services.translation.getTranslations();
 
-  setup().then(function (app) {
-    // Make sure the translations have been written to disc and can be retrieved again.
-    app.services.bus.on('config.translations.resp', function (data) {
-      data.should.be.a.Object();
-      data.should.have.property('da').which.is.a.Object();
-      data.should.have.property('en').which.is.a.Object();
-
-      // Test that file has been created.
-      fs.exists(__dirname + "/../plugins/translation/files/test_translations_test.json", function (exists) {
-        exists.should.be.equal(true);
-
-        // Cleanup translation test file.
-        fs.unlink(__dirname + "/../plugins/translation/files/test_translations_test.json");
-
-        done();
-      });
-    });
-
-    // Emit new translations. This should result in config.translations event containing new translations.
-    app.services.bus.emit('config.translations.update', {
-      "translations": {
-          "da": {},
-          "en": {}
-      },
-      "busEvent": "config.translations.resp"
-    });
+    translations.should.have.property('da').which.is.a.Object();
+    translations.should.have.property('en').which.is.a.Object();
   });
+});
 
-  // Give it 1 second to finish events.
-  setTimeout(function () {}, 1000);
+it('Danish translations should be returned only', function () {
+  return setup().then(function (app) {
+    var translations = app.services.translation.getTranslationsLang('da');
+
+    translations.should.have.property('MATERIAL_NOT_FOUND');
+    translations.should.not.have.property('en').which.is.a.Object();
+  });
 });
 
 it('Teardown', function(done) {

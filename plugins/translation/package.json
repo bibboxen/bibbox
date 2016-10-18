@@ -5,7 +5,7 @@
   "main": "translation.js",
   "private": true,
   "dependencies": {
-    "jsonfile": "^2.4.0"
+    "i18n": "^0.8.3"
   },
   "plugin": {
     "consumes": [

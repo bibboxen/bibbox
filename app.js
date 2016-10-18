@@ -42,8 +42,7 @@ var plugins = [
     "vid": config.barcode.vid
   },
   {
-    "packagePath": "./plugins/translation",
-    "destination": config.translation.destination
+    "packagePath": "./plugins/translation"
   },
   {
     "packagePath": "./plugins/proxy",

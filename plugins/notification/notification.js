@@ -39,7 +39,7 @@ var Notification = function Notification(bus) {
     defaultLocale: 'en',
     indent: "  ",
     autoReload: true,
-    directory: __dirname + '/locales'
+    directory: __dirname + '/../../locales/notifications'
   });
 
   twig.extendFilter('translate', function (str) {
@@ -372,11 +372,16 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
   });
 
   // Request the data to use in the notification.
-  this.bus.emit('fbs.patron', {
-    'username': items[0].patronIdentifier,
-    'password': '',
-    'busEvent': 'notification.patronReceipt'
-  });
+  if (items.length && items[0].hasOwnProperty('patronIdentifier')) {
+    this.bus.emit('fbs.patron', {
+      'username': items[0].patronIdentifier,
+      'password': '',
+      'busEvent': 'notification.patronReceipt'
+    });
+  }
+  else {
+    deferred.reject(new Error('First return has no patron information'));
+  }
 
   return deferred.promise;
 };

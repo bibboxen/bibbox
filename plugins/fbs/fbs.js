@@ -342,12 +342,12 @@ module.exports = function (options, imports, register) {
    */
   bus.on('fbs.renew.all', function (data) {
     fbs.renewAll(data.username, data.password).then(function (res) {
-        bus.emit(data.busEvent, res);
-      },
-      function (err) {
-        bus.emit('fbs.err', err);
-        bus.emit(data.busEvent, false);
-      });
+      bus.emit(data.busEvent, res);
+    },
+    function (err) {
+      bus.emit('fbs.err', err);
+      bus.emit(data.busEvent, false);
+    });
   });
 
   /**
