@@ -35,6 +35,10 @@ angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', 
 
     /**
      * Check if fbs is online.
+     *
+     * @TODO: Should this be turned around, so the server push event if its
+     *        off-line? Maybe into the config object, so all parts of the
+     *        front-end has the information and can react on it if need be!
      */
     var fbsOnline = function () {
       var uniqueId = CryptoJS.MD5("indexController" + Date.now());
