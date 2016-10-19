@@ -3,6 +3,8 @@
  * Unit test setup of proxy plugin.
  */
 
+'use strict';
+
 var app = null;
 var setup = function setup() {
   if (!app) {
@@ -14,24 +16,24 @@ var setup = function setup() {
     // Configure the plugins.
     var plugins = [
       {
-        "packagePath": "./../plugins/bus"
+        packagePath: './../plugins/bus'
       },
       {
-        "packagePath": "./../plugins/server",
-        "port": 3011,
-        "path": path.join(__dirname, 'public')
+        packagePath: './../plugins/server',
+        port: 3011,
+        path: path.join(__dirname, 'public')
       },
       {
-        "packagePath": "./../plugins/proxy",
-        "whitelistedBusEvents": [
-          "^bus.event1$",
-          "^bus.event2$",
-          "^bus.event3$"
+        packagePath: './../plugins/proxy',
+        whitelistedBusEvents: [
+          '^bus.event1$',
+          '^bus.event2$',
+          '^bus.event3$'
         ],
-        "whitelistedSocketEvents": [
-          "^proxy.event1$",
-          "^proxy.event2$",
-          "^proxy.event3$"
+        whitelistedSocketEvents: [
+          '^proxy.event1$',
+          '^proxy.event2$',
+          '^proxy.event3$'
         ]
       }
     ];
@@ -59,14 +61,16 @@ it('Proxy event should return a bus event', function (done) {
   setup().then(function (app) {
     // Setup event listener for bus, that reacts to a proxy.event2 with a bus.event2 event.
     app.services.bus.on('proxy.event2', function () {
-      app.services.bus.emit('bus.event2', {'msg': 'test'});
+      app.services.bus.emit('bus.event2', {
+        msg: 'test'
+      });
     });
 
     // Setup a socket.io client
     var io = require('socket.io-client');
     var socketURL = 'http://127.0.0.1:3011';
     var options = {
-      transports: ['websocket'],
+      'transports': ['websocket'],
       'force new connection': true
     };
 
@@ -108,7 +112,7 @@ it('Should unregister previous bus events, if new connection', function (done) {
     var io = require('socket.io-client');
     var socketURL = 'http://127.0.0.1:3011';
     var options = {
-      transports: ['websocket'],
+      'transports': ['websocket'],
       'force new connection': true
     };
 
@@ -119,7 +123,7 @@ it('Should unregister previous bus events, if new connection', function (done) {
     client1.on('connect', function () {
       client1.on('bus.event1', function () {
         eventFired++;
-      })
+      });
     });
 
     // Wait 1.5 second to make sure the events have fired.
@@ -129,7 +133,7 @@ it('Should unregister previous bus events, if new connection', function (done) {
       var io = require('socket.io-client');
       var socketURL = 'http://127.0.0.1:3011';
       var options = {
-        transports: ['websocket'],
+        'transports': ['websocket'],
         'force new connection': true
       };
 
@@ -144,12 +148,12 @@ it('Should unregister previous bus events, if new connection', function (done) {
 
         app.services.bus.emit('bus.event1');
       });
-    },100);
+    }, 100);
   });
 });
 
 
-it('Teardown', function(done) {
+it('Teardown', function (done) {
   setup().then(function (app) {
     app.destroy();
     done();

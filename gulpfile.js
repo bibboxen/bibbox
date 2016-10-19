@@ -18,6 +18,10 @@ var ui_paths = [
   '!./public/js/lib/*/'
 ];
 
+var test_paths = [
+  './test/*.js'
+];
+
 gulp.task('ui_lint', function () {
   return gulp.src(ui_paths)
     .pipe(eslint({
@@ -39,6 +43,27 @@ gulp.task('node_lint', function () {
     .pipe(eslint({
       globals: [
         'console'
+      ],
+      envs: [
+        'node'
+      ]
+    }))
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
+});
+
+gulp.task('test_lint', function () {
+  return gulp.src(test_paths)
+    .pipe(eslint({
+      globals: [
+        'setupArchitect',
+        'it',
+        'should',
+        'describe',
+        'supertest',
+        'server',
+        'assert',
+        'sinon'
       ],
       envs: [
         'node'

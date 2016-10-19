@@ -2,8 +2,7 @@
  * @file
  * Unit test setup of translation plugin.
  */
-
-var fs = require('fs');
+'use strict';
 
 var app = null;
 var setup = function setup() {
@@ -14,11 +13,10 @@ var setup = function setup() {
     // Configure the plugins.
     var plugins = [
       {
-        "packagePath": "./../plugins/bus"
+        packagePath: './../plugins/bus'
       },
       {
-        "packagePath": "./../plugins/translation",
-        "destination": "/files/test_translations_test.json"
+        packagePath: './../plugins/translation'
       }
     ];
 
@@ -46,7 +44,7 @@ it('Danish translations should be returned only', function () {
   });
 });
 
-it('Teardown', function(done) {
+it('Teardown', function (done) {
   setup().then(function (app) {
     app.destroy();
     done();

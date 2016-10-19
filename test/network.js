@@ -5,59 +5,59 @@
  * @TODO: mock FSB?
  */
 
+'use strict';
+
 var app = null;
 var setup = function setup() {
-	if (!app) {
-		var path = require('path');
+  if (!app) {
+    // Load config file.
+    var config = require(__dirname + '/../config.json');
 
-		// Load config file.
-		var config = require(__dirname + '/../config.json');
+    // Configure the plugins.
+    var plugins = [
+      {
+        packagePath: './../plugins/logger',
+        logs: config.logs
+      },
+      {
+        packagePath: './../plugins/bus'
+      },
+      {
+        packagePath: './../plugins/network'
+      }
+    ];
 
-		// Configure the plugins.
-		var plugins = [
-			{
-				"packagePath": "./../plugins/logger",
-				"logs": config.logs
-			},
-			{
-				"packagePath": "./../plugins/bus"
-			},
-			{
-				"packagePath": "./../plugins/network"
-			}
-		];
+    app = setupArchitect(plugins, config);
+  }
 
-		app = setupArchitect(plugins, config);
-	}
-
-	return app;
+  return app;
 };
 
-it('Google online test', function(done) {
-	setup().then(function (app) {
-		app.services.network.isOnline('https://google.dk').then(function (val) {
-			// Promise resolved, so success.
-			assert(true);
-			done();
-		}, done);
-	}, done);
+it('Google online test', function (done) {
+  setup().then(function (app) {
+    app.services.network.isOnline('https://google.dk').then(function (val) {
+      // Promise resolved, so success.
+      assert(true);
+      done();
+    }, done);
+  }, done);
 });
 
-it('Test non-existing site', function(done) {
-	setup().then(function (app) {
-		app.services.network.isOnline('https://fbsfisker.dk').then(function (val) {
-			// Promise resolved, so success.
-			assert(false);
-			done();
-		},
-		function () {
-			assert(true);
-			done();
-		});
-	}, done);
+it('Test non-existing site', function (done) {
+  setup().then(function (app) {
+    app.services.network.isOnline('https://fbsfisker.dk').then(function (val) {
+      // Promise resolved, so success.
+      assert(false);
+      done();
+    },
+    function () {
+      assert(true);
+      done();
+    });
+  }, done);
 });
 
-it('Teardown', function(done) {
+it('Teardown', function (done) {
   setup().then(function (app) {
     app.destroy();
     done();
