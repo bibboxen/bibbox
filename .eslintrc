@@ -1,12 +1,7 @@
 {
   "extends": "eslint:recommended",
-  "env": {
-    "browser": false
-  },
-  "globals": {
-    '__dirname',
-    'angular'
-  },
+  "env": {},
+  "globals": {},
   "rules": {
     // Errors.
     "array-bracket-spacing": [2, "never"],

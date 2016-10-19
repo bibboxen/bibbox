@@ -18,7 +18,7 @@
         restrict: 'E',
         replace: false,
         templateUrl: 'views/spinner-global.html'
-      }
+      };
     }
   ]);
 
@@ -31,7 +31,7 @@
         restrict: 'E',
         replace: false,
         templateUrl: 'views/spinner.html'
-      }
+      };
     }
   ]);
 }).call(this);

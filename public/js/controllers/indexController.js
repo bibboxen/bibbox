@@ -10,7 +10,7 @@
  */
 angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', '$translate', 'configService', 'proxyService', 'config', 'tmhDynamicLocale', '$interval',
   function ($rootScope, $scope, $translate, configService, proxyService, config, tmhDynamicLocale, $interval) {
-    "use strict";
+    'use strict';
 
     var onlineInterval = null;
     $scope.loading = true;
@@ -41,16 +41,18 @@ angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', 
      *        front-end has the information and can react on it if need be!
      */
     var fbsOnline = function () {
-      var uniqueId = CryptoJS.MD5("indexController" + Date.now());
+      var uniqueId = CryptoJS.MD5('indexController' + Date.now());
 
-      proxyService.emitEvent('fbs.online', 'fbs.online.response' + uniqueId, 'fbs.err', {'busEvent': 'fbs.online.response' + uniqueId})
+      proxyService.emitEvent('fbs.online', 'fbs.online.response' + uniqueId, 'fbs.err', {
+        busEvent: 'fbs.online.response' + uniqueId
+      })
       .then(
         function success(online) {
           $scope.online = online;
         },
         function error(err) {
           // @TODO: Handle error?
-          console.log("fbs.online", err);
+          console.error('fbs.online', err);
         }
       );
     };
@@ -82,7 +84,7 @@ angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', 
       // Remove online interval.
       if (angular.isDefined(onlineInterval)) {
         $interval.cancel(onlineInterval);
-        onlineInterval = undefined;
+        onlineInterval = null;
       }
     });
   }

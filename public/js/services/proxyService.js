@@ -18,12 +18,12 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
      *   The connected socket as an object.
      */
     self.getSocket = function getSocket() {
-      return io.connect(location.protocol + '//' + location.hostname + (location.port ? ':'+location.port: ''), {
-        'forceNew': true,
-        'reconnection': true,
-        'reconnectionDelay': 1000,
-        'reconnectionDelayMax' : 5000,
-        'reconnectionAttempts': Infinity
+      return io.connect(location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''), {
+        forceNew: true,
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        reconnectionAttempts: Infinity
       });
     };
 
@@ -45,7 +45,7 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
      *
      * @returns {*|promise}
      */
-    self.emitEvent = function(emitEvent, callbackEvent, errorEvent, data) {
+    self.emitEvent = function emitEvent(emitEvent, callbackEvent, errorEvent, data) {
       // Try to connect to the server if not already connected.
       var deferred = $q.defer();
 
@@ -78,9 +78,9 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
      *   The callback to call when the event is fired.
      */
     this.onEvent = function onEvent(eventName, callback) {
-      socket.on(eventName, function() {
+      socket.on(eventName, function () {
         var args = arguments;
-        $rootScope.$apply(function() {
+        $rootScope.$apply(function () {
           callback.apply(socket, args);
         });
       });
@@ -101,10 +101,8 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
      *
      * Wrapped in function to allow testing.
      */
-    self.registerListeners = function () {
-      /**
-       * Reloads the browser on the 'frontend.reload' event.
-       */
+    self.registerListeners = function registerListeners() {
+      // Reloads the browser on the 'frontend.reload' event.
       socket.on('frontend.reload', function () {
         $location.path('/');
         $route.reload();

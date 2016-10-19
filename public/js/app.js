@@ -16,6 +16,8 @@ angular.module('BibBox', [
 // Set path for dynamic translation loading and set default idle configuration.
 angular.module('BibBox').config(['tmhDynamicLocaleProvider', 'IdleProvider',
     function (tmhDynamicLocaleProvider, IdleProvider) {
+      'use strict';
+
       tmhDynamicLocaleProvider.localeLocationPattern('/js/lib/locales/angular-locale_{{locale}}.js');
 
       // Configure Idle settings, defaults.
@@ -25,6 +27,8 @@ angular.module('BibBox').config(['tmhDynamicLocaleProvider', 'IdleProvider',
   ]
 )
 .run(function (Idle) {
+  'use strict';
+
   // Start watching when the app runs. also starts the keep-alive service
   // by default.
   Idle.watch();

@@ -26,6 +26,8 @@ angular.module('BibBox').factory('bibboxTranslationLoader', ['$http', '$q', 'con
 ]);
 
 angular.module('BibBox').config(['$translateProvider', function ($translateProvider) {
+  'use strict';
+
   // Set up translations.
   // Loads from json files, preferred language da, fallback en.
   // @TODO: Which fallback file?

@@ -82,7 +82,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * @param err
      */
     var barcodeError = function barcodeError(err) {
-      console.log(err);
+      console.error(err);
       // Ignore error. Restart barcode scanner.
       // @TODO: Should this be handled differently?
       startBarcode();
@@ -199,7 +199,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
           $scope.loading = false;
 
           if (loggedIn) {
-            $location.path("/" + $routeParams.redirectUrl);
+            $location.path('/' + $routeParams.redirectUrl);
           }
           else {
             resetScope();
@@ -209,9 +209,9 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
             $scope.loading = false;
           }
         },
-        function error(reason) {
+        function error(err) {
           // @TODO: Show error.
-          console.log('login error: ', reason);
+          console.error('login error: ', err);
           resetScope();
           gotoStep('default');
 
@@ -234,7 +234,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
     /**
      * On destroy.
      */
-    $scope.$on("$destroy", function() {
+    $scope.$on('$destroy', function () {
       proxyService.cleanup();
       stopBarcode();
     });
