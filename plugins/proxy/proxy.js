@@ -85,13 +85,13 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
     socket.on('*', socketEventHandler);
 
     // Emit configuration to client.
-    bus.on('proxy.config.ui', function (data) {
+    bus.once('proxy.config.ui', function (data) {
       socket.emit('config.ui.update', data);
     });
     bus.emit('ctrl.config.ui', { 'busEvent': 'proxy.config.ui' });
 
     // Emit translation to client.
-    bus.on('proxy.config.ui.translation', function (data) {
+    bus.once('proxy.config.ui.translation', function (data) {
       socket.emit('config.ui.translations.update', data);
     });
     bus.emit('ctrl.config.ui.translations', { 'lang': 'da', 'busEvent': 'proxy.config.ui.translation' });
