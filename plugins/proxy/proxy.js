@@ -3,6 +3,8 @@
  * Proxy for forwarding events between frontend (connected through socket.io) and the bus.
  */
 
+'use strict';
+
 /**
  * This object encapsulates the proxy.
  *
@@ -14,8 +16,6 @@
  * @constructor
  */
 var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents) {
-  "use strict";
-
   var io = require('socket.io')(server);
 
   // Add wildcard support for socket.
@@ -32,9 +32,9 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
    * @param event
    * @param value
    */
-  var busEventHandler = function (event, value) {
+  var busEventHandler = function busEventHandler(event, value) {
     if (currentSocket) {
-      // Test for each white list RegExp
+      // Test for each white list RegExp.
       for (var item in whitelistedBusEvents) {
         if (whitelistedBusEvents.hasOwnProperty(item)) {
           var reg = new RegExp(whitelistedBusEvents[item]);
@@ -52,7 +52,7 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
    *
    * @param event
    */
-  var socketEventHandler = function (event) {
+  var socketEventHandler = function socketEventHandler(event) {
     // Test for each white list RegExp.
     for (var item in whitelistedSocketEvents) {
       if (whitelistedSocketEvents.hasOwnProperty(item)) {
@@ -88,20 +88,20 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
     bus.once('proxy.config.ui', function (data) {
       socket.emit('config.ui.update', data);
     });
-    bus.emit('ctrl.config.ui', { 'busEvent': 'proxy.config.ui' });
+    bus.emit('ctrl.config.ui', {busEvent: 'proxy.config.ui'});
 
     // Emit translation to client.
     bus.once('proxy.config.ui.translation', function (data) {
       socket.emit('config.ui.translations.update', data);
     });
-    bus.emit('ctrl.config.ui.translations', { 'busEvent': 'proxy.config.ui.translation' });
+    bus.emit('ctrl.config.ui.translations', {busEvent: 'proxy.config.ui.translation'});
 
     // Handle socket error events.
     socket.on('error', function (err) {
       bus.emit('logger.err', err);
 
       // @TODO: Handle! How?
-      console.log(err);
+      console.error(err);
     });
   });
 };
@@ -110,9 +110,7 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
-  "use strict";
-
   var proxy = new Proxy(imports.server, imports.bus, options.whitelistedBusEvents, options.whitelistedSocketEvents);
 
-  register(null, { "proxy": proxy });
+  register(null, {proxy: proxy});
 };

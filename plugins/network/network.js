@@ -2,13 +2,14 @@
  * @file
  * Checks if the application has online connection.
  */
+
+'use strict';
+
 var connectionTester = require('connection-tester');
 var url = require('url');
 var Q = require('q');
 
 var Network = function Network(bus) {
-  "use strict";
-
   this.bus = bus;
 };
 
@@ -50,5 +51,7 @@ module.exports = function (options, imports, register) {
     );
   });
 
-  register(null, {"network": network});
+  register(null, {
+    network: network
+  });
 };

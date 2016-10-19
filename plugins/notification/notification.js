@@ -3,6 +3,8 @@
  * Handle PDF generation and printer events..
  */
 
+'use strict';
+
 var printer = require('printer');
 var twig = require('twig');
 var nodemailer = require('nodemailer');
@@ -12,7 +14,6 @@ var Q = require('q');
 var fs = require('fs');
 
 var Notification = function Notification(bus) {
-  "use strict";
   var self = this;
   this.bus = bus;
 
@@ -25,19 +26,19 @@ var Notification = function Notification(bus) {
     self.config = data.config;
 
     self.mailTransporter = nodemailer.createTransport({
-      'host': self.mailConfig.host,
-      'port': self.mailConfig.port,
-      'secure': self.mailConfig.secure,
-      'ignoreTLS': !self.mailConfig.secure
+      host: self.mailConfig.host,
+      port: self.mailConfig.port,
+      secure: self.mailConfig.secure,
+      ignoreTLS: !self.mailConfig.secure
     });
   });
-  bus.emit('config.notification', {'busEvent': 'notification.config'});
+  bus.emit('config.notification', {busEvent: 'notification.config'});
 
   // Configure I18N with supported languages.
   i18n.configure({
-    locales:['en', 'da'],
-    defaultLocale: 'en',
-    indent: "  ",
+    locales: ['en', 'da'],
+    defaultLocale: 'da',
+    indent: '  ',
     autoReload: true,
     directory: __dirname + '/../../locales/notifications'
   });
@@ -48,74 +49,74 @@ var Notification = function Notification(bus) {
 
   // Load template snippets.
   this.mailTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/receipt.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/receipt.html', 'utf8')
   });
   this.textTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/receipt.txt', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/receipt.txt', 'utf8')
   });
 
   // Load library header templates.
   this.mailLibraryTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/library.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/library.html', 'utf8')
   });
   this.textLibraryTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/library.txt', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/library.txt', 'utf8')
   });
 
   // Load fines templates.
   this.mailFinesTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/fines.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/fines.html', 'utf8')
   });
   this.textFinesTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/fines.txt', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/fines.txt', 'utf8')
   });
 
   // Load loans templates.
   this.mailLoansTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/loans.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/loans.html', 'utf8')
   });
   this.textLoansTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/loans.txt', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/loans.txt', 'utf8')
   });
 
   // Load new loans templates.
   this.mailLoansNewTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/loans_new.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/loans_new.html', 'utf8')
   });
   this.textLoansNewTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/loans_new.txt', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/loans_new.txt', 'utf8')
   });
 
   // Load reservations ready templates.
   this.mailReservationsReadyTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/reservations_ready.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/reservations_ready.html', 'utf8')
   });
   this.textReservationsReadyTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/reservations_ready.txt', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/reservations_ready.txt', 'utf8')
   });
 
   // Load reservations templates.
   this.mailReservationsTemplate = twig.twig({
-    'data':  fs.readFileSync(__dirname + '/templates/reservations.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/reservations.html', 'utf8')
   });
   this.textReservationsTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/reservations.txt', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/reservations.txt', 'utf8')
   });
 
   // Load check-in templates.
   this.mailCheckInTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/checkin.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/checkin.html', 'utf8')
   });
   this.textCheckInTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/checkin.txt', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/checkin.txt', 'utf8')
   });
 
   // Load footer templates.
   this.mailFooterTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/footer.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/footer.html', 'utf8')
   });
   this.textFooterTemplate = twig.twig({
-    'data': fs.readFileSync(__dirname + '/templates/footer.txt', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/footer.txt', 'utf8')
   });
 
   // Get default printer name and use that as printer.
@@ -161,10 +162,14 @@ Notification.prototype.renderLibrary = function renderLibrary(html) {
  */
 Notification.prototype.renderFines = function renderFines(html, fines) {
   if (html) {
-    return this.mailFinesTemplate.render({'items': fines});
+    return this.mailFinesTemplate.render({
+      items: fines
+    });
   }
   else {
-    return this.textFinesTemplate.render({'items': fines});
+    return this.textFinesTemplate.render({
+      items: fines
+    });
   }
 };
 
@@ -194,14 +199,14 @@ Notification.prototype.renderLoans = function renderLoans(html, headline, loans,
 
   if (html) {
     return this.mailLoansTemplate.render({
-      'headline': headline,
-      'items': loans
+      headline: headline,
+      items: loans
     });
   }
   else {
     return this.textLoansTemplate.render({
-      'headline': headline,
-      'items': loans
+      headline: headline,
+      items: loans
     });
   }
 };
@@ -218,17 +223,17 @@ Notification.prototype.renderLoans = function renderLoans(html, headline, loans,
  *
  * @returns {*}
  */
-Notification.prototype.renderNewLoans = function renderNewLoans(html, headline, items){
+Notification.prototype.renderNewLoans = function renderNewLoans(html, headline, items) {
   if (html) {
     return this.mailLoansNewTemplate.render({
-      'headline': headline,
-      'items': items
+      headline: headline,
+      items: items
     });
   }
   else {
     return this.textLoansNewTemplate.render({
-      'headline': headline,
-      'items': items
+      headline: headline,
+      items: items
     });
   }
 };
@@ -245,10 +250,14 @@ Notification.prototype.renderNewLoans = function renderNewLoans(html, headline, 
  */
 Notification.prototype.renderReadyReservations = function renderReadyReservations(html, reservations) {
   if (html) {
-    return this.mailReservationsReadyTemplate.render({'items': reservations});
+    return this.mailReservationsReadyTemplate.render({
+      items: reservations
+    });
   }
   else {
-    return this.textReservationsReadyTemplate.render({'items': reservations});
+    return this.textReservationsReadyTemplate.render({
+      items: reservations
+    });
   }
 };
 
@@ -265,10 +274,14 @@ Notification.prototype.renderReadyReservations = function renderReadyReservation
  */
 Notification.prototype.renderReservations = function renderReservations(html, reservations) {
   if (html) {
-    return this.mailReservationsTemplate.render({'items': reservations});
+    return this.mailReservationsTemplate.render({
+      items: reservations
+    });
   }
   else {
-    return this.textReservationsTemplate.render({'items': reservations});
+    return this.textReservationsTemplate.render({
+      items: reservations
+    });
   }
 };
 
@@ -284,10 +297,14 @@ Notification.prototype.renderReservations = function renderReservations(html, re
  */
 Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
   if (html) {
-    return this.mailCheckInTemplate.render({'items': items});
+    return this.mailCheckInTemplate.render({
+      items: items
+    });
   }
   else {
-    return this.textCheckInTemplate.render({'items': items});
+    return this.textCheckInTemplate.render({
+      items: items
+    });
   }
 };
 
@@ -300,10 +317,14 @@ Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
  */
 Notification.prototype.renderFooter = function renderFooter(html) {
   if (html) {
-    return this.mailFooterTemplate.render({ 'debug': true, 'content': this.footer.html });
+    return this.mailFooterTemplate.render({
+      content: this.footer.html
+    });
   }
   else {
-    return this.textFooterTemplate.render({ 'text': this.footer.text });
+    return this.textFooterTemplate.render({
+      text: this.footer.text
+    });
   }
 };
 
@@ -331,15 +352,15 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
   // Listen for status notification message.
   this.bus.once('notification.patronReceipt', function (data) {
     var context = {
-      'name': data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
-      'header': self.headerConfig,
-      'library': self.renderLibrary(mail),
-      'fines': layout.fines ? self.renderFines(mail, data.fineItems) : '',
-      'loans': layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
-      'reservations': layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
-      'reservations_ready': layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
-      'footer': self.renderFooter(mail),
-      'check_ins': layout.check_ins ? self.renderCheckIn(mail, items) : ''
+      name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
+      header: self.headerConfig,
+      library: self.renderLibrary(mail),
+      fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
+      loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
+      reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
+      reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
+      footer: self.renderFooter(mail),
+      check_ins: layout.check_ins ? self.renderCheckIn(mail, items) : ''
     };
 
     var result = '';
@@ -374,9 +395,9 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
   // Request the data to use in the notification.
   if (items.length && items[0].hasOwnProperty('patronIdentifier')) {
     this.bus.emit('fbs.patron', {
-      'username': items[0].patronIdentifier,
-      'password': '',
-      'busEvent': 'notification.patronReceipt'
+      username: items[0].patronIdentifier,
+      password: '',
+      busEvent: 'notification.patronReceipt'
     });
   }
   else {
@@ -421,15 +442,15 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
   // Listen for status notification message.
   this.bus.once('notification.patronReceipt', function (data) {
     var context = {
-      'name': data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
-      'header': self.headerConfig,
-      'library': self.renderLibrary(mail),
-      'fines': layout.fines ? self.renderFines(mail, data.fineItems) : '',
-      'loans_new': layout.loans_new ? self.renderNewLoans(mail, 'receipt.loans.new.headline', items) : '',
-      'loans': layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
-      'reservations': layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
-      'reservations_ready': layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
-      'footer': self.renderFooter(mail)
+      name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
+      header: self.headerConfig,
+      library: self.renderLibrary(mail),
+      fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
+      loans_new: layout.loans_new ? self.renderNewLoans(mail, 'receipt.loans.new.headline', items) : '',
+      loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
+      reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
+      reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
+      footer: self.renderFooter(mail)
     };
 
     var result = '';
@@ -456,16 +477,16 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
       // Print it.
       self.printReceipt(result);
       deferred.resolve();
-     }
-   }, function (err) {
-     deferred.reject(err);
+    }
+  }, function (err) {
+    deferred.reject(err);
   });
 
    // Request the data to use in the notification.
    this.bus.emit('fbs.patron', {
-     'username': username,
-     'password': password,
-     'busEvent': 'notification.patronReceipt'
+     username: username,
+     password: password,
+     busEvent: 'notification.patronReceipt'
    });
 
   return deferred.promise;
@@ -499,14 +520,14 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
   // Listen for status notification message.
   this.bus.once('notification.patronReceipt', function (data) {
     var context = {
-      'name': data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
-      'header': self.headerConfig,
-      'library': self.renderLibrary(mail),
-      'fines': layout.fines ? self.renderFines(mail, data.fineItems) : '',
-      'loans': layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
-      'reservations': layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
-      'reservations_ready': layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
-      'footer': self.renderFooter(mail)
+      name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
+      header: self.headerConfig,
+      library: self.renderLibrary(mail),
+      fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
+      loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
+      reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
+      reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
+      footer: self.renderFooter(mail)
     };
 
     var result = '';
@@ -540,9 +561,9 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
 
   // Request the data to use in the notification.
   this.bus.emit('fbs.patron', {
-    'username': username,
-    'password': password,
-    'busEvent': 'notification.patronReceipt'
+    username: username,
+    password: password,
+    busEvent: 'notification.patronReceipt'
   });
 
   return deferred.promise;
@@ -588,9 +609,7 @@ Notification.prototype.sendMail = function sendMail(to, content) {
  * @param content
  */
 Notification.prototype.printReceipt = function printReceipt(content) {
-  /**
-   * @TODO: Print the receipt.
-   */
+  // @TODO: Print the receipt.
 };
 
 /**
@@ -657,6 +676,6 @@ module.exports = function (options, imports, register) {
   });
 
   register(null, {
-    "notification": notification
+    notification: notification
   });
 };

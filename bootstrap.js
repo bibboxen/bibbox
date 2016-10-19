@@ -2,6 +2,9 @@
  * @file
  * Bootstrap the application to allow self-updating.
  */
+
+'use strict';
+
 var debug = require('debug')('bibbox:bootstrap');
 var fork = require('child_process').fork;
 var spawn = require('child_process').spawn;
@@ -67,8 +70,7 @@ Bootstrap.prototype.startApp = function startApp() {
     self.bibbox = app;
   }
 
-
-  app.on('message', function(message) {
+  app.on('message', function (message) {
     for (var id in self.sockets) {
       var socket = self.sockets[id];
       socket.emit('message', message);
@@ -103,13 +105,16 @@ Bootstrap.prototype.stopApp = function stopApp() {
  *   The version to update to.
  */
 Bootstrap.prototype.updateApp = function updateApp(version) {
+  var self = this;
+
   debug('Update called.');
+
   // Update from github.com.
   // @TODO: error handling etc.
   // @TODO: check it's up and fetch then checkout version.
   spawn('git', ['fetch']).on('close', function (code) {
     spawn('git', ['checkout', version]).on('close', function (code) {
-      restartApp();
+      self.restartApp();
     });
   });
 };
@@ -125,7 +130,9 @@ bs.startApp();
  * @param err
  */
 function exitHandler(options, err) {
-  if (err) console.log(err.stack);
+  if (err) {
+    console.error(err.stack);
+  }
   if (options.exit) {
     bs.stopApp();
     process.exit();
@@ -133,10 +140,10 @@ function exitHandler(options, err) {
 }
 
 // Bootstrap app is closing.
-process.on('exit', exitHandler.bind(null, {exit:true}));
+process.on('exit', exitHandler.bind(null, {exit: true}));
 
 // Catches ctrl+c event
-process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+process.on('SIGINT', exitHandler.bind(null, {exit: true}));
 
 // Catches uncaught exceptions
-process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
+process.on('uncaughtException', exitHandler.bind(null, {exit: true}));

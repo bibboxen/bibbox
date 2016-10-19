@@ -3,6 +3,8 @@
  * Defines an event bus to send messages between plugins.
  */
 
+'use strict';
+
 // Get event emitter.
 var EventEmitter2 = require('eventemitter2').EventEmitter2;
 
@@ -18,7 +20,7 @@ module.exports = function (options, imports, register) {
   });
 
   register(null, {
-    'bus': {
+    bus: {
       emit: emitter.emit,
       onAny: emitter.onAny,
       offAny: emitter.offAny,

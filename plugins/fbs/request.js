@@ -2,7 +2,9 @@
  * @file
  * Handle sip2 response from FBS server.
  */
-var util = require('util');
+
+'use strict';
+
 var handlebars = require('handlebars');
 var fs = require('fs');
 
@@ -31,7 +33,7 @@ var Request = function Request(bus) {
     self.agency = data.agency;
     self.location = data.location;
   });
-  bus.emit('config.fbs', {'busEvent': 'config.fbs.res'});
+  bus.emit('config.fbs', {busEvent: 'config.fbs.res'});
 };
 
 /**
@@ -46,7 +48,7 @@ var Request = function Request(bus) {
  *   Padded number.
  */
 Request.prototype.zeroPad = function zeroPad(number) {
-  return ('0' + (number)).slice(-2)
+  return ('0' + (number)).slice(-2);
 };
 
 /**
@@ -79,9 +81,9 @@ Request.prototype.encodeTime = function encodeTime(timestamp) {
 Request.prototype.buildXML = function buildXML(message) {
   var self = this;
   return self.template({
-    'username': self.username,
-    'password': self.password,
-    'message': message
+    username: self.username,
+    password: self.password,
+    message: message
   });
 };
 
@@ -105,13 +107,13 @@ Request.prototype.send = function send(message, firstVar, callback) {
       self.bus.emit('logger.debug', 'FBS send: ' + xml);
 
       var options = {
-        'method': 'POST',
-        'url': self.endpoint,
-        'headers': {
+        method: 'POST',
+        url: self.endpoint,
+        headers: {
           'User-Agent': 'bibbox',
           'Content-Type': 'application/xml'
         },
-        'body': xml
+        body: xml
       };
 
       var request = require('request');
@@ -138,7 +140,7 @@ Request.prototype.send = function send(message, firstVar, callback) {
         }
         else {
           // Send debug message.
-          debug(response.statusCode + ':' + message.substr(0,2));
+          debug(response.statusCode + ':' + message.substr(0, 2));
 
           var err = null;
           res = new Response(body, firstVar);
@@ -158,8 +160,8 @@ Request.prototype.send = function send(message, firstVar, callback) {
 
   // Check if server is online (FBS).
   self.bus.emit('network.online', {
-    'url': self.endpoint,
-    'busEvent': 'fbs.sip2.online'
+    url: self.endpoint,
+    busEvent: 'fbs.sip2.online'
   });
 };
 

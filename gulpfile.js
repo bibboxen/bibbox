@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 
-const gulp = require('gulp');
-const eslint = require('gulp-eslint');
+'use strict';
+
+var gulp = require('gulp');
+var eslint = require('gulp-eslint');
 
 var node_paths = [
   './plugins/**/*.js',
+  './*.js',
   '!./plugins/**/node_modules/**',
   '!./node_modules/**'
 ];
@@ -46,6 +49,6 @@ gulp.task('node_lint', function () {
 });
 
 
-gulp.task('default', ['ui_lint',  'node_lint'], function () {
+gulp.task('default', ['ui_lint', 'node_lint'], function () {
   // This will only run if the lint task is successful...
 });

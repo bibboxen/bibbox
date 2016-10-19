@@ -4,19 +4,20 @@
  *
  * Enables the front-end (AngularJS) to have dynamic language translations.
  */
+
+'use strict';
+
 var i18n = require('i18n');
 
 /**
  * This object encapsulates translation.
  */
 var Translation = function (bus) {
-  "use strict";
-
   // Configure I18N with supported languages.
   i18n.configure({
-    locales:['en', 'da'],
-    defaultLocale: 'en',
-    indent: "  ",
+    locales: ['en', 'da'],
+    defaultLocale: 'da',
+    indent: '  ',
     autoReload: true,
     directory: __dirname + '/../../locales/ui'
   });
@@ -61,8 +62,6 @@ Translation.prototype.updateTranslations = function updateTranslations() {
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
-  'use strict';
-
   var bus = imports.bus;
   var translation = new Translation(bus);
 
@@ -94,6 +93,6 @@ module.exports = function (options, imports, register) {
   });
 
   register(null, {
-    "translation": translation
+    translation: translation
   });
 };

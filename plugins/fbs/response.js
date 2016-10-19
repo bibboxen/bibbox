@@ -3,6 +3,8 @@
  * Handle sip2 response from FBS server.
  */
 
+'use strict';
+
 var util = require('util');
 var eventEmitter = require('events').EventEmitter;
 
@@ -260,7 +262,7 @@ Response.prototype.parseXML = function parseXML() {
     }
     else {
       // It might be a reset service error.
-      var err = this.xml.match(/(<errorCode>)(.*)(<\/errorCode>)/);
+      err = this.xml.match(/(<errorCode>)(.*)(<\/errorCode>)/);
       if (err) {
         var id = this.xml.match(/(<correlationId>)(.*)(<\/correlationId>)/);
         this.error = err[2] + ' - ' + (id.length ? id[2] : 'Unknown correlation id');
@@ -283,44 +285,44 @@ Response.prototype.parseXML = function parseXML() {
  */
 Response.prototype.variablesResponseTranslation = function variablesResponseTranslation(code) {
   var codes = {
-    'AE': 'personalName',
-    'AU': 'chargedItems',
-    'AP': 'currentLocation',
-    'AH': 'dueDate',
-    'BE': 'emailAddress',
-    'BW': 'expirationDate',
-    'AV': 'fineItems',
-    'AS': 'holdItems',
-    'BD': 'homeAddress',
-    'BF': 'homePhoneNumber',
-    'AO': 'institutionId',
-    'AB': 'itemIdentifier',
-    'CF': 'holdQueueLength',
-    'CH': 'itemProperties',
-    'AT': 'overdueItems',
-    'AA': 'patronIdentifier',
-    'AD': 'patronStatus',
-    'AQ': 'permanentLocation',
-    'BS': 'pickupLocation',
-    'AG': 'printLine',
-    'BU': 'recallItems',
-    'BM': 'renewedItems',
-    'AF': 'screenMessage',
-    'AJ': 'titleIdentifier',
-    'BK': 'transactionId',
-    'CD': 'unavailableHoldItems',
-    'CG': 'feeIdentifier',
-    'BN': 'unrenewedItems',
-    'BL': 'validPatron',
-    'CQ': 'validPatronPassword',
-    'AM': 'libraryName',
-    'BX': 'supportedMessages',
-    'BZ': 'holdItemsLimit',
-    'CA': 'overdueItemsLimit',
-    'CB': 'chargedItemsLimit',
-    'BH': 'currencyType',
-    'BV': 'feeAmount',
-    'CC': 'feeLimit'
+    AE: 'personalName',
+    AU: 'chargedItems',
+    AP: 'currentLocation',
+    AH: 'dueDate',
+    BE: 'emailAddress',
+    BW: 'expirationDate',
+    AV: 'fineItems',
+    AS: 'holdItems',
+    BD: 'homeAddress',
+    BF: 'homePhoneNumber',
+    AO: 'institutionId',
+    AB: 'itemIdentifier',
+    CF: 'holdQueueLength',
+    CH: 'itemProperties',
+    AT: 'overdueItems',
+    AA: 'patronIdentifier',
+    AD: 'patronStatus',
+    AQ: 'permanentLocation',
+    BS: 'pickupLocation',
+    AG: 'printLine',
+    BU: 'recallItems',
+    BM: 'renewedItems',
+    AF: 'screenMessage',
+    AJ: 'titleIdentifier',
+    BK: 'transactionId',
+    CD: 'unavailableHoldItems',
+    CG: 'feeIdentifier',
+    BN: 'unrenewedItems',
+    BL: 'validPatron',
+    CQ: 'validPatronPassword',
+    AM: 'libraryName',
+    BX: 'supportedMessages',
+    BZ: 'holdItemsLimit',
+    CA: 'overdueItemsLimit',
+    CB: 'chargedItemsLimit',
+    BH: 'currencyType',
+    BV: 'feeAmount',
+    CC: 'feeLimit'
   };
 
   if (codes.hasOwnProperty(code)) {
@@ -354,10 +356,10 @@ Response.prototype.parseVariables = function parseVariables() {
         case 'BD':
           val = val.split('%');
           self[keyTrans] = {
-            'Name': entities.decode(val.shift()),
-            'Street': val.shift(),
-            'zipcode': val.shift(),
-            'city': val.shift()
+            Name: entities.decode(val.shift()),
+            Street: val.shift(),
+            zipcode: val.shift(),
+            city: val.shift()
           };
           break;
 
@@ -366,13 +368,13 @@ Response.prototype.parseVariables = function parseVariables() {
           val = val.split('%');
           if (val.length > 1) {
             self[keyTrans].push({
-              'id': val.shift(),
-              'dueDate': self.parseDate(val.shift()),
-              'title': entities.decode(val.shift()),
-              'author': entities.decode(val.shift()),
-              'GMB': val.shift(),
-              'SMB': val.shift(),
-              'DK5': val.shift()
+              id: val.shift(),
+              dueDate: self.parseDate(val.shift()),
+              title: entities.decode(val.shift()),
+              author: entities.decode(val.shift()),
+              GMB: val.shift(),
+              SMB: val.shift(),
+              DK5: val.shift()
             });
           }
           break;
@@ -382,14 +384,14 @@ Response.prototype.parseVariables = function parseVariables() {
           val = val.split('%');
           if (val.length > 1) {
             self[keyTrans].push({
-              'id': val.shift(),
-              'reason': entities.decode(val.shift()),
-              'dueDate': self.parseDate(val.shift()),
-              'title': entities.decode(val.shift()),
-              'author': entities.decode(val.shift()),
-              'GMB': val.shift(),
-              'SMB': val.shift(),
-              'DK5': val.shift()
+              id: val.shift(),
+              reason: entities.decode(val.shift()),
+              dueDate: self.parseDate(val.shift()),
+              title: entities.decode(val.shift()),
+              author: entities.decode(val.shift()),
+              GMB: val.shift(),
+              SMB: val.shift(),
+              DK5: val.shift()
             });
           }
           break;
@@ -405,16 +407,16 @@ Response.prototype.parseVariables = function parseVariables() {
           val = val.split('%');
           if (val.length > 1) {
             self[keyTrans].push({
-              'bibliographicId': val.shift(),
-              'id': val.shift(),
-              'pickupId': val.shift(),
-              'pickupDate': self.parseDate(val.shift()),
-              'pickupLocation': val.shift().match(/\w{2,3}-\d{6}\s-\s(.*)/)[1],
-              'title': entities.decode(val.shift()),
-              'author': entities.decode(val.shift()),
-              'GMB': val.shift(),
-              'SMB': val.shift(),
-              'DK5': val.shift()
+              bibliographicId: val.shift(),
+              id: val.shift(),
+              pickupId: val.shift(),
+              pickupDate: self.parseDate(val.shift()),
+              pickupLocation: val.shift().match(/\w{2,3}-\d{6}\s-\s(.*)/)[1],
+              title: entities.decode(val.shift()),
+              author: entities.decode(val.shift()),
+              GMB: val.shift(),
+              SMB: val.shift(),
+              DK5: val.shift()
             });
           }
           break;
@@ -424,13 +426,13 @@ Response.prototype.parseVariables = function parseVariables() {
           val = val.split('%');
           if (val.length > 1) {
             self[keyTrans].push({
-              'id': val.shift(),
-              'dueDate': self.parseDate(val.shift()),
-              'title': entities.decode(val.shift()),
-              'author': entities.decode(val.shift()),
-              'GMB': val.shift(),
-              'SMB': val.shift(),
-              'DK5': val.shift()
+              id: val.shift(),
+              dueDate: self.parseDate(val.shift()),
+              title: entities.decode(val.shift()),
+              author: entities.decode(val.shift()),
+              GMB: val.shift(),
+              SMB: val.shift(),
+              DK5: val.shift()
             });
           }
           break;
@@ -440,15 +442,15 @@ Response.prototype.parseVariables = function parseVariables() {
           val = val.split('%');
           if (val.length > 1) {
             self[keyTrans].push({
-              'id': val.shift(),
-              'fineId': val.shift(),
-              'fineDate': self.parseDate(val.shift()),
-              'fineAmount': val.shift(),
-              'title': entities.decode(val.shift()),
-              'author': entities.decode(val.shift()),
-              'GMB': val.shift(),
-              'SMB': val.shift(),
-              'DK5': val.shift()
+              id: val.shift(),
+              fineId: val.shift(),
+              fineDate: self.parseDate(val.shift()),
+              fineAmount: val.shift(),
+              title: entities.decode(val.shift()),
+              author: entities.decode(val.shift()),
+              GMB: val.shift(),
+              SMB: val.shift(),
+              DK5: val.shift()
             });
           }
           break;
@@ -458,13 +460,13 @@ Response.prototype.parseVariables = function parseVariables() {
           val = val.split('%');
           if (val.length > 1) {
             self[keyTrans].push({
-              'id': val.shift(),
-              'recallDate': self.parseDate(val.shift()),
-              'title': val.shift(),
-              'author': val.shift(),
-              'GMB': val.shift(),
-              'SMB': val.shift(),
-              'DK5': val.shift()
+              id: val.shift(),
+              recallDate: self.parseDate(val.shift()),
+              title: val.shift(),
+              author: val.shift(),
+              GMB: val.shift(),
+              SMB: val.shift(),
+              DK5: val.shift()
             });
           }
           break;
@@ -474,14 +476,14 @@ Response.prototype.parseVariables = function parseVariables() {
           val = val.split('%');
           if (val.length > 1) {
             self[keyTrans].push({
-              'bibliographicId': val.shift(),
-              'id': val.shift(),
-              'interestDate': self.parseDate(val.shift()),
-              'title': entities.decode(val.shift()),
-              'author': entities.decode(val.shift()),
-              'GMB': val.shift(),
-              'SMB': val.shift(),
-              'DK5': val.shift()
+              bibliographicId: val.shift(),
+              id: val.shift(),
+              interestDate: self.parseDate(val.shift()),
+              title: entities.decode(val.shift()),
+              author: entities.decode(val.shift()),
+              GMB: val.shift(),
+              SMB: val.shift(),
+              DK5: val.shift()
             });
           }
           break;
@@ -491,12 +493,12 @@ Response.prototype.parseVariables = function parseVariables() {
           val = val.split('%');
           if (val.length > 1) {
             self[keyTrans].push({
-              'id': val.shift(),
-              'returnDate': self.parseDate(val.shift()),
-              'title': entities.decode(val.shift()),
-              'author': entities.decode(val.shift()),
-              'GMB': val.shift(),
-              'SMB': val.shift()
+              id: val.shift(),
+              returnDate: self.parseDate(val.shift()),
+              title: entities.decode(val.shift()),
+              author: entities.decode(val.shift()),
+              GMB: val.shift(),
+              SMB: val.shift()
             });
           }
           break;
@@ -506,11 +508,11 @@ Response.prototype.parseVariables = function parseVariables() {
           val = val.split('%');
           if (val.length > 1) {
             self[keyTrans] = {
-              'title': entities.decode(val.shift()),
-              'author': entities.decode(val.shift()),
-              'GMB': val.shift(),
-              'SMB': val.shift(),
-              'DK5': val.shift()
+              title: entities.decode(val.shift()),
+              author: entities.decode(val.shift()),
+              GMB: val.shift(),
+              SMB: val.shift(),
+              DK5: val.shift()
             };
           }
           break;
@@ -530,7 +532,7 @@ Response.prototype.parseVariables = function parseVariables() {
 /**
  * Check if error exists.
  *
- * @returns {boolean}
+ * @return {boolean}
  *   TRUE on error else FALSE.
  */
 Response.prototype.hasError = function hasError() {
@@ -540,7 +542,7 @@ Response.prototype.hasError = function hasError() {
 /**
  * Get error message.
  *
- * @returns {string}
+ * @return {string}
  *   The error message.
  */
 Response.prototype.getError = function getError() {

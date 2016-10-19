@@ -5,9 +5,10 @@
  * This is the main application that uses architect to build the application
  * base on plugins.
  */
+'use strict';
 
 var path = require('path');
-var architect = require("architect");
+var architect = require('architect');
 
 // Load config file.
 var config = require(__dirname + '/config.json');
@@ -15,45 +16,45 @@ var config = require(__dirname + '/config.json');
 // Configure the plugins.
 var plugins = [
   {
-    "packagePath": "./plugins/logger",
-    "logs": config.logs
+    packagePath: './plugins/logger',
+    logs: config.logs
   },
   {
-    "packagePath": "./plugins/bus"
+    packagePath: './plugins/bus'
   },
   {
-    "packagePath": "./plugins/server",
-    "port": config.port,
-    "path": path.join(__dirname, 'public')
+    packagePath: './plugins/server',
+    port: config.port,
+    path: path.join(__dirname, 'public')
   },
   {
-    "packagePath": "./plugins/ctrl",
-    "allowed": config.allowed
+    packagePath: './plugins/ctrl',
+    allowed: config.allowed
   },
   {
-    "packagePath": "./plugins/network"
+    packagePath: './plugins/network'
   },
   {
-    "packagePath": "./plugins/api"
+    packagePath: './plugins/api'
   },
   {
-    "packagePath": "./plugins/barcode",
-    "pid": config.barcode.pid,
-    "vid": config.barcode.vid
+    packagePath: './plugins/barcode',
+    pid: config.barcode.pid,
+    vid: config.barcode.vid
   },
   {
-    "packagePath": "./plugins/translation"
+    packagePath: './plugins/translation'
   },
   {
-    "packagePath": "./plugins/proxy",
-    "whitelistedSocketEvents": config.proxy.whitelistedSocketEvents,
-    "whitelistedBusEvents": config.proxy.whitelistedBusEvents
+    packagePath: './plugins/proxy',
+    whitelistedSocketEvents: config.proxy.whitelistedSocketEvents,
+    whitelistedBusEvents: config.proxy.whitelistedBusEvents
   },
   {
-    "packagePath": "./plugins/fbs"
+    packagePath: './plugins/fbs'
   },
   {
-    "packagePath": "./plugins/notification"
+    packagePath: './plugins/notification'
   }
 ];
 
@@ -68,6 +69,8 @@ architect.createApp(config, function (err, app) {
 // If process is forked from bootstrap send keep-alive events back.
 setInterval(function () {
   if (process.send) {
-    process.send({'ping': new Date().getTime()});
+    process.send({
+      ping: new Date().getTime()
+    });
   }
 }, 1000);
