@@ -6,36 +6,11 @@
 
 var Q = require('q');
 
-var CTRL = function CTRL(app, bus, allowed) {
+var CTRL = function CTRL(bus, allowed) {
   var self = this;
 
   self.bus = bus;
   self.allowed = allowed;
-
-  /**
-   * Default get request.
-   */
-  app.get('/ctrl', function (req, res) {
-    if (self.checkAccess(req)) {
-      res.status(501).send('Please see documentation about using the controller interface.');
-    }
-    else {
-      res.status(401).end();
-    }
-  });
-
-  /**
-   * Reload front end.
-   */
-  app.get('/ctrl/reload', function (req, res) {
-    if (self.checkAccess(req)) {
-      bus.emit('frontend.reload');
-      res.status(200).end();
-    }
-    else {
-      res.status(401).end();
-    }
-  });
 
   /**
    * Handle SIP2 configuration request.
@@ -215,7 +190,7 @@ CTRL.prototype.getTranslations = function getTranslations() {
 module.exports = function (options, imports, register) {
 
   var bus = imports.bus;
-  var ctrl = new CTRL(imports.app, bus, options.allowed);
+  var ctrl = new CTRL(bus, options.allowed);
 
   /**
    * Handle front-end (UI) configuration requests.

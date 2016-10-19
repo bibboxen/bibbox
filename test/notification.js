@@ -19,6 +19,9 @@ var setup = function setup() {
 				"packagePath": "./../plugins/bus"
 			},
 			{
+				"packagePath": "./../plugins/ctrl"
+			},
+			{
 				"packagePath": "./../plugins/notification"
 			}
 		];

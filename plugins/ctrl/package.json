@@ -6,8 +6,7 @@
   "private": true,
   "plugin": {
     "consumes": [
-      "bus",
-      "app"
+      "bus"
     ],
     "provides": [
       "ctrl"
