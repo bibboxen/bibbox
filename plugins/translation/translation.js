@@ -61,11 +61,10 @@ Translation.prototype.updateTranslations = function updateTranslations() {
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
-  "use strict";
+  'use strict';
 
   var bus = imports.bus;
-
-  var translation = new Translation(imports.bus);
+  var translation = new Translation(bus);
 
   /**
    * Handler for 'translations.request' event.

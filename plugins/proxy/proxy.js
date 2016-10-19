@@ -94,7 +94,7 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
     bus.once('proxy.config.ui.translation', function (data) {
       socket.emit('config.ui.translations.update', data);
     });
-    bus.emit('ctrl.config.ui.translations', { 'lang': 'da', 'busEvent': 'proxy.config.ui.translation' });
+    bus.emit('ctrl.config.ui.translations', { 'busEvent': 'proxy.config.ui.translation' });
 
     // Handle socket error events.
     socket.on('error', function (err) {
