@@ -9,7 +9,11 @@
 </nav>
 
 <div class="container">
-  <div class="panel panel-default">
+  <div class="image-help" data-ng-if="!materials || materials.length === 0">
+    <img src="img/help2.jpg" />
+  </div>
+
+  <div class="panel panel-default" data-ng-if="materials && materials.length > 0">
     <table class="table">
       <tr>
         <th></th>
@@ -42,7 +46,7 @@
     <button type="button" class="btn btn-success button button-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0">
       <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'borrow.button.receipt' | translate }}
     </button>
-    <button type="button" class="btn btn-success button button-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0">
+    <button type="button" class="btn btn-success button button-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0" >
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'borrow.button.receipt' | translate }}
     </button>
   </div>
