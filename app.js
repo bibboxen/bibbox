@@ -23,6 +23,10 @@ var plugins = [
     packagePath: './plugins/bus'
   },
   {
+    packagePath: './plugins/storage',
+    paths: config.paths
+  },
+  {
     packagePath: './plugins/server',
     port: config.port,
     path: path.join(__dirname, 'public')
@@ -59,10 +63,6 @@ var plugins = [
     packagePath: './plugins/notification',
     paths: config.paths,
     languages: config.languages
-  },
-  {
-    packagePath: './plugins/storage',
-    paths: config.paths
   }
 ];
 

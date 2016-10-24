@@ -17,7 +17,7 @@ var Notification = function Notification(bus, paths, languages) {
   var self = this;
   this.bus = bus;
 
-  bus.once('notification.config', function (data) {
+  bus.on('notification.loaded.config', function (data) {
     self.mailConfig = data.mailer;
     self.headerConfig = data.header;
     self.libraryHeader = data.library;
@@ -32,7 +32,9 @@ var Notification = function Notification(bus, paths, languages) {
       ignoreTLS: !self.mailConfig.secure
     });
   });
-  bus.emit('config.notification', {busEvent: 'notification.config'});
+  bus.emit('ctrl.config.notification', {
+    busEvent: 'notification.loaded.config'
+  });
 
   // Configure I18N with supported languages.
   i18n.configure({

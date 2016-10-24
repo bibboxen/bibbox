@@ -47,18 +47,6 @@ Translation.prototype.getTranslationsLang = function getTranslationsLang(lang) {
 };
 
 /**
- * Update the translations store on disk.
- *
- * @TODO: Update translations based on input from admin.
- * @TODO: Update the json files. The i18n will automatically pickup the
- *        changes.
- * @TODO: trigger the translations update in proxy.js
- */
-Translation.prototype.updateTranslations = function updateTranslations() {
-
-};
-
-/**
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
