@@ -98,8 +98,6 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
       proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {})
         .then(
           function success(data) {
-            // Restart idle service.
-            Idle.watch();
             $scope.countdown = null;
 
             // Ignore result if the barcode should not be running.
@@ -144,6 +142,9 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
       }
     };
 
+    /**
+     * Handle back button.
+     */
     $scope.back = function back() {
       if ($scope.display === 'default') {
         $scope.gotoFront();
@@ -196,6 +197,9 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
 
       userService.login($scope.user.username, $scope.user.password).then(
         function success(loggedIn) {
+          // Restart idle service.
+          Idle.watch();
+
           $scope.loading = false;
 
           if (loggedIn) {
@@ -210,6 +214,9 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
           }
         },
         function error(reason) {
+          // Restart idle service.
+          Idle.watch();
+
           // @TODO: Show error.
           console.log('login error: ', reason);
           resetScope();
