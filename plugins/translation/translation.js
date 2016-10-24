@@ -12,14 +12,14 @@ var i18n = require('i18n');
 /**
  * This object encapsulates translation.
  */
-var Translation = function (bus) {
+var Translation = function (bus, paths,languages) {
   // Configure I18N with supported languages.
   i18n.configure({
-    locales: ['en', 'da'],
-    defaultLocale: 'da',
+    locales: languages.locales,
+    defaultLocale: languages.defaultLocale,
     indent: '  ',
     autoReload: true,
-    directory: __dirname + '/../../locales/ui'
+    directory: __dirname + '/../../' + paths.base + '/' + paths.translations + '/ui'
   });
 };
 
@@ -63,7 +63,7 @@ Translation.prototype.updateTranslations = function updateTranslations() {
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
-  var translation = new Translation(bus);
+  var translation = new Translation(bus, options.paths, options.languages);
 
   /**
    * Handler for 'translations.request' event.

@@ -45,5 +45,10 @@
   "ctrl": {
     "port": 3050,
     "allowed": [ "127.0.0.1", "::ffff:192.168.50.1" ]
+  },
+  "paths": {
+    "base": "files",
+    "translations": "locales",
+    "config": "config"
   }
 }

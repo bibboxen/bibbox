@@ -13,7 +13,7 @@ var i18n = require('i18n');
 var Q = require('q');
 var fs = require('fs');
 
-var Notification = function Notification(bus) {
+var Notification = function Notification(bus, paths, languages) {
   var self = this;
   this.bus = bus;
 
@@ -36,11 +36,11 @@ var Notification = function Notification(bus) {
 
   // Configure I18N with supported languages.
   i18n.configure({
-    locales: ['en', 'da'],
-    defaultLocale: 'da',
+    locales: languages.locales,
+    defaultLocale: languages.defaultLocale,
     indent: '  ',
     autoReload: true,
-    directory: __dirname + '/../../locales/notifications'
+    directory: __dirname + '/../../' + paths.base + '/' + paths.translations + '/notifications'
   });
 
   twig.extendFilter('translate', function (str) {
@@ -617,7 +617,7 @@ Notification.prototype.printReceipt = function printReceipt(content) {
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
-  var notification = new Notification(bus);
+  var notification = new Notification(bus, options.paths, options.languages);
 
   /**
    * Listen status receipt events.
