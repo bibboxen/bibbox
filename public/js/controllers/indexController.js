@@ -1,76 +1,69 @@
 /**
+ * @file
  * Index page controller.
  */
-angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$window', '$location', '$translate', 'proxyService', 'config', 'tmhDynamicLocale', '$interval',
-  function ($scope, $http, $window, $location, $translate, proxyService, config, tmhDynamicLocale, $interval) {
-    "use strict";
+
+/**
+ * The Index controller.
+ *
+ * Note: The configService has to be a dependency to load the configuration.
+ */
+angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', '$translate', 'configService', 'proxyService', 'config', 'tmhDynamicLocale', '$interval',
+  function ($rootScope, $scope, $translate, configService, proxyService, config, tmhDynamicLocale, $interval) {
+    'use strict';
 
     var onlineInterval = null;
-
     $scope.loading = true;
 
     /**
-     * Request config.
-     *
-     * @TODO: Gather in single config.request event.
+     * Get the configuration loaded correctly from the config object.
      */
-    proxyService.emitEvent('config.translations.request', 'config.translations', 'config.translations.error', {"busEvent": "config.translations"})
-    .then(
-      function success() {
-        proxyService.emitEvent('config.languages.request', 'config.languages', 'config.languages.error', {"busEvent": "config.languages"})
-        .then(
-          function success() {
-            proxyService.emitEvent('config.features.request', 'config.features', 'config.features.error', {"busEvent": "config.features"})
-            .then(
-              function success() {
-                // Expose features and languages to scope.
-                $scope.features = config.features;
-                $scope.languages = config.languages;
+    var init = function init() {
+      $rootScope.$on('config.updated', function () {
+        $scope.features = config.features;
+        $scope.languages = config.languages;
+        $scope.loading = false;
+      });
 
-                $scope.loading = false;
-              },
-              function error(err) {
-                // @TODO: Handle error.
-                console.log("config.features.request", err);
-              });
-          },
-          function error(err) {
-            // @TODO: Handle error.
-            console.log("config.languages.request", err);
-          });
-      },
-      function error(err) {
-        // @TODO: Handle error.
-        console.log("config.translations.request", err);
+      if (config.initialized) {
+        $scope.features = config.features;
+        $scope.languages = config.languages;
+        $scope.loading = false;
       }
-    );
+    };
+    init();
 
     /**
      * Check if fbs is online.
+     *
+     * @TODO: Should this be turned around, so the server push event if its
+     *        off-line? Maybe into the config object, so all parts of the
+     *        front-end has the information and can react on it if need be!
      */
     var fbsOnline = function () {
-      var uniqueId = CryptoJS.MD5("indexController" + Date.now());
+      var uniqueId = CryptoJS.MD5('indexController' + Date.now());
 
-      proxyService.emitEvent('fbs.online', 'fbs.online.response' + uniqueId, 'fbs.err', {'busEvent': 'fbs.online.response' + uniqueId})
+      proxyService.emitEvent('fbs.online', 'fbs.online.response' + uniqueId, 'fbs.err', {
+        busEvent: 'fbs.online.response' + uniqueId
+      })
       .then(
         function success(online) {
           $scope.online = online;
         },
         function error(err) {
           // @TODO: Handle error?
-          console.log("fbs.online", err);
+          console.error('fbs.online', err);
         }
       );
     };
-    fbsOnline();
 
     /**
      * Register interval checking of fbs connectivity.
+     *
+     * Also check now that it's online.
      */
-    onlineInterval = $interval(
-      fbsOnline,
-      config.testFbsConnectionInterval
-    );
+    onlineInterval = $interval(fbsOnline, config.testFbsConnectionInterval);
+    fbsOnline();
 
     /**
      * Change the language.
@@ -91,7 +84,7 @@ angular.module('BibBox').controller('IndexController', ['$scope', '$http', '$win
       // Remove online interval.
       if (angular.isDefined(onlineInterval)) {
         $interval.cancel(onlineInterval);
-        onlineInterval = undefined;
+        onlineInterval = null;
       }
     });
   }

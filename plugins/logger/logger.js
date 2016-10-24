@@ -3,20 +3,16 @@
  * This is a wrapper class to handel the system logger.
  */
 
+'use strict';
+
 // Node core modules.
-var fs = require('fs');
 var path = require('path');
 
 // NPM modules.
 var winston = require('winston');
 var Rotate = require('winston-logrotate').Rotate;
 
-/**
- * Define the Base object (constructor).
- */
 var Logger = function Logger(logs) {
-  "use strict";
-
   var levels = winston.config.syslog.levels;
   winston.setLevels(levels);
 
@@ -93,8 +89,7 @@ var Logger = function Logger(logs) {
         }),
         new (winston.transports.Console)({
           colorize: true,
-          level: 'exceptions-file',
-          timestamp: timeFormatFn
+          level: 'exceptions-file'
         })
       ],
       exitOnError: true
@@ -109,8 +104,6 @@ var Logger = function Logger(logs) {
  *   The message to send to the logger.
  */
 Logger.prototype.error = function error(message) {
-  "use strict";
-
   if (this.errorLog !== undefined) {
     this.errorLog.error(message);
   }
@@ -123,8 +116,6 @@ Logger.prototype.error = function error(message) {
  *   The message to send to the logger.
  */
 Logger.prototype.info = function info(message) {
-  "use strict";
-
   if (this.infoLog !== undefined) {
     this.infoLog.info(message);
   }
@@ -137,8 +128,6 @@ Logger.prototype.info = function info(message) {
  *   The message to send to the logger.
  */
 Logger.prototype.debug = function debug(message) {
-  "use strict";
-
   if (this.debugLog !== undefined) {
     this.debugLog.debug(message);
   }
@@ -148,8 +137,6 @@ Logger.prototype.debug = function debug(message) {
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
-  "use strict";
-
   var logger = new Logger(options.logs);
 
   // Add event listeners to logging events on the bus. For some reason they need
@@ -169,6 +156,6 @@ module.exports = function (options, imports, register) {
 
   // Register the plugin with the system.
   register(null, {
-    "logger": logger
+    logger: logger
   });
 };

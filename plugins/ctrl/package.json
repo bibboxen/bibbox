@@ -6,11 +6,13 @@
   "private": true,
   "plugin": {
     "consumes": [
-      "bus",
-      "app"
+      "bus"
     ],
     "provides": [
       "ctrl"
     ]
+  },
+  "dependencies": {
+    "q": "^1.4.1"
   }
 }

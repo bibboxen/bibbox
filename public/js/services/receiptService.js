@@ -3,30 +3,31 @@
  * Handles request for receipt(s) (printed) and notifications (mailed).
  */
 
-angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
-  function ($q, proxyService) {
+angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'proxyService',
+  function ($q, tmhDynamicLocale, proxyService) {
     'use strict';
 
     /**
      * States receipt.
      *
-     * @param user
+     * @param username
      *   Username to get receipt data for.
-     * @param pass
+     * @param password
      *   Password for that user.
      * @param type
      *   The type of receipt.
      *
      * @returns {Function}
      */
-    this.status = function status(user, pass, type) {
+    this.status = function status(username, password, type) {
       var deferred = $q.defer();
 
       proxyService.emitEvent('notification.status', 'notification.response', null, {
-        'username': user,
-        'password': pass,
-        'mail': type === 'mail',
-        'busEvent': 'notification.response'
+        username: username,
+        password: password,
+        mail: type === 'mail',
+        lang: tmhDynamicLocale.get(),
+        busEvent: 'notification.response'
       }).then(
         function success(status) {
           deferred.resolve(status);
@@ -42,23 +43,24 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
     /**
      * Reservation receipt.
      *
-     * @param user
+     * @param username
      *   Username to get receipt data for.
-     * @param pass
+     * @param password
      *   Password for that user.
      * @param type
      *   The type of receipt.
      *
      * @returns {Function}
      */
-    this.reservations = function reservations(user, pass, type) {
+    this.reservations = function reservations(username, password, type) {
       var deferred = $q.defer();
 
       proxyService.emitEvent('notification.reservations', 'notification.response', null, {
-        'username': user,
-        'password': pass,
-        'mail': type === 'mail',
-        'busEvent': 'notification.response'
+        username: username,
+        password: password,
+        mail: type === 'mail',
+        lang: tmhDynamicLocale.get(),
+        busEvent: 'notification.response'
       }).then(
         function success(status) {
           deferred.resolve(status);
@@ -74,9 +76,9 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
     /**
      * Borrow receipt.
      *
-     * @param user
+     * @param username
      *   Username to get receipt data for.
-     * @param pass
+     * @param password
      *   Password for that user.
      * @param items
      *   The items to
@@ -85,15 +87,16 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
      *
      * @returns {Function}
      */
-    this.borrow = function borrow(user, pass, items, type) {
+    this.borrow = function borrow(username, password, items, type) {
       var deferred = $q.defer();
 
       proxyService.emitEvent('notification.checkOut', 'notification.response', null, {
-        'username': user,
-        'password': pass,
-        'mail': type === 'mail',
-        'items': items,
-        'busEvent': 'notification.response'
+        username: username,
+        password: password,
+        mail: type === 'mail',
+        lang: tmhDynamicLocale.get(),
+        items: items,
+        busEvent: 'notification.response'
       }).then(
         function success(status) {
           deferred.resolve(status);
@@ -120,9 +123,10 @@ angular.module('BibBox').service('receiptService', ['$q', 'proxyService',
       var deferred = $q.defer();
 
       proxyService.emitEvent('notification.checkIn', 'notification.response', null, {
-        'mail': type === 'mail',
-        'items': items,
-        'busEvent': 'notification.response'
+        mail: type === 'mail',
+        lang: tmhDynamicLocale.get(),
+        items: items,
+        busEvent: 'notification.response'
       }).then(
         function success(status) {
           deferred.resolve(status);

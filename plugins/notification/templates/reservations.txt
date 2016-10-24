@@ -1,9 +1,9 @@
-Reserveringer
+{{ 'receipt.reservations.headline'|translate }}
 -----------------------------------------------
-{{items|sort>returnDate}}
-Materialnr.: {{ id }}
+{% for item in items|sort %}
+{{ 'receipt.reservations.id'|translate }} {{ id }}
 {{ title }}
 {{ author }}
-Udløbsdato: {{ interestDate|date }}
-DK5: {{ DK5 }}
-{{/items}}
+{{ 'receipt.reservations.interestDate'|translate }} {{ interestDate|date }}
+{{ 'receipt.reservations.dk5'|translate }} {{ DK5 }}
+{% endfor %}

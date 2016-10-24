@@ -13,10 +13,6 @@
   "proxy": {
     "whitelistedBusEvents": [
       "^barcode.data$",
-      "^config.translations$",
-      "^config.languages$",
-      "^config.features$",
-      "^config.idle_config$",
       "^frontend.[\\w]+$",
       "^fbs.login.[\\w]+$",
       "^fbs.patron.[\\w]+$",
@@ -31,9 +27,6 @@
       "^barcode.start$",
       "^barcode.stop$",
       "^barcode.list$",
-      "^config.translations.request$",
-      "^config.languages.request$",
-      "^config.features.request$",
       "^fbs.login$",
       "^fbs.patron$",
       "^fbs.checkout$",
@@ -44,10 +37,13 @@
       "^notification.status$",
       "^notification.reservations$",
       "^notification.checkIn$",
-      "^notification.checkOut$"
+      "^notification.checkOut$",
+      "^config.ui.update$",
+      "^config.ui.translations.update$"
     ]
   },
-  "translation": {
-    "destination": "/files/translations.json"
+  "ctrl": {
+    "port": 3050,
+    "allowed": [ "127.0.0.1", "::ffff:192.168.50.1" ]
   }
 }

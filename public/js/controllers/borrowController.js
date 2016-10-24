@@ -1,6 +1,8 @@
 /**
+ * @file
  * Borrow page controller.
  */
+
 angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'proxyService', 'Idle', 'receiptService', '$modal',
   function ($scope, $location, $timeout, userService, proxyService, Idle, receiptService, $modal) {
     'use strict';
@@ -25,13 +27,13 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
         else {
           $scope.loading = false;
           // @TODO: Report error.
-          console.log('patron not defined.');
+          console.error('Patron not defined.');
         }
       },
       function (err) {
         $scope.loading = false;
         // @TODO: Report error.
-        console.log(err);
+        console.error(err);
       }
     );
 
@@ -71,9 +73,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
 
       if (itemNotAdded) {
         $scope.materials.push({
-          "id": id,
-          "title": id,
-          "loading": true
+          id: id,
+          title: id,
+          loading: true
         });
 
         userService.borrow(id).then(
@@ -81,10 +83,11 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
             // Restart idle service if not running.
             Idle.watch();
 
-            console.log(result);
+            var i;
+
             if (result) {
-              if (result.ok === "0") {
-                for (var i = 0; i < $scope.materials.length; i++) {
+              if (result.ok === '0') {
+                for (i = 0; i < $scope.materials.length; i++) {
                   if ($scope.materials[i].id === result.itemIdentifier) {
                     $scope.materials[i].loading = false;
                     $scope.materials[i].information = result.screenMessage;
@@ -100,16 +103,16 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
                 }
               }
               else {
-                for (var i = 0; i < $scope.materials.length; i++) {
+                for (i = 0; i < $scope.materials.length; i++) {
                   if ($scope.materials[i].id === result.itemIdentifier) {
                     $scope.materials[i] = {
-                      "id": result.itemIdentifier,
-                      "title": result.itemProperties.title,
-                      "author": result.itemProperties.author,
-                      "status": "borrow.success",
-                      "information": "borrow.was_successful",
-                      "dueDate": result.dueDate,
-                      "loading": false
+                      id: result.itemIdentifier,
+                      title: result.itemProperties.title,
+                      author: result.itemProperties.author,
+                      status: 'borrow.success',
+                      information: 'borrow.was_successful',
+                      dueDate: result.dueDate,
+                      loading: false
                     };
                     break;
                   }
@@ -117,10 +120,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
               }
             }
             else {
-              for (var i = 0; i < $scope.materials.length; i++) {
+              for (i = 0; i < $scope.materials.length; i++) {
                 if ($scope.materials[i].id === id) {
-                  $scope.materials[i].status = "borrow.error";
-                  $scope.materials[i].information = "borrow.was_not_successful";
+                  $scope.materials[i].status = 'borrow.error';
+                  $scope.materials[i].information = 'borrow.was_not_successful';
                   $scope.materials[i].loading = false;
                   break;
                 }
@@ -135,15 +138,15 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
 
             for (var i = 0; i < $scope.materials.length; i++) {
               if ($scope.materials[i].id === id) {
-                $scope.materials[i].status = "borrow.error";
-                $scope.materials[i].information = "borrow.was_not_successful";
+                $scope.materials[i].status = 'borrow.error';
+                $scope.materials[i].information = 'borrow.was_not_successful';
                 $scope.materials[i].loading = false;
                 break;
               }
             }
 
             // @TODO: Handle error.
-            console.log(err);
+            console.error(err);
 
             startBarcode();
           }
@@ -202,8 +205,12 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     /**
      * Setup receipt modal.
      */
-    var receiptModal = $modal({scope: $scope, templateUrl: './views/modal_receipt.html', show: false });
-    $scope.showReceiptModal = function() {
+    var receiptModal = $modal({
+      scope: $scope,
+      templateUrl: './views/modal_receipt.html',
+      show: false
+    });
+    $scope.showReceiptModal = function showReceiptModal() {
       receiptModal.$promise.then(receiptModal.show);
     };
 
@@ -217,12 +224,12 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       var credentials = userService.getCredentials();
 
       receiptService.borrow(credentials.username, credentials.password, $scope.materials, type).then(
-        function(status) {
+        function (status) {
           alert('mail sent');
 
-          // @TODO: Redirect to frontpage.
+          // @TODO: Redirect to front page.
         },
-        function(err) {
+        function (err) {
           // @TODO: handel error etc.
           alert(err);
         }
@@ -242,7 +249,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
      * Log out of user service.
      * Stop listening for barcode.
      */
-    $scope.$on("$destroy", function () {
+    $scope.$on('$destroy', function () {
       proxyService.cleanup();
       userService.logout();
       stopBarcode();

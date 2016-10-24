@@ -1,10 +1,10 @@
-Reserveringer klar til afhentning
+{{ 'receipt.reservations.ready.pickupLocation'|translate }}
 -----------------------------------------------
-{{items|pickupDate>interestDate}}
-Afh.sted: {{ pickupLocation }}
-Afhentes senest: {{ pickupDate|date }}
-Reserveringsnr.: {{ pickupId }}
-Materialnr.: {{ id }}
-{{ title }}
-{{ author }}
-{{/items}}
+{% for item in items|sort %}
+Afh.sted: {{ item.pickupLocation }}
+Afhentes senest: {{ item.pickupDate|date }}
+Reserveringsnr.: {{ item.pickupId }}
+Materialnr.: {{ item.id }}
+{{ item.title }}
+{{ item.author }}
+{% endfor %}

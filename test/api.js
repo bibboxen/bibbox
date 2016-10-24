@@ -3,6 +3,8 @@
  * Test of the UI API.
  */
 
+'use strict';
+
 var app = null;
 var setup = function setup() {
   var path = require('path');
@@ -14,15 +16,15 @@ var setup = function setup() {
     // Configure the plugins.
     var plugins = [
       {
-        "packagePath": "./../plugins/bus"
+        packagePath: './../plugins/bus'
       },
       {
-        "packagePath": "./../plugins/api"
+        packagePath: './../plugins/api'
       },
       {
-        "packagePath": "./../plugins/server",
-        "port": config.port,
-        "path": path.join(__dirname, 'public')
+        packagePath: './../plugins/server',
+        port: config.port,
+        path: path.join(__dirname, 'public')
       }
     ];
 
@@ -33,11 +35,11 @@ var setup = function setup() {
 };
 
 
-it('Test /api exists (501)', function(done) {
+it('Test /api exists (501)', function (done) {
   setup().then(function (app) {
-    server.get("/api")
+    server.get('/api')
       .expect(501)
-      .end(function(err, res) {
+      .end(function (err, res) {
 
         res.status.should.equal(501);
 
@@ -46,7 +48,7 @@ it('Test /api exists (501)', function(done) {
   });
 });
 
-it('Teardown', function(done) {
+it('Teardown', function (done) {
   setup().then(function (app) {
     app.destroy();
     done();

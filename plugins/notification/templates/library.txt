@@ -1,4 +1,4 @@
 {{ name }}
 {{ address }}
 {{ zipcode }} {{ city }}
-Tlf. {{ phone }}
+{{ phone }}

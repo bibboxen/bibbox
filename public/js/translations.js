@@ -1,6 +1,8 @@
 /**
  * @file
  * Sets up translations for the app.
+ *
+ * @TODO: This file need som more documentation.
  */
 
 angular.module('BibBox').factory('bibboxTranslationLoader', ['$http', '$q', 'config',
@@ -24,8 +26,11 @@ angular.module('BibBox').factory('bibboxTranslationLoader', ['$http', '$q', 'con
 ]);
 
 angular.module('BibBox').config(['$translateProvider', function ($translateProvider) {
+  'use strict';
+
   // Set up translations.
   // Loads from json files, preferred language da, fallback en.
+  // @TODO: Which fallback file?
   $translateProvider
     .useSanitizeValueStrategy('escape')
     .useLoader('bibboxTranslationLoader')

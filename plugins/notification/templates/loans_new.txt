@@ -1,8 +1,8 @@
-{{ title }}
+{{ headline|translate }}
 -----------------------------------------------
-{{items|sort>dueDate}}
-Materialnr.: {{ id }}
-{{ title }}{{if author}}
-{{ author }}{{/if}}
-Afleveres senest.: {{ dueDate|date }}
-{{/items}}
+{% for item in items|sort %}
+{{ 'receipt.loans.new.id'|translate }} {{ item.id }}
+{{ item.title }}{% if author %}
+{{ item.author }}{% endif %}
+{{ 'receipt.loans.new.dueDate'|translate }} {{ (item.dueDate/1000)|date('d/m/y') }}
+{% endfor %}

@@ -3,14 +3,13 @@
  * The barcode reader plugin.
  */
 
-// Node core modules required.
+'use strict';
+
 var util = require('util');
 var eventEmitter = require('events').EventEmitter;
 var usb = require('usb');
 
 var Barcode = function Barcode(VID, PID) {
-  'use strict';
-
   this.VID = VID;
   this.PID = PID;
 
@@ -172,7 +171,7 @@ Barcode.prototype.stop = function stop() {
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
-	var bus = imports.bus;
+  var bus = imports.bus;
 
   /**
    * @TODO: make the VID and PID configurable.
@@ -183,14 +182,14 @@ module.exports = function (options, imports, register) {
   /**
    * Listen to list devices event.
    */
-  bus.on('barcode.list', function(data) {
+  bus.on('barcode.list', function (data) {
     bus.emit(data.busEvent, barcode.list());
   });
 
   /**
    * Listen to barcode start event.
    */
-  bus.on('barcode.start', function() {
+  bus.on('barcode.start', function () {
     bus.emit('logger.debug', 'Barcode: started');
     barcode.start();
   });
@@ -198,7 +197,7 @@ module.exports = function (options, imports, register) {
   /**
    * Listen to barcode stop event.
    */
-  bus.on('barcode.stop', function() {
+  bus.on('barcode.stop', function () {
     bus.emit('logger.debug', 'Barcode: stopped');
     barcode.stop();
   });
@@ -206,7 +205,7 @@ module.exports = function (options, imports, register) {
   /**
    * Listen to barcode read and emit the code into the bus.
    */
-  barcode.on('code', function(code) {
+  barcode.on('code', function (code) {
     bus.emit('logger.debug', 'Barcode: scanned - ' + code);
     bus.emit('barcode.data', code);
   });
@@ -216,14 +215,14 @@ module.exports = function (options, imports, register) {
    *
    * @NOTE: Its call err an not error, because nodeJS catches "error" events.
    */
-  barcode.on('err', function(err) {
+  barcode.on('err', function (err) {
     bus.emit('logger.err', 'Barcode: ' + err);
     bus.emit('barcode.err', {
-      'msg': err.message
+      msg: err.message
     });
   });
 
   register(null, {
-    "barcode" : barcode
+    barcode: barcode
   });
 };

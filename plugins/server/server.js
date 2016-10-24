@@ -2,9 +2,10 @@
  * @file
  * Provide core http services by using express.
  */
-module.exports = function (options, imports, register) {
-  "use strict";
 
+'use strict';
+
+module.exports = function (options, imports, register) {
   var bus = imports.bus;
 
   // Load modules required.
@@ -24,8 +25,8 @@ module.exports = function (options, imports, register) {
 
   // Log express requests.
   app.use(morgan('combined', {
-    "stream": {
-      "write": function (message) {
+    stream: {
+      write: function (message) {
         bus.emit('logger.info', message);
       }
     }
@@ -34,7 +35,7 @@ module.exports = function (options, imports, register) {
   // Set express app configuration.
   app.set('port', options.port || 3000);
   app.use(favicon(__dirname + '/../../public/favicon.ico'));
-  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.urlencoded({extended: false}));
   app.use(bodyParser.json());
 
   // Enable route.
@@ -44,7 +45,7 @@ module.exports = function (options, imports, register) {
   }
 
   // Set static path (absolute path in the filesystem).
-  if (options.path !== undefined) {
+  if (options.hasOwnProperty('path')) {
     app.use(express.static(options.path));
   }
 
@@ -55,7 +56,7 @@ module.exports = function (options, imports, register) {
 
   // Register exposed function with architect.
   register(null, {
-    "onDestroy": function (callback) {
+    onDestroy: function (callback) {
       bus.emit('logger.info', 'Server stopped');
       server.close(callback);
     },

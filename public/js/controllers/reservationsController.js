@@ -2,8 +2,8 @@
  * Reservations page controller.
  */
 angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal', 'proxyService',
-  function($scope, $location, $timeout, userService, Idle, receiptService, $modal, proxyService) {
-    "use strict";
+  function ($scope, $location, $timeout, userService, Idle, receiptService, $modal, proxyService) {
+    'use strict';
 
     $scope.loading = true;
 
@@ -39,8 +39,6 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
       function (patron) {
         $scope.loading = false;
 
-        console.log(patron);
-
         // Restart idle service if not running.
         Idle.watch();
 
@@ -48,7 +46,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
         if (patron) {
           $scope.currentPatron = patron;
 
-          var i, item;
+          var i;
+          var item;
 
           // Add available items
           for (i = 0; i < patron.holdItems.length; i++) {
@@ -60,10 +59,10 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
           }
 
           // Add unavailable items
-          for (i = 0; i < patron.unavailableHoldItems.length; i++) {
+          for (i = 0; i < patron.unavailableHoldItems.length; i++) {
             item = angular.copy(patron.unavailableHoldItems[i]);
 
-            item.reservationNumber = "?";
+            item.reservationNumber = '?';
             item.ready = false;
 
             $scope.materials.push(item);
@@ -71,13 +70,13 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
         }
         else {
           // @TODO: Report error.
-          console.log(err);
+          console.error('Not patron defined');
         }
       },
       function (err) {
         $scope.loading = false;
         // @TODO: Report error.
-        console.log(err);
+        console.error(err);
 
         // Restart idle service if not running.
         Idle.watch();
@@ -88,8 +87,12 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
     /**
      * Setup receipt modal.
      */
-    var receiptModal = $modal({scope: $scope, templateUrl: './views/modal_receipt.html', show: false });
-    $scope.showReceiptModal = function() {
+    var receiptModal = $modal({
+      scope: $scope,
+      templateUrl: './views/modal_receipt.html',
+      show: false
+    });
+    $scope.showReceiptModal = function showReceiptModal() {
       receiptModal.$promise.then(receiptModal.show);
     };
 
@@ -100,12 +103,12 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
       var credentials = userService.getCredentials();
 
       receiptService.reservations(credentials.username, credentials.password, type).then(
-        function(status) {
+        function (status) {
           alert('mail sent');
 
-          // @TODO: Redirect to frontpage.
+          // @TODO: Redirect to front page.
         },
-        function(err) {
+        function (err) {
           // @TODO: handel error etc.
           alert(err);
         }
@@ -125,7 +128,7 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
      *
      * Log out of user service.
      */
-    $scope.$on("$destroy", function() {
+    $scope.$on('$destroy', function () {
       proxyService.cleanup();
       userService.logout();
       receiptModal.hide();

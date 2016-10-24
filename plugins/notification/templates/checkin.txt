@@ -1,8 +1,8 @@
-{{ title }}
+{{ 'receipt.checkin.headline'|translate }}
 -----------------------------------------------
-{{items|sort>transactionDate}}
-Materialnr.: {{ itemIdentifier }}
-{{ itemProperties.title }}{{if itemProperties.author}}
-{{ itemProperties.author }}{{/if}}
-Afleveret: {{ transactionDate|date }}
-{{/items}}
+{% for item in items|sort %}
+{{ 'receipt.checkin.id'|translate }} {{ item.itemIdentifier }}
+{{ item.itemProperties.title }}{% if item.itemProperties.author %}
+{{ item.itemProperties.author }}{% endif %}
+{{ 'receipt.checkin.transactionDate'|translate }} {{ (item.transactionDate/1000)|date('d/m/y') }}
+{% endfor %}

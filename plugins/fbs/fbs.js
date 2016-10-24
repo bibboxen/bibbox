@@ -2,17 +2,18 @@
  * @file
  * Handles communication with FBS through SIP2.
  */
+
+'use strict';
+
 var util = require('util');
 var eventEmitter = require('events').EventEmitter;
 var Q = require('q');
 
-var debug = require('debug')('FBS:main');
+var debug = require('debug')('bibbox:FBS:main');
 
 var Request = require('./request.js');
 
-
 var FBS = function FBS(bus) {
-  "use strict";
 
   this.bus = bus;
 };
@@ -47,7 +48,7 @@ FBS.prototype.libraryStatus = function libraryStatus() {
  * @param password
  *   The patrons password.
  *
- * @returns {*|promise}
+ * @return {*|promise}
  *   TRUE if valid else FALSE.
  */
 FBS.prototype.login = function login(username, password) {
@@ -74,7 +75,7 @@ FBS.prototype.login = function login(username, password) {
  * @param password
  *   The patrons password.
  *
- * @returns {*|promise}
+ * @return {*|promise}
  *   JSON object with information or FALSE on failure.
  */
 FBS.prototype.patronInformation = function patronInformation(username, password) {
@@ -103,7 +104,7 @@ FBS.prototype.patronInformation = function patronInformation(username, password)
  * @param itemIdentifier
  *   The item to checkout.
  *
- * @returns {*|promise}
+ * @return {*|promise}
  *   JSON object with information or error message on failure.
  */
 FBS.prototype.checkout = function checkout(username, password, itemIdentifier) {
@@ -128,7 +129,7 @@ FBS.prototype.checkout = function checkout(username, password, itemIdentifier) {
  * @param itemIdentifier
  *   The item to checkout.
  *
- * @returns {*|promise}
+ * @return {*|promise}
  *   JSON object with information or error message on failure.
  */
 FBS.prototype.checkIn = function checkIn(itemIdentifier) {
@@ -157,7 +158,7 @@ FBS.prototype.checkIn = function checkIn(itemIdentifier) {
  * @param itemIdentifier
  *   The item to renew.
  *
- * @returns {*|promise}
+ * @return {*|promise}
  *   JSON object with information or error message on failure.
  */
 FBS.prototype.renew = function renew(username, password, itemIdentifier) {
@@ -184,7 +185,7 @@ FBS.prototype.renew = function renew(username, password, itemIdentifier) {
  * @param password
  *   The patrons password.
  *
- * @returns {*|promise}
+ * @return {*|promise}
  *   JSON object with information or error message on failure.
  */
 FBS.prototype.renewAll = function renewAll(username, password) {
@@ -208,7 +209,7 @@ FBS.prototype.renewAll = function renewAll(username, password) {
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
-	var fbs = new FBS(bus);
+  var fbs = new FBS(bus);
 
   /**
    * Listen to login requests.
@@ -222,7 +223,7 @@ module.exports = function (options, imports, register) {
 
       if (data.errorEvent) {
         bus.emit(data.errorEvent, {
-          "message": err.message
+          message: err.message
         });
       }
     });
@@ -264,25 +265,26 @@ module.exports = function (options, imports, register) {
     function (err) {
       if (err.message === 'FBS is offline') {
         var material = {
-          "itemIdentifier": data.itemIdentifier,
-          "offline": true,
-          "ok": "1",
-          "itemProperties": {
-            "title": data.itemIdentifier
+          itemIdentifier: data.itemIdentifier,
+          offline: true,
+          ok: '1',
+          itemProperties: {
+            title: data.itemIdentifier
           }
         };
 
         // @TODO: Save in storage for delivery later.
 
         bus.emit(data.busEvent, material);
-        console.log("accepted offline borrow");
+
+        console.log('Accepted offline borrow');
       }
       else {
         bus.emit('fbs.err', err);
 
         if (data.errorEvent) {
           bus.emit(data.errorEvent, {
-            "message": err.message
+            message: err.message
           });
         }
       }
@@ -299,25 +301,26 @@ module.exports = function (options, imports, register) {
     function (err) {
       if (err.message === 'FBS is offline') {
         var material = {
-          "itemIdentifier": data.itemIdentifier,
-          "offline": true,
-          "ok": "1",
-          "itemProperties": {
-            "title": data.itemIdentifier
+          itemIdentifier: data.itemIdentifier,
+          offline: true,
+          ok: '1',
+          itemProperties: {
+            title: data.itemIdentifier
           }
         };
 
         // @TODO: Save in storage for delivery later.
 
         bus.emit(data.busEvent, material);
-        console.log("accepted offline borrow");
+
+        console.log('Accepted offline borrow');
       }
       else {
         bus.emit('fbs.err', err);
 
         if (data.errorEvent) {
           bus.emit(data.errorEvent, {
-            "message": err.message
+            message: err.message
           });
         }
       }
@@ -342,12 +345,12 @@ module.exports = function (options, imports, register) {
    */
   bus.on('fbs.renew.all', function (data) {
     fbs.renewAll(data.username, data.password).then(function (res) {
-        bus.emit(data.busEvent, res);
-      },
-      function (err) {
-        bus.emit('fbs.err', err);
-        bus.emit(data.busEvent, false);
-      });
+      bus.emit(data.busEvent, res);
+    },
+    function (err) {
+      bus.emit('fbs.err', err);
+      bus.emit(data.busEvent, false);
+    });
   });
 
   /**
@@ -360,13 +363,15 @@ module.exports = function (options, imports, register) {
     // When config is delivered, test for network.online with fbs server.
     bus.once('config.fbs.online.res', function (config) {
       bus.emit('network.online', {
-        "url": config.endpoint,
-        "busEvent": "network.fbs.online"
+        url: config.endpoint,
+        busEvent: 'network.fbs.online'
       });
     });
     // Request config.
-    bus.emit('config.fbs', {'busEvent': 'config.fbs.online.res'});
+    bus.emit('config.fbs', {busEvent: 'config.fbs.online.res'});
   });
 
-  register(null, { "fbs": fbs });
+  register(null, {
+    fbs: fbs
+  });
 };
