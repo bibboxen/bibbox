@@ -17,6 +17,7 @@ var Notification = function Notification(bus, paths, languages) {
   var self = this;
   this.bus = bus;
 
+  // @TODO: handel config updates.
   bus.on('notification.loaded.config', function (data) {
     self.mailConfig = data.mailer;
     self.headerConfig = data.header;

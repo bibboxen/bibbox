@@ -11,28 +11,6 @@ var CTRL = function CTRL(bus, allowed) {
 
   self.bus = bus;
   self.allowed = allowed;
-
-  /**
-   * Handle SIP2 configuration request.
-   *
-   * @TODO: Load from backend web-service dims.
-   */
-  bus.on('config.fbs', function sip2config(data) {
-    bus.emit(data.busEvent, {
-      username: 'TroelsOgJesper',
-      password: 'HaveNisse94Molslinjenq',
-      endpoint: 'https://Cicero-fbs.com/rest/sip2/DK-675100',
-      agency: 'DK-675100',
-      location: 'hb'
-    });
-  });
-
-  /**
-   * Handle notification template configuration request.
-   *
-   * @TODO: Load from backend web-service dims.
-   */
-
 };
 
 /**
@@ -53,8 +31,32 @@ CTRL.prototype.checkAccess = function checkAccess(req) {
   return ret;
 };
 
+/**
+ * Get notification configuration.
+ *
+ * @returns {*|promise}
+ */
+CTRL.prototype.getFBSConfig = function getFBSConfig() {
+  var deferred = Q.defer();
 
-CTRL.prototype.getNotificationConfig = function () {
+  this.bus.on('ctrl.fbs.loaded.config', function (data) {
+    deferred.resolve(data);
+  });
+  this.bus.emit('storage.load', {
+    name: 'fbs',
+    busEvent: 'ctrl.fbs.loaded.config'
+  });
+
+  return deferred.promise;
+};
+
+
+/**
+ * Get notification configuration.
+ *
+ * @returns {*|promise}
+ */
+CTRL.prototype.getNotificationConfig = function getNotificationConfig() {
   var deferred = Q.defer();
 
   this.bus.on('ctrl.notification.loaded.config', function (data) {
@@ -145,6 +147,19 @@ module.exports = function (options, imports, register) {
         bus.emit('logger.err', 'CTRL: ' + err);
         bus.emit(data.busEvent, false);
     });
+  });
+
+  /**
+   * Handle notification config requests.
+   */
+  bus.on('ctrl.config.fbs', function (data) {
+    ctrl.getFBSConfig().then(function (config) {
+        bus.emit(data.busEvent, config);
+      },
+      function (err) {
+        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit(data.busEvent, false);
+      });
   });
 
   register(null, {

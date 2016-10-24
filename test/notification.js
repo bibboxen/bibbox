@@ -5,6 +5,7 @@
 
 'use strict';
 
+var config = require(__dirname + '/config.json');
 var app = null;
 var setup = function setup() {
   if (!app) {
@@ -21,10 +22,16 @@ var setup = function setup() {
         packagePath: './../plugins/bus'
       },
       {
+        packagePath: './../plugins/storage',
+        paths: config.paths
+      },
+      {
         packagePath: './../plugins/ctrl'
       },
       {
-        packagePath: './../plugins/notification'
+        packagePath: './../plugins/notification',
+        paths: config.paths,
+        languages: config.languages
       }
     ];
 

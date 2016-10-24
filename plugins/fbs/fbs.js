@@ -14,8 +14,16 @@ var debug = require('debug')('bibbox:FBS:main');
 var Request = require('./request.js');
 
 var FBS = function FBS(bus) {
+  var self = this;
+  self.bus = bus;
 
-  this.bus = bus;
+  // @TODO: Handel config updates.
+  bus.once('fbs.config.loaded', function (config) {
+    self.config = config;
+  });
+  bus.emit('ctrl.config.fbs', {
+    busEvent: 'fbs.config.loaded'
+  });
 };
 
 // Extend the object with event emitter.
@@ -27,7 +35,7 @@ util.inherits(FBS, eventEmitter);
 FBS.prototype.libraryStatus = function libraryStatus() {
   var deferred = Q.defer();
 
-  var req = new Request(this.bus);
+  var req = new Request(this.bus, this.config);
   req.libraryStatus(function (err, response) {
     if (err) {
       deferred.reject(err);
@@ -54,7 +62,7 @@ FBS.prototype.libraryStatus = function libraryStatus() {
 FBS.prototype.login = function login(username, password) {
   var deferred = Q.defer();
 
-  var req = new Request(this.bus);
+  var req = new Request(this.bus, this.config);
   req.patronStatus(username, password, function (err, res) {
     if (err) {
       deferred.reject(err);
@@ -81,7 +89,7 @@ FBS.prototype.login = function login(username, password) {
 FBS.prototype.patronInformation = function patronInformation(username, password) {
   var deferred = Q.defer();
 
-  var req = new Request(this.bus);
+  var req = new Request(this.bus, this.config);
   req.patronInformation(username, password, function (err, res) {
     if (err) {
       deferred.reject(err);
@@ -110,7 +118,7 @@ FBS.prototype.patronInformation = function patronInformation(username, password)
 FBS.prototype.checkout = function checkout(username, password, itemIdentifier) {
   var deferred = Q.defer();
 
-  var req = new Request(this.bus);
+  var req = new Request(this.bus, this.config);
   req.checkout(username, password, itemIdentifier, function (err, res) {
     if (err) {
       deferred.reject(err);
@@ -135,7 +143,7 @@ FBS.prototype.checkout = function checkout(username, password, itemIdentifier) {
 FBS.prototype.checkIn = function checkIn(itemIdentifier) {
   var deferred = Q.defer();
 
-  var req = new Request(this.bus);
+  var req = new Request(this.bus, this.config);
   req.checkIn(itemIdentifier, function (err, res) {
     if (err) {
       deferred.reject(err);
@@ -164,7 +172,7 @@ FBS.prototype.checkIn = function checkIn(itemIdentifier) {
 FBS.prototype.renew = function renew(username, password, itemIdentifier) {
   var deferred = Q.defer();
 
-  var req = new Request(this.bus);
+  var req = new Request(this.bus, this.config);
   req.renew(username, password, itemIdentifier, function (err, res) {
     if (err) {
       deferred.reject(err);
@@ -191,7 +199,7 @@ FBS.prototype.renew = function renew(username, password, itemIdentifier) {
 FBS.prototype.renewAll = function renewAll(username, password) {
   var deferred = Q.defer();
 
-  var req = new Request(this.bus);
+  var req = new Request(this.bus, this.config);
   req.renewAll(username, password, function (err, res) {
     if (err) {
       deferred.reject(err);
@@ -360,6 +368,7 @@ module.exports = function (options, imports, register) {
     bus.once('network.fbs.online', function (online) {
       bus.emit(request.busEvent, online);
     });
+
     // When config is delivered, test for network.online with fbs server.
     bus.once('config.fbs.online.res', function (config) {
       bus.emit('network.online', {
@@ -367,8 +376,11 @@ module.exports = function (options, imports, register) {
         busEvent: 'network.fbs.online'
       });
     });
+
     // Request config.
-    bus.emit('config.fbs', {busEvent: 'config.fbs.online.res'});
+    bus.emit('ctrl.config.fbs', {
+      busEvent: 'config.fbs.online.res'
+    });
   });
 
   register(null, {
