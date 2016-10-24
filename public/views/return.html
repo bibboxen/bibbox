@@ -9,7 +9,11 @@
 </nav>
 
 <div class="container">
-  <div class="panel panel-default">
+  <div class="image-help" data-ng-if="!materials || materials.length === 0">
+    <img src="img/help3.jpg" />
+  </div>
+
+  <div class="panel panel-default" data-ng-if="materials && materials.length > 0">
     <table class="table">
       <tr>
         <th></th>
