@@ -54,8 +54,15 @@ module.exports = function (options, imports, register) {
    * Listen to load requests.
    */
   bus.on('storage.load', function (data) {
-    var json = storage.load(data.name);
-    bus.emit(data.busEvent, json);
+    var ret = false;
+    try {
+      ret = storage.load(data.name);
+    }
+    catch (e) {
+      bus.emit('logger.err', e.message);
+    }
+
+    bus.emit(data.busEvent, ret);
   });
 
   /**

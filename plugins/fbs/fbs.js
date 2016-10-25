@@ -18,6 +18,7 @@ var FBS = function FBS(bus) {
   self.bus = bus;
 
   // @TODO: Handel config updates.
+  // @TODO: Handel config = false (missing config).
   bus.once('fbs.config.loaded', function (config) {
     self.config = config;
   });
@@ -365,22 +366,22 @@ module.exports = function (options, imports, register) {
    * Listen for fbs.online events.
    */
   bus.on('fbs.online', function (request) {
-    bus.once('network.fbs.online', function (online) {
-      bus.emit(request.busEvent, online);
-    });
+    // Check that config exists.
+    if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
+      // Listen to online check event send below.
+      bus.once('network.fbs.online', function (online) {
+        bus.emit(request.busEvent, online);
+      });
 
-    // When config is delivered, test for network.online with fbs server.
-    bus.once('config.fbs.online.res', function (config) {
+      // Send online check.
       bus.emit('network.online', {
-        url: config.endpoint,
+        url: fbs.config.endpoint,
         busEvent: 'network.fbs.online'
       });
-    });
-
-    // Request config.
-    bus.emit('ctrl.config.fbs', {
-      busEvent: 'config.fbs.online.res'
-    });
+    }
+    else {
+      bus.emit(request.busEvent, false);
+    }
   });
 
   register(null, {
