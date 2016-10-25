@@ -14,24 +14,6 @@ var CTRL = function CTRL(bus, allowed) {
 };
 
 /**
- * Access check based on IP.
- *
- * @param req
- *   The express request.
-
- * @returns {boolean}
- *   If allowed TRUE else FALSE.
- */
-CTRL.prototype.checkAccess = function checkAccess(req) {
-  var ip = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress;
-  var ret = this.allowed.indexOf(ip) > -1;
-
-  this.bus.emit('logger.info', 'CTRL: ' + ip + ' requested have accessed to ' + req.url + (ret ? ' (allowed)' : ' (denied)'));
-
-  return ret;
-};
-
-/**
  * Get notification configuration.
  *
  * @returns {*|promise}
@@ -40,7 +22,12 @@ CTRL.prototype.getFBSConfig = function getFBSConfig() {
   var deferred = Q.defer();
 
   this.bus.on('ctrl.fbs.loaded.config', function (data) {
-    deferred.resolve(data);
+    if (data instanceof Error) {
+      deferred.reject(data);
+    }
+    else {
+      deferred.resolve(data);
+    }
   });
   this.bus.emit('storage.load', {
     name: 'fbs',
@@ -60,7 +47,12 @@ CTRL.prototype.getNotificationConfig = function getNotificationConfig() {
   var deferred = Q.defer();
 
   this.bus.on('ctrl.notification.loaded.config', function (data) {
-    deferred.resolve(data);
+    if (data instanceof Error) {
+      deferred.reject(data);
+    }
+    else {
+      deferred.resolve(data);
+    }
   });
   this.bus.emit('storage.load', {
     name: 'notification',
@@ -79,12 +71,17 @@ CTRL.prototype.getNotificationConfig = function getNotificationConfig() {
 CTRL.prototype.getUiConfig = function getUiConfig() {
   var deferred = Q.defer();
 
-  this.bus.on('ctrl.notification.loaded.ui.config', function (data) {
-    deferred.resolve(data);
+  this.bus.on('ctrl.loaded.ui.config', function (data) {
+    if (data instanceof Error) {
+      deferred.reject(data);
+    }
+    else {
+      deferred.resolve(data);
+    }
   });
   this.bus.emit('storage.load', {
     name: 'ui',
-    busEvent: 'ctrl.notification.loaded.ui.config'
+    busEvent: 'ctrl.loaded.ui.config'
   });
 
   return deferred.promise;
@@ -94,7 +91,12 @@ CTRL.prototype.getTranslations = function getTranslations() {
   var deferred = Q.defer();
 
   this.bus.on('translations.request.languages', function (data) {
-    deferred.resolve(data);
+    if (data instanceof Error) {
+      deferred.reject(data);
+    }
+    else {
+      deferred.resolve(data);
+    }
   });
   this.bus.emit('translations.request', {busEvent: 'translations.request.languages'});
 

@@ -21,15 +21,26 @@ angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', 
     var init = function init() {
       $rootScope.$on('config.updated', function () {
         $scope.features = config.features;
-        $scope.languages = config.languages;
         $scope.loading = false;
+        $scope.error = false;
+      });
+
+      $rootScope.$on('config.translations.updated', function () {
+        $scope.languages = config.languages;
       });
 
       if (config.initialized) {
         $scope.features = config.features;
         $scope.languages = config.languages;
         $scope.loading = false;
+        $scope.error = false;
       }
+
+      // Handel error in loading config.
+      $rootScope.$on('config.error', function () {
+        $scope.error = true;
+        $scope.loading = false;
+      });
     };
     init();
 

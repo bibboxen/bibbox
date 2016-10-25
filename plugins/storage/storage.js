@@ -54,15 +54,13 @@ module.exports = function (options, imports, register) {
    * Listen to load requests.
    */
   bus.on('storage.load', function (data) {
-    var ret = false;
     try {
-      ret = storage.load(data.name);
+      bus.emit(data.busEvent, storage.load(data.name));
     }
-    catch (e) {
-      bus.emit('logger.err', e.message);
+    catch (err) {
+      bus.emit(data.busEvent, err);
+      bus.emit('logger.err', err.message);
     }
-
-    bus.emit(data.busEvent, ret);
   });
 
   /**

@@ -39,7 +39,8 @@
       "^notification.checkIn$",
       "^notification.checkOut$",
       "^config.ui.update$",
-      "^config.ui.translations.update$"
+      "^config.ui.translations.update$",
+      "^bibbox.error"
     ]
   },
   "ctrl": {

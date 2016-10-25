@@ -90,5 +90,7 @@
 	"MATERIAL_NOT_FOUND": "Materialet blev ikke fundet",
 	"[MATERIAL_NOT_FOUND]": "Materialet blev ikke fundet",
 
-	"DKK": "kr."
+	"DKK": "kr.",
+
+	"out_of_order.text": "Midlertidig ude af drift"
 }
