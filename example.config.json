@@ -54,5 +54,12 @@
   "paths": {
     "base": "files",
     "translations": "locales"
+  },
+  "rfid": {
+    "port": 3001,
+    "afi": {
+      "on": 194,
+      "off": 7
+    }
   }
 }

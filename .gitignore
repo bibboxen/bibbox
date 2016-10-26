@@ -5,3 +5,4 @@ config.json
 *.pid
 .idea
 coverage
+files/config/fbs.json

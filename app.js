@@ -60,7 +60,8 @@ var plugins = [
     packagePath: './plugins/fbs'
   },
   {
-    packagePath: './plugins/rfid'
+    packagePath: './plugins/rfid',
+    port: config.rfid.port
   },
   {
     packagePath: './plugins/notification',
