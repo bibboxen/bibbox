@@ -3,9 +3,12 @@
  * Borrow page controller.
  */
 
-angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal',
-  function ($scope, $location, $timeout, userService, Idle, receiptService, $modal) {
+angular.module('BibBox').controller('BorrowController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal',
+  function ($scope, $controller, $location, $timeout, userService, Idle, receiptService, $modal) {
     'use strict';
+
+    // Instantiate/extend base controller.
+    $controller('BaseController', { $scope: $scope });
 
     if (!userService.userLoggedIn()) {
       $location.path('/');
@@ -36,45 +39,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
         console.error(err);
       }
     );
-
-    // Restart idle service if not running.
-    Idle.watch();
-
-    /**
-     * @TODO: Missing description.
-     *
-     * @NOTE: Could this be done on the rootScope, so each controller just
-     *        inherit it?
-     */
-    $scope.$on('IdleWarn', function (e, countdown) {
-      $scope.$apply(function () {
-        $scope.countdown = countdown;
-      });
-    });
-
-    /**
-     * @TODO: Missing description.
-     *
-     * @NOTE: Could this be done on the rootScope, so each controller just
-     *        inherit it?
-     */
-    $scope.$on('IdleTimeout', function () {
-      $scope.$evalAsync(function () {
-        $location.path('/');
-      });
-    });
-
-    /**
-     * @TODO: Missing description.
-     *
-     * @NOTE: Could this be done on the rootScope, so each controller just
-     *        inherit it?
-     */
-    $scope.$on('IdleEnd', function () {
-      $scope.$apply(function () {
-        $scope.countdown = null;
-      });
-    });
 
     /**
      * @TODO: documentation?

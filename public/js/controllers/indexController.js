@@ -8,9 +8,12 @@
  *
  * Note: The configService has to be a dependency to load the configuration.
  */
-angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', '$translate', 'configService', 'proxyService', 'config', 'tmhDynamicLocale', '$interval',
-  function ($rootScope, $scope, $translate, configService, proxyService, config, tmhDynamicLocale, $interval) {
+angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', '$controller', '$translate', 'configService', 'config', 'tmhDynamicLocale', '$interval',
+  function ($rootScope, $scope, $controller, $translate, configService, config, tmhDynamicLocale, $interval) {
     'use strict';
+
+    // Instantiate/extend base controller.
+    $controller('BaseController', { $scope: $scope });
 
     var onlineInterval = null;
     $scope.loading = true;
@@ -54,18 +57,18 @@ angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', 
     var fbsOnline = function () {
       var uniqueId = CryptoJS.MD5('indexController' + Date.now());
 
-      proxyService.emitEvent('fbs.online', 'fbs.online.response' + uniqueId, 'fbs.err', {
-        busEvent: 'fbs.online.response' + uniqueId
-      })
-      .then(
-        function success(online) {
-          $scope.online = online;
-        },
-        function error(err) {
-          // @TODO: Handle error?
-          console.error('fbs.online', err);
-        }
-      );
+      // proxyService.emitEvent('fbs.online', 'fbs.online.response' + uniqueId, 'fbs.err', {
+      //   busEvent: 'fbs.online.response' + uniqueId
+      // })
+      // .then(
+      //   function success(online) {
+           $scope.online = true;
+      //   },
+      //   function error(err) {
+      //     // @TODO: Handle error?
+      //     console.error('fbs.online', err);
+      //   }
+      // );
     };
 
     /**

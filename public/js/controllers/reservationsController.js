@@ -1,9 +1,12 @@
 /**
  * Reservations page controller.
  */
-angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal',
-  function ($scope, $location, $timeout, userService, Idle, receiptService, $modal) {
+angular.module('BibBox').controller('ReservationsController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal',
+  function ($scope, $controller, $location, $timeout, userService, Idle, receiptService, $modal) {
     'use strict';
+
+    // Instantiate/extend base controller.
+    $controller('BaseController', { $scope: $scope });
 
     $scope.loading = true;
 
@@ -11,27 +14,6 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
       $location.path('/');
       return;
     }
-
-    // Restart idle service if not running.
-    Idle.watch();
-
-    $scope.$on('IdleWarn', function (e, countdown) {
-      $scope.$apply(function () {
-        $scope.countdown = countdown;
-      });
-    });
-
-    $scope.$on('IdleTimeout', function () {
-      $scope.$evalAsync(function () {
-        $location.path('/');
-      });
-    });
-
-    $scope.$on('IdleEnd', function () {
-      $scope.$apply(function () {
-        $scope.countdown = null;
-      });
-    });
 
     $scope.materials = [];
 

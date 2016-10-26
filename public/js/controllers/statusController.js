@@ -3,9 +3,12 @@
  * Status page controller.
  */
 
-angular.module('BibBox').controller('StatusController', ['$scope', '$location', '$translate', '$timeout', 'userService', 'receiptService', 'Idle', '$modal',
-  function ($scope, $location, $translate, $timeout, userService, receiptService, Idle, $modal) {
+angular.module('BibBox').controller('StatusController', ['$scope', '$controller', '$location', '$translate', '$timeout', 'userService', 'receiptService', 'Idle', '$modal',
+  function ($scope, $controller, $location, $translate, $timeout, userService, receiptService, Idle, $modal) {
     'use strict';
+
+    // Instantiate/extend base controller.
+    $controller('BaseController', { $scope: $scope });
 
     $scope.loading = true;
 
@@ -14,27 +17,6 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$location', 
       $location.path('/');
       return;
     }
-
-    // Restart idle service if not running.
-    Idle.watch();
-
-    $scope.$on('IdleWarn', function (e, countdown) {
-      $scope.$apply(function () {
-        $scope.countdown = countdown;
-      });
-    });
-
-    $scope.$on('IdleTimeout', function () {
-      $scope.$evalAsync(function () {
-        $location.path('/');
-      });
-    });
-
-    $scope.$on('IdleEnd', function () {
-      $scope.$apply(function () {
-        $scope.countdown = null;
-      });
-    });
 
     $scope.materials = [];
     $scope.fineItems = [];

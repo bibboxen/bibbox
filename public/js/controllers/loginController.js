@@ -1,17 +1,18 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'userService', 'Idle',
-  function ($scope, $http, $window, $location, $routeParams, userService, Idle) {
+angular.module('BibBox').controller('LoginController', ['$scope', '$controller', '$http', '$window', '$location', '$routeParams', 'userService', 'barcodeService',
+  function ($scope, $controller, $http, $window, $location, $routeParams, userService, barcodeService) {
     'use strict';
+
+    // Instantiate/extend base controller.
+    $controller('BaseController', { $scope: $scope });
 
     // @TODO: Block user on X number of failed login attempts.
 
     // @TODO: Update validation functions.
     var usernameRegExp = /^\d{10}$/;
     var passwordRegExp = /\d+/;
-
-    var barcodeRunning = false;
 
     // Log out of user service.
     userService.logout();
@@ -31,27 +32,6 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
       $scope.usernameValidationError = false;
     };
     resetScope();
-
-    // Restart idle service if not running.
-    Idle.watch();
-
-    $scope.$on('IdleWarn', function (e, countdown) {
-      $scope.$apply(function () {
-        $scope.countdown = countdown;
-      });
-    });
-
-    $scope.$on('IdleTimeout', function () {
-      $scope.$evalAsync(function () {
-        $location.path('/');
-      });
-    });
-
-    $scope.$on('IdleEnd', function () {
-      $scope.$apply(function () {
-        $scope.countdown = null;
-      });
-    });
 
     /**
      * Sets the $scope.display variable.
@@ -237,13 +217,5 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
 
     // Go to start page.
     gotoStep('default');
-
-    /**
-     * On destroy.
-     */
-    $scope.$on('$destroy', function () {
-      // proxyService.cleanup();
-      // stopBarcode();
-    });
   }
 ]);
