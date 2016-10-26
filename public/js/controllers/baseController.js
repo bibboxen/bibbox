@@ -69,9 +69,7 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
      * @TODO: Missing documentation.
      */
     $scope.$on('IdleEnd', function () {
-      $scope.$apply(function () {
-        $scope.countdown = null;
-      });
+      $scope.countdown = null;
     });
 
     /**

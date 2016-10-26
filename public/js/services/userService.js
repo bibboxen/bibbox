@@ -136,6 +136,36 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     };
 
     /**
+     * Check in material (return).
+     *
+     * @param itemIdentifier
+     *   The id of the item to check in.
+     * @param timestamp
+     *   The current date that the check ins should be groupped under if in
+     *   offline mode.
+     */
+    this.checkIn = function checkIn(itemIdentifier, timestamp) {
+      var deferred = $q.defer();
+
+      proxyService.once('fbs.checkin.success' + itemIdentifier, function (result) {
+        deferred.resolve(result);
+      });
+
+      proxyService.once('fbs.checkin.error' + itemIdentifier, function (err) {
+        deferred.reject(err);
+      });
+
+      proxyService.emit('fbs.checkin', {
+        busEvent: 'fbs.checkin.success' + itemIdentifier,
+        errorEvent: 'fbs.checkin.error' + itemIdentifier,
+        timestamp: timestamp,
+        itemIdentifier: itemIdentifier
+      });
+
+      return deferred.promise;
+    };
+
+    /**
      * Renew a material.
      *
      * @param itemIdentifier

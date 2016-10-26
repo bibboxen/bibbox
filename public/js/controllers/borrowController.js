@@ -153,9 +153,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       );
     };
 
-    //$timeout(function () {itemScannedResult('0000003225');}, 1000);
-    //$timeout(function () {itemScannedResult('0000007889');}, 2000);
-    //$timeout(function () {itemScannedResult('0000003572');}, 3000);
+    $timeout(function () {itemScannedResult('0000003225');}, 1000);
+    $timeout(function () {itemScannedResult('0000007889');}, 2000);
+    $timeout(function () {itemScannedResult('0000003572');}, 3000);
 
     /**
      * On destroy.
