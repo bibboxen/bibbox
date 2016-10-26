@@ -55,6 +55,9 @@ var plugins = [
   },
   {
     packagePath: './plugins/notification'
+  },
+  {
+    packagePath: './plugins/rfid'
   }
 ];
 
