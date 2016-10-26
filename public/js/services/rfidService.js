@@ -16,11 +16,8 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      *   The tags that were detected by the RFID.
      */
     function tagsDetected(tags) {
-      for (var tag in tags) {
-        if (tags.hasOwnProperty(tag)) {
-          tag = tags[tag];
-          currentScope.$emit('rfid.tag.detected', tag);
-        }
+      for (var i = 0; i < tags.length; i++) {
+        currentScope.$emit('rfid.tag.detected', tags[i]);
       }
     }
 

@@ -1,12 +1,12 @@
 /**
  * Return page controller.
  */
-angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'Idle', 'receiptService',
-  function ($scope, $controller, $location, $timeout, Idle, receiptService) {
+angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'Idle', 'receiptService', 'rfidService',
+  function ($scope, $controller, $location, $timeout, Idle, receiptService, rfidService) {
     'use strict';
 
     // Instantiate/extend base controller.
-    $controller('BaseController', { $scope: $scope });
+    $controller('BaseController', {$scope: $scope});
 
     // Store raw check-in responses as it's need to print receipt.
     var raw_materials = [];
@@ -120,6 +120,38 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
         }
       );
     };
+
+    /**
+     * Handler for when tag is detected.
+     *
+     * @param event
+     * @param tag
+     */
+    function tagDetected(event, tag) {
+      // Get material id.
+      var mid = tag.MID.slice(6);
+
+      // Get meta
+      //var meta = tag.MID.slice(0, 5);
+
+      itemScannedResult(mid);
+    }
+
+    /**
+     * Handler for when tag is removed.
+     *
+     * @param event
+     * @param tag
+     */
+    function tagRemoved(event, tag) {
+      // @TODO: Handle.
+    }
+
+    $scope.$on('rfid.tag.detected', tagDetected);
+    $scope.$on('rfid.tag.removed', tagRemoved);
+
+    // Start listening for rfid events.
+    rfidService.start($scope);
 
     // $timeout(function () {itemScannedResult('3846646417');}, 1000);
     // $timeout(function () {itemScannedResult('3846469957');}, 2000);

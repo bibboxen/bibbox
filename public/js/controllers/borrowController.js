@@ -187,11 +187,29 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       );
     };
 
-    function tagDetected(tag) {
-      itemScannedResult(tag.MID);
+    /**
+     * Handler for when tag is detected.
+     *
+     * @param event
+     * @param tag
+     */
+    function tagDetected(event, tag) {
+      // Get material id.
+      var mid = tag.MID.slice(6);
+
+      // Get meta
+      //var meta = tag.MID.slice(0, 5);
+
+      itemScannedResult(mid);
     }
 
-    function tagRemoved(tag) {
+    /**
+     * Handler for when tag is removed.
+     *
+     * @param event
+     * @param tag
+     */
+    function tagRemoved(event, tag) {
       // @TODO: Handle.
     }
 

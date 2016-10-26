@@ -60,19 +60,13 @@ var RFID = function (bus, port, afi) {
             bus.emit('rfid.connected');
             break;
           case 'tagsDetected':
-            bus.emit('rfid.tags.detected', {
-              tags: data.tags
-            });
+            bus.emit('rfid.tags.detected', data.tags);
             break;
           case 'tagDetected':
-            bus.emit('rfid.tag.detected', {
-              tag: data.tag
-            });
+            bus.emit('rfid.tag.detected', data.tag);
             break;
           case 'tagRemoved':
-            bus.emit('rfid.tag.removed', {
-              tag: data.tag
-            });
+            bus.emit('rfid.tag.removed', data.tag);
             break;
           case 'tagSetResult':
             console.log("tagSet not implemented.");
