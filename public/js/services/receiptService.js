@@ -22,20 +22,21 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
     this.status = function status(username, password, type) {
       var deferred = $q.defer();
 
-      proxyService.emitEvent('notification.status', 'notification.response', null, {
+      proxyService.once('notification.response', function (status) {
+        deferred.resolve(status);
+      });
+
+      proxyService.once('notification.error', function (err) {
+        deferred.reject(err);
+      });
+
+      proxyService.emit('notification.status', {
         username: username,
         password: password,
         mail: type === 'mail',
         lang: tmhDynamicLocale.get(),
         busEvent: 'notification.response'
-      }).then(
-        function success(status) {
-          deferred.resolve(status);
-        },
-        function error(err) {
-          deferred.reject(err);
-        }
-      );
+      });
 
       return deferred.promise;
     };
@@ -55,20 +56,21 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
     this.reservations = function reservations(username, password, type) {
       var deferred = $q.defer();
 
-      proxyService.emitEvent('notification.reservations', 'notification.response', null, {
+      proxyService.once('notification.response', function (status) {
+        deferred.resolve(status);
+      });
+
+      proxyService.once('notification.error', function (err) {
+        deferred.reject(err);
+      });
+
+      proxyService.emit('notification.reservations', {
         username: username,
         password: password,
         mail: type === 'mail',
         lang: tmhDynamicLocale.get(),
         busEvent: 'notification.response'
-      }).then(
-        function success(status) {
-          deferred.resolve(status);
-        },
-        function error(err) {
-          deferred.reject(err);
-        }
-      );
+      });
 
       return deferred.promise;
     };
@@ -90,21 +92,22 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
     this.borrow = function borrow(username, password, items, type) {
       var deferred = $q.defer();
 
-      proxyService.emitEvent('notification.checkOut', 'notification.response', null, {
+      proxyService.once('notification.response', function (status) {
+        deferred.resolve(status);
+      });
+
+      proxyService.once('notification.error', function (err) {
+        deferred.reject(err);
+      });
+
+      proxyService.emit('notification.checkOut', 'notification.response', null, {
         username: username,
         password: password,
         mail: type === 'mail',
         lang: tmhDynamicLocale.get(),
         items: items,
         busEvent: 'notification.response'
-      }).then(
-        function success(status) {
-          deferred.resolve(status);
-        },
-        function error(err) {
-          deferred.reject(err);
-        }
-      );
+      });
 
       return deferred.promise;
     };
@@ -122,19 +125,20 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
     this.returnReceipt = function returnReceipt(items, type) {
       var deferred = $q.defer();
 
-      proxyService.emitEvent('notification.checkIn', 'notification.response', null, {
+      proxyService.once('notification.response', function (status) {
+        deferred.resolve(status);
+      });
+
+      proxyService.once('notification.error', function (err) {
+        deferred.reject(err);
+      });
+
+      proxyService.emit('notification.checkIn', {
         mail: type === 'mail',
         lang: tmhDynamicLocale.get(),
         items: items,
         busEvent: 'notification.response'
-      }).then(
-        function success(status) {
-          deferred.resolve(status);
-        },
-        function error(err) {
-          deferred.reject(err);
-        }
-      );
+      });
 
       return deferred.promise;
     };

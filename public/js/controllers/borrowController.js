@@ -3,8 +3,8 @@
  * Borrow page controller.
  */
 
-angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'proxyService', 'Idle', 'receiptService', '$modal',
-  function ($scope, $location, $timeout, userService, proxyService, Idle, receiptService, $modal) {
+angular.module('BibBox').controller('BorrowController', ['$scope', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal',
+  function ($scope, $location, $timeout, userService, Idle, receiptService, $modal) {
     'use strict';
 
     if (!userService.userLoggedIn()) {
@@ -40,29 +40,57 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     // Restart idle service if not running.
     Idle.watch();
 
+    /**
+     * @TODO: Missing description.
+     *
+     * @NOTE: Could this be done on the rootScope, so each controller just
+     *        inherit it?
+     */
     $scope.$on('IdleWarn', function (e, countdown) {
       $scope.$apply(function () {
         $scope.countdown = countdown;
       });
     });
 
+    /**
+     * @TODO: Missing description.
+     *
+     * @NOTE: Could this be done on the rootScope, so each controller just
+     *        inherit it?
+     */
     $scope.$on('IdleTimeout', function () {
       $scope.$evalAsync(function () {
         $location.path('/');
       });
     });
 
+    /**
+     * @TODO: Missing description.
+     *
+     * @NOTE: Could this be done on the rootScope, so each controller just
+     *        inherit it?
+     */
     $scope.$on('IdleEnd', function () {
       $scope.$apply(function () {
         $scope.countdown = null;
       });
     });
 
-    var barcodeRunning = false;
-
+    /**
+     * @TODO: documentation?
+     *
+     * @type {Array}
+     */
     $scope.materials = [];
 
+    /**
+     * @TODO: Missing documentation.
+     *
+     * @param id
+     *  @TODO: Missing doc.
+     */
     var itemScannedResult = function itemScannedResult(id) {
+      // Check if item have been added before to the list.
       var itemNotAdded = true;
       for (var i = 0; i < $scope.materials.length; i++) {
         if ($scope.materials[i].id === id) {
@@ -71,6 +99,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
         }
       }
 
+      // If item have not been added it to the scope (UI list) and send requests
+      // to the user service to borrow the item.
       if (itemNotAdded) {
         $scope.materials.push({
           id: id,
@@ -80,11 +110,11 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
 
         userService.borrow(id).then(
           function success(result) {
-            // Restart idle service if not running.
+            // Restart the idle service, so the user is not logged out during
+            // scanning events.
             Idle.watch();
 
             var i;
-
             if (result) {
               if (result.ok === '0') {
                 for (i = 0; i < $scope.materials.length; i++) {
@@ -129,11 +159,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
                 }
               }
             }
-
-            startBarcode();
           },
           function error(err) {
-            // Restart idle service if not running.
+            // Restart the idle service, so the user is not logged out during
+            // scanning events.
             Idle.watch();
 
             for (var i = 0; i < $scope.materials.length; i++) {
@@ -144,11 +173,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
                 break;
               }
             }
-
-            // @TODO: Handle error.
-            console.error(err);
-
-            startBarcode();
           }
         );
       }
@@ -162,44 +186,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     $scope.gotoFront = function gotoFront() {
       userService.logout();
       $location.path('/');
-    };
-
-    /**
-     * Start scanning for a barcode.
-     * Stops after one "barcode.data" has been returned.
-     */
-    var startBarcode = function scanBarcode() {
-      barcodeRunning = true;
-
-      proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {})
-      .then(
-        function success(data) {
-          itemScannedResult(data);
-
-          // Start barcode again.
-          startBarcode();
-        },
-        function error(err) {
-          // @TODO: Handle error.
-          console.log(err);
-
-          // Start barcode again.
-          startBarcode();
-        }
-      );
-    };
-
-    /**
-     * Stop scanning for a barcode.
-     */
-    var stopBarcode = function stopBarcode() {
-      if (barcodeRunning) {
-        proxyService.emitEvent('barcode.stop', null, null, {}).then(
-          function () {
-            barcodeRunning = false;
-          }
-        );
-      }
     };
 
     /**
@@ -236,12 +222,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
       );
     };
 
-    // Start looking for material.
-    startBarcode();
-
-    // $timeout(function () {itemScannedResult('3846646417');}, 1000);
-    // $timeout(function () {itemScannedResult('3846469957');}, 2000);
-    // $timeout(function () {itemScannedResult('5010941603');}, 3000);
+    //$timeout(function () {itemScannedResult('0000003225');}, 1000);
+    //$timeout(function () {itemScannedResult('0000007889');}, 2000);
+    //$timeout(function () {itemScannedResult('0000003572');}, 3000);
 
     /**
      * On destroy.
@@ -252,7 +235,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$location', 
     $scope.$on('$destroy', function () {
       proxyService.cleanup();
       userService.logout();
-      stopBarcode();
       receiptModal.hide();
     });
   }

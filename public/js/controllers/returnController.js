@@ -1,11 +1,10 @@
 /**
  * Return page controller.
  */
-angular.module('BibBox').controller('ReturnController', ['$scope', '$location', '$timeout', 'proxyService', 'Idle', 'receiptService',
-  function ($scope, $location, $timeout, proxyService, Idle, receiptService) {
+angular.module('BibBox').controller('ReturnController', ['$scope', '$location', '$timeout', 'Idle', 'receiptService',
+  function ($scope, $location, $timeout, Idle, receiptService) {
     'use strict';
 
-    var barcodeRunning = false;
     // Store raw check-in responses as it's need to print receipt.
     var raw_materials = [];
 
@@ -135,43 +134,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
     };
 
     /**
-     * Start scanning for a barcode.
-     * Stops after one "barcode.data" has been returned.
-     */
-    var startBarcode = function scanBarcode() {
-      barcodeRunning = true;
-
-      proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {}).then(
-        function success(data) {
-          itemScannedResult(data);
-
-          // Start barcode again after 1 second.
-          $timeout(startBarcode, 500);
-        },
-        function error(err) {
-          // @TODO: Handle error.
-          console.log(err);
-
-          // Start barcode again.
-          $timeout(startBarcode, 500);
-        }
-      );
-    };
-
-    /**
-     * Stop scanning for a barcode.
-     */
-    var stopBarcode = function stopBarcode() {
-      if (barcodeRunning) {
-        proxyService.emitEvent('barcode.stop', null, null, {}).then(
-          function () {
-            barcodeRunning = false;
-          }
-        );
-      }
-    };
-
-    /**
      * Print receipt.
      */
     $scope.receipt = function receipt() {
@@ -187,21 +149,15 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$location', 
       );
     };
 
-    // Start looking for material.
-    startBarcode();
-
     // $timeout(function () {itemScannedResult('3846646417');}, 1000);
     // $timeout(function () {itemScannedResult('3846469957');}, 2000);
     // $timeout(function () {itemScannedResult('5010941603');}, 3000);
 
     /**
      * On destroy.
-     *
-     * Stop listening for barcode.
      */
     $scope.$on('$destroy', function () {
-      proxyService.cleanup();
-      stopBarcode();
+
     });
   }
 ]);

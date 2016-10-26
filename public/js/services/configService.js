@@ -15,7 +15,7 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
      *
      * Emits 'config.updated' into the $rootScope when updated.
      */
-    proxyService.onEvent('config.ui.update', function (data) {
+    proxyService.on('config.ui.update', function (data) {
       if (data === false) {
         $rootScope.$emit('config.error');
       }
@@ -34,7 +34,7 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
      * A $rootScope event (config.translations.updated) is emitted and the
      * translations are refreshed.
      */
-    proxyService.onEvent('config.ui.translations.update', function (data) {
+    proxyService.on('config.ui.translations.update', function (data) {
       if (data === false) {
         $rootScope.$emit('config.error');
       }

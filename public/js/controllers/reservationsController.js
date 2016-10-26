@@ -1,8 +1,8 @@
 /**
  * Reservations page controller.
  */
-angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal', 'proxyService',
-  function ($scope, $location, $timeout, userService, Idle, receiptService, $modal, proxyService) {
+angular.module('BibBox').controller('ReservationsController', ['$scope', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal',
+  function ($scope, $location, $timeout, userService, Idle, receiptService, $modal) {
     'use strict';
 
     $scope.loading = true;
@@ -129,7 +129,6 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$locat
      * Log out of user service.
      */
     $scope.$on('$destroy', function () {
-      proxyService.cleanup();
       userService.logout();
       receiptModal.hide();
     });
