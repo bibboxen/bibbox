@@ -14,7 +14,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
 
     this.username = null;
     this.password = null;
-    var loggedIn = false;
+    this.loggedIn = false;
 
     /**
      * Is user logged in?
@@ -57,37 +57,42 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
 
       var uniqueId = CryptoJS.MD5('userServiceLogin' + Date.now());
 
-      proxyService.emitEvent('fbs.login', 'fbs.login.success' + uniqueId, 'fbs.login.err' + uniqueId, {
+      // Handel response when login request is completed.
+      proxyService.once('fbs.login.success' + uniqueId, function(loggedIn) {
+        self.username = username;
+        self.password = password;
+        self.loggedIn = loggedIn;
+
+        // The result maybe "true" or "false".
+        deferred.resolve(loggedIn);
+      });
+
+      // Handel errors and the off-line case, which should allow the user to
+      // continue.
+      proxyService.once('fbs.login.err' + uniqueId, function (err) {
+        if (err.message === 'FBS is offline') {
+          self.username = username;
+          self.password = password;
+          self.loggedIn = true;
+
+          deferred.resolve(true);
+        }
+        else {
+          self.username = null;
+          self.password = null;
+          self.loggedIn = false;
+
+          deferred.reject(err);
+        }
+      });
+
+      // Send the login request.
+      proxyService.emit('fbs.login', {
         username: username,
         password: password,
         busEvent: 'fbs.login.success' + uniqueId,
         errorEvent: 'fbs.login.err' + uniqueId
-      }).then(
-        function success(loggedInSuccess) {
-          self.username = username;
-          self.password = password;
-          loggedIn = loggedInSuccess;
-
-          deferred.resolve(loggedInSuccess);
-        },
-        function error(err) {
-          if (err.message === 'FBS is offline') {
-            console.log('User logged in, in offline mode.');
-            self.username = username;
-            self.password = password;
-            loggedIn = true;
-
-            deferred.resolve(true);
-          }
-          else {
-            self.username = null;
-            self.password = null;
-            loggedIn = false;
-
-            deferred.reject(err);
-          }
-        }
-      );
+      });
 
       return deferred.promise;
     };
@@ -100,7 +105,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     this.logout = function () {
       this.username = null;
       this.password = null;
-      loggedIn = false;
+      this.loggedIn = false;
     };
 
     /**
@@ -110,22 +115,22 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      */
     this.borrow = function borrow(itemIdentifier) {
       var deferred = $q.defer();
-      var self = this;
 
-      proxyService.emitEvent('fbs.checkout', 'fbs.checkout.success' + itemIdentifier, 'fbs.checkout.error' + itemIdentifier, {
+      proxyService.once('fbs.checkout.success' + itemIdentifier, function (result) {
+        deferred.resolve(result);
+      });
+
+      proxyService.once('fbs.checkout.error' + itemIdentifier, function (err) {
+        deferred.reject(err);
+      });
+
+      proxyService.emit('fbs.checkout', {
         busEvent: 'fbs.checkout.success' + itemIdentifier,
         errorEvent: 'fbs.checkout.error' + itemIdentifier,
-        username: self.username,
-        password: self.password,
+        username: this.username,
+        password: this.password,
         itemIdentifier: itemIdentifier
-      }).then(
-        function success(result) {
-          deferred.resolve(result);
-        },
-        function error(err) {
-          deferred.reject(err);
-        }
-      );
+      });
 
       return deferred.promise;
     };
@@ -138,21 +143,22 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      */
     this.renew = function renew(itemIdentifier) {
       var deferred = $q.defer();
-      var self = this;
 
-      proxyService.emitEvent('fbs.renew', 'fbs.renew.success' + itemIdentifier, 'fbs.error', {
+      proxyService.once('fbs.renew.success' + itemIdentifier, function(result) {
+        deferred.resolve(result);
+      });
+
+      proxyService.once('fbs.renew.error' + itemIdentifier, function(err) {
+        deferred.resolve(err);
+      });
+
+      proxyService.emit('fbs.renew', {
         busEvent: 'fbs.renew.success' + itemIdentifier,
-        username: self.username,
-        password: self.password,
+        errorEvent: 'fbs.renew.error' + itemIdentifier,
+        username: this.username,
+        password: this.password,
         itemIdentifier: itemIdentifier
-      }).then(
-        function success(result) {
-          deferred.resolve(result);
-        },
-        function error(err) {
-          deferred.reject(err);
-        }
-      );
+      });
 
       return deferred.promise;
     };
@@ -164,22 +170,22 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      */
     this.renewAll = function renewAll() {
       var deferred = $q.defer();
-      var self = this;
-
       var uniqueId = CryptoJS.MD5('userServiceRenewAll' + Date.now());
 
-      proxyService.emitEvent('fbs.renew.all', 'fbs.renew.all.success' + uniqueId, 'fbs.error', {
+      proxyService.once('fbs.renew.all.success' + uniqueId, function (result) {
+        deferred.resolve(result);
+      });
+
+      proxyService.once('fbs.renew.all.error' + uniqueId, function (err) {
+        deferred.reject(err);
+      });
+
+      proxyService.emit('fbs.renew.all', {
         busEvent: 'fbs.renew.all.success' + uniqueId,
-        username: self.username,
-        password: self.password
-      }).then(
-        function success(result) {
-          deferred.resolve(result);
-        },
-        function error(err) {
-          deferred.reject(err);
-        }
-      );
+        errorEvent:  'fbs.renew.all.error' + uniqueId,
+        username: this.username,
+        password: this.password
+      });
 
       return deferred.promise;
     };
@@ -193,22 +199,22 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      */
     this.patron = function patron() {
       var deferred = $q.defer();
-      var self = this;
-
       var uniqueId = CryptoJS.MD5('userServicePatron' + Date.now());
 
-      proxyService.emitEvent('fbs.patron', 'fbs.patron.success' + uniqueId, 'fbs.patron.error', {
+      proxyService.once('fbs.patron.success' + uniqueId, function (result) {
+        deferred.resolve(result);
+      });
+
+      proxyService.once('fbs.patron.error' + uniqueId, function (err) {
+        deferred.reject(err);
+      });
+
+      proxyService.emit('fbs.patron', 'fbs.patron.success' + uniqueId, 'fbs.patron.error', {
         busEvent: 'fbs.patron.success' + uniqueId,
-        username: self.username,
-        password: self.password
-      }).then(
-        function success(patron) {
-          deferred.resolve(patron);
-        },
-        function error(err) {
-          deferred.reject(err);
-        }
-      );
+        errorEvent: 'fbs.patron.error' + uniqueId,
+        username: this.username,
+        password: this.password
+      });
 
       return deferred.promise;
     };

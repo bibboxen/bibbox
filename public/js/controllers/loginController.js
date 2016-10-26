@@ -1,8 +1,8 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'proxyService', 'userService', 'Idle',
-  function ($scope, $http, $window, $location, $routeParams, proxyService, userService, Idle) {
+angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$window', '$location', '$routeParams', 'userService', 'Idle',
+  function ($scope, $http, $window, $location, $routeParams, userService, Idle) {
     'use strict';
 
     // @TODO: Block user on X number of failed login attempts.
@@ -93,36 +93,36 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * Stops after one "barcode.data" has been returned.
      */
     var startBarcode = function startBarcode() {
-      barcodeRunning = true;
-
-      proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {})
-        .then(
-          function success(data) {
-            $scope.countdown = null;
-
-            // Ignore result if the barcode should not be running.
-            if (barcodeRunning) {
-              barcodeResult(data);
-              stopBarcode();
-            }
-          },
-          function error(err) {
-            barcodeError(err);
-          }
-        );
+      // barcodeRunning = true;
+      //
+      // proxyService.emitEvent('barcode.start', 'barcode.data', 'barcode.err', {})
+      //   .then(
+      //     function success(data) {
+      //       $scope.countdown = null;
+      //
+      //       // Ignore result if the barcode should not be running.
+      //       if (barcodeRunning) {
+      //         barcodeResult(data);
+      //         stopBarcode();
+      //       }
+      //     },
+      //     function error(err) {
+      //       barcodeError(err);
+      //     }
+      //   );
     };
 
     /**
      * Stop scanning for a barcode.
      */
     var stopBarcode = function stopBarcode() {
-      if (barcodeRunning) {
-        proxyService.emitEvent('barcode.stop', null, null, {}).then(
-          function () {
-            barcodeRunning = false;
-          }
-        );
-      }
+      // if (barcodeRunning) {
+      //   proxyService.emitEvent('barcode.stop', null, null, {}).then(
+      //     function () {
+      //       barcodeRunning = false;
+      //     }
+      //   );
+      // }
     };
 
     /**
@@ -242,8 +242,8 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$http', '$win
      * On destroy.
      */
     $scope.$on('$destroy', function () {
-      proxyService.cleanup();
-      stopBarcode();
+      // proxyService.cleanup();
+      // stopBarcode();
     });
   }
 ]);

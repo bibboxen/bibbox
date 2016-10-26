@@ -3,11 +3,9 @@
  * proxyService for communication with backend.
  */
 
-angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location', '$route', 'config', '$translate',
-  function ($rootScope, $q, $location, $route, config, $translate) {
+angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location', '$route',
+  function ($rootScope, $q, $location, $route) {
     'use strict';
-
-    var self = this;
 
     /**
      * Get socket connection back to the host that load the page.
@@ -17,7 +15,7 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
      * @returns {*}
      *   The connected socket as an object.
      */
-    self.getSocket = function getSocket() {
+    this.getSocket = function getSocket() {
       return io.connect(location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''), {
         forceNew: true,
         reconnection: true,
@@ -30,43 +28,15 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
     /**
      * Emits an event to the backend.
      *
-     * Emits an event and resolves the promise when the callbackEvent/errorEvent is called.
-     * In some cases the backend expects a callback event in the data parameter,
-     *   in these cases data and callbackEvent should be the same.
-     *
-     * @param emitEvent
-     *   The event to emit through the socket.
-     * @param callbackEvent
-     *   The event to listen for with result.
-     * @param errorEvent
-     *   The event to listen for with error.
+     * @param eventName
+     *   Name of the event.
      * @param data
      *   The data to send with the event.
      *
      * @returns {*|promise}
      */
-    self.emitEvent = function emitEvent(emitEvent, callbackEvent, errorEvent, data) {
-      // Try to connect to the server if not already connected.
-      var deferred = $q.defer();
-
-      // Register callback event listener.
-      if (callbackEvent) {
-        socket.once(callbackEvent, function (data) {
-          deferred.resolve(data);
-        });
-      }
-
-      // Register error event listener.
-      if (errorEvent) {
-        socket.once(errorEvent, function (err) {
-          deferred.reject(err);
-        });
-      }
-
-      // Send event to backend.
-      socket.emit(emitEvent, data);
-
-      return deferred.promise;
+    this.emit = function emit(eventName, data) {
+      socket.emit(eventName, data);
     };
 
     /**
@@ -77,7 +47,7 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
      * @param callback
      *   The callback to call when the event is fired.
      */
-    this.onEvent = function onEvent(eventName, callback) {
+    this.on = function on(eventName, callback) {
       socket.on(eventName, function () {
         var args = arguments;
         $rootScope.$apply(function () {
@@ -87,13 +57,44 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
     };
 
     /**
+     * Handled once events from the socket connection.
+     *
+     * @param eventName
+     *   Name of the event.
+     * @param callback
+     *   The callback to call when the event is fired.
+     */
+    this.once = function once(eventName, callback) {
+      socket.once(eventName, function () {
+        var args = arguments;
+        $rootScope.$apply(function () {
+          callback.apply(socket, args);
+        });
+      });
+    };
+
+    /**
+     * Remove event listeners.
+     *
+     * @param eventName
+     *   Name of the event.
+     * @param callback
+     *   The callback to remove.
+     */
+    this.removeListener = function removeListener(eventName, callback) {
+      socket.removeListener(eventName, callback);
+    };
+
+    /**
      * Cleanup event listeners.
      *
      * And re-register event listeners.
      */
-    self.cleanup = function cleanup() {
+    this.cleanup = function cleanup() {
       socket.removeAllListeners();
-      self.registerListeners();
+
+      // Re-attach default listeners.
+      this.registerListeners();
     };
 
     /**
@@ -101,7 +102,7 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
      *
      * Wrapped in function to allow testing.
      */
-    self.registerListeners = function registerListeners() {
+    this.registerListeners = function registerListeners() {
       // Reloads the browser on the 'frontend.reload' event.
       socket.on('frontend.reload', function () {
         $location.path('/');
@@ -110,7 +111,7 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
     };
 
     // Initialize.
-    var socket = self.getSocket();
-    self.registerListeners();
+    var socket = this.getSocket();
+    this.registerListeners();
   }
 ]);

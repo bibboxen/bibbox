@@ -48,6 +48,36 @@ Storage.prototype.save = function save(type, name, obj) {
 };
 
 /**
+ * Merge data into storage.
+ *
+ * @param type
+ *   The type (config, translation or offline).
+ * @param name
+ *   Name of the modules config.
+ * @param obj
+ *   Data to store.
+ *
+ * @returns {*}
+ */
+Storage.prototype.append = function append(type, name, obj) {
+  try {
+    var data = this.load(type, name);
+    data.push(obj);
+  }
+  catch (err) {
+    if (err.code === 'ENOENT') {
+      // File don't exists. Set data to the parsed in object.
+      data = [ obj ];
+    }
+    else {
+      throw err;
+    }
+  }
+
+  return this.save(type, name, data);
+};
+
+/**
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
@@ -71,8 +101,26 @@ module.exports = function (options, imports, register) {
    * Listen to save requests.
    */
   bus.on('storage.save', function (data) {
-    var json = storage.save(data.type, data.name, data.obj);
-    bus.emit(data.busEvent, json);
+    try {
+      bus.emit(data.busEvent, storage.save(data.type, data.name, data.obj));
+    }
+    catch (err) {
+      bus.emit(data.busEvent, err);
+      bus.emit('logger.err', err.message);
+    }
+  });
+
+  /**
+   * Listen to append requests.
+   */
+  bus.on('storage.append', function (data) {
+    try {
+      bus.emit(data.busEvent, storage.append(data.type, data.name, data.obj));
+    }
+    catch (err) {
+      bus.emit(data.busEvent, err);
+      bus.emit('logger.err', err.message);
+    }
   });
 
   register(null, {

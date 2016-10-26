@@ -16,14 +16,19 @@ var Network = function Network(bus) {
 Network.prototype.isOnline = function isOnline(uri) {
   var deferred = Q.defer();
 
-  var address = url.parse(uri);
-  var port = address.protocol === 'https:' ? 443 : 80;
-  var connected = connectionTester.test(address.host, port, 1000);
-  if (connected.error !== null) {
-    deferred.reject(connected.error);
+  try {
+    var address = url.parse(uri);
+    var port = address.protocol === 'https:' ? 443 : 80;
+    var connected = connectionTester.test(address.host, port, 1000);
+    if (connected.error !== null) {
+      deferred.reject(connected.error);
+    }
+    else {
+      deferred.resolve();
+    }
   }
-  else {
-    deferred.resolve();
+  catch (err) {
+    deferred.reject(err);
   }
 
   return deferred.promise;

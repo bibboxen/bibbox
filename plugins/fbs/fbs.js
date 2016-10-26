@@ -92,6 +92,7 @@ FBS.prototype.patronInformation = function patronInformation(username, password)
 
   var req = new Request(this.bus, this.config);
   req.patronInformation(username, password, function (err, res) {
+    console.log(err);
     if (err) {
       deferred.reject(err);
     }
@@ -260,7 +261,7 @@ module.exports = function (options, imports, register) {
     },
     function (err) {
       bus.emit('fbs.err', err);
-      bus.emit(data.busEvent, false);
+      bus.emit(data.busEvent, err);
     });
   });
 
@@ -285,6 +286,18 @@ module.exports = function (options, imports, register) {
         // @TODO: Save in storage for delivery later.
 
         bus.emit(data.busEvent, material);
+
+        bus.emit('storage.merge', {
+          type: 'offline',
+          name: 'test',
+          obj: {
+            date: new Date().getTime(),
+            username: data.username,
+            password: data.password,
+            action: 'checkout',
+            item: data.itemIdentifier
+          }
+        });
 
         console.log('Accepted offline borrow');
       }
