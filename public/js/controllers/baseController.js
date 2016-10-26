@@ -3,12 +3,20 @@
  * Borrow page controller.
  */
 
-angular.module('BibBox').controller('BaseController', ['$scope', '$location', 'Idle',
-  function ($scope, $location, Idle) {
+angular.module('BibBox').controller('BaseController', ['$scope', '$location', 'userService', 'Idle',
+  function ($scope, $location, userService, Idle) {
     'use strict';
 
-    // Restart idle service if not running.
-    Idle.watch();
+    /**
+     * Logout current user and redirect.
+     *
+     * @param path
+     *   The path to redirect to.
+     */
+    $scope.baseLogoutRedirect = function logoutRedirect(path) {
+      userService.logout();
+      $location.path(path);
+    };
 
     /**
      * @TODO: Missing documentation.
@@ -24,7 +32,7 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', 'I
      */
     $scope.$on('IdleTimeout', function () {
       $scope.$evalAsync(function () {
-        $location.path('/');
+        $scope.baseLogoutRedirect('/');
       });
     });
 
@@ -36,6 +44,16 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', 'I
         $scope.countdown = null;
       });
     });
+
+    /**
+     * Restart the idle service or start it if it's not running.
+     */
+    $scope.baseResetIdleWatch = function baseResetIdleWatch() {
+      Idle.watch();
+    };
+
+    // Start the idle service.
+    $scope.baseResetIdleWatch();
 
     /**
      * On destroy.

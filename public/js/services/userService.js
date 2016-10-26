@@ -22,7 +22,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      * @returns {*}
      */
     this.userLoggedIn = function userLoggedIn() {
-      return loggedIn;
+      return this.loggedIn;
     };
 
     /**
