@@ -1,45 +1,17 @@
 /**
  * Return page controller.
  */
-angular.module('BibBox').controller('ReturnController', ['$scope', '$location', '$timeout', 'Idle', 'receiptService',
-  function ($scope, $location, $timeout, Idle, receiptService) {
+angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'Idle', 'receiptService',
+  function ($scope, $controller, $location, $timeout, Idle, receiptService) {
     'use strict';
+
+    // Instantiate/extend base controller.
+    $controller('BaseController', { $scope: $scope });
 
     // Store raw check-in responses as it's need to print receipt.
     var raw_materials = [];
 
     $scope.materials = [];
-
-    // Restart idle service if not running.
-    Idle.watch();
-
-    /**
-     * Listen for idle warning.
-     */
-    $scope.$on('IdleWarn', function (e, countdown) {
-      $scope.$apply(function () {
-        $scope.countdown = countdown;
-      });
-    });
-
-    /**
-     * Listen for idle timeout.
-     */
-    $scope.$on('IdleTimeout', function () {
-      $scope.$evalAsync(function () {
-        $location.path('/');
-      });
-    });
-
-    /**
-     * Listen for idle end.
-     */
-    $scope.$on('IdleEnd', function () {
-      $scope.$apply(function () {
-        $scope.countdown = null;
-      });
-    });
-
 
     /**
      * Check-in scanned result.
