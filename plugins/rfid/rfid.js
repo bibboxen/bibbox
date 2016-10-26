@@ -74,11 +74,20 @@ var RFID = function (bus, port, afi) {
               tag: data.tag
             });
             break;
-          case 'tagSet':
+          case 'tagSetResult':
             console.log("tagSet not implemented.");
             break;
-          case 'tagSetAFI':
-            console.log("tagSetAFI not implemented.");
+          case 'tagSetAFIResult':
+            if (data.success) {
+              bus.emit('rfid.tag.afi.set', {
+                uid: data.UID,
+                afi: data.AFI
+              })
+            }
+            else {
+              bus.emit('rfid.')
+            }
+
             break;
           default:
             // @TODO: Log error.
