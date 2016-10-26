@@ -1,8 +1,8 @@
 /**
  * Return page controller.
  */
-angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'Idle', 'receiptService',
-  function ($scope, $controller, $location, $timeout, Idle, receiptService) {
+angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'receiptService',
+  function ($scope, $controller, $location, $timeout, receiptService) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -45,9 +45,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
         }).then(
           function success(result) {
             var i;
-
-            // Restart idle service if not running.
-            Idle.watch();
+            $scope.baseResetIdleWatch();
 
             // Store the raw result (it's used to send with receipts).
             raw_materials.push(result);
@@ -86,8 +84,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
             }
           },
           function error(err) {
-            // Restart idle service if not running.
-            Idle.watch();
+            $scope.baseResetIdleWatch();
 
             // @TODO: Handle error.
             console.log(err);
@@ -99,20 +96,12 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     // @TODO: Subscribe to rfid.tag_detected
 
     /**
-     * Go to front page.
-     */
-    $scope.gotoFront = function gotoFront() {
-      $location.path('/');
-    };
-
-    /**
      * Print receipt.
      */
     $scope.receipt = function receipt() {
       receiptService.returnReceipt(raw_materials, 'printer').then(
         function (status) {
-          console.log('returnController - receipt', status);
-          $location.path('/');
+          $scope.baseLogoutRedirect();
         },
         function (err) {
           // @TODO: handel error etc.

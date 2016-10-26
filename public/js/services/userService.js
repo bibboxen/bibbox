@@ -209,7 +209,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
         deferred.reject(err);
       });
 
-      proxyService.emit('fbs.patron', 'fbs.patron.success' + uniqueId, 'fbs.patron.error', {
+      proxyService.emit('fbs.patron', {
         busEvent: 'fbs.patron.success' + uniqueId,
         errorEvent: 'fbs.patron.error' + uniqueId,
         username: this.username,

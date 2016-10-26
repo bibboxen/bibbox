@@ -3,8 +3,8 @@
  * Status page controller.
  */
 
-angular.module('BibBox').controller('StatusController', ['$scope', '$controller', '$location', '$translate', '$timeout', 'userService', 'receiptService', 'Idle', '$modal',
-  function ($scope, $controller, $location, $translate, $timeout, userService, receiptService, Idle, $modal) {
+angular.module('BibBox').controller('StatusController', ['$scope', '$controller', '$location', '$translate', '$timeout', 'userService', 'receiptService', '$modal',
+  function ($scope, $controller, $location, $translate, $timeout, userService, receiptService, $modal) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -12,9 +12,9 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
 
     $scope.loading = true;
 
-    // Check that the user is logged in.
+    // @TODO: Move to base controller.
     if (!userService.userLoggedIn()) {
-      $location.path('/');
+      $scope.baseLogoutRedirect('/');
       return;
     }
 
@@ -22,63 +22,39 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
     $scope.fineItems = [];
     $scope.currentPatron = null;
 
+    // Sets $scope.currentPatron to the current logged in patron.
     // Load materials for current user.
-    userService.patron().then(
-      function (patron) {
-        $scope.loading = false;
+    $scope.baseGetPatron().then(function () {
+      var i;
+      var j;
+      var item = null;
 
-        // Restart idle service if not running.
-        Idle.watch();
-
-        $scope.currentPatron = patron;
-
-        $scope.fineItems = patron.fineItems;
-
-        // If patron exists, get all charged, overdue and recall items.
-        if (patron) {
-          var i;
-          var j;
-          var item = null;
-
-          // Add charged items.
-          for (i = 0; i < patron.chargedItems.length; i++) {
-            item = angular.copy(patron.chargedItems[i]);
-            $scope.materials.push(item);
-          }
-
-          // Add overdue items.
-          for (i = 0; i < patron.overdueItems.length; i++) {
-            for (j = 0; j < $scope.materials.length; j++) {
-              if ($scope.materials[j].id === patron.overdueItems[i].id) {
-                $scope.materials[j].overdue = true;
-                $scope.materials[j].information = 'status.overdue';
-              }
-            }
-          }
-
-          // Add fines to items.
-          for (i = 0; i < patron.fineItems.length; i++) {
-            for (j = 0; j < $scope.materials.length; j++) {
-              if ($scope.materials[j].id === patron.fineItems[i].id) {
-                $scope.materials[j].fineItem = patron.fineItems[i];
-                break;
-              }
-            }
-          }
-        }
-        else {
-          // @TODO: Report error
-          console.error('No patron');
-        }
-      },
-      function (err) {
-        // Restart idle service if not running.
-        Idle.watch();
-
-        // @TODO: Report error
-        console.error(err);
+      // Add charged items.
+      for (i = 0; i < $scope.currentPatron.chargedItems.length; i++) {
+        item = angular.copy($scope.currentPatron.chargedItems[i]);
+        $scope.materials.push(item);
       }
-    );
+
+      // Add overdue items.
+      for (i = 0; i < $scope.currentPatron.overdueItems.length; i++) {
+        for (j = 0; j < $scope.materials.length; j++) {
+          if ($scope.materials[j].id === $scope.currentPatron.overdueItems[i].id) {
+            $scope.materials[j].overdue = true;
+            $scope.materials[j].information = 'status.overdue';
+          }
+        }
+      }
+
+      // Add fines to items.
+      for (i = 0; i < $scope.currentPatron.fineItems.length; i++) {
+        for (j = 0; j < $scope.materials.length; j++) {
+          if ($scope.materials[j].id === $scope.currentPatron.fineItems[i].id) {
+            $scope.materials[j].fineItem = $scope.currentPatron.fineItems[i];
+            break;
+          }
+        }
+      }
+    });
 
     /**
      * Renew a material.
@@ -91,9 +67,8 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
       userService.renew(material.id).then(
         function success(data) {
           material.loading = false;
-
           // Restart idle service if not running.
-          Idle.watch();
+          $scope.baseResetIdleWatch();
 
           if (!data) {
             material.information = 'status.renew.failed';
@@ -119,7 +94,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
           console.error(err);
 
           // Restart idle service if not running.
-          Idle.watch();
+          $scope.baseResetIdleWatch();
         }
       );
     };
@@ -137,7 +112,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
       userService.renewAll().then(
         function success(data) {
           // Restart idle service if not running.
-          Idle.watch();
+          $scope.baseResetIdleWatch();
 
           var material;
           if (data.ok === '1') {
@@ -188,7 +163,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
           console.error(err);
 
           // Restart idle service if not running.
-          Idle.watch();
+          $scope.baseResetIdleWatch();
         }
       );
     };
@@ -230,9 +205,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
       receiptService.status(credentials.username, credentials.password, type)
       .then(
         function (status) {
-          alert('mail sent');
-
-          // @TODO: Redirect to frontpage.
+          $scope.baseLogoutRedirect();
         },
         function (err) {
           alert(err);
@@ -243,20 +216,11 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
     };
 
     /**
-     * Goto to front page.
-     */
-    $scope.gotoFront = function gotoFront() {
-      userService.logout();
-      $location.path('/');
-    };
-
-    /**
      * On destroy.
      *
      * Log out of user service.
      */
     $scope.$on('$destroy', function () {
-      userService.logout();
       receiptModal.hide();
       finesModal.hide();
     });

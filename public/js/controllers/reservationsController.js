@@ -10,61 +10,42 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
 
     $scope.loading = true;
 
+    // @TODO: Move to base controller.
     if (!userService.userLoggedIn()) {
-      $location.path('/');
+      $scope.baseLogoutRedirect();
       return;
     }
 
     $scope.materials = [];
 
-    userService.patron().then(
-      function (patron) {
-        $scope.loading = false;
+    // Sets $scope.currentPatron to the current logged in patron.
+    $scope.baseGetPatron().then(function () {
+      var i;
+      var item;
 
-        // Restart idle service if not running.
-        Idle.watch();
+      // Add available items.
+      if ($scope.currentPatron.hasOwnProperty('holdItems')) {
+        for (i = 0; i < $scope.currentPatron.holdItems.length; i++) {
+          item = angular.copy($scope.currentPatron.holdItems[i]);
 
-        // If patron exists, get reservations.
-        if (patron) {
-          $scope.currentPatron = patron;
+          item.ready = true;
 
-          var i;
-          var item;
-
-          // Add available items
-          for (i = 0; i < patron.holdItems.length; i++) {
-            item = angular.copy(patron.holdItems[i]);
-
-            item.ready = true;
-
-            $scope.materials.push(item);
-          }
-
-          // Add unavailable items
-          for (i = 0; i < patron.unavailableHoldItems.length; i++) {
-            item = angular.copy(patron.unavailableHoldItems[i]);
-
-            item.reservationNumber = '?';
-            item.ready = false;
-
-            $scope.materials.push(item);
-          }
+          $scope.materials.push(item);
         }
-        else {
-          // @TODO: Report error.
-          console.error('Not patron defined');
-        }
-      },
-      function (err) {
-        $scope.loading = false;
-        // @TODO: Report error.
-        console.error(err);
-
-        // Restart idle service if not running.
-        Idle.watch();
       }
-    );
 
+      // Add unavailable items.
+      if ($scope.currentPatron.hasOwnProperty('unavailableHoldItems')) {
+        for (i = 0; i < $scope.currentPatron.unavailableHoldItems.length; i++) {
+          item = angular.copy($scope.currentPatron.unavailableHoldItems[i]);
+
+          item.reservationNumber = '?';
+          item.ready = false;
+
+          $scope.materials.push(item);
+        }
+      }
+    });
 
     /**
      * Setup receipt modal.
@@ -86,9 +67,7 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
 
       receiptService.reservations(credentials.username, credentials.password, type).then(
         function (status) {
-          alert('mail sent');
-
-          // @TODO: Redirect to front page.
+          $scope.baseLogoutRedirect();
         },
         function (err) {
           // @TODO: handel error etc.
@@ -98,20 +77,11 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
     };
 
     /**
-     * Goto to front page.
-     */
-    $scope.gotoFront = function gotoFront() {
-      userService.logout();
-      $location.path('/');
-    };
-
-    /**
      * On destroy.
      *
      * Log out of user service.
      */
     $scope.$on('$destroy', function () {
-      userService.logout();
       receiptModal.hide();
     });
   }

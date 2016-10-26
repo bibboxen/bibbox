@@ -92,7 +92,6 @@ FBS.prototype.patronInformation = function patronInformation(username, password)
 
   var req = new Request(this.bus, this.config);
   req.patronInformation(username, password, function (err, res) {
-    console.log(err);
     if (err) {
       deferred.reject(err);
     }
