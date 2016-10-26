@@ -81,23 +81,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
             var i;
             if (result) {
-              if (result.ok === '0') {
-                for (i = 0; i < $scope.materials.length; i++) {
-                  if ($scope.materials[i].id === result.itemIdentifier) {
-                    $scope.materials[i].loading = false;
-                    $scope.materials[i].information = result.screenMessage;
-                    $scope.materials[i].status = 'borrow.error';
-
-                    if (result.itemProperties) {
-                      $scope.materials[i].title = result.itemProperties.title;
-                      $scope.materials[i].author = result.itemProperties.author;
-                    }
-
-                    break;
-                  }
-                }
-              }
-              else {
+              if (result.ok === '1') {
                 for (i = 0; i < $scope.materials.length; i++) {
                   if ($scope.materials[i].id === result.itemIdentifier) {
                     $scope.materials[i] = {
@@ -109,6 +93,22 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                       dueDate: result.dueDate,
                       loading: false
                     };
+                    break;
+                  }
+                }
+              }
+              else {
+                for (i = 0; i < $scope.materials.length; i++) {
+                  if ($scope.materials[i].id === result.itemIdentifier) {
+                    $scope.materials[i].loading = false;
+                    $scope.materials[i].information = result.screenMessage;
+                    $scope.materials[i].status = 'borrow.error';
+
+                    if (result.itemProperties) {
+                      $scope.materials[i].title = result.itemProperties.title;
+                      $scope.materials[i].author = result.itemProperties.author;
+                    }
+
                     break;
                   }
                 }
@@ -233,6 +233,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     $scope.$on('$destroy', function () {
       userService.logout();
       receiptModal.hide();
+      rfidService.stop();
     });
   }
 ]);

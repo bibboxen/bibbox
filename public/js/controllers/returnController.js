@@ -161,7 +161,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      * On destroy.
      */
     $scope.$on('$destroy', function () {
-
+      rfidService.stop();
     });
   }
 ]);
