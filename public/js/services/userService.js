@@ -218,5 +218,32 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
 
       return deferred.promise;
     };
+
+    /**
+     * Check FBS is online.
+     *
+     * It's plased on user service as FBS has to due with users.
+     *
+     * @returns {Function}
+     */
+    this.isOnline = function isOnline() {
+      var deferred = $q.defer();
+      var uniqueId = CryptoJS.MD5('userServiceOnline' + Date.now());
+
+      proxyService.once('fbs.online.response' + uniqueId, function (status) {
+        deferred.resolve(status);
+      });
+
+      proxyService.once('fbs.online.error' + uniqueId, function (err) {
+        deferred.reject(err);
+      });
+
+      proxyService.emit('fbs.online', {
+        busEvent: 'fbs.online.response' + uniqueId,
+        errorEvent: 'fbs.online.error' + uniqueId,
+      });
+
+      return deferred.promise;
+    }
   }
 ]);

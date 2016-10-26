@@ -8,8 +8,8 @@
  *
  * Note: The configService has to be a dependency to load the configuration.
  */
-angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', '$controller', '$translate', 'configService', 'config', 'tmhDynamicLocale', '$interval',
-  function ($rootScope, $scope, $controller, $translate, configService, config, tmhDynamicLocale, $interval) {
+angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', '$controller', '$translate', 'configService', 'userService', 'config', 'tmhDynamicLocale', '$interval',
+  function ($rootScope, $scope, $controller, $translate, configService, userService, config, tmhDynamicLocale, $interval) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -55,20 +55,13 @@ angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', 
      *        front-end has the information and can react on it if need be!
      */
     var fbsOnline = function () {
-      var uniqueId = CryptoJS.MD5('indexController' + Date.now());
-
-      // proxyService.emitEvent('fbs.online', 'fbs.online.response' + uniqueId, 'fbs.err', {
-      //   busEvent: 'fbs.online.response' + uniqueId
-      // })
-      // .then(
-      //   function success(online) {
-           $scope.online = true;
-      //   },
-      //   function error(err) {
-      //     // @TODO: Handle error?
-      //     console.error('fbs.online', err);
-      //   }
-      // );
+      userService.isOnline().then(function (status) {
+        $scope.online = status;
+      },
+      function (err) {
+        console.error('fbs.online', err);
+        $scope.online = false;
+      });
     };
 
     /**
