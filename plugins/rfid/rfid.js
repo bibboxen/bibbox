@@ -22,25 +22,29 @@ var RFID = function (bus, port, afi) {
 
   // Connection set up.
   server.on('connection', function connection(ws) {
-    // Cleanup bus events for previous connections.
-    bus.off('rfid.tags.request');
-    bus.off('rfid.tag.set_afi');
-
-    // Listener for rfid.tags.detected.request bus event.
-    bus.on('rfid.tags.request', function () {
+    var requestTags = function requestTags() {
       ws.send(JSON.stringify({
         event: 'detectTags'
       }));
-    });
+    };
 
-    // Listener for rfid.tags.detected.request bus event.
-    bus.on('rfid.tag.set_afi', function (data) {
+    var setAFI = function setAFI(data) {
       ws.send(JSON.stringify({
         event: 'setAFI',
         uid: data.uid,
         afi: data.afi ? afi.on : afi.off
       }));
-    });
+    };
+
+    // Cleanup bus events for previous connections.
+    bus.removeListener('rfid.tags.request', requestTags);
+    bus.removeListener('rfid.tag.set_afi', setAFI);
+
+    // Listener for rfid.tags.detected.request bus event.
+    bus.on('rfid.tags.request', requestTags);
+
+    // Listener for rfid.tags.detected.request bus event.
+    bus.on('rfid.tag.set_afi', setAFI);
 
     ws.on('message', function incoming(message) {
       try {

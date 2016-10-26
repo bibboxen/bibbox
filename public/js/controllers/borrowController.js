@@ -3,8 +3,8 @@
  * Borrow page controller.
  */
 
-angular.module('BibBox').controller('BorrowController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal',
-  function ($scope, $controller, $location, $timeout, userService, Idle, receiptService, $modal) {
+angular.module('BibBox').controller('BorrowController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal', 'rfidService',
+  function ($scope, $controller, $location, $timeout, userService, Idle, receiptService, $modal, rfidService) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -185,6 +185,21 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
         }
       );
     };
+
+    function tagDetected(tag) {
+      itemScannedResult(tag.MID);
+    }
+
+    function tagRemoved(tag) {
+      // @TODO: Handle.
+    }
+
+    $scope.$on('rfid.tag.detected', tagDetected);
+    $scope.$on('rfid.tag.removed', tagRemoved);
+
+    // Start listening for rfid events.
+    rfidService.start($scope);
+
 
     //$timeout(function () {itemScannedResult('0000003225');}, 1000);
     //$timeout(function () {itemScannedResult('0000007889');}, 2000);
