@@ -3,19 +3,48 @@
  * Borrow page controller.
  */
 
-angular.module('BibBox').controller('BaseController', ['$scope', '$location', 'userService', 'Idle',
-  function ($scope, $location, userService, Idle) {
+angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$q', 'userService', 'Idle',
+  function ($scope, $location, $q, userService, Idle) {
     'use strict';
 
     /**
      * Logout current user and redirect.
      *
      * @param path
-     *   The path to redirect to.
+     *   The path to redirect to. Defaults to front page ('/').
      */
     $scope.baseLogoutRedirect = function logoutRedirect(path) {
+      path = path || '/';
       userService.logout();
       $location.path(path);
+    };
+
+    $scope.baseGetPatron = function baseGetPatron() {
+      var deferred = $q.defer();
+
+      userService.patron().then(
+        function (patron) {
+          $scope.loading = false;
+
+          // If patron exists, get reservations.
+          if (patron) {
+            $scope.currentPatron = patron;
+            deferred.resolve();
+          }
+          else {
+            $scope.loading = false;
+            // @TODO: Report error.
+            console.error('Patron not defined.');
+          }
+        },
+        function (err) {
+          $scope.loading = false;
+          // @TODO: Report error.
+          console.error(err);
+        }
+      );
+
+      return deferred.promise;
     };
 
     /**
@@ -40,9 +69,7 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', 'u
      * @TODO: Missing documentation.
      */
     $scope.$on('IdleEnd', function () {
-      $scope.$apply(function () {
-        $scope.countdown = null;
-      });
+      $scope.countdown = null;
     });
 
     /**

@@ -75,14 +75,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
       console.error(err);
     });
 
-    /**
-     * Stop scanning for a barcode.
-     */
-    var stopBarcode = function stopBarcode() {
-      barcodeService.stop();
-    };
-
-    /**
+     /**
      * Use manual login.
      *
      * @param use

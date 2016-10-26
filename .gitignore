@@ -6,3 +6,4 @@ config.json
 .idea
 coverage
 files/config/fbs.json
+files/offline/*.json

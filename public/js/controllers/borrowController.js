@@ -3,8 +3,8 @@
  * Borrow page controller.
  */
 
-angular.module('BibBox').controller('BorrowController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal', 'rfidService',
-  function ($scope, $controller, $location, $timeout, userService, Idle, receiptService, $modal, rfidService) {
+angular.module('BibBox').controller('BorrowController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', '$modal', 'rfidService',
+  function ($scope, $controller, $location, $timeout, userService, receiptService, $modal, rfidService) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -18,28 +18,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
     $scope.loading = true;
 
-    userService.patron().then(
-      function (patron) {
-        $scope.loading = false;
-
-        console.log(patron);
-
-        // If patron exists, get reservations.
-        if (patron) {
-          $scope.currentPatron = patron;
-        }
-        else {
-          $scope.loading = false;
-          // @TODO: Report error.
-          console.error('Patron not defined.');
-        }
-      },
-      function (err) {
-        $scope.loading = false;
-        // @TODO: Report error.
-        console.error(err);
-      }
-    );
+    // Sets $scope.currentPatron to the current logged in patron.
+    $scope.baseGetPatron();
 
     /**
      * @TODO: documentation?
@@ -75,9 +55,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
         userService.borrow(id).then(
           function success(result) {
-            // Restart the idle service, so the user is not logged out during
-            // scanning events.
-            Idle.watch();
+            $scope.baseResetIdleWatch();
 
             var i;
             if (result) {
@@ -126,9 +104,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
             }
           },
           function error(err) {
-            // Restart the idle service, so the user is not logged out during
-            // scanning events.
-            Idle.watch();
+            $scope.baseResetIdleWatch();
 
             for (var i = 0; i < $scope.materials.length; i++) {
               if ($scope.materials[i].id === id) {
@@ -144,14 +120,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     };
 
     // @TODO: Subscribe to rfid.tag_detected
-
-    /**
-     * Go to front page.
-     */
-    $scope.gotoFront = function gotoFront() {
-      userService.logout();
-      $location.path('/');
-    };
 
     /**
      * Setup receipt modal.
@@ -176,9 +144,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
       receiptService.borrow(credentials.username, credentials.password, $scope.materials, type).then(
         function (status) {
-          alert('mail sent');
-
-          // @TODO: Redirect to front page.
+          $scope.baseLogoutRedirect();
         },
         function (err) {
           // @TODO: handel error etc.
@@ -218,7 +184,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
     // Start listening for rfid events.
     rfidService.start($scope);
-
 
     //$timeout(function () {itemScannedResult('0000003225');}, 1000);
     //$timeout(function () {itemScannedResult('0000007889');}, 2000);

@@ -92,7 +92,6 @@ FBS.prototype.patronInformation = function patronInformation(username, password)
 
   var req = new Request(this.bus, this.config);
   req.patronInformation(username, password, function (err, res) {
-    console.log(err);
     if (err) {
       deferred.reject(err);
     }
@@ -283,13 +282,10 @@ module.exports = function (options, imports, register) {
           }
         };
 
-        // @TODO: Save in storage for delivery later.
-
-        bus.emit(data.busEvent, material);
-
-        bus.emit('storage.merge', {
+        // Store for later processing.
+        bus.emit('storage.append', {
           type: 'offline',
-          name: 'test',
+          name: data.username,
           obj: {
             date: new Date().getTime(),
             username: data.username,
@@ -299,7 +295,7 @@ module.exports = function (options, imports, register) {
           }
         });
 
-        console.log('Accepted offline borrow');
+        bus.emit(data.busEvent, material);
       }
       else {
         bus.emit('fbs.err', err);
@@ -331,11 +327,18 @@ module.exports = function (options, imports, register) {
           }
         };
 
-        // @TODO: Save in storage for delivery later.
+        // Store for later processing.
+        bus.emit('storage.append', {
+          type: 'offline',
+          name: data.timestamp,
+          obj: {
+            date: new Date().getTime(),
+            action: 'checkin',
+            item: data.itemIdentifier
+          }
+        });
 
         bus.emit(data.busEvent, material);
-
-        console.log('Accepted offline borrow');
       }
       else {
         bus.emit('fbs.err', err);

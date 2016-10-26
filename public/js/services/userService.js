@@ -136,6 +136,36 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     };
 
     /**
+     * Check in material (return).
+     *
+     * @param itemIdentifier
+     *   The id of the item to check in.
+     * @param timestamp
+     *   The current date that the check ins should be groupped under if in
+     *   offline mode.
+     */
+    this.checkIn = function checkIn(itemIdentifier, timestamp) {
+      var deferred = $q.defer();
+
+      proxyService.once('fbs.checkin.success' + itemIdentifier, function (result) {
+        deferred.resolve(result);
+      });
+
+      proxyService.once('fbs.checkin.error' + itemIdentifier, function (err) {
+        deferred.reject(err);
+      });
+
+      proxyService.emit('fbs.checkin', {
+        busEvent: 'fbs.checkin.success' + itemIdentifier,
+        errorEvent: 'fbs.checkin.error' + itemIdentifier,
+        timestamp: timestamp,
+        itemIdentifier: itemIdentifier
+      });
+
+      return deferred.promise;
+    };
+
+    /**
      * Renew a material.
      *
      * @param itemIdentifier
@@ -209,7 +239,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
         deferred.reject(err);
       });
 
-      proxyService.emit('fbs.patron', 'fbs.patron.success' + uniqueId, 'fbs.patron.error', {
+      proxyService.emit('fbs.patron', {
         busEvent: 'fbs.patron.success' + uniqueId,
         errorEvent: 'fbs.patron.error' + uniqueId,
         username: this.username,
@@ -218,5 +248,32 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
 
       return deferred.promise;
     };
+
+    /**
+     * Check FBS is online.
+     *
+     * It's plased on user service as FBS has to due with users.
+     *
+     * @returns {Function}
+     */
+    this.isOnline = function isOnline() {
+      var deferred = $q.defer();
+      var uniqueId = CryptoJS.MD5('userServiceOnline' + Date.now());
+
+      proxyService.once('fbs.online.response' + uniqueId, function (status) {
+        deferred.resolve(status);
+      });
+
+      proxyService.once('fbs.online.error' + uniqueId, function (err) {
+        deferred.reject(err);
+      });
+
+      proxyService.emit('fbs.online', {
+        busEvent: 'fbs.online.response' + uniqueId,
+        errorEvent: 'fbs.online.error' + uniqueId,
+      });
+
+      return deferred.promise;
+    }
   }
 ]);

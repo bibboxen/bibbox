@@ -1,8 +1,8 @@
 /**
  * Return page controller.
  */
-angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'Idle', 'receiptService', 'rfidService',
-  function ($scope, $controller, $location, $timeout, Idle, receiptService, rfidService) {
+angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', 'rfidService',
+  function ($scope, $controller, $location, $timeout, userService, receiptService, rfidService) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -12,6 +12,9 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     var raw_materials = [];
 
     $scope.materials = [];
+
+    // User when offline to group returns into a single file.
+    var currentDate = new Date().getTime();
 
     /**
      * Check-in scanned result.
@@ -36,74 +39,54 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
           loading: true
         });
 
-        // @TODO: Move to service so it the same for check-in and checkout.
-        var uniqueId = CryptoJS.MD5('returnControllerReturn' + Date.now());
+        userService.checkIn(id, currentDate).then(function (result) {
+          var i;
+          $scope.baseResetIdleWatch();
 
-        proxyService.emitEvent('fbs.checkin', 'fbs.checkin.success' + uniqueId, 'fbs.error', {
-          busEvent: 'fbs.checkin.success' + uniqueId,
-          itemIdentifier: id
-        }).then(
-          function success(result) {
-            var i;
+          // Store the raw result (it's used to send with receipts).
+          raw_materials.push(result);
 
-            // Restart idle service if not running.
-            Idle.watch();
-
-            // Store the raw result (it's used to send with receipts).
-            raw_materials.push(result);
-
-            if (result) {
-              if (result.ok === '1') {
-                for (i = 0; i < $scope.materials.length; i++) {
-                  if ($scope.materials[i].id === result.itemIdentifier) {
-                    $scope.materials[i] = {
-                      id: result.itemIdentifier,
-                      title: result.itemProperties.title,
-                      author: result.itemProperties.author,
-                      status: 'return.success',
-                      information: 'return.was_successful',
-                      loading: false
-                    };
-                    break;
-                  }
-                }
-              }
-              else {
-                for (i = 0; i < $scope.materials.length; i++) {
-                  if ($scope.materials[i].id === result.itemIdentifier) {
-                    $scope.materials[i].loading = false;
-                    $scope.materials[i].information = result.screenMessage;
-                    $scope.materials[i].status = 'return.error';
-
-                    break;
-                  }
+          if (result) {
+            if (result.ok === '1') {
+              for (i = 0; i < $scope.materials.length; i++) {
+                if ($scope.materials[i].id === result.itemIdentifier) {
+                  console.log(result);
+                  $scope.materials[i] = {
+                    id: result.itemIdentifier,
+                    title: result.itemProperties.title,
+                    author: result.itemProperties.author,
+                    status: 'return.success',
+                    information: 'return.was_successful',
+                    loading: false
+                  };
+                  break;
                 }
               }
             }
             else {
-              // @TODO: Handle error.
-              console.log('result === false');
-            }
-          },
-          function error(err) {
-            // Restart idle service if not running.
-            Idle.watch();
+              for (i = 0; i < $scope.materials.length; i++) {
+                if ($scope.materials[i].id === result.itemIdentifier) {
+                  $scope.materials[i].loading = false;
+                  $scope.materials[i].information = result.screenMessage;
+                  $scope.materials[i].status = 'return.error';
 
-            // @TODO: Handle error.
-            console.log(err);
+                  break;
+                }
+              }
+            }
           }
-        );
+          else {
+            // @TODO: Handle error.
+            console.log('result === false');
+          }
+        }, function (err) {
+          // @TODO: Handle error.
+          console.log(err);
+        });
       }
     };
 
     // @TODO: Subscribe to rfid.tag_detected
-
-    /**
-     * Go to front page.
-     */
-    $scope.gotoFront = function gotoFront() {
-      $location.path('/');
-    };
 
     /**
      * Print receipt.
@@ -111,8 +94,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     $scope.receipt = function receipt() {
       receiptService.returnReceipt(raw_materials, 'printer').then(
         function (status) {
-          console.log('returnController - receipt', status);
-          $location.path('/');
+          $scope.baseLogoutRedirect();
         },
         function (err) {
           // @TODO: handel error etc.
@@ -153,9 +135,9 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     // Start listening for rfid events.
     rfidService.start($scope);
 
-    // $timeout(function () {itemScannedResult('3846646417');}, 1000);
-    // $timeout(function () {itemScannedResult('3846469957');}, 2000);
-    // $timeout(function () {itemScannedResult('5010941603');}, 3000);
+    //$timeout(function () {itemScannedResult('3846646417');}, 1000);
+    //$timeout(function () {itemScannedResult('3846469957');}, 2000);
+    //$timeout(function () {itemScannedResult('5010941603');}, 3000);
 
     /**
      * On destroy.
