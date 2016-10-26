@@ -30,6 +30,10 @@ var setup = function setup() {
         packagePath: './../plugins/bus'
       },
       {
+        packagePath: './../plugins/storage',
+        paths: config.paths
+      },
+      {
         packagePath: './../plugins/server'
       },
       {
@@ -51,12 +55,12 @@ var setup = function setup() {
 
 it('Build XML message', function () {
   return setup().then(function (app) {
-    var req = new Request(app.services.bus);
+    var req = new Request(app.services.bus, config.fbs);
     var xml = req.buildXML('990xxx2.00');
 
     // Remove newlines to match string below.
     xml = xml.replace(/(\r\n|\n|\r)/gm, '');
-    xml.should.equal('<?xml version="1.0" encoding="UTF-8"?><ns1:sip password="' + config.fbs_password + '" login="' + config.fbs_username + '" xsi:schemaLocation="http://axiell.com/Schema/sip.xsd" xmlns:ns1="http://axiell.com/Schema/sip.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">  <request>990xxx2.00</request></ns1:sip>');
+    xml.should.equal('<?xml version="1.0" encoding="UTF-8"?><ns1:sip password="' + config.fbs.password + '" login="' + config.fbs.username + '" xsi:schemaLocation="http://axiell.com/Schema/sip.xsd" xmlns:ns1="http://axiell.com/Schema/sip.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">  <request>990xxx2.00</request></ns1:sip>');
   });
 });
 
@@ -137,7 +141,7 @@ it('Check the response date parser', function (done) {
   done();
 });
 
-it('Login with test use', function (done) {
+it('Login with test user', function (done) {
   setup().then(function (app) {
     app.services.fbs.login(config.username, config.pin).then(function (val) {
       try {

@@ -62,5 +62,7 @@
 
   "[BEFORE_RENEW_PERIOD]": "Before renew period",
 
-  "return.button.receipt": "Receipt"
+  "return.button.receipt": "Receipt",
+
+  "out_of_order.text": "Temporarily out of service"
 }

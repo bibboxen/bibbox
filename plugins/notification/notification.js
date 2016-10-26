@@ -13,11 +13,12 @@ var i18n = require('i18n');
 var Q = require('q');
 var fs = require('fs');
 
-var Notification = function Notification(bus) {
+var Notification = function Notification(bus, paths, languages) {
   var self = this;
   this.bus = bus;
 
-  bus.once('notification.config', function (data) {
+  // @TODO: handel config updates.
+  bus.on('notification.loaded.config', function (data) {
     self.mailConfig = data.mailer;
     self.headerConfig = data.header;
     self.libraryHeader = data.library;
@@ -32,15 +33,17 @@ var Notification = function Notification(bus) {
       ignoreTLS: !self.mailConfig.secure
     });
   });
-  bus.emit('config.notification', {busEvent: 'notification.config'});
+  bus.emit('ctrl.config.notification', {
+    busEvent: 'notification.loaded.config'
+  });
 
   // Configure I18N with supported languages.
   i18n.configure({
-    locales: ['en', 'da'],
-    defaultLocale: 'da',
+    locales: languages.locales,
+    defaultLocale: languages.defaultLocale,
     indent: '  ',
     autoReload: true,
-    directory: __dirname + '/../../locales/notifications'
+    directory: __dirname + '/../../' + paths.base + '/' + paths.translations + '/notifications'
   });
 
   twig.extendFilter('translate', function (str) {
@@ -617,7 +620,7 @@ Notification.prototype.printReceipt = function printReceipt(content) {
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
-  var notification = new Notification(bus);
+  var notification = new Notification(bus, options.paths, options.languages);
 
   /**
    * Listen status receipt events.

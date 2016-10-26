@@ -112,5 +112,7 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
 module.exports = function (options, imports, register) {
   var proxy = new Proxy(imports.server, imports.bus, options.whitelistedBusEvents, options.whitelistedSocketEvents);
 
-  register(null, {proxy: proxy});
+  register(null, {
+    proxy: proxy
+  });
 };

@@ -16,10 +16,16 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
      * Emits 'config.updated' into the $rootScope when updated.
      */
     proxyService.onEvent('config.ui.update', function (data) {
-      config.initialized = true;
+      if (data === false) {
+        $rootScope.$emit('config.error');
+      }
+      else {
+        // Mark config as initialized, so the application can present the UI.
+        config.initialized = true;
 
-      angular.merge(config, data);
-      $rootScope.$emit('config.updated');
+        angular.merge(config, data);
+        $rootScope.$emit('config.updated');
+      }
     });
 
     /**
@@ -29,11 +35,17 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
      * translations are refreshed.
      */
     proxyService.onEvent('config.ui.translations.update', function (data) {
-      config.initialized = true;
+      if (data === false) {
+        $rootScope.$emit('config.error');
+      }
+      else {
+        // Mark config as initialized, so the application can present the UI.
+        config.initialized = true;
 
-      angular.merge(config, data);
-      $rootScope.$emit('config.translations.updated');
-      $translate.refresh();
+        angular.merge(config, data);
+        $rootScope.$emit('config.translations.updated');
+        $translate.refresh();
+      }
     });
   }
 ]);

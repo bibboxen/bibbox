@@ -23,6 +23,10 @@ var plugins = [
     packagePath: './plugins/bus'
   },
   {
+    packagePath: './plugins/storage',
+    paths: config.paths
+  },
+  {
     packagePath: './plugins/server',
     port: config.port,
     path: path.join(__dirname, 'public')
@@ -43,7 +47,9 @@ var plugins = [
     vid: config.barcode.vid
   },
   {
-    packagePath: './plugins/translation'
+    packagePath: './plugins/translation',
+    paths: config.paths,
+    languages: config.languages
   },
   {
     packagePath: './plugins/proxy',
@@ -54,10 +60,12 @@ var plugins = [
     packagePath: './plugins/fbs'
   },
   {
-    packagePath: './plugins/notification'
+    packagePath: './plugins/rfid'
   },
   {
-    packagePath: './plugins/rfid'
+    packagePath: './plugins/notification',
+    paths: config.paths,
+    languages: config.languages
   }
 ];
 

@@ -17,8 +17,10 @@ var Response = require('./response.js');
  *
  * @param bus
  *   Event bus.
+ * @param config
+ *   FBS connection config.
  */
-var Request = function Request(bus) {
+var Request = function Request(bus, config) {
   var self = this;
   self.bus = bus;
 
@@ -26,14 +28,11 @@ var Request = function Request(bus) {
   var source = fs.readFileSync(__dirname + '/templates/sip2_message.xml', 'utf8');
   self.template = handlebars.compile(source);
 
-  bus.once('config.fbs.res', function fbsConfig(data) {
-    self.username = data.username;
-    self.password = data.password;
-    self.endpoint = data.endpoint;
-    self.agency = data.agency;
-    self.location = data.location;
-  });
-  bus.emit('config.fbs', {busEvent: 'config.fbs.res'});
+  self.username = config.username;
+  self.password = config.password;
+  self.endpoint = config.endpoint;
+  self.agency = config.agency;
+  self.location = config.location;
 };
 
 /**
