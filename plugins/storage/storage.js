@@ -10,25 +10,29 @@
 var jsonfile = require('jsonfile');
 
 var Storage = function Storage(bus, paths) {
-  this.path = __dirname + '/../../' + paths.base + '/' + paths.config + '/';
+  this.path = __dirname + '/../../' + paths.base + '/';
 };
 
 /**
  * Load object from storage.
  *
+ * @param type
+ *   The type (config, translation or offline).
  * @param name
  *   Name of the modules config.
  * @returns {*}
  *   JSON object with the config.
  */
-Storage.prototype.load = function load(name) {
-  var file = this.path + name + '.json';
+Storage.prototype.load = function load(type, name) {
+  var file = this.path + type + '/' + name + '.json';
   return jsonfile.readFileSync(file);
 };
 
 /**
  * Save object from storage.
  *
+ * @param type
+ *   The type (config, translation or offline).
  * @param name
  *   Name of the modules config.
  * @param obj
@@ -36,8 +40,8 @@ Storage.prototype.load = function load(name) {
  *
  * @returns {*}
  */
-Storage.prototype.save = function save(name, obj) {
-  var file = this.path + name + '.json';
+Storage.prototype.save = function save(type, name, obj) {
+  var file = this.path + type + '/' + name + '.json';
   return jsonfile.writeFileSync(file, obj, {
     spaces: 2
   });
@@ -55,7 +59,7 @@ module.exports = function (options, imports, register) {
    */
   bus.on('storage.load', function (data) {
     try {
-      bus.emit(data.busEvent, storage.load(data.name));
+      bus.emit(data.busEvent, storage.load(data.type, data.name));
     }
     catch (err) {
       bus.emit(data.busEvent, err);
@@ -67,7 +71,7 @@ module.exports = function (options, imports, register) {
    * Listen to save requests.
    */
   bus.on('storage.save', function (data) {
-    var json = storage.save(data.name, data.obj);
+    var json = storage.save(data.type, data.name, data.obj);
     bus.emit(data.busEvent, json);
   });
 

@@ -30,6 +30,7 @@ CTRL.prototype.getFBSConfig = function getFBSConfig() {
     }
   });
   this.bus.emit('storage.load', {
+    type: 'config',
     name: 'fbs',
     busEvent: 'ctrl.fbs.loaded.config'
   });
@@ -55,6 +56,7 @@ CTRL.prototype.getNotificationConfig = function getNotificationConfig() {
     }
   });
   this.bus.emit('storage.load', {
+    type: 'config',
     name: 'notification',
     busEvent: 'ctrl.notification.loaded.config'
   });
@@ -80,6 +82,7 @@ CTRL.prototype.getUiConfig = function getUiConfig() {
     }
   });
   this.bus.emit('storage.load', {
+    type: 'config',
     name: 'ui',
     busEvent: 'ctrl.loaded.ui.config'
   });
@@ -87,6 +90,11 @@ CTRL.prototype.getUiConfig = function getUiConfig() {
   return deferred.promise;
 };
 
+/**
+ * Get all translations for the front-end.
+ *
+ * @returns {*|promise}
+ */
 CTRL.prototype.getTranslations = function getTranslations() {
   var deferred = Q.defer();
 
