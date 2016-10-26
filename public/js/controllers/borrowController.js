@@ -10,6 +10,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     // Instantiate/extend base controller.
     $controller('BaseController', { $scope: $scope });
 
+    // @TODO: Move to base controller.
     if (!userService.userLoggedIn()) {
       $scope.baseLogoutRedirect('/');
       return;
@@ -197,7 +198,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      * Stop listening for barcode.
      */
     $scope.$on('$destroy', function () {
-      proxyService.cleanup();
       userService.logout();
       receiptModal.hide();
     });
