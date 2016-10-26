@@ -11,7 +11,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     $controller('BaseController', { $scope: $scope });
 
     if (!userService.userLoggedIn()) {
-      $location.path('/');
+      $scope.baseLogoutRedirect('/');
       return;
     }
 
