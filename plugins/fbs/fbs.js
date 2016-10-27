@@ -214,6 +214,33 @@ FBS.prototype.renewAll = function renewAll(username, password) {
 };
 
 /**
+ * Block patron.
+ *
+ * @param username
+ *   Username for the patron (card or CPR number).
+ * @param reason
+ *   Reason for blocking user.
+ *
+ * @return {*|promise}
+ *   JSON object with information or error message on failure.
+ */
+FBS.prototype.block = function block(username, reason) {
+  var deferred = Q.defer();
+
+  var req = new Request(this.bus, this.config);
+  req.blockPatron(username, reason, function (err, res) {
+    if (err) {
+      deferred.reject(err);
+    }
+    else {
+      deferred.resolve(res);
+    }
+  });
+
+  return deferred.promise;
+};
+
+/**
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
@@ -376,6 +403,19 @@ module.exports = function (options, imports, register) {
       bus.emit('fbs.err', err);
       bus.emit(data.busEvent, false);
     });
+  });
+
+  /**
+   * Listen to block patron requests.
+   */
+  bus.on('fbs.block', function (data) {
+    fbs.block(data.username, data.reason).then(function (res) {
+        bus.emit(data.busEvent, res);
+      },
+      function (err) {
+        bus.emit('fbs.err', err);
+        bus.emit(data.busEvent, false);
+      });
   });
 
   /**

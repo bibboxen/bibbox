@@ -30,6 +30,10 @@ Required configuration from the "ctrl" plugin on the "config.fbs" event:
       - Renew item in the library system.
     * fbs.renew.all => { username, password, busEvent }
       - Renew all the patrons loans.
+    * fbs.block => { username, reason}
+      - Block user in FBS.
+    * fbs.online
+      Check that FBS is online.
 
   * Emit
     * fbs.err
