@@ -71,15 +71,6 @@ module.exports = function (options, imports, register) {
     bus.emit(data.busEvent, translation.getTranslationsLang(data.lang));
   });
 
-  /**
-   * Handler for 'config.translations.update' event.
-   *
-   * Writes new translations to disc and emits the changes to the bus.
-   */
-  bus.on('translations.update', function updateTranslations(data) {
-    translation.updateTranslations();
-  });
-
   register(null, {
     translation: translation
   });

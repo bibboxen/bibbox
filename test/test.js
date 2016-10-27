@@ -61,6 +61,7 @@ function importTest(name, file) {
 
 // Load test cases.
 importTest('Bus', './bus.js');
+importTest('Storage', './storage.js');
 importTest('Logger', './logger.js');
 importTest('ctrl', './ctrl.js');
 importTest('Network', './network.js');
