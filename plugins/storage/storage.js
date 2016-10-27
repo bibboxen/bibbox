@@ -8,6 +8,7 @@
 'use strict';
 
 var jsonfile = require('jsonfile');
+var fs = require('fs');
 
 var Storage = function Storage(bus, paths) {
   this.path = __dirname + '/../../' + paths.base + '/';
@@ -48,7 +49,7 @@ Storage.prototype.save = function save(type, name, obj) {
 };
 
 /**
- * Merge data into storage.
+ * Append data into storage.
  *
  * @param type
  *   The type (config, translation or offline).
@@ -77,6 +78,27 @@ Storage.prototype.append = function append(type, name, obj) {
   return this.save(type, name, data);
 };
 
+
+/**
+ * Remove data from the storage.
+ *
+ * @param type
+ *   The type (config, translation or offline).
+ * @param name
+ *   Name of the modules config.
+ *
+ * @returns {*}
+ */
+Storage.prototype.remove = function append(type, name) {
+  try {
+    var file = this.path + type + '/' + name + '.json';
+    fs.unlinkSync(file);
+  }
+  catch (err) {
+    throw err;
+  }
+};
+
 /**
  * Register the plugin with architect.
  */
@@ -102,7 +124,8 @@ module.exports = function (options, imports, register) {
    */
   bus.on('storage.save', function (data) {
     try {
-      bus.emit(data.busEvent, storage.save(data.type, data.name, data.obj));
+      storage.save(data.type, data.name, data.obj);
+      bus.emit(data.busEvent, true);
     }
     catch (err) {
       bus.emit(data.busEvent, err);
@@ -115,7 +138,22 @@ module.exports = function (options, imports, register) {
    */
   bus.on('storage.append', function (data) {
     try {
-      bus.emit(data.busEvent, storage.append(data.type, data.name, data.obj));
+      storage.append(data.type, data.name, data.obj);
+      bus.emit(data.busEvent, true);
+    }
+    catch (err) {
+      bus.emit(data.busEvent, err);
+      bus.emit('logger.err', err.message);
+    }
+  });
+
+  /**
+   * Listen to remove requests.
+   */
+  bus.on('storage.remove', function (data) {
+    try {
+      storage.remove(data.type, data.name);
+      bus.emit(data.busEvent, true);
     }
     catch (err) {
       bus.emit(data.busEvent, err);

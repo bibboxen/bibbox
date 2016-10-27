@@ -285,4 +285,24 @@ Request.prototype.renewAll = function renewAll(patronId, patronPassword, callbac
   self.send(message, 'AO', callback);
 };
 
+/**
+ * Block patron.
+ *
+ * Note: that there is not response form SIP2 on this call.
+ *
+ * @param patronId
+ *   Patron card number or CPR number.
+ * @param reason
+ *   Message with reason for the user being blocked.
+ * @param callback
+ *   Function to call when completed request to FBS.
+ */
+Request.prototype.blockPatron = function blockPatron(patronId, reason, callback) {
+  var self = this;
+  var transactionDate = self.encodeTime();
+  var message = '01N' + transactionDate + '|AO' + self.agency + '|AL' + reason + '|AA' + patronId + '|';
+
+  self.send(message, 'AO', callback);
+};
+
 module.exports = Request;

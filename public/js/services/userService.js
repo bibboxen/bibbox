@@ -221,6 +221,33 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     };
 
     /**
+     * Block user.
+     *
+     * @returns {Function}
+     */
+    this.block = function block(username, reson) {
+      var deferred = $q.defer();
+      var uniqueId = CryptoJS.MD5('userServiceBlock' + Date.now());
+
+      proxyService.once('fbs.block.success' + uniqueId, function (result) {
+        deferred.resolve(result);
+      });
+
+      proxyService.once('fbs.block.error' + uniqueId, function (err) {
+        deferred.reject(err);
+      });
+
+      proxyService.emit('fbs.block', {
+        busEvent: 'fbs.block.success' + uniqueId,
+        errorEvent:  'fbs.block.error' + uniqueId,
+        username: username,
+        password: reson
+      });
+
+      return deferred.promise;
+    };
+
+    /**
      * Get patron.
      *
      * Contains all info about the currently logged in patron.
