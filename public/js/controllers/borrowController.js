@@ -29,30 +29,62 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     $scope.materials = [];
 
     /**
-     * @TODO: Missing documentation.
+     * Check-out scanned result.
      *
-     * @param id
-     *  @TODO: Missing doc.
+     * @param tag
+     *   The tag of material to check-out (borrow).
      */
-    var itemScannedResult = function itemScannedResult(id) {
-      // Check if item have been added before to the list.
+    var itemScannedResult = function itemScannedResult(tag) {
+      var material = null;
+      var id = tag.MID.slice(6);
+
+      // @TODO: Handle multiple tags in series.
+      var seriesLength = parseInt(tag.MID.slice(2, 4));
+      var numberInSeries = parseInt(tag.MID.slice(4, 6));
+
+      tag.numberInSeries = numberInSeries;
+      tag.seriesLength = seriesLength;
+
+      // Check if item has already been added to the list.
       var itemNotAdded = true;
       for (var i = 0; i < $scope.materials.length; i++) {
         if ($scope.materials[i].id === id) {
           itemNotAdded = false;
+          material = $scope.materials[i];
           break;
         }
       }
 
-      // If item have not been added it to the scope (UI list) and send requests
-      // to the user service to borrow the item.
+      // If item have not been added it to the scope (UI list).
       if (itemNotAdded) {
-        $scope.materials.push({
+        // Add a first version of the material.
+        material = {
           id: id,
+          seriesLength: seriesLength,
+          tags: [],
           title: id,
           loading: true
-        });
+        };
+        $scope.materials.push(material);
+      }
 
+      // Add tag to material if not already added.
+      var alreadyAdded = false;
+      for (var i = 0; i < material.tags.length; i++) {
+        if (material.tags[i].UID === tag.UID) {
+          alreadyAdded = true;
+          break;
+        }
+      }
+      if (!alreadyAdded) {
+        material.tags.push(tag);
+      }
+
+      console.log(material);
+
+      // Check if all tags in series have been added.
+      if (material.seriesLength === material.tags.length && !material.borrowed) {
+        // Attempt to borrow material.
         userService.borrow(id).then(
           function success(result) {
             $scope.baseResetIdleWatch();
@@ -69,6 +101,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                       status: 'borrow.success',
                       information: 'borrow.was_successful',
                       dueDate: result.dueDate,
+                      borrowed: true,
                       loading: false
                     };
                     break;
@@ -116,10 +149,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
             }
           }
         );
+
       }
     };
-
-    // @TODO: Subscribe to rfid.tag_detected
 
     /**
      * Setup receipt modal.
@@ -160,13 +192,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      * @param tag
      */
     function tagDetected(event, tag) {
-      // Get material id.
-      var mid = tag.MID.slice(6);
+      $scope.baseResetIdleWatch();
 
-      // Get meta
-      //var meta = tag.MID.slice(0, 5);
-
-      itemScannedResult(mid);
+      itemScannedResult(tag);
     }
 
     /**
@@ -185,9 +213,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     // Start listening for rfid events.
     rfidService.start($scope);
 
-    //$timeout(function () {itemScannedResult('0000003225');}, 1000);
-    //$timeout(function () {itemScannedResult('0000007889');}, 2000);
-    //$timeout(function () {itemScannedResult('0000003572');}, 3000);
+    //$timeout(function () {itemScannedResult('1101010000003225');}, 1000);
+    //$timeout(function () {itemScannedResult('1101010000007889');}, 2000);
+    //$timeout(function () {itemScannedResult('1101010000003572');}, 3000);
 
     /**
      * On destroy.

@@ -8,14 +8,14 @@ Make it possible to launch karma by typing:
 karma start
 ```
 
-Run the tests:
-```bash
-./node_modules/karma/bin/karma start
-```
-
 By installing karma-cli.
 ```bash
 npm install -g karma-cli
+```
+
+Else run the tests:
+```bash
+./node_modules/karma/bin/karma start
 ```
 
 ## Test coverage

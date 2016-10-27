@@ -34,7 +34,10 @@
           <span data-ng-if="material.status === 'borrow.error'" class="glyphicon glyphicon glyphicon-remove"
                 aria-hidden="true"></span>
         </td>
-        <td class="vert-align">{{ material.information | translate }}</td>
+        <td class="vert-align">
+          <span data-ng-if="material.tags.length === material.seriesLength">{{ material.information | translate }}</span>
+          <span data-ng-if="material.tags.length !== material.seriesLength">{{ material.tags.length }} / {{ material.seriesLength }}</span>
+        </td>
       </tr>
     </table>
   </div>

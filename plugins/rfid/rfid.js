@@ -18,6 +18,7 @@
  */
 var RFID = function (bus, port, afi) {
   var WebSocketServer = require('ws').Server;
+  // localhost
   var server = new WebSocketServer({ port: port });
 
   // Connection set up.
@@ -51,7 +52,7 @@ var RFID = function (bus, port, afi) {
         var data = JSON.parse(message);
 
         if (!data.event) {
-          bus.emit('rfid.error', "Event not set.");
+          bus.emit('rfid.error', 'Event not set.');
           return;
         }
 
@@ -69,7 +70,7 @@ var RFID = function (bus, port, afi) {
             bus.emit('rfid.tag.removed', data.tag);
             break;
           case 'tagSetResult':
-            console.log("tagSet not implemented.");
+            console.log('tagSet not implemented.');
             break;
           case 'tagSetAFIResult':
             if (data.success) {
@@ -79,13 +80,11 @@ var RFID = function (bus, port, afi) {
               })
             }
             else {
-              bus.emit('rfid.')
+              bus.emit('rfid.error', '')
             }
-
             break;
           default:
-            // @TODO: Log error.
-            console.log("Event not recognized!");
+            bus.emit('rfid.error', 'Event not recognized!');
         }
       }
       catch (err) {

@@ -70,3 +70,4 @@ importTest('FBS', './fbs.js');
 importTest('Notification', './notification.js');
 importTest('Proxy', './proxy.js');
 importTest('Translation', './translation.js');
+importTest('RFID', './rfid.js');

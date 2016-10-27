@@ -48,7 +48,9 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
     };
 
     /**
-     * @TODO: Missing documentation.
+     * Handle IdleWarn.
+     *
+     * Triggered when Idling countdown should be displayed.
      */
     $scope.$on('IdleWarn', function (e, countdown) {
       $scope.$apply(function () {
@@ -57,7 +59,10 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
     });
 
     /**
-     * @TODO: Missing documentation.
+     * Handle IdleTimeout.
+     *
+     * Triggered when Idling has exceeded timeout.
+     * Redirect to front page.
      */
     $scope.$on('IdleTimeout', function () {
       $scope.$evalAsync(function () {
@@ -66,10 +71,14 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
     });
 
     /**
-     * @TODO: Missing documentation.
+     * Handle IdleEnd.
+     *
+     * Triggered when Idling has ended, reset countdown.
      */
     $scope.$on('IdleEnd', function () {
-      $scope.countdown = null;
+      $scope.$evalAsync(function () {
+        $scope.countdown = null;
+      });
     });
 
     /**

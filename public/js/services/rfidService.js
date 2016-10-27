@@ -16,8 +16,10 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      *   The tags that were detected by the RFID.
      */
     function tagsDetected(tags) {
-      for (var i = 0; i < tags.length; i++) {
-        currentScope.$emit('rfid.tag.detected', tags[i]);
+      if (currentScope) {
+        for (var i = 0; i < tags.length; i++) {
+          currentScope.$emit('rfid.tag.detected', tags[i]);
+        }
       }
     }
 
@@ -28,7 +30,9 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      *   The tag that was detected by the RFID.
      */
     function tagDetected(tag) {
-      currentScope.$emit('rfid.tag.detected', tag);
+      if (currentScope) {
+        currentScope.$emit('rfid.tag.detected', tag);
+      }
     }
 
     /**
@@ -38,7 +42,9 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      *   The tag that was removed from the RFID.
      */
     function tagRemoved(tag) {
-      currentScope.$emit('rfid.tag.removed', tag);
+      if (currentScope) {
+        currentScope.$emit('rfid.tag.removed', tag);
+      }
     }
 
     /**

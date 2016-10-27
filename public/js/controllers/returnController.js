@@ -19,10 +19,16 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     /**
      * Check-in scanned result.
      *
-     * @param id
-     *   The ID of material to check-in (return).
+     * @param tag
+     *   The tag of material to check-in (return).
      */
-    var itemScannedResult = function itemScannedResult(id) {
+    var itemScannedResult = function itemScannedResult(tag) {
+      var id = tag.MID.slice(6);
+
+      // @TODO: Handle multiple tags in series.
+      var serieLength = tag.MID.slice(2, 3);
+      var numberInSerie = tag.MID.slice(4, 5);
+
       // Check if item has already been added.
       var itemNotAdded = true;
       for (var i = 0; i < $scope.materials.length; i++) {
@@ -110,13 +116,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      * @param tag
      */
     function tagDetected(event, tag) {
-      // Get material id.
-      var mid = tag.MID.slice(6);
-
-      // Get meta
-      //var meta = tag.MID.slice(0, 5);
-
-      itemScannedResult(mid);
+      itemScannedResult(tag);
     }
 
     /**
@@ -135,14 +135,16 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     // Start listening for rfid events.
     rfidService.start($scope);
 
-    //$timeout(function () {itemScannedResult('3846646417');}, 1000);
-    //$timeout(function () {itemScannedResult('3846469957');}, 2000);
-    //$timeout(function () {itemScannedResult('5010941603');}, 3000);
+    //$timeout(function () {itemScannedResult('1101013846646417');}, 1000);
+    //$timeout(function () {itemScannedResult('1101013846469957');}, 2000);
+    //$timeout(function () {itemScannedResult('1101015010941603');}, 3000);
 
     /**
      * On destroy.
      */
     $scope.$on('$destroy', function () {
+      $scope.removeListener('rfid.tag.detected', tagDetected);
+      $scope.removeListener('rfid.tag.removed', tagRemoved);
       rfidService.stop();
     });
   }
