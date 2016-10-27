@@ -61,7 +61,8 @@ var plugins = [
   },
   {
     packagePath: './plugins/rfid',
-    port: config.rfid.port
+    port: config.rfid.port,
+    afi: config.rfid.afi
   },
   {
     packagePath: './plugins/notification',

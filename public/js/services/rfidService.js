@@ -48,6 +48,48 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
     }
 
     /**
+     * The AFI has been set.
+     *
+     * @param tag
+     *   The tag where the AFI have been set.
+     */
+    function tagAFISet(tag) {
+      if (currentScope) {
+        currentScope.$emit('rfid.tag.afi.set', tag);
+      }
+    }
+
+    /**
+     * RFID error.
+     *
+     * @param err
+     *   The error.
+     */
+    function rfidError(err) {
+      // @TODO: Handle.
+    }
+
+    /**
+     * Turn the AFI on/off of the tag.
+     *
+     * @param uid
+     *   The uid of the tag to set.
+     * @param afi
+     *   The value (true/false) to the in the AFI.
+     * @returns {Function}
+     */
+    this.setAFI = function setAFI(uid, afi) {
+      var deferred = $q.defer();
+
+      proxyService.emit('rfid.tag.set_afi', {
+        UID: uid,
+        AFI: afi
+      });
+
+      return deferred.promise;
+    };
+
+    /**
      * Start listing for barcode events.
      *
      * @param scope
@@ -58,6 +100,8 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
       proxyService.on('rfid.tags.detected', tagsDetected);
       proxyService.on('rfid.tag.detected', tagDetected);
       proxyService.on('rfid.tag.removed', tagRemoved);
+      proxyService.on('rfid.tag.afi.set', tagAFISet);
+      proxyService.on('rfid.error', rfidError);
 
       proxyService.emit('rfid.tags.request');
     };
@@ -69,6 +113,8 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
       proxyService.removeListener('rfid.tags.detected', tagsDetected);
       proxyService.removeListener('rfid.tag.detected', tagDetected);
       proxyService.removeListener('rfid.tag.removed', tagRemoved);
+      proxyService.removeListener('rfid.tag.afi.set', tagAFISet);
+      proxyService.removeListener('rfid.error', rfidError);
       currentScope = null;
     };
   }

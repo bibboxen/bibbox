@@ -26,8 +26,8 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       var id = tag.MID.slice(6);
 
       // @TODO: Handle multiple tags in series.
-      var serieLength = tag.MID.slice(2, 3);
-      var numberInSerie = tag.MID.slice(4, 5);
+      var serieLength = tag.MID.slice(2, 4);
+      var numberInSerie = tag.MID.slice(4, 6);
 
       // Check if item has already been added.
       var itemNotAdded = true;
@@ -135,6 +135,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     // Start listening for rfid events.
     rfidService.start($scope);
 
+    // @TODO: Remove.
     //$timeout(function () {itemScannedResult('1101013846646417');}, 1000);
     //$timeout(function () {itemScannedResult('1101013846469957');}, 2000);
     //$timeout(function () {itemScannedResult('1101015010941603');}, 3000);

@@ -32,7 +32,7 @@ var RFID = function (bus, port, afi) {
     var setAFI = function setAFI(data) {
       ws.send(JSON.stringify({
         event: 'setAFI',
-        uid: data.uid,
+        uid: data.UID,
         afi: data.afi ? afi.on : afi.off
       }));
     };
@@ -69,18 +69,18 @@ var RFID = function (bus, port, afi) {
           case 'tagRemoved':
             bus.emit('rfid.tag.removed', data.tag);
             break;
-          case 'tagSetResult':
+          case 'setTagResult':
             console.log('tagSet not implemented.');
             break;
-          case 'tagSetAFIResult':
+          case 'setAFIResult':
             if (data.success) {
               bus.emit('rfid.tag.afi.set', {
-                uid: data.UID,
-                afi: data.AFI
+                UID: data.UID,
+                AFI: data.AFI === afi.on
               })
             }
             else {
-              bus.emit('rfid.error', '')
+              bus.emit('rfid.error', 'AFI not set!')
             }
             break;
           default:

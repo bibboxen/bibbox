@@ -23,7 +23,7 @@
         <th>{{ 'borrow.information' | translate }}</th>
       </tr>
       <tr data-ng-repeat="material in materials"
-          data-ng-class="{'bg-success': material.status === 'borrow.success', 'bg-danger': material.status === 'borrow.error'}">
+          data-ng-class="{'bg-success': material.status === 'borrow.success', 'bg-danger': material.status === 'borrow.error', 'bg-warning': material.status === 'borrow.awaiting_afi'}">
         <td class="vert-align">{{ $index + 1 }}</td>
         <td class="vert-align">{{ material.title }}</td>
         <td class="vert-align">{{ material.dueDate | date }}</td>
