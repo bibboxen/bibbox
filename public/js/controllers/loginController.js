@@ -54,15 +54,10 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
      */
     $scope.$on('barcodeScanned', function (data) {
       switch ($scope.display) {
-        case 'username':
+        case 'default':
           $scope.user.username = data;
           $scope.usernameEntered();
           break;
-
-        case 'password':
-          // Allow scanning of passwords to speed up testing.
-          $scope.user.password = data;
-          $scope.passwordEntered();
       }
     });
 
