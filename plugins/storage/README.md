@@ -11,8 +11,9 @@ This plugin serves translation strings for the frontend.
     * storage.append => { type, name, obj, busEvent }
       - Append to storage object, assumes that the storage is an array and the
         content is pushed to the array (mainly used for off-line storage).
-  
-
+    * storage.remove => { type, name, busEvent }
+      - Remove data (file) from storage.
+    
 # Example usage
 
 ### Update translations
