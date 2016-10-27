@@ -35,7 +35,8 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
         password: password,
         mail: type === 'mail',
         lang: tmhDynamicLocale.get(),
-        busEvent: 'notification.response'
+        busEvent: 'notification.response',
+        errorEvent: 'notification.error'
       });
 
       return deferred.promise;
@@ -69,7 +70,8 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
         password: password,
         mail: type === 'mail',
         lang: tmhDynamicLocale.get(),
-        busEvent: 'notification.response'
+        busEvent: 'notification.response',
+        errorEvent: 'notification.error'
       });
 
       return deferred.promise;
@@ -106,7 +108,8 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
         mail: type === 'mail',
         lang: tmhDynamicLocale.get(),
         items: items,
-        busEvent: 'notification.response'
+        busEvent: 'notification.response',
+        errorEvent: 'notification.error'
       });
 
       return deferred.promise;
@@ -137,7 +140,8 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
         mail: type === 'mail',
         lang: tmhDynamicLocale.get(),
         items: items,
-        busEvent: 'notification.response'
+        busEvent: 'notification.response',
+        errorEvent: 'notification.error'
       });
 
       return deferred.promise;

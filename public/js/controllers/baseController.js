@@ -24,18 +24,9 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
 
       userService.patron().then(
         function (patron) {
+          $scope.currentPatron = patron;
           $scope.loading = false;
-
-          // If patron exists, get reservations.
-          if (patron) {
-            $scope.currentPatron = patron;
-            deferred.resolve();
-          }
-          else {
-            $scope.loading = false;
-            // @TODO: Report error.
-            console.error('Patron not defined.');
-          }
+          deferred.resolve();
         },
         function (err) {
           $scope.loading = false;
@@ -48,7 +39,9 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
     };
 
     /**
-     * @TODO: Missing documentation.
+     * Handle Idle timeout warnings.
+     *
+     * Update the idle counter warning in the UI.
      */
     $scope.$on('IdleWarn', function (e, countdown) {
       $scope.$apply(function () {
@@ -57,7 +50,9 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
     });
 
     /**
-     * @TODO: Missing documentation.
+     * Handle idle timeouts.
+     *
+     * Redirect the user to the front-page.
      */
     $scope.$on('IdleTimeout', function () {
       $scope.$evalAsync(function () {
@@ -66,7 +61,9 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
     });
 
     /**
-     * @TODO: Missing documentation.
+     * Handle idle end events.
+     *
+     * Reset the UI count down.
      */
     $scope.$on('IdleEnd', function () {
       $scope.countdown = null;

@@ -255,13 +255,7 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, isLoggedIn);
     },
     function (err) {
-      bus.emit('fbs.err', err);
-
-      if (data.errorEvent) {
-        bus.emit(data.errorEvent, {
-          message: err.message
-        });
-      }
+      bus.emit(data.errorEvent, err);
     });
   });
 
@@ -273,8 +267,7 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, res);
     },
     function (err) {
-      bus.emit('fbs.err', err);
-      bus.emit(data.busEvent, false);
+      bus.emit(data.errorEvent, err);
     });
   });
 
@@ -286,8 +279,8 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, status);
     },
     function (err) {
-      bus.emit('fbs.err', err);
-      bus.emit(data.busEvent, err);
+      bus.emit(data.errorEvent, err);
+
     });
   });
 
@@ -325,13 +318,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, material);
       }
       else {
-        bus.emit('fbs.err', err);
-
-        if (data.errorEvent) {
-          bus.emit(data.errorEvent, {
-            message: err.message
-          });
-        }
+        bus.emit(data.errorEvent, err);
       }
     });
   });
@@ -368,13 +355,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, material);
       }
       else {
-        bus.emit('fbs.err', err);
-
-        if (data.errorEvent) {
-          bus.emit(data.errorEvent, {
-            message: err.message
-          });
-        }
+        bus.emit(data.errorEvent, err);
       }
     });
   });
@@ -387,8 +368,7 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, res);
     },
     function (err) {
-      bus.emit('fbs.err', err);
-      bus.emit(data.busEvent, false);
+      bus.emit(data.errorEvent, err);
     });
   });
 
@@ -400,8 +380,7 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, res);
     },
     function (err) {
-      bus.emit('fbs.err', err);
-      bus.emit(data.busEvent, false);
+      bus.emit(data.errorEvent, err);
     });
   });
 
@@ -413,8 +392,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, res);
       },
       function (err) {
-        bus.emit('fbs.err', err);
-        bus.emit(data.busEvent, false);
+        bus.emit(data.errorEvent, err);
       });
   });
 

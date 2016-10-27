@@ -631,7 +631,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, true);
       },
       function (err) {
-        bus.emit(data.busEvent, err);
+        bus.emit(data.errorEvent, err);
       }
     );
   });
@@ -645,7 +645,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, true);
       },
       function (err) {
-        bus.emit(data.busEvent, err);
+        bus.emit(data.errorEvent, err);
       }
     );
   });
@@ -659,7 +659,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, true);
       },
       function (err) {
-        bus.emit(data.busEvent, err);
+        bus.emit(data.errorEvent, err);
       }
     );
   });
@@ -673,7 +673,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, true);
       },
       function (err) {
-        bus.emit(data.busEvent, err);
+        bus.emit(data.errorEvent, err);
       }
     );
   });

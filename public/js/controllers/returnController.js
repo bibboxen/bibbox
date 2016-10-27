@@ -80,7 +80,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
             console.log('result === false');
           }
         }, function (err) {
-          // @TODO: Handle error.
+          // @TODO: what to do...
           console.log(err);
         });
       }
@@ -97,8 +97,8 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
           $scope.baseLogoutRedirect();
         },
         function (err) {
-          // @TODO: handel error etc.
-          console.error('returnController - receipt', err);
+          /// @TODO: what to do...
+          console.log(err);
         }
       );
     };

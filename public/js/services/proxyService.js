@@ -86,18 +86,6 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
     };
 
     /**
-     * Cleanup event listeners.
-     *
-     * And re-register event listeners.
-     */
-    this.cleanup = function cleanup() {
-      socket.removeAllListeners();
-
-      // Re-attach default listeners.
-      this.registerListeners();
-    };
-
-    /**
      * Register socket listeners.
      *
      * Wrapped in function to allow testing.

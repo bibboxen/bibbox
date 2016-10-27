@@ -67,6 +67,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
      * @param err
      */
     $scope.$on('barcodeError', function barcodeError(err) {
+      // @TODO: inform user that barcode as faild and swith to manual.
       console.error(err);
     });
 

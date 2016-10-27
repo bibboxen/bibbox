@@ -54,6 +54,9 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
           }
         }
       }
+    }, function (err) {
+      // @TODO: what to do...
+      console.log(err);
     });
 
     /**
@@ -91,7 +94,8 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
           material.information = 'status.renew.failed';
           material.renewed = false;
 
-          console.error(err);
+          // @TODO: what to do...
+          console.log(err);
 
           // Restart idle service if not running.
           $scope.baseResetIdleWatch();
@@ -159,8 +163,8 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
           }
         },
         function error(err) {
-          // @TODO: Handle error!
-          console.error(err);
+          // @TODO: what to do...
+          console.log(err);
 
           // Restart idle service if not running.
           $scope.baseResetIdleWatch();
@@ -199,18 +203,16 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
      *   'mail' or 'printer'
      */
     $scope.receipt = function receipt(type) {
-      var credentials = userService.getCredentials();
+      var creds = userService.getCredentials();
 
       // @TODO: handel error etc.
-      receiptService.status(credentials.username, credentials.password, type)
-      .then(
+      receiptService.status(creds.username, creds.password, type).then(
         function (status) {
           $scope.baseLogoutRedirect();
         },
         function (err) {
-          alert(err);
-
-          // @TODO: Handle error.
+          // @TODO: what to do...
+          console.log(err);
         }
       );
     };
