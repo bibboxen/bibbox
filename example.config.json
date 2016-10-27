@@ -22,7 +22,8 @@
       "^fbs.renew.all.[\\w]+$",
       "^fbs.block.[\\w]+$",
       "^fbs.online.[\\w]+$",
-      "^notification.response$"
+      "^notification.response$",
+      "^notification.error$"
     ],
     "whitelistedSocketEvents": [
       "^barcode.start$",
