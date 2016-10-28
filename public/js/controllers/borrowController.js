@@ -206,8 +206,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           $scope.baseLogoutRedirect();
         },
         function (err) {
-          // @TODO: handel error etc.
-          alert(err);
+          alert(err.message);
         }
       );
     };

@@ -297,7 +297,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
 
       proxyService.emit('fbs.online', {
         busEvent: 'fbs.online.response' + uniqueId,
-        errorEvent: 'fbs.online.error' + uniqueId,
+        errorEvent: 'fbs.online.error' + uniqueId
       });
 
       return deferred.promise;

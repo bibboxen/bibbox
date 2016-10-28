@@ -59,7 +59,6 @@ angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', 
         $scope.online = status;
       },
       function (err) {
-        console.error('fbs.online', err);
         $scope.online = false;
       });
     };

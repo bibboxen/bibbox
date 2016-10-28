@@ -88,13 +88,25 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
     bus.once('proxy.config.ui', function (data) {
       socket.emit('config.ui.update', data);
     });
-    bus.emit('ctrl.config.ui', {busEvent: 'proxy.config.ui'});
+    bus.once('proxy.config.ui.error', function (err) {
+      socket.emit('config.ui.update.error', err);
+    });
+    bus.emit('ctrl.config.ui', {
+      busEvent: 'proxy.config.ui',
+      errorEvent: 'proxy.config.ui.error'
+    });
 
     // Emit translation to client.
     bus.once('proxy.config.ui.translation', function (data) {
       socket.emit('config.ui.translations.update', data);
     });
-    bus.emit('ctrl.config.ui.translations', {busEvent: 'proxy.config.ui.translation'});
+    bus.once('proxy.config.ui.translation.error', function (err) {
+      socket.emit('config.ui.translations.error', err);
+    });
+    bus.emit('ctrl.config.ui.translations', {
+      busEvent: 'proxy.config.ui.translation',
+      errorEvent: 'proxy.config.ui.translation.error'
+    });
 
     // Handle socket error events.
     socket.on('error', function (err) {

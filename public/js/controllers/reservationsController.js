@@ -45,6 +45,9 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
           $scope.materials.push(item);
         }
       }
+    }, function (err) {
+      // @TODO: what to do...
+      console.log(err);
     });
 
     /**
@@ -70,8 +73,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
           $scope.baseLogoutRedirect();
         },
         function (err) {
-          // @TODO: handel error etc.
-          alert(err);
+          // @TODO: what to do...
+          console.log(err);
         }
       );
     };
