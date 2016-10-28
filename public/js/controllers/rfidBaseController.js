@@ -85,7 +85,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
         }
       }
 
-      // If item have not been added it to the scope (UI list).
+      // If material has not been added it to the list, add it.
       if (!material) {
         // Add a first version of the material.
         material = {
@@ -111,6 +111,18 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       }
 
       return material;
+    };
+
+    /**
+     * Set the AFI on tag with UID.
+     *
+     * @param uid
+     *   UID of tag to set AFI for.
+     * @param afi
+     *   boolean: AFI on/off.
+     */
+    $scope.setAFI = function setAFI(uid, afi) {
+      rfidService.setAFI(uid, afi);
     };
 
     /**

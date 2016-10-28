@@ -6,47 +6,31 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     'use strict';
 
     // Instantiate/extend base controller.
-    $controller('BaseController', {$scope: $scope});
+    $controller('RFIDBaseController', {$scope: $scope});
 
     // Store raw check-in responses as it's need to print receipt.
     var raw_materials = [];
 
-    $scope.materials = [];
-
-    // User when offline to group returns into a single file.
+    // Used for offline storage.
     var currentDate = new Date().getTime();
 
+    $scope.materials = [];
+
     /**
-     * Check-in scanned result.
+     * Handle tag detected.
+     *
+     * Attempts to check-in the material if all part are available.
      *
      * @param tag
      *   The tag of material to check-in (return).
      */
-    var itemScannedResult = function itemScannedResult(tag) {
-      var id = tag.MID.slice(6);
+    $scope.tagDetected = function tagDetected(tag) {
+      var i;
+      var material = $scope.addTag(tag, $scope.materials);
 
-      // @TODO: Handle multiple tags in series.
-      var serieLength = tag.MID.slice(2, 4);
-      var numberInSerie = tag.MID.slice(4, 6);
-
-      // Check if item has already been added.
-      var itemNotAdded = true;
-      for (var i = 0; i < $scope.materials.length; i++) {
-        if ($scope.materials[i].id === id) {
-          itemNotAdded = false;
-          break;
-        }
-      }
-
-      if (itemNotAdded) {
-        $scope.materials.push({
-          id: id,
-          title: id,
-          loading: true
-        });
-
-        userService.checkIn(id, currentDate).then(function (result) {
-          var i;
+      // Check if all tags in series have been added.
+      if (material.seriesLength === material.tags.length) {
+        userService.checkIn(material.id, currentDate).then(function (result) {
           $scope.baseResetIdleWatch();
 
           // Store the raw result (it's used to send with receipts).
@@ -56,15 +40,17 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
             if (result.ok === '1') {
               for (i = 0; i < $scope.materials.length; i++) {
                 if ($scope.materials[i].id === result.itemIdentifier) {
-                  console.log(result);
-                  $scope.materials[i] = {
-                    id: result.itemIdentifier,
-                    title: result.itemProperties.title,
-                    author: result.itemProperties.author,
-                    status: 'return.success',
-                    information: 'return.was_successful',
-                    loading: false
-                  };
+                  $scope.materials[i].title = result.itemProperties.title;
+                  $scope.materials[i].author = result.itemProperties.author;
+                  $scope.materials[i].status = 'return.waiting_afi';
+                  $scope.materials[i].information = 'return.is_awaiting_afi';
+                  $scope.materials[i].loading = false;
+
+                  // Turn AFI on.
+                  for (i = 0; i < material.tags.length; i++) {
+                    $scope.setAFI(material.tags[i].UID, false);
+                  }
+
                   break;
                 }
               }
@@ -92,8 +78,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       }
     };
 
-    // @TODO: Subscribe to rfid.tag_detected
-
     /**
      * Print receipt.
      */
@@ -108,37 +92,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
         }
       );
     };
-
-    /**
-     * Handler for when tag is detected.
-     *
-     * @param event
-     * @param tag
-     */
-    function tagDetected(event, tag) {
-      itemScannedResult(tag);
-    }
-
-    /**
-     * Handler for when tag is removed.
-     *
-     * @param event
-     * @param tag
-     */
-    function tagRemoved(event, tag) {
-      // @TODO: Handle.
-    }
-
-    $scope.$on('rfid.tag.detected', tagDetected);
-    $scope.$on('rfid.tag.removed', tagRemoved);
-
-    // Start listening for rfid events.
-    rfidService.start($scope);
-
-    // @TODO: Remove.
-    //$timeout(function () {itemScannedResult('1101013846646417');}, 1000);
-    //$timeout(function () {itemScannedResult('1101013846469957');}, 2000);
-    //$timeout(function () {itemScannedResult('1101015010941603');}, 3000);
 
     /**
      * On destroy.

@@ -3,8 +3,8 @@
  * Borrow page controller.
  */
 
-angular.module('BibBox').controller('BorrowController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', '$modal', 'rfidService',
-  function ($scope, $controller, $location, $timeout, userService, receiptService, $modal, rfidService) {
+angular.module('BibBox').controller('BorrowController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', '$modal',
+  function ($scope, $controller, $location, $timeout, userService, receiptService, $modal) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -58,7 +58,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
                     // Turn AFI off.
                     for (i = 0; i < material.tags.length; i++) {
-                      rfidService.setAFI(material.tags[i].UID, false);
+                      $scope.setAFI(material.tags[i].UID, false);
                     }
 
                     break;
@@ -220,7 +220,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     $scope.$on('$destroy', function () {
       userService.logout();
       receiptModal.hide();
-      rfidService.stop();
     });
   }
 ]);
