@@ -8,8 +8,8 @@
  */
 
 
-angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 'proxyService',
-  function ($q, $timeout, $location, proxyService) {
+angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 'proxyService', 'userTrackerService',
+  function ($q, $timeout, $location, proxyService, userTrackerService) {
     'use strict';
 
     this.username = null;
@@ -62,6 +62,26 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
         self.username = username;
         self.password = password;
         self.loggedIn = loggedIn;
+
+        if (loggedIn) {
+          // User logged in, so clear tracker service.
+          userTrackerService.clear(username);
+        }
+        else {
+          // User not logged in add/or tracker user login attempt.
+          userTrackerService.add(username);
+
+          // Check if user has tried to many times. If so block the user.
+          if (userTrackerService.check(username)) {
+            userService.block(username, 'To many login attempts: ' + config.loginAttempts.max).then(function () {
+              // @TODO: Inform the user to contact the desk.
+            },
+            function () {
+              // @TODO: What to do...
+              console.log(err);
+            });
+          }
+        }
 
         // The result maybe "true" or "false".
         deferred.resolve(loggedIn);
@@ -225,7 +245,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      *
      * @returns {Function}
      */
-    this.block = function block(username, reson) {
+    this.block = function block(username, reason) {
       var deferred = $q.defer();
       var uniqueId = CryptoJS.MD5('userServiceBlock' + Date.now());
 
@@ -241,7 +261,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
         busEvent: 'fbs.block.success' + uniqueId,
         errorEvent:  'fbs.block.error' + uniqueId,
         username: username,
-        password: reson
+        password: reason
       });
 
       return deferred.promise;
