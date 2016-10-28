@@ -144,8 +144,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      * On destroy.
      */
     $scope.$on('$destroy', function () {
-      $scope.removeListener('rfid.tag.detected', tagDetected);
-      $scope.removeListener('rfid.tag.removed', tagRemoved);
       rfidService.stop();
     });
   }

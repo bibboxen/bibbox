@@ -8,7 +8,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     'use strict';
 
     // Instantiate/extend base controller.
-    $controller('BaseController', { $scope: $scope });
+    $controller('RFIDBaseController', { $scope: $scope });
 
     // @TODO: Move to base controller.
     if (!userService.userLoggedIn()) {
@@ -22,68 +22,26 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     $scope.baseGetPatron();
 
     /**
-     * @TODO: documentation?
+     * Contains the array of materials scanned.
      *
      * @type {Array}
      */
     $scope.materials = [];
 
     /**
-     * Check-out scanned result.
+     * Handle tag detected.
      *
      * @param tag
      *   The tag of material to check-out (borrow).
      */
-    var itemScannedResult = function itemScannedResult(tag) {
-      var material = null;
-      var id = tag.MID.slice(6);
+    $scope.tagDetected = function tagDetected(tag) {
       var i;
-
-      // @TODO: Handle multiple tags in series.
-      var seriesLength = parseInt(tag.MID.slice(2, 4));
-      var numberInSeries = parseInt(tag.MID.slice(4, 6));
-
-      tag.numberInSeries = numberInSeries;
-      tag.seriesLength = seriesLength;
-      tag.AFI = true;
-
-      // Check if item has already been added to the list.
-      for (i = 0; i < $scope.materials.length; i++) {
-        if ($scope.materials[i].id === id) {
-          material = $scope.materials[i];
-          break;
-        }
-      }
-
-      // If item have not been added it to the scope (UI list).
-      if (!material) {
-        // Add a first version of the material.
-        material = {
-          id: id,
-          seriesLength: seriesLength,
-          tags: [],
-          title: id,
-          loading: true
-        };
-        $scope.materials.push(material);
-      }
-
-      // Add tag to material if not already added.
-      var alreadyAdded = false;
-      for (i = 0; i < material.tags.length; i++) {
-        if (material.tags[i].UID === tag.UID) {
-          alreadyAdded = true;
-          break;
-        }
-      }
-      if (!alreadyAdded) {
-        material.tags.push(tag);
-      }
+      var material = $scope.addTag(tag, $scope.materials);
 
       // Check if all tags in series have been added.
       if (material.seriesLength === material.tags.length && !material.borrowed) {
         // Attempt to borrow material.
-        userService.borrow(id).then(
+        userService.borrow(material.id).then(
           function success(result) {
             $scope.baseResetIdleWatch();
 
@@ -126,7 +84,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
             }
             else {
               for (i = 0; i < $scope.materials.length; i++) {
-                if ($scope.materials[i].id === id) {
+                if ($scope.materials[i].id === material.id) {
                   $scope.materials[i].status = 'borrow.error';
                   $scope.materials[i].information = 'borrow.was_not_successful';
                   $scope.materials[i].loading = false;
@@ -139,7 +97,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
             $scope.baseResetIdleWatch();
 
             for (i = 0; i < $scope.materials.length; i++) {
-              if ($scope.materials[i].id === id) {
+              if ($scope.materials[i].id === material.id) {
                 $scope.materials[i].status = 'borrow.error';
                 $scope.materials[i].information = 'borrow.was_not_successful';
                 $scope.materials[i].loading = false;
@@ -153,11 +111,11 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     };
 
     /**
-     * Item removed from RFID device.
+     * Tag was removed from RFID device.
      *
      * @param tag
      */
-    var itemRemoved = function itemRemoved(tag) {
+    $scope.tagRemoved = function itemRemoved(tag) {
       var material = null;
       var id = tag.MID.slice(6);
       var i;
@@ -178,7 +136,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       // Remove tag from material.
       for (i = 0; i < material.tags.length; i++) {
         if (material.tags[i].UID === tag.UID) {
-          material.tags.slice(i, 1);
+          //material.tags.slice(i, 1);
+
+          // @TODO: What should happen?
 
           break;
         }
@@ -186,14 +146,16 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     };
 
     /**
-     * Item AFI has been set.
+     * Tag AFI has been set.
      *
      * @param tag
      */
-    var itemAFISet = function itemAFISet(tag) {
+    $scope.tagAFISet = function itemAFISet(tag) {
       for (var i = 0; i < $scope.materials.length; i++) {
+        // Track if the tag has the AFI set to off.
         var allAFISetToFalse = true;
 
+        // Set AFI of tag.
         for (var j = 0; j < $scope.materials[i].tags.length; j++) {
           if ($scope.materials[i].tags[j].UID === tag.UID) {
             $scope.materials[i].tags[j].AFI = tag.AFI;
@@ -222,6 +184,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       templateUrl: './views/modal_receipt.html',
       show: false
     });
+
+    /**
+     * Show the receipt modal.
+     */
     $scope.showReceiptModal = function showReceiptModal() {
       receiptModal.$promise.then(receiptModal.show);
     };
@@ -245,54 +211,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
         }
       );
     };
-
-    /**
-     * Handler for when tag is detected.
-     *
-     * @param event
-     * @param tag
-     */
-    function tagDetected(event, tag) {
-      $scope.baseResetIdleWatch();
-
-      itemScannedResult(tag);
-    }
-
-    /**
-     * Handler for when tag is removed.
-     *
-     * @param event
-     * @param tag
-     */
-    function tagRemoved(event, tag) {
-      $scope.baseResetIdleWatch();
-
-      itemRemoved(tag);
-    }
-
-    /**
-     * The AFI has been set for a tag.
-     *
-     * @param event
-     * @param tag
-     */
-    function tagAFISet(event, tag) {
-      $scope.baseResetIdleWatch();
-
-      itemAFISet(tag);
-    }
-
-    $scope.$on('rfid.tag.detected', tagDetected);
-    $scope.$on('rfid.tag.removed', tagRemoved);
-    $scope.$on('rfid.tag.afi.set', tagAFISet);
-
-    // Start listening for rfid events.
-    rfidService.start($scope);
-
-    // @TODO: Remove.
-    //$timeout(function () {itemScannedResult('1101010000003225');}, 1000);
-    //$timeout(function () {itemScannedResult('1101010000007889');}, 2000);
-    //$timeout(function () {itemScannedResult('1101010000003572');}, 3000);
 
     /**
      * On destroy.
