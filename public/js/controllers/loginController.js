@@ -8,11 +8,8 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
     // Instantiate/extend base controller.
     $controller('BaseController', { $scope: $scope });
 
-    // @TODO: Block user on X number of failed login attempts.
-
-    // @TODO: Update validation functions.
-    var usernameRegExp = /^\d{10}$/;
-    var passwordRegExp = /\d+/;
+    var usernameRegExp = /^\d+$/;
+    var passwordRegExp = /^\d+$/;
 
     $scope.display = 'default';
     $scope.loading = false;
@@ -41,7 +38,8 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
      * Sets the $scope.display variable.
      *
      * @param step
-     *   @TODO: Missing documentation. (default, username, password)
+     *   The step in the login process.
+     *   Values: (default, username, password)
      */
     var gotoStep = function (step) {
       $scope.display = step;
@@ -74,13 +72,13 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
      /**
      * Use manual login.
      *
-     * @param use
-     *   @TODO: What is this?
+     * @param {boolean} useManual
+     *   Should manual login be used?
      */
-    $scope.useManualLogin = function useManualLogin(use) {
+    $scope.useManualLogin = function useManualLogin(useManual) {
       resetScope();
 
-      if (use) {
+      if (useManual) {
         gotoStep('username');
       }
       else {
@@ -145,6 +143,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
           $scope.baseResetIdleWatch();
 
           $scope.loading = false;
+
           if (loggedIn) {
             barcodeService.stop();
             $location.path('/' + $routeParams.redirectUrl);
@@ -160,12 +159,12 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
         function error(err) {
           $scope.baseResetIdleWatch();
 
-          // @TODO: Show error.
           console.error('login error: ', err);
 
           resetScope();
           gotoStep('default');
 
+          $scope.invalidLoginError = true;
           $scope.loading = false;
         }
       );
