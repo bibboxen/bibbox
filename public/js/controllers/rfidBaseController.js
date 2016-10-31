@@ -75,8 +75,10 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
 
       var seriesLength = parseInt(tag.MID.slice(2, 4));
 
+      // Set tag info.
       tag.numberInSeries = parseInt(tag.MID.slice(4, 6));
       tag.seriesLength = seriesLength;
+      tag.removed = false;
 
       // Check if item has already been added to the list.
       for (i = 0; i < list.length; i++) {
@@ -103,6 +105,9 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       var alreadyAdded = false;
       for (i = 0; i < material.tags.length; i++) {
         if (material.tags[i].UID === tag.UID) {
+          // Mark the tag as not-removed from device.
+          material.tags[i].removed = false;
+
           alreadyAdded = true;
           break;
         }
@@ -112,6 +117,22 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       }
 
       return material;
+    };
+
+    /**
+     * Have any of the tags been removed?
+     *
+     * @param tags
+     *   Array of tags.
+     */
+    $scope.anyTagRemoved = function nonRemoved(tags) {
+      for (var i = 0; i < tags.length; i++) {
+        if (tags[i].removed) {
+          return true;
+        }
+      }
+
+      return false;
     };
 
     /**

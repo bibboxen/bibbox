@@ -34,14 +34,20 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      * Called from RFIDBaseController.
      *
      * @param tag
-     *   The tag of material to check-out (borrow).
+     *   The tag of the material to check-out (borrow).
      */
     $scope.tagDetected = function tagDetected(tag) {
       var i;
       var material = $scope.addTag(tag, $scope.materials);
 
       // Check if all tags in series have been added.
-      if (material.seriesLength === material.tags.length && !material.borrowed) {
+      if (!material.borrowed && material.seriesLength === material.tags.length) {
+        // If a tag is missing from the device.
+        if ($scope.anyTagRemoved(material.tags)) {
+          material.tagRemoved = true;
+          return;
+        }
+
         // Attempt to borrow material.
         userService.borrow(material.id).then(
           function success(result) {
@@ -108,7 +114,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
             }
           }
         );
-
       }
     };
 
@@ -140,9 +145,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       // Remove tag from material.
       for (i = 0; i < material.tags.length; i++) {
         if (material.tags[i].UID === tag.UID) {
-          //material.tags.slice(i, 1);
-
-          // @TODO: What should happen?
+          material.tags[i].removed = true;
 
           break;
         }
