@@ -41,7 +41,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       var material = $scope.addTag(tag, $scope.materials);
 
       // Check if all tags in series have been added.
-      if (!material.borrowed && material.seriesLength === material.tags.length) {
+      if (!material.loading && !material.borrowed && material.seriesLength === material.tags.length) {
         // If a tag is missing from the device.
         if ($scope.anyTagRemoved(material.tags)) {
           material.tagRemoved = true;
@@ -110,6 +110,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           function error(err) {
             $scope.baseResetIdleWatch();
 
+            console.log(err);
+
             for (i = 0; i < $scope.materials.length; i++) {
               if ($scope.materials[i].id === material.id) {
                 $scope.materials[i].status = 'borrow.error';
@@ -142,7 +144,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
         var allAFISetToFalse = true;
 
         // Iterate all tags in material.
-        for (i = 0; i < material.tags.length; i++) {
+        for (var i = 0; i < material.tags.length; i++) {
           if (material.tags[i].AFI) {
             allAFISetToFalse = false;
             break;
@@ -154,6 +156,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           material.status = 'borrow.success';
           material.information = 'borrow.was_successful';
           material.loading = false;
+          material.borrowed = true;
         }
       }
     };

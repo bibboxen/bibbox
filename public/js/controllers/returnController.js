@@ -29,7 +29,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       var material = $scope.addTag(tag, $scope.materials);
 
       // Check if all tags in series have been added.
-      if (!material.retured && material.seriesLength === material.tags.length) {
+      if (!material.loading && !material.returned && material.seriesLength === material.tags.length) {
         // If a tag is missing from the device.
         if ($scope.anyTagRemoved(material.tags)) {
           material.tagRemoved = true;
@@ -53,11 +53,10 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
                   $scope.materials[i].author = result.itemProperties.author;
                   $scope.materials[i].status = 'return.waiting_afi';
                   $scope.materials[i].information = 'return.is_awaiting_afi';
-                  $scope.materials[i].loading = false;
 
                   // Turn AFI on.
                   for (i = 0; i < material.tags.length; i++) {
-                    $scope.setAFI(material.tags[i].UID, false);
+                    $scope.setAFI(material.tags[i].UID, true);
                   }
 
                   break;
@@ -90,6 +89,10 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
             }
           }
         }, function (err) {
+          $scope.baseResetIdleWatch();
+          
+          console.log(err);
+
           for (i = 0; i < $scope.materials.length; i++) {
             if ($scope.materials[i].id === material.id) {
               $scope.materials[i].status = 'return.error';
@@ -121,7 +124,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
         var allAFISetToTrue = true;
 
         // Iterate all tags in material.
-        for (i = 0; i < material.tags.length; i++) {
+        for (var i = 0; i < material.tags.length; i++) {
           if (!material.tags[i].AFI) {
             allAFISetToTrue = false;
             break;
@@ -133,6 +136,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
           material.status = 'return.success';
           material.information = 'return.was_successful';
           material.loading = false;
+          material.returned = true;
         }
       }
     };

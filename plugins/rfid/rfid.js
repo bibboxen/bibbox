@@ -24,17 +24,29 @@ var RFID = function (bus, port, afi) {
   // Connection set up.
   server.on('connection', function connection(ws) {
     var requestTags = function requestTags() {
-      ws.send(JSON.stringify({
-        event: 'detectTags'
-      }));
+      try {
+        ws.send(JSON.stringify({
+          event: 'detectTags'
+        }));
+      }
+      catch (err) {
+        console.log(err);
+        // Ignore.
+      }
     };
 
     var setAFI = function setAFI(data) {
-      ws.send(JSON.stringify({
-        event: 'setAFI',
-        uid: data.UID,
-        afi: data.afi ? afi.on : afi.off
-      }));
+      try {
+        ws.send(JSON.stringify({
+          event: 'setAFI',
+          UID: data.UID,
+          AFI: data.AFI ? afi.on : afi.off
+        }));
+      }
+      catch (err) {
+        console.log(err);
+        // Ignore.
+      }
     };
 
     // Cleanup bus events for previous connections.
@@ -73,6 +85,8 @@ var RFID = function (bus, port, afi) {
             console.log('tagSet not implemented.');
             break;
           case 'setAFIResult':
+            console.log(data);
+
             if (data.success) {
               bus.emit('rfid.tag.afi.set', {
                 UID: data.UID,

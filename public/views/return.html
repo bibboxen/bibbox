@@ -22,7 +22,7 @@
         <th>{{ 'return.information' | translate }}</th>
       </tr>
       <tr data-ng-repeat="material in materials"
-          data-ng-class="{'bg-success': material.status === 'return.success', 'bg-danger': material.status === 'return.error'}">
+          data-ng-class="{'bg-success': material.status === 'return.success', 'bg-danger': material.status === 'return.error', 'bg-warning': material.status === 'borrow.awaiting_afi'}">
         <td class="vert-align">{{ $index + 1 }}</td>
         <td class="vert-align">{{ material.title }}</td>
         <td class="vert-align text-center">
@@ -32,7 +32,10 @@
           <span data-ng-if="material.status === 'return.error'" class="glyphicon glyphicon glyphicon-remove"
                 aria-hidden="true"></span>
         </td>
-        <td class="vert-align">{{ material.information | translate }}</td>
+        <td class="vert-align">
+          <span data-ng-if="material.tags.length === material.seriesLength">{{ material.information | translate }}</span>
+          <span data-ng-if="material.tags.length !== material.seriesLength">{{ material.tags.length }} / {{ material.seriesLength }}</span>
+        </td>
       </tr>
     </table>
   </div>

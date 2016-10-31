@@ -135,7 +135,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
           seriesLength: seriesLength,
           tags: [],
           title: id,
-          loading: true
+          loading: false
         };
         list.push(material);
       }
@@ -184,7 +184,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      *   The material that contains the tag.
      */
     $scope.setAFIonTagReturnMaterial = function setAFIonTagReturnMaterial(tag) {
-      var i, j;
+      var i, j, material;
 
       // Locate tag.
       for (i = 0; i < $scope.materials.length; i++) {
@@ -192,7 +192,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
           // If the tag is located.
           if ($scope.materials[i].tags[j].UID === tag.UID) {
             // Set material for later evaluation.
-            material = $scope.materials[i].tags[j];
+            material = $scope.materials[i];
 
             // Set AFI of tag.
             material.tags[j].AFI = tag.AFI;
@@ -208,7 +208,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       }
 
       return material;
-    }
+    };
 
     /**
      * Set the AFI on tag with UID.
