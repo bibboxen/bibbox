@@ -24,8 +24,10 @@
       "^fbs.checkin.[\\w]+$",
       "^fbs.renew.[\\w]+$",
       "^fbs.renew.all.[\\w]+$",
+      "^fbs.block.[\\w]+$",
       "^fbs.online.[\\w]+$",
-      "^notification.response$"
+      "^notification.response$",
+      "^notification.error$"
     ],
     "whitelistedSocketEvents": [
       "^rfid.tags.request$",
@@ -45,8 +47,9 @@
       "^notification.checkIn$",
       "^notification.checkOut$",
       "^config.ui.update$",
+      "^config.ui.update.error$",
       "^config.ui.translations.update$",
-      "^bibbox.error"
+      "^config.ui.translations.error$"
     ]
   },
   "ctrl": {
