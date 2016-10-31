@@ -31,6 +31,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     /**
      * Handle tag detected.
      *
+     * Called from RFIDBaseController.
+     *
      * @param tag
      *   The tag of material to check-out (borrow).
      */
@@ -113,6 +115,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     /**
      * Tag was removed from RFID device.
      *
+     * Called from RFIDBaseController.
+     *
      * @param tag
      */
     $scope.tagRemoved = function itemRemoved(tag) {
@@ -148,6 +152,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     /**
      * Tag AFI has been set.
      *
+     * Called from RFIDBaseController.
+     *
      * @param tag
      */
     $scope.tagAFISet = function itemAFISet(tag) {
@@ -156,16 +162,20 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
       // Locate tag.
       for (i = 0; i < $scope.materials.length; i++) {
-        // Set AFI of tag.
         for (j = 0; j < $scope.materials[i].tags.length; j++) {
+          // If the tag is located.
           if ($scope.materials[i].tags[j].UID === tag.UID) {
-            $scope.materials[i].tags[j].AFI = tag.AFI;
-
             // Set material for later evaluation.
             material = $scope.materials[i].tags[j];
+
+            // Set AFI of tag.
+            material.tags[j].AFI = tag.AFI;
+
+            // Tag found, break loop.
             break;
           }
         }
+        // If material found, break loop.
         if (material) {
           break;
         }
@@ -175,6 +185,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       if (material) {
         var allAFISetToFalse = true;
 
+        // Iterate all tags in material.
         for (i = 0; i < material.tags.length; i++) {
           if (material.tags[i].AFI) {
             allAFISetToFalse = false;
@@ -221,6 +232,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           $scope.baseLogoutRedirect();
         },
         function (err) {
+          // @TODO: Better message than alert.
           alert(err.message);
         }
       );

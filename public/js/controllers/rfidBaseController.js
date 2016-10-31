@@ -52,6 +52,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       }
     }
 
+    // Register event listeners for RFID events.
     $scope.$on('rfid.tag.detected', tagDetected);
     $scope.$on('rfid.tag.removed', tagRemoved);
     $scope.$on('rfid.tag.afi.set', tagAFISet);
