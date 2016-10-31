@@ -65,7 +65,7 @@ angular.module('BibBox').service('userTrackerService', ['$interval', 'config',
       var time = new Date().getTime();
       var limit = config.loginAttempts.timeLimit;
       for (var username in loginAttempts) {
-        if (loginAttempts[username].date + limit <= time + limit) {
+        if (loginAttempts[username].date + limit <= time) {
           self.clear(username);
         }
       }
