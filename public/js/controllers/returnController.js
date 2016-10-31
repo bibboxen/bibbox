@@ -19,7 +19,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     /**
      * Handle tag detected.
      *
-     * Attempts to check-in the material if all part are available.
+     * Attempts to check-in the material if all part are available and on device.
      *
      * @param tag
      *   The tag of material to check-in (return).
@@ -29,7 +29,16 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       var material = $scope.addTag(tag, $scope.materials);
 
       // Check if all tags in series have been added.
-      if (material.seriesLength === material.tags.length) {
+      if (!material.retured && material.seriesLength === material.tags.length) {
+        // If a tag is missing from the device.
+        if ($scope.anyTagRemoved(material.tags)) {
+          material.tagRemoved = true;
+          return;
+        }
+
+        // Set the material to loading.
+        material.loading = true;
+
         userService.checkIn(material.id, currentDate).then(function (result) {
           $scope.baseResetIdleWatch();
 
@@ -68,13 +77,63 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
             }
           }
           else {
-            // @TODO: Handle error.
-            console.log('result === false');
+            for (i = 0; i < $scope.materials.length; i++) {
+              if ($scope.materials[i].id === material.id) {
+                $scope.materials[i].status = 'return.error';
+                $scope.materials[i].information = 'return.was_not_successful';
+                $scope.materials[i].loading = false;
+
+                // @TODO: How can this be retried?
+
+                break;
+              }
+            }
           }
         }, function (err) {
-          // @TODO: what to do...
-          console.log(err);
+          for (i = 0; i < $scope.materials.length; i++) {
+            if ($scope.materials[i].id === material.id) {
+              $scope.materials[i].status = 'return.error';
+              $scope.materials[i].information = 'return.was_not_successful';
+              $scope.materials[i].loading = false;
+
+              // @TODO: How can this be retried?
+
+              break;
+            }
+          }
         });
+      }
+    };
+
+    /**
+     * Tag AFI has been set.
+     *
+     * Called from RFIDBaseController.
+     *
+     * @param tag
+     *   The tag returned from the device.
+     */
+    $scope.tagAFISet = function itemAFISet(tag) {
+      var material = $scope.setAFIonTagReturnMaterial(tag);
+
+      // If the tag belongs to a material in $scope.materials.
+      if (material) {
+        var allAFISetToTrue = true;
+
+        // Iterate all tags in material.
+        for (i = 0; i < material.tags.length; i++) {
+          if (!material.tags[i].AFI) {
+            allAFISetToTrue = false;
+            break;
+          }
+        }
+
+        // If all AFIs have been turned off mark the material as returned.
+        if (allAFISetToTrue) {
+          material.status = 'return.success';
+          material.information = 'return.was_successful';
+          material.loading = false;
+        }
       }
     };
 
@@ -96,8 +155,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     /**
      * On destroy.
      */
-    $scope.$on('$destroy', function () {
-      rfidService.stop();
-    });
+    $scope.$on('$destroy', function () {});
   }
 ]);

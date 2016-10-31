@@ -14,7 +14,9 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * Handler for when tag is detected.
      *
      * @param event
+     *   The event.
      * @param tag
+     *   The tag returned from the device.
      */
     function tagDetected(event, tag) {
       $scope.baseResetIdleWatch();
@@ -28,7 +30,9 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * Handler for when tag is removed.
      *
      * @param event
+     *   The event.
      * @param tag
+     *   The tag returned from the device.
      */
     function tagRemoved(event, tag) {
       $scope.baseResetIdleWatch();
@@ -42,7 +46,9 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * The AFI has been set for a tag.
      *
      * @param event
+     *   The event.
      * @param tag
+     *   The tag returned from the device.
      */
     function tagAFISet(event, tag) {
       $scope.baseResetIdleWatch();
@@ -59,6 +65,39 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
 
     // Start listening for rfid events.
     rfidService.start($scope);
+
+    /**
+     * Tag was removed from RFID device.
+     * 
+     * @param tag
+     */
+    $scope.tagRemoved = function itemRemoved(tag) {
+      var material = null;
+      var id = tag.MID.slice(6);
+      var i;
+
+      // Check if material has already been added to the list.
+      for (i = 0; i < $scope.materials.length; i++) {
+        if ($scope.materials[i].id === id) {
+          material = $scope.materials[i];
+          break;
+        }
+      }
+
+      // If the material has not been added, ignore it.
+      if (!material) {
+        return;
+      }
+
+      // Remove tag from material.
+      for (i = 0; i < material.tags.length; i++) {
+        if (material.tags[i].UID === tag.UID) {
+          material.tags[i].removed = true;
+
+          break;
+        }
+      }
+    };
 
     /**
      * Adds a tag to the proper material in a list.
@@ -134,6 +173,42 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
 
       return false;
     };
+
+    /**
+     * Set AFI on Tag and return material.
+     *
+     * @param tag
+     *   The tag that has been set AFI on.
+     *
+     * @returns material
+     *   The material that contains the tag.
+     */
+    $scope.setAFIonTagReturnMaterial = function setAFIonTagReturnMaterial(tag) {
+      var i, j;
+
+      // Locate tag.
+      for (i = 0; i < $scope.materials.length; i++) {
+        for (j = 0; j < $scope.materials[i].tags.length; j++) {
+          // If the tag is located.
+          if ($scope.materials[i].tags[j].UID === tag.UID) {
+            // Set material for later evaluation.
+            material = $scope.materials[i].tags[j];
+
+            // Set AFI of tag.
+            material.tags[j].AFI = tag.AFI;
+
+            // Tag found, break loop.
+            break;
+          }
+        }
+        // If material found, break loop.
+        if (material) {
+          break;
+        }
+      }
+
+      return material;
+    }
 
     /**
      * Set the AFI on tag with UID.

@@ -48,6 +48,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           return;
         }
 
+        // Set the material to loading.
+        material.loading = true;
+
         // Attempt to borrow material.
         userService.borrow(material.id).then(
           function success(result) {
@@ -96,6 +99,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                   $scope.materials[i].status = 'borrow.error';
                   $scope.materials[i].information = 'borrow.was_not_successful';
                   $scope.materials[i].loading = false;
+
+                  // @TODO: How can this be retried?
+
                   break;
                 }
               }
@@ -109,6 +115,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                 $scope.materials[i].status = 'borrow.error';
                 $scope.materials[i].information = 'borrow.was_not_successful';
                 $scope.materials[i].loading = false;
+
+                // @TODO: How can this be retried?
+
                 break;
               }
             }
@@ -117,74 +126,18 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       }
     };
 
-    /**
-     * Tag was removed from RFID device.
-     *
-     * Called from RFIDBaseController.
-     *
-     * @param tag
-     */
-    $scope.tagRemoved = function itemRemoved(tag) {
-      var material = null;
-      var id = tag.MID.slice(6);
-      var i;
-
-      // Check if item has already been added to the list.
-      for (i = 0; i < $scope.materials.length; i++) {
-        if ($scope.materials[i].id === id) {
-          material = $scope.materials[i];
-          break;
-        }
-      }
-
-      // If item have not been added it to the scope (UI list).
-      if (!material) {
-        return;
-      }
-
-      // Remove tag from material.
-      for (i = 0; i < material.tags.length; i++) {
-        if (material.tags[i].UID === tag.UID) {
-          material.tags[i].removed = true;
-
-          break;
-        }
-      }
-    };
-
-    /**
+   /**
      * Tag AFI has been set.
      *
      * Called from RFIDBaseController.
      *
      * @param tag
+     *   The tag returned from the device.
      */
     $scope.tagAFISet = function itemAFISet(tag) {
-      var material = null;
-      var i, j;
+      var material = $scope.setAFIonTagReturnMaterial(tag);
 
-      // Locate tag.
-      for (i = 0; i < $scope.materials.length; i++) {
-        for (j = 0; j < $scope.materials[i].tags.length; j++) {
-          // If the tag is located.
-          if ($scope.materials[i].tags[j].UID === tag.UID) {
-            // Set material for later evaluation.
-            material = $scope.materials[i].tags[j];
-
-            // Set AFI of tag.
-            material.tags[j].AFI = tag.AFI;
-
-            // Tag found, break loop.
-            break;
-          }
-        }
-        // If material found, break loop.
-        if (material) {
-          break;
-        }
-      }
-
-      // If the tag belonged to a material in $scope.materials.
+      // If the tag belongs to a material in $scope.materials.
       if (material) {
         var allAFISetToFalse = true;
 
