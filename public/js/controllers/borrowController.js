@@ -151,27 +151,42 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      * @param tag
      */
     $scope.tagAFISet = function itemAFISet(tag) {
-      for (var i = 0; i < $scope.materials.length; i++) {
-        // Track if the tag has the AFI set to off.
-        var allAFISetToFalse = true;
+      var material = null;
+      var i, j;
 
+      // Locate tag.
+      for (i = 0; i < $scope.materials.length; i++) {
         // Set AFI of tag.
-        for (var j = 0; j < $scope.materials[i].tags.length; j++) {
+        for (j = 0; j < $scope.materials[i].tags.length; j++) {
           if ($scope.materials[i].tags[j].UID === tag.UID) {
             $scope.materials[i].tags[j].AFI = tag.AFI;
-            $scope.materials[i].loading = false;
+
+            // Set material for later evaluation.
+            material = $scope.materials[i].tags[j];
             break;
           }
+        }
+        if (material) {
+          break;
+        }
+      }
 
-          if ($scope.materials[i].tags[j].AFI) {
+      // If the tag belonged to a material in $scope.materials.
+      if (material) {
+        var allAFISetToFalse = true;
+
+        for (i = 0; i < material.tags.length; i++) {
+          if (material.tags[i].AFI) {
             allAFISetToFalse = false;
+            break;
           }
         }
 
         // If all AFIs have been turned off mark the material as borrowed.
         if (allAFISetToFalse) {
-          $scope.materials[i].status = 'borrow.success';
-          $scope.materials[i].information = 'borrow.was_successful';
+          material.status = 'borrow.success';
+          material.information = 'borrow.was_successful';
+          material.loading = false;
         }
       }
     };
