@@ -33,8 +33,15 @@ var Notification = function Notification(bus, paths, languages) {
       ignoreTLS: !self.mailConfig.secure
     });
   });
+
+  bus.on('notification.error.config', function (err) {
+    // @TODO what to do...
+    console.log(err);
+  });
+
   bus.emit('ctrl.config.notification', {
-    busEvent: 'notification.loaded.config'
+    busEvent: 'notification.loaded.config',
+    errorEvent: 'notification.error.config'
   });
 
   // Configure I18N with supported languages.

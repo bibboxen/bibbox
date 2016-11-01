@@ -46,7 +46,6 @@ var setup = function setup() {
         packagePath: './../plugins/fbs'
       }
     ];
-
     app = setupArchitect(plugins, config);
   }
 
