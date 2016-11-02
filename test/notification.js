@@ -32,6 +32,12 @@ var setup = function setup() {
         packagePath: './../plugins/notification',
         paths: config.paths,
         languages: config.languages
+      },
+      {
+        packagePath: './../plugins/network'
+      },
+      {
+        packagePath: './../plugins/fbs'
       }
     ];
 
@@ -41,7 +47,7 @@ var setup = function setup() {
   return app;
 };
 
-it('Render library header (HTML)', function () {
+it('Should render library header in HTML', function () {
   return setup().then(function (app) {
     // Override the settings from the ctrl.
     app.services.notification.libraryHeader = {
@@ -66,10 +72,69 @@ it('Render library header (HTML)', function () {
   });
 });
 
-/**
- * @TODO: When testing the receipt functions override sendMail() to store
- *        rendered content into a file. That can be checked.
- */
+// @TODO: Test the render functions....
+
+it('Should render HTML status mail in english', function (done) {
+  this.timeout(5000);
+
+  setup().then(function (app) {
+    app.services.notification.sendMail = function (to, content) {
+      try {
+        to.should.not.be.empty();
+        content.should.not.be.empty();
+
+        var matches = content.match(/(The library visited)/);
+        matches.should.have.length(2);
+        matches.should.be.Array();
+        matches.should.containDeep(['The library visited']);
+
+        done();
+      }
+      catch (err) {
+        done(err);
+      }
+    };
+
+    // Allow notification configuration to be loaded from storage.
+    setTimeout(function () {
+      app.services.notification.patronReceipt('status', true, config.username, config.pin, 'en').then(function () {
+        // Don't do anything as the tests are in the mail callback.
+        done();
+      }, done);
+    }, 500);
+  }, done);
+});
+
+it('Should render HTML status mail in danish', function (done) {
+  this.timeout(5000);
+
+  setup().then(function (app) {
+    app.services.notification.sendMail = function (to, content) {
+      try {
+        to.should.not.be.empty();
+        content.should.not.be.empty();
+
+        var matches = content.match(/(Det besøgte bibliotek)/);
+        matches.should.have.length(2);
+        matches.should.be.Array();
+        matches.should.containDeep(['Det besøgte bibliotek']);
+
+        done();
+      }
+      catch (err) {
+        done(err);
+      }
+    };
+
+    // Allow notification configuration to be loaded from storage.
+    setTimeout(function () {
+      app.services.notification.patronReceipt('status', true, config.username, config.pin, 'da').then(function () {
+        // Don't do anything as the tests are in the mail callback.
+        done();
+      }, done);
+    }, 500);
+  }, done);
+});
 
 it('Teardown', function (done) {
   setup().then(function (app) {

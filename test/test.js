@@ -63,7 +63,6 @@ function importTest(name, file) {
 importTest('Bus', './bus.js');
 importTest('Storage', './storage.js');
 importTest('Logger', './logger.js');
-importTest('ctrl', './ctrl.js');
 importTest('Network', './network.js');
 importTest('API (UI)', './api.js');
 importTest('BarCode', './barcode.js');
@@ -72,3 +71,4 @@ importTest('Notification', './notification.js');
 importTest('Proxy', './proxy.js');
 importTest('Translation', './translation.js');
 importTest('RFID', './rfid.js');
+importTest('ctrl', './ctrl.js');
