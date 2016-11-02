@@ -45,7 +45,6 @@ it('Multi events', function () {
 
     callback.calledOnce.should.be.false();
     callback.callCount.should.equal(2);
-
   });
 });
 
@@ -58,6 +57,73 @@ it('Simple once only event', function () {
     app.services.bus.emit('testOnceEvent', {});
 
     assert(callback.calledOnce);
+  });
+});
+
+it('Should be able to register (onAny) for all events', function () {
+  return setup().then(function (app) {
+    var callback = sinon.spy();
+
+    app.services.bus.onAny(callback);
+    app.services.bus.emit('testEvent1', {});
+    app.services.bus.emit('testEvent2', {});
+    app.services.bus.emit('testEvent3', {});
+
+    callback.calledOnce.should.be.false();
+    callback.callCount.should.equal(3);
+  });
+});
+
+it('Should be able to unregister (offAny) for all events', function () {
+  return setup().then(function (app) {
+    var callback = sinon.spy();
+
+    app.services.bus.onAny(callback);
+    app.services.bus.offAny(callback);
+
+    app.services.bus.emit('testEvent1', {});
+    app.services.bus.emit('testEvent2', {});
+    app.services.bus.emit('testEvent3', {});
+
+    callback.callCount.should.equal(0);
+  });
+});
+
+it('Should be able to unregister (off) for an event', function () {
+  return setup().then(function (app) {
+    var callback = sinon.spy();
+
+    app.services.bus.on('testEvent1', callback);
+
+    app.services.bus.emit('testEvent1', {});
+    app.services.bus.emit('testEvent1', {});
+
+    callback.calledOnce.should.be.false();
+    callback.callCount.should.equal(2);
+
+    app.services.bus.off('testEvent1', callback);
+
+    app.services.bus.emit('testEvent1', {});
+    app.services.bus.emit('testEvent1', {});
+
+    callback.callCount.should.equal(2);
+  });
+});
+
+it('Should be able to register and unregister to many events', function () {
+  return setup().then(function (app) {
+    var callback = sinon.spy();
+
+    app.services.bus.many('testEvent1', 3, callback);
+
+    app.services.bus.emit('testEvent1', {});
+    app.services.bus.emit('testEvent1', {});
+    app.services.bus.emit('testEvent1', {});
+    app.services.bus.emit('testEvent1', {});
+    app.services.bus.emit('testEvent1', {});
+    app.services.bus.emit('testEvent1', {});
+
+    callback.callCount.should.equal(3);
   });
 });
 

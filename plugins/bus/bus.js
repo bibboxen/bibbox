@@ -5,7 +5,7 @@
 
 'use strict';
 
-// Get event emitter.
+// Get event emitter: https://github.com/asyncly/EventEmitter2
 var EventEmitter2 = require('eventemitter2').EventEmitter2;
 
 /**
