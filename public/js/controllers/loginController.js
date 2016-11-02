@@ -11,7 +11,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
     var usernameRegExp = /^\d+$/;
     var passwordRegExp = /^\d+$/;
 
-    $scope.display = 'default';
+    $scope.display = 'start';
     $scope.loading = false;
 
     /**
@@ -36,7 +36,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
      *
      * @param step
      *   The step in the login process.
-     *   Values: (default, username, password)
+     *   Values: (start, username, password)
      */
     var gotoStep = function (step) {
       $scope.display = step;
@@ -55,7 +55,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
         gotoStep('username');
       }
       else {
-        gotoStep('default');
+        gotoStep('start');
       }
     };
 
@@ -63,8 +63,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
      * Handle back button.
      */
     $scope.back = function back() {
-      if ($scope.display === 'default') {
-        barcodeService.stop();
+      if ($scope.display === 'start') {
         $scope.baseLogoutRedirect('/');
       }
       else {
@@ -118,12 +117,11 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
           $scope.loading = false;
 
           if (loggedIn) {
-            barcodeService.stop();
             $location.path('/' + $routeParams.redirectUrl);
           }
           else {
             resetScope();
-            gotoStep('default');
+            gotoStep('start');
 
             $scope.invalidLoginError = true;
             $scope.loading = false;
@@ -135,7 +133,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
           console.error('login error: ', err);
 
           resetScope();
-          gotoStep('default');
+          gotoStep('start');
 
           $scope.invalidLoginError = true;
           $scope.loading = false;
@@ -148,12 +146,12 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
      *
      * @param data
      */
-    $scope.$on('barcodeScanned', function (data) {
-      switch ($scope.display) {
-        case 'default':
-          $scope.user.username = data;
-          $scope.usernameEntered();
-          break;
+    $scope.$on('barcodeScanned', function barcodeScanned(data) {
+      console.log('barcodeScanned', data);
+
+      if ($scope.display === 'start') {
+        $scope.user.username = data;
+        $scope.usernameEntered();
       }
     });
 
@@ -163,15 +161,15 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
      * @param err
      */
     $scope.$on('barcodeError', function barcodeError(err) {
-      // @TODO: inform user that barcode as faild and swith to manual.
-      console.error(err);
+      // @TODO: inform user that barcode as failed and switch to manual.
+      console.log('barcodeError', err);
     });
 
     // Start listen to barcode events.
     barcodeService.start($scope);
 
     // Go to start page.
-    gotoStep('default');
+    gotoStep('start');
 
     /**
      * On destroy.
