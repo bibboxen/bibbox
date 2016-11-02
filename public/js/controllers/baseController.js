@@ -66,7 +66,9 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
      * Reset the UI count down.
      */
     $scope.$on('IdleEnd', function () {
-      $scope.countdown = null;
+      $scope.$evalAsync(function () {
+        $scope.countdown = null;
+      });
     });
 
     /**

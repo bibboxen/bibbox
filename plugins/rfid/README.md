@@ -1,0 +1,5 @@
+# RFID plugin
+
+## Events
+
+@TODO

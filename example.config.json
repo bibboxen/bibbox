@@ -12,6 +12,10 @@
   },
   "proxy": {
     "whitelistedBusEvents": [
+      "^rfid.tags.detected$",
+      "^rfid.tag.detected$",
+      "^rfid.tag.removed$",
+      "^rfid.tag.afi.set$",
       "^barcode.data$",
       "^frontend.[\\w]+$",
       "^fbs.login.[\\w]+$",
@@ -26,6 +30,8 @@
       "^notification.error$"
     ],
     "whitelistedSocketEvents": [
+      "^rfid.tags.request$",
+      "^rfid.tag.set_afi$",
       "^barcode.start$",
       "^barcode.stop$",
       "^barcode.list$",
@@ -57,5 +63,12 @@
   "paths": {
     "base": "files",
     "translations": "locales"
+  },
+  "rfid": {
+    "port": 3001,
+    "afi": {
+      "on": "194",
+      "off": "7"
+    }
   }
 }

@@ -8,17 +8,11 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
     // Instantiate/extend base controller.
     $controller('BaseController', { $scope: $scope });
 
-    // @TODO: Block user on X number of failed login attempts.
+    var usernameRegExp = /^\d+$/;
+    var passwordRegExp = /^\d+$/;
 
-    // @TODO: Update validation functions.
-    var usernameRegExp = /^\d{10}$/;
-    var passwordRegExp = /\d+/;
-
-    $scope.display = 'default';
+    $scope.display = 'start';
     $scope.loading = false;
-
-    // Start listen to barcode events.
-    barcodeService.start();
 
     /**
      * Reset user scope.
@@ -41,50 +35,27 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
      * Sets the $scope.display variable.
      *
      * @param step
-     *   @TODO: Missing documentation. (default, username, password)
+     *   The step in the login process.
+     *   Values: (start, username, password)
      */
     var gotoStep = function (step) {
       $scope.display = step;
     };
 
     /**
-     * Barcode result handler.
-     *
-     * @param data
-     */
-    $scope.$on('barcodeScanned', function (data) {
-      switch ($scope.display) {
-        case 'default':
-          $scope.user.username = data;
-          $scope.usernameEntered();
-          break;
-      }
-    });
-
-    /**
-     * Barcode error handler.
-     *
-     * @param err
-     */
-    $scope.$on('barcodeError', function barcodeError(err) {
-      // @TODO: inform user that barcode as faild and swith to manual.
-      console.error(err);
-    });
-
-     /**
      * Use manual login.
      *
-     * @param use
-     *   @TODO: What is this?
+     * @param {boolean} useManual
+     *   Should manual login be used?
      */
-    $scope.useManualLogin = function useManualLogin(use) {
+    $scope.useManualLogin = function useManualLogin(useManual) {
       resetScope();
 
-      if (use) {
+      if (useManual) {
         gotoStep('username');
       }
       else {
-        gotoStep('default');
+        gotoStep('start');
       }
     };
 
@@ -92,8 +63,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
      * Handle back button.
      */
     $scope.back = function back() {
-      if ($scope.display === 'default') {
-        barcodeService.stop();
+      if ($scope.display === 'start') {
         $scope.baseLogoutRedirect('/');
       }
       else {
@@ -145,13 +115,13 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
           $scope.baseResetIdleWatch();
 
           $scope.loading = false;
+
           if (loggedIn) {
-            barcodeService.stop();
             $location.path('/' + $routeParams.redirectUrl);
           }
           else {
             resetScope();
-            gotoStep('default');
+            gotoStep('start');
 
             $scope.invalidLoginError = true;
             $scope.loading = false;
@@ -160,18 +130,52 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
         function error(err) {
           $scope.baseResetIdleWatch();
 
-          // @TODO: Show error.
           console.error('login error: ', err);
 
           resetScope();
-          gotoStep('default');
+          gotoStep('start');
 
+          $scope.invalidLoginError = true;
           $scope.loading = false;
         }
       );
     };
 
+    /**
+     * Barcode result handler.
+     *
+     * @param data
+     */
+    $scope.$on('barcodeScanned', function barcodeScanned(data) {
+      console.log('barcodeScanned', data);
+
+      if ($scope.display === 'start') {
+        $scope.user.username = data;
+        $scope.usernameEntered();
+      }
+    });
+
+    /**
+     * Barcode error handler.
+     *
+     * @param err
+     */
+    $scope.$on('barcodeError', function barcodeError(err) {
+      // @TODO: inform user that barcode as failed and switch to manual.
+      console.log('barcodeError', err);
+    });
+
+    // Start listen to barcode events.
+    barcodeService.start($scope);
+
     // Go to start page.
-    gotoStep('default');
+    gotoStep('start');
+
+    /**
+     * On destroy.
+     */
+    $scope.$on('$destroy', function () {
+      barcodeService.stop();
+    });
   }
 ]);

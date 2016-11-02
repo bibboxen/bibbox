@@ -1,46 +1,45 @@
 /**
  * Return page controller.
  */
-angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService',
-  function ($scope, $controller, $location, $timeout, userService, receiptService) {
+angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', 'rfidService',
+  function ($scope, $controller, $location, $timeout, userService, receiptService, rfidService) {
     'use strict';
 
     // Instantiate/extend base controller.
-    $controller('BaseController', { $scope: $scope });
+    $controller('RFIDBaseController', {$scope: $scope});
 
     // Store raw check-in responses as it's need to print receipt.
     var raw_materials = [];
 
-    $scope.materials = [];
-
-    // User when offline to group returns into a single file.
+    // Used for offline storage.
     var currentDate = new Date().getTime();
 
+    $scope.materials = [];
+
     /**
-     * Check-in scanned result.
+     * Handle tag detected.
      *
-     * @param id
-     *   The ID of material to check-in (return).
+     * Attempts to check-in the material if all part are available and on device.
+     *
+     * @param tag
+     *   The tag of material to check-in (return).
      */
-    var itemScannedResult = function itemScannedResult(id) {
-      // Check if item has already been added.
-      var itemNotAdded = true;
-      for (var i = 0; i < $scope.materials.length; i++) {
-        if ($scope.materials[i].id === id) {
-          itemNotAdded = false;
-          break;
+    $scope.tagDetected = function tagDetected(tag) {
+      var i;
+      var material = $scope.addTag(tag, $scope.materials);
+
+      // Check if all tags in series have been added.
+      if (!material.invalid && !material.loading && !material.returned && material.seriesLength === material.tags.length) {
+        // If a tag is missing from the device.
+        if ($scope.anyTagRemoved(material.tags)) {
+          material.tagRemoved = true;
+          return;
         }
-      }
 
-      if (itemNotAdded) {
-        $scope.materials.push({
-          id: id,
-          title: id,
-          loading: true
-        });
+        // Set the material to loading.
+        material.loading = true;
 
-        userService.checkIn(id, currentDate).then(function (result) {
-          var i;
+        userService.checkIn(material.id, currentDate).then(function (result) {
           $scope.baseResetIdleWatch();
 
           // Store the raw result (it's used to send with receipts).
@@ -50,15 +49,16 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
             if (result.ok === '1') {
               for (i = 0; i < $scope.materials.length; i++) {
                 if ($scope.materials[i].id === result.itemIdentifier) {
-                  console.log(result);
-                  $scope.materials[i] = {
-                    id: result.itemIdentifier,
-                    title: result.itemProperties.title,
-                    author: result.itemProperties.author,
-                    status: 'return.success',
-                    information: 'return.was_successful',
-                    loading: false
-                  };
+                  $scope.materials[i].title = result.itemProperties.title;
+                  $scope.materials[i].author = result.itemProperties.author;
+                  $scope.materials[i].status = 'return.waiting_afi';
+                  $scope.materials[i].information = 'return.is_awaiting_afi';
+
+                  // Turn AFI on.
+                  for (i = 0; i < material.tags.length; i++) {
+                    $scope.setAFI(material.tags[i].UID, true);
+                  }
+
                   break;
                 }
               }
@@ -76,17 +76,70 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
             }
           }
           else {
-            // @TODO: Handle error.
-            console.log('result === false');
+            for (i = 0; i < $scope.materials.length; i++) {
+              if ($scope.materials[i].id === material.id) {
+                $scope.materials[i].status = 'return.error';
+                $scope.materials[i].information = 'return.was_not_successful';
+                $scope.materials[i].loading = false;
+
+                // @TODO: How can this be retried?
+
+                break;
+              }
+            }
           }
         }, function (err) {
-          // @TODO: what to do...
+          $scope.baseResetIdleWatch();
+          
           console.log(err);
+
+          for (i = 0; i < $scope.materials.length; i++) {
+            if ($scope.materials[i].id === material.id) {
+              $scope.materials[i].status = 'return.error';
+              $scope.materials[i].information = 'return.was_not_successful';
+              $scope.materials[i].loading = false;
+
+              // @TODO: How can this be retried?
+
+              break;
+            }
+          }
         });
       }
     };
 
-    // @TODO: Subscribe to rfid.tag_detected
+    /**
+     * Tag AFI has been set.
+     *
+     * Called from RFIDBaseController.
+     *
+     * @param tag
+     *   The tag returned from the device.
+     */
+    $scope.tagAFISet = function itemAFISet(tag) {
+      var material = $scope.setAFIonTagReturnMaterial(tag);
+
+      // If the tag belongs to a material in $scope.materials.
+      if (material) {
+        var allAFISetToTrue = true;
+
+        // Iterate all tags in material.
+        for (var i = 0; i < material.tags.length; i++) {
+          if (!material.tags[i].AFI) {
+            allAFISetToTrue = false;
+            break;
+          }
+        }
+
+        // If all AFIs have been turned off mark the material as returned.
+        if (allAFISetToTrue) {
+          material.status = 'return.success';
+          material.information = 'return.was_successful';
+          material.loading = false;
+          material.returned = true;
+        }
+      }
+    };
 
     /**
      * Print receipt.
@@ -103,15 +156,9 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       );
     };
 
-    //$timeout(function () {itemScannedResult('3846646417');}, 1000);
-    //$timeout(function () {itemScannedResult('3846469957');}, 2000);
-    //$timeout(function () {itemScannedResult('5010941603');}, 3000);
-
     /**
      * On destroy.
      */
-    $scope.$on('$destroy', function () {
-
-    });
+    $scope.$on('$destroy', function () {});
   }
 ]);

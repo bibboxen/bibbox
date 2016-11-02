@@ -8,7 +8,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     'use strict';
 
     // Instantiate/extend base controller.
-    $controller('BaseController', { $scope: $scope });
+    $controller('RFIDBaseController', { $scope: $scope });
 
     // @TODO: Move to base controller.
     if (!userService.userLoggedIn()) {
@@ -22,44 +22,61 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     $scope.baseGetPatron();
 
     /**
-     * @TODO: documentation?
+     * Contains the array of materials scanned.
      *
      * @type {Array}
      */
     $scope.materials = [];
 
     /**
-     * @TODO: Missing documentation.
+     * Handle tag detected.
      *
-     * @param id
-     *  @TODO: Missing doc.
+     * Called from RFIDBaseController.
+     *
+     * @param tag
+     *   The tag of the material to check-out (borrow).
      */
-    var itemScannedResult = function itemScannedResult(id) {
-      // Check if item have been added before to the list.
-      var itemNotAdded = true;
-      for (var i = 0; i < $scope.materials.length; i++) {
-        if ($scope.materials[i].id === id) {
-          itemNotAdded = false;
-          break;
+    $scope.tagDetected = function tagDetected(tag) {
+      var i;
+      var material = $scope.addTag(tag, $scope.materials);
+
+      // Check if all tags in series have been added.
+      if (!material.invalid && !material.loading && !material.borrowed && material.seriesLength === material.tags.length) {
+        // If a tag is missing from the device.
+        if ($scope.anyTagRemoved(material.tags)) {
+          material.tagRemoved = true;
+          return;
         }
-      }
 
-      // If item have not been added it to the scope (UI list) and send requests
-      // to the user service to borrow the item.
-      if (itemNotAdded) {
-        $scope.materials.push({
-          id: id,
-          title: id,
-          loading: true
-        });
+        // Set the material to loading.
+        material.loading = true;
 
-        userService.borrow(id).then(
+        // Attempt to borrow material.
+        userService.borrow(material.id).then(
           function success(result) {
             $scope.baseResetIdleWatch();
 
-            var i;
             if (result) {
-              if (result.ok === '0') {
+              if (result.ok === '1') {
+                for (i = 0; i < $scope.materials.length; i++) {
+                  if ($scope.materials[i].id === result.itemIdentifier) {
+                    $scope.materials[i].title = result.itemProperties.title;
+                    $scope.materials[i].author = result.itemProperties.author;
+                    $scope.materials[i].status = 'borrow.awaiting_afi';
+                    $scope.materials[i].information = 'borrow.is_awaiting_afi';
+                    $scope.materials[i].dueDate = result.dueDate;
+                    $scope.materials[i].borrowed = true;
+
+                    // Turn AFI off.
+                    for (i = 0; i < material.tags.length; i++) {
+                      $scope.setAFI(material.tags[i].UID, false);
+                    }
+
+                    break;
+                  }
+                }
+              }
+              else {
                 for (i = 0; i < $scope.materials.length; i++) {
                   if ($scope.materials[i].id === result.itemIdentifier) {
                     $scope.materials[i].loading = false;
@@ -75,29 +92,16 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                   }
                 }
               }
-              else {
-                for (i = 0; i < $scope.materials.length; i++) {
-                  if ($scope.materials[i].id === result.itemIdentifier) {
-                    $scope.materials[i] = {
-                      id: result.itemIdentifier,
-                      title: result.itemProperties.title,
-                      author: result.itemProperties.author,
-                      status: 'borrow.success',
-                      information: 'borrow.was_successful',
-                      dueDate: result.dueDate,
-                      loading: false
-                    };
-                    break;
-                  }
-                }
-              }
             }
             else {
               for (i = 0; i < $scope.materials.length; i++) {
-                if ($scope.materials[i].id === id) {
+                if ($scope.materials[i].id === material.id) {
                   $scope.materials[i].status = 'borrow.error';
                   $scope.materials[i].information = 'borrow.was_not_successful';
                   $scope.materials[i].loading = false;
+
+                  // @TODO: How can this be retried?
+
                   break;
                 }
               }
@@ -106,11 +110,16 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           function error(err) {
             $scope.baseResetIdleWatch();
 
-            for (var i = 0; i < $scope.materials.length; i++) {
-              if ($scope.materials[i].id === id) {
+            console.log(err);
+
+            for (i = 0; i < $scope.materials.length; i++) {
+              if ($scope.materials[i].id === material.id) {
                 $scope.materials[i].status = 'borrow.error';
                 $scope.materials[i].information = 'borrow.was_not_successful';
                 $scope.materials[i].loading = false;
+
+                // @TODO: How can this be retried?
+
                 break;
               }
             }
@@ -119,7 +128,38 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       }
     };
 
-    // @TODO: Subscribe to rfid.tag_detected
+   /**
+     * Tag AFI has been set.
+     *
+     * Called from RFIDBaseController.
+     *
+     * @param tag
+     *   The tag returned from the device.
+     */
+    $scope.tagAFISet = function itemAFISet(tag) {
+      var material = $scope.setAFIonTagReturnMaterial(tag);
+
+      // If the tag belongs to a material in $scope.materials.
+      if (material) {
+        var allAFISetToFalse = true;
+
+        // Iterate all tags in material.
+        for (var i = 0; i < material.tags.length; i++) {
+          if (material.tags[i].AFI) {
+            allAFISetToFalse = false;
+            break;
+          }
+        }
+
+        // If all AFIs have been turned off mark the material as borrowed.
+        if (allAFISetToFalse) {
+          material.status = 'borrow.success';
+          material.information = 'borrow.was_successful';
+          material.loading = false;
+          material.borrowed = true;
+        }
+      }
+    };
 
     /**
      * Setup receipt modal.
@@ -129,6 +169,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       templateUrl: './views/modal_receipt.html',
       show: false
     });
+
+    /**
+     * Show the receipt modal.
+     */
     $scope.showReceiptModal = function showReceiptModal() {
       receiptModal.$promise.then(receiptModal.show);
     };
@@ -147,14 +191,11 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           $scope.baseLogoutRedirect();
         },
         function (err) {
+          // @TODO: Better message than alert.
           alert(err.message);
         }
       );
     };
-
-    //$timeout(function () {itemScannedResult('0000003225');}, 1000);
-    //$timeout(function () {itemScannedResult('0000007889');}, 2000);
-    //$timeout(function () {itemScannedResult('0000003572');}, 3000);
 
     /**
      * On destroy.
