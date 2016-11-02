@@ -3,6 +3,8 @@
  * Helper to setup usb barcode on new machines.
  */
 
+var config = require('./../../config.json');
+
 var bus = null;
 var b = require('./../bus/bus.js');
 b({}, {}, function (a ,r) {
@@ -11,8 +13,9 @@ b({}, {}, function (a ,r) {
 
 var barcode = null;
 var b = require('./barcode.js');
-b({}, {'bus': bus }, function (a ,r) {
+b({ vid: config.barcode.vid, pid: config.barcode.pid}, {bus: bus }, function (a ,r) {
   barcode = r.barcode;
+  //console.log(barcode.list());
 });
 
 var stop = false;
