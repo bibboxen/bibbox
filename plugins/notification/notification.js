@@ -59,74 +59,74 @@ var Notification = function Notification(bus, paths, languages) {
 
   // Load template snippets.
   this.mailTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/receipt.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/receipt.html', 'utf8')
   });
-  this.textTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/receipt.txt', 'utf8')
+  this.printTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/receipt.html', 'utf8')
   });
 
   // Load library header templates.
   this.mailLibraryTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/library.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/library.html', 'utf8')
   });
-  this.textLibraryTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/library.txt', 'utf8')
+  this.printLibraryTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/library.html', 'utf8')
   });
 
   // Load fines templates.
   this.mailFinesTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/fines.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/fines.html', 'utf8')
   });
-  this.textFinesTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/fines.txt', 'utf8')
+  this.printFinesTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/fines.html', 'utf8')
   });
 
   // Load loans templates.
   this.mailLoansTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/loans.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/loans.html', 'utf8')
   });
-  this.textLoansTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/loans.txt', 'utf8')
+  this.printLoansTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/loans.html', 'utf8')
   });
 
   // Load new loans templates.
   this.mailLoansNewTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/loans_new.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/loans_new.html', 'utf8')
   });
-  this.textLoansNewTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/loans_new.txt', 'utf8')
+  this.printLoansNewTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/loans_new.txt', 'utf8')
   });
 
   // Load reservations ready templates.
   this.mailReservationsReadyTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/reservations_ready.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/reservations_ready.html', 'utf8')
   });
-  this.textReservationsReadyTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/reservations_ready.txt', 'utf8')
+  this.printReservationsReadyTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/reservations_ready.html', 'utf8')
   });
 
   // Load reservations templates.
   this.mailReservationsTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/reservations.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/reservations.html', 'utf8')
   });
-  this.textReservationsTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/reservations.txt', 'utf8')
+  this.printReservationsTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/reservations.html', 'utf8')
   });
 
   // Load check-in templates.
   this.mailCheckInTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/checkin.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/checkin.html', 'utf8')
   });
-  this.textCheckInTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/checkin.txt', 'utf8')
+  this.printCheckInTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/checkin.html', 'utf8')
   });
 
   // Load footer templates.
   this.mailFooterTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/footer.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/footer.html', 'utf8')
   });
-  this.textFooterTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/footer.txt', 'utf8')
+  this.printFooterTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/footer.html', 'utf8')
   });
 
   // Get default printer name and use that as printer.
@@ -155,7 +155,7 @@ Notification.prototype.renderLibrary = function renderLibrary(html) {
     return this.mailLibraryTemplate.render(this.libraryHeader);
   }
   else {
-    return this.textLibraryTemplate.render(this.libraryHeader);
+    return this.printLibraryTemplate.render(this.libraryHeader);
   }
 };
 
@@ -177,7 +177,7 @@ Notification.prototype.renderFines = function renderFines(html, fines) {
     });
   }
   else {
-    return this.textFinesTemplate.render({
+    return this.printFinesTemplate.render({
       items: fines
     });
   }
@@ -214,7 +214,7 @@ Notification.prototype.renderLoans = function renderLoans(html, headline, loans,
     });
   }
   else {
-    return this.textLoansTemplate.render({
+    return this.printLoansTemplate.render({
       headline: headline,
       items: loans
     });
@@ -241,7 +241,7 @@ Notification.prototype.renderNewLoans = function renderNewLoans(html, headline, 
     });
   }
   else {
-    return this.textLoansNewTemplate.render({
+    return this.printLoansNewTemplate.render({
       headline: headline,
       items: items
     });
@@ -265,7 +265,7 @@ Notification.prototype.renderReadyReservations = function renderReadyReservation
     });
   }
   else {
-    return this.textReservationsReadyTemplate.render({
+    return this.printReservationsReadyTemplate.render({
       items: reservations
     });
   }
@@ -289,7 +289,7 @@ Notification.prototype.renderReservations = function renderReservations(html, re
     });
   }
   else {
-    return this.textReservationsTemplate.render({
+    return this.printReservationsTemplate.render({
       items: reservations
     });
   }
@@ -312,7 +312,7 @@ Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
     });
   }
   else {
-    return this.textCheckInTemplate.render({
+    return this.printCheckInTemplate.render({
       items: items
     });
   }
@@ -332,7 +332,7 @@ Notification.prototype.renderFooter = function renderFooter(html) {
     });
   }
   else {
-    return this.textFooterTemplate.render({
+    return this.printFooterTemplate.render({
       text: this.footer.text
     });
   }
@@ -389,7 +389,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
       }
     }
     else {
-      result = self.textTemplate.render(context);
+      result = self.printTemplate.render(context);
 
       // Remove empty lines (from template engine if statements).
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
@@ -479,7 +479,7 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
       }
     }
     else {
-      result = self.textTemplate.render(context);
+      result = self.printTemplate.render(context);
 
       // Remove empty lines (from template engine if statements).
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
@@ -556,7 +556,7 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       }
     }
     else {
-      result = self.textTemplate.render(context);
+      result = self.printTemplate.render(context);
 
       // Remove empty lines (from template engine if statements).
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
@@ -619,7 +619,15 @@ Notification.prototype.sendMail = function sendMail(to, content) {
  * @param content
  */
 Notification.prototype.printReceipt = function printReceipt(content) {
-  // @TODO: Print the receipt.
+  // // @TODO: Print the receipt.
+  // $this->pdf->setOption('margin-left', 0);
+  // $this->pdf->setOption('margin-right', 0);
+  // $this->pdf->setOption('margin-top', 10);
+  // $this->pdf->setOption('margin-bottom', 0);
+  // $this->pdf->setOption('page-height', 800);
+  // $this->pdf->setOption('page-width', 70);
+
+
 };
 
 /**

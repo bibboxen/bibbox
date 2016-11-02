@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PBA bon</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      height: 100%;
+      padding: 20px 10px;
+
+      background-color: white;
+      color: black;
+      font: 15px/15px "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header with library information -->
+  <div class="header">
+    <img style="max-width: 100%;display: block;height: 50px;" src="{{ header.brand }}"/>
+    {{ library }}
+  </div>
+
+  <!-- The users name -->
+  <div class="borrower">
+    {{ 'receipt.user'|translate }}: {{ name }}
+  </div>
+
+
+  {% if loans_new %}
+  {{ loans_new }}
+  -----------------------------------------------
+  {% endif %}
+
+  {% if loans %}
+  {{ loans }}
+  -----------------------------------------------
+  {% endif %}
+
+  {% if reservations_ready %}
+  {{ reservations_ready }}
+  -----------------------------------------------
+  {% endif %}
+
+  {% if reservations %}
+  {{ reservations }}
+  -----------------------------------------------
+  {% endif %}
+
+  {% if fines %}
+  {{ fines }}
+  -----------------------------------------------
+  {% endif %}
+
+  <!-- Footer -->
+  <div class="footer">
+    {{ footer }}
+  </div>
+</body>
+</html>
+
+
+
+
+
