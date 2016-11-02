@@ -14,6 +14,10 @@
       color: black;
       font: 15px/15px "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
+
+    .line::after {
+      content: "-----------------------------------------------";
+    }
   </style>
 </head>
 <body>
@@ -28,30 +32,34 @@
     {{ 'receipt.user'|translate }}: {{ name }}
   </div>
 
-
   {% if loans_new %}
-  {{ loans_new }}
-  -----------------------------------------------
+  <div class="row new-loans line">
+    {{ loans_new }}
+  </div>
   {% endif %}
 
   {% if loans %}
-  {{ loans }}
-  -----------------------------------------------
+  <div class="row loans line">
+    {{ loans }}
+  </div>
   {% endif %}
 
   {% if reservations_ready %}
-  {{ reservations_ready }}
-  -----------------------------------------------
+  <div class="row reservations-ready line">
+    {{ reservations_ready }}
+  </div>
   {% endif %}
 
   {% if reservations %}
-  {{ reservations }}
-  -----------------------------------------------
+  <div class="row reservations line">
+    {{ reservations }}
+  </div>
   {% endif %}
 
   {% if fines %}
-  {{ fines }}
-  -----------------------------------------------
+  <div class="row fines line">
+    {{ fines }}
+  </div>
   {% endif %}
 
   <!-- Footer -->

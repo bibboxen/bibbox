@@ -9,39 +9,29 @@ var printer = require('printer');
 var twig = require('twig');
 var nodemailer = require('nodemailer');
 var i18n = require('i18n');
+var wkhtmltopdf = require('wkhtmltopdf');
 
 var Q = require('q');
 var fs = require('fs');
 
-var Notification = function Notification(bus, paths, languages) {
+var Notification = function Notification(bus, config, paths, languages) {
   var self = this;
   this.bus = bus;
 
-  // @TODO: handel config updates.
-  bus.on('notification.loaded.config', function (data) {
-    self.mailConfig = data.mailer;
-    self.headerConfig = data.header;
-    self.libraryHeader = data.library;
-    self.footer = data.footer;
-    self.layouts = data.layouts;
-    self.config = data.config;
+  // Set object config variables.
+  self.mailConfig = config.mailer;
+  self.headerConfig = config.header;
+  self.libraryHeader = config.library;
+  self.footer = config.footer;
+  self.layouts = config.layouts;
+  self.config = config.config;
 
-    self.mailTransporter = nodemailer.createTransport({
-      host: self.mailConfig.host,
-      port: self.mailConfig.port,
-      secure: self.mailConfig.secure,
-      ignoreTLS: !self.mailConfig.secure
-    });
-  });
-
-  bus.on('notification.error.config', function (err) {
-    // @TODO what to do...
-    console.log(err);
-  });
-
-  bus.emit('ctrl.config.notification', {
-    busEvent: 'notification.loaded.config',
-    errorEvent: 'notification.error.config'
+  // Set mails transporter.
+  self.mailTransporter = nodemailer.createTransport({
+    host: self.mailConfig.host,
+    port: self.mailConfig.port,
+    secure: self.mailConfig.secure,
+    ignoreTLS: !self.mailConfig.secure
   });
 
   // Configure I18N with supported languages.
@@ -53,6 +43,7 @@ var Notification = function Notification(bus, paths, languages) {
     directory: __dirname + '/../../' + paths.base + '/' + paths.translations + '/notifications'
   });
 
+  // Extend twig (templates) with translation filter.
   twig.extendFilter('translate', function (str) {
     return i18n.__(str);
   });
@@ -94,7 +85,7 @@ var Notification = function Notification(bus, paths, languages) {
     data: fs.readFileSync(__dirname + '/templates/mail/loans_new.html', 'utf8')
   });
   this.printLoansNewTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/print/loans_new.txt', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/print/loans_new.html', 'utf8')
   });
 
   // Load reservations ready templates.
@@ -129,8 +120,45 @@ var Notification = function Notification(bus, paths, languages) {
     data: fs.readFileSync(__dirname + '/templates/print/footer.html', 'utf8')
   });
 
+
   // Get default printer name and use that as printer.
   this.defaultPrinterName = printer.getDefaultPrinterName();
+};
+
+/**
+ * Create new Notification object.
+ *
+ * Static factory function to create Notification object with loaded config.
+ * This pattern used to fix race conditions and to ensure that we have an
+ * constructor without side-effects.
+ *
+ * @param bus
+ *   The event bus
+ * @param paths
+ *   Configuration paths to load default translations.
+ * @param languages
+ *   The configured languages.
+ *
+ * @returns {*|promise}
+ *   Promise that the Notification object is created with configuration.
+ */
+Notification.create = function create(bus, paths, languages) {
+  var deferred = Q.defer();
+
+  bus.once('notification.loaded.config', function (config) {
+    deferred.resolve(new Notification(bus, config, paths, languages))
+  });
+
+  bus.on('notification.error.config', function (err) {
+    deferred.reject(err)
+  });
+
+  bus.emit('ctrl.config.notification', {
+    busEvent: 'notification.loaded.config',
+    errorEvent: 'notification.error.config'
+  });
+
+  return deferred.promise;
 };
 
 /**
@@ -619,14 +647,15 @@ Notification.prototype.sendMail = function sendMail(to, content) {
  * @param content
  */
 Notification.prototype.printReceipt = function printReceipt(content) {
-  // // @TODO: Print the receipt.
-  // $this->pdf->setOption('margin-left', 0);
-  // $this->pdf->setOption('margin-right', 0);
-  // $this->pdf->setOption('margin-top', 10);
-  // $this->pdf->setOption('margin-bottom', 0);
-  // $this->pdf->setOption('page-height', 800);
-  // $this->pdf->setOption('page-width', 70);
 
+  wkhtmltopdf(content, {
+    'margin-left': 0,
+    'margin-right': 0,
+    'margin-top': 10,
+    'margin-bottom': 0,
+    'page-height': 800,
+    'page-width': 70
+  }).pipe(fs.createWriteStream('/vagrant/out.pdf'));
 
 };
 
@@ -635,65 +664,88 @@ Notification.prototype.printReceipt = function printReceipt(content) {
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
-  var notification = new Notification(bus, options.paths, options.languages);
+  //var notification = new Notification(bus, options.paths, options.languages);
+
+  // Create FBS object to use in tests.
+  Notification.create(bus, options.paths, options.languages).then(function (notification) {
+    register(null, {
+      notification: notification
+    });
+  }, function (err) {
+    bus.emit('logger.err', err);
+    register(null, {
+      notification: null
+    });
+  });
 
   /**
    * Listen status receipt events.
    */
   bus.on('notification.status', function (data) {
-    notification.patronReceipt('status', data.mail, data.username, data.password, data.lang).then(
-      function () {
+    Notification.create(bus, options.paths, options.languages).then(function (notification) {
+      notification.patronReceipt('status', data.mail, data.username, data.password, data.lang).then(function () {
         bus.emit(data.busEvent, true);
-      },
-      function (err) {
+      }, function (err) {
         bus.emit(data.errorEvent, err);
-      }
-    );
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   /**
    * Listen status receipt events.
    */
   bus.on('notification.reservations', function (data) {
-    notification.patronReceipt('reservations', data.mail, data.username, data.password, data.lang).then(
-      function () {
+    Notification.create(bus, options.paths, options.languages).then(function (notification) {
+      notification.patronReceipt('reservations', data.mail, data.username, data.password, data.lang).then(function () {
         bus.emit(data.busEvent, true);
-      },
-      function (err) {
+      }, function (err) {
         bus.emit(data.errorEvent, err);
-      }
-    );
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   /**
    * Listen check-out (loans) receipt events.
    */
   bus.on('notification.checkOut', function (data) {
-    notification.checkOutReceipt(data.mail, data.items, data.username, data.password, data.lang).then(
-      function () {
+    Notification.create(bus, options.paths, options.languages).then(function (notification) {
+      notification.checkOutReceipt(data.mail, data.items, data.username, data.password, data.lang).then(function () {
         bus.emit(data.busEvent, true);
       },
       function (err) {
         bus.emit(data.errorEvent, err);
-      }
-    );
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   /**
    * Listen check-in (returns) receipt events.
    */
   bus.on('notification.checkIn', function (data) {
-    notification.checkInReceipt(data.mail, data.items, data.lang).then(
-      function () {
+    Notification.create(bus, options.paths, options.languages).then(function (notification) {
+      notification.checkInReceipt(data.mail, data.items, data.lang).then(function () {
         bus.emit(data.busEvent, true);
-      },
-      function (err) {
+      }, function (err) {
         bus.emit(data.errorEvent, err);
-      }
-    );
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 
-  register(null, {
-    notification: notification
+  Notification.create(bus, options.paths, options.languages).then(function (notification) {
+    notification.patronReceipt('status', false, '3210519792', '12345').then(function () {
+      console.log('done');
+    }, function (err) {
+      console.error(err);
+    });
+  }, function (err) {
+    bus.emit(data.errorEvent, err);
   });
 };
