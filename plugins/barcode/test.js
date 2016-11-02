@@ -15,7 +15,10 @@ var barcode = null;
 var b = require('./barcode.js');
 b({ vid: config.barcode.vid, pid: config.barcode.pid}, {bus: bus }, function (a ,r) {
   barcode = r.barcode;
-  //console.log(barcode.list());
+});
+
+barcode.on('err', function (err) {
+  console.log(err);
 });
 
 var stop = false;
@@ -24,10 +27,6 @@ bus.on('code', function (data) {
   stop = true;
 });
 barcode.start();
-
-barcode.on('err', function (err) {
-  console.log(err);
-});
 
 process.on('SIGINT', function() {
   stop = true;
