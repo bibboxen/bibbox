@@ -22,7 +22,7 @@ barcode.on('err', function (err) {
 });
 
 var stop = false;
-bus.on('code', function (data) {
+barcode.on('code', function (data) {
   console.log('Barcode: ' + data);
   stop = true;
 });
