@@ -43,33 +43,6 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
     };
 
     /**
-     * Barcode result handler.
-     *
-     * @param data
-     */
-    $scope.$on('barcodeScanned', function (data) {
-      switch ($scope.display) {
-        case 'default':
-          $scope.user.username = data;
-          $scope.usernameEntered();
-          break;
-      }
-    });
-
-    /**
-     * Barcode error handler.
-     *
-     * @param err
-     */
-    $scope.$on('barcodeError', function barcodeError(err) {
-      // @TODO: inform user that barcode as faild and swith to manual.
-      console.error(err);
-    });
-
-    // Start listen to barcode events.
-    barcodeService.start($scope);
-
-    /**
      * Use manual login.
      *
      * @param {boolean} useManual
@@ -170,7 +143,41 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
       );
     };
 
+    /**
+     * Barcode result handler.
+     *
+     * @param data
+     */
+    $scope.$on('barcodeScanned', function (data) {
+      switch ($scope.display) {
+        case 'default':
+          $scope.user.username = data;
+          $scope.usernameEntered();
+          break;
+      }
+    });
+
+    /**
+     * Barcode error handler.
+     *
+     * @param err
+     */
+    $scope.$on('barcodeError', function barcodeError(err) {
+      // @TODO: inform user that barcode as faild and swith to manual.
+      console.error(err);
+    });
+
+    // Start listen to barcode events.
+    barcodeService.start($scope);
+
     // Go to start page.
     gotoStep('default');
+
+    /**
+     * On destroy.
+     */
+    $scope.$on('$destroy', function () {
+      barcodeService.stop();
+    });
   }
 ]);
