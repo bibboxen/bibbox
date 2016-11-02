@@ -40,6 +40,9 @@ Barcode.prototype.connect = function connect() {
 
     // Open the interface an connect.
     var iface = term.interfaces.shift();
+    if (iface.isKernelDriverActive()) {
+      iface.detachKernelDriver();
+    }
     iface.claim();
 
     // Get end-point an start data event.
