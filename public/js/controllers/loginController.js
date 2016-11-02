@@ -14,9 +14,6 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
     $scope.display = 'default';
     $scope.loading = false;
 
-    // Start listen to barcode events.
-    barcodeService.start();
-
     /**
      * Reset user scope.
      *
@@ -69,7 +66,10 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
       console.error(err);
     });
 
-     /**
+    // Start listen to barcode events.
+    barcodeService.start($scope);
+
+    /**
      * Use manual login.
      *
      * @param {boolean} useManual
