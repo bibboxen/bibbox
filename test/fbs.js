@@ -219,7 +219,6 @@ it('Checkout (loan) book with id "0000001245" - check that for error as it have 
   setup().then(function (app) {
     app.services.fbs.checkout(config.username, config.pin, '0000001245').then(function (res) {
       try {
-        res.ok.should.equal('0');
         res.screenMessage.should.equal('[BEFORE_RENEW_PERIOD]');
         done();
       }
