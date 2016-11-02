@@ -17,10 +17,14 @@ b({}, {'bus': bus }, function (a ,r) {
 
 var stop = false;
 bus.on('code', function (data) {
-  console.log(data);
+  console.log('Barcode: ' + data);
   stop = true;
 });
 barcode.start();
+
+barcode.on('err', function (err) {
+  console.log(err);
+});
 
 process.on('SIGINT', function() {
   stop = true;

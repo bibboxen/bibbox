@@ -13,22 +13,55 @@ var debug = require('debug')('bibbox:FBS:main');
 
 var Request = require('./request.js');
 
-var FBS = function FBS(bus) {
-  var self = this;
-  self.bus = bus;
-
-  // @TODO: Handel config updates.
-  // @TODO: Handel config = false (missing config).
-  bus.once('fbs.config.loaded', function (config) {
-    self.config = config;
-  });
-  bus.emit('ctrl.config.fbs', {
-    busEvent: 'fbs.config.loaded'
-  });
+/**
+ * Default constructor.
+ *
+ * @param bus
+ *   The event bus.
+ * @param config
+ *   The FBS configuration.
+ *
+ * @constructor
+ */
+var FBS = function FBS(bus, config) {
+  this.bus = bus;
+  this.config = config;
 };
 
 // Extend the object with event emitter.
 util.inherits(FBS, eventEmitter);
+
+/**
+ * Create new FBS object.
+ *
+ * Static factory function to create FBS object with loaded config. This pattern
+ * used to fix race conditions and to ensure that we have an constructor
+ * without side-effects.
+ *
+ * @param bus
+ *   The event bus
+ *
+ * @returns {*|promise}
+ *   Promise that the FBS object is created with configuration.
+ */
+FBS.create = function create(bus) {
+  var deferred = Q.defer();
+
+  bus.once('fbs.config.loaded', function (config) {
+    deferred.resolve(new FBS(bus, config))
+  });
+
+  bus.once('fbs.config.error', function (err) {
+    deferred.reject(err)
+  });
+
+  bus.emit('ctrl.config.fbs', {
+    busEvent: 'fbs.config.loaded',
+    errorEvent: 'fbs.config.error'
+  });
+
+  return deferred.promise;
+};
 
 /**
  * Send status message to FBS.
@@ -245,14 +278,30 @@ FBS.prototype.block = function block(username, reason) {
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
-  var fbs = new FBS(bus);
+
+  // Create FBS object to use in tests.
+  FBS.create(bus).then(function (fbs) {
+    register(null, {
+      fbs: fbs
+    });
+  }, function (err) {
+    bus.emit('logger.err', err);
+    register(null, {
+      fbs: null
+    });
+  });
 
   /**
    * Listen to login requests.
    */
   bus.on('fbs.login', function (data) {
-    fbs.login(data.username, data.password).then(function (isLoggedIn) {
-      bus.emit(data.busEvent, isLoggedIn);
+    FBS.create(bus).then(function (fbs) {
+      fbs.login(data.username, data.password).then(function (isLoggedIn) {
+        bus.emit(data.busEvent, isLoggedIn);
+      },
+      function (err) {
+        bus.emit(data.errorEvent, err);
+      });
     },
     function (err) {
       bus.emit(data.errorEvent, err);
@@ -263,8 +312,13 @@ module.exports = function (options, imports, register) {
    * Listen to library status requests.
    */
   bus.on('fbs.library.status', function (data) {
-    fbs.libraryStatus().then(function (res) {
-      bus.emit(data.busEvent, res);
+    FBS.create(bus).then(function (fbs) {
+      fbs.libraryStatus().then(function (res) {
+        bus.emit(data.busEvent, res);
+      },
+      function (err) {
+        bus.emit(data.errorEvent, err);
+      });
     },
     function (err) {
       bus.emit(data.errorEvent, err);
@@ -275,12 +329,16 @@ module.exports = function (options, imports, register) {
    * Listen to patron status requests.
    */
   bus.on('fbs.patron', function (data) {
-    fbs.patronInformation(data.username, data.password).then(function (status) {
-      bus.emit(data.busEvent, status);
+    FBS.create(bus).then(function (fbs) {
+      fbs.patronInformation(data.username, data.password).then(function (status) {
+        bus.emit(data.busEvent, status);
+      },
+      function (err) {
+        bus.emit(data.errorEvent, err);
+      });
     },
     function (err) {
       bus.emit(data.errorEvent, err);
-
     });
   });
 
@@ -288,38 +346,43 @@ module.exports = function (options, imports, register) {
    * Listen to checkout requests.
    */
   bus.on('fbs.checkout', function (data) {
-    fbs.checkout(data.username, data.password, data.itemIdentifier).then(function (res) {
-      bus.emit(data.busEvent, res);
+    FBS.create(bus).then(function (fbs) {
+      fbs.checkout(data.username, data.password, data.itemIdentifier).then(function (res) {
+        bus.emit(data.busEvent, res);
+      },
+      function (err) {
+        if (err.message === 'FBS is offline') {
+          var material = {
+            itemIdentifier: data.itemIdentifier,
+            offline: true,
+            ok: '1',
+            itemProperties: {
+              title: data.itemIdentifier
+            }
+          };
+
+          // Store for later processing.
+          bus.emit('storage.append', {
+            type: 'offline',
+            name: data.username,
+            obj: {
+              date: new Date().getTime(),
+              username: data.username,
+              password: data.password,
+              action: 'checkout',
+              item: data.itemIdentifier
+            }
+          });
+
+          bus.emit(data.busEvent, material);
+        }
+        else {
+          bus.emit(data.errorEvent, err);
+        }
+      });
     },
     function (err) {
-      if (err.message === 'FBS is offline') {
-        var material = {
-          itemIdentifier: data.itemIdentifier,
-          offline: true,
-          ok: '1',
-          itemProperties: {
-            title: data.itemIdentifier
-          }
-        };
-
-        // Store for later processing.
-        bus.emit('storage.append', {
-          type: 'offline',
-          name: data.username,
-          obj: {
-            date: new Date().getTime(),
-            username: data.username,
-            password: data.password,
-            action: 'checkout',
-            item: data.itemIdentifier
-          }
-        });
-
-        bus.emit(data.busEvent, material);
-      }
-      else {
-        bus.emit(data.errorEvent, err);
-      }
+      bus.emit(data.errorEvent, err);
     });
   });
 
@@ -327,36 +390,41 @@ module.exports = function (options, imports, register) {
    * Listen to checkIn requests.
    */
   bus.on('fbs.checkin', function (data) {
-    fbs.checkIn(data.itemIdentifier).then(function (res) {
-      bus.emit(data.busEvent, res);
+    FBS.create(bus).then(function (fbs) {
+      fbs.checkIn(data.itemIdentifier).then(function (res) {
+        bus.emit(data.busEvent, res);
+      },
+      function (err) {
+        if (err.message === 'FBS is offline') {
+          var material = {
+            itemIdentifier: data.itemIdentifier,
+            offline: true,
+            ok: '1',
+            itemProperties: {
+              title: data.itemIdentifier
+            }
+          };
+
+          // Store for later processing.
+          bus.emit('storage.append', {
+            type: 'offline',
+            name: data.timestamp,
+            obj: {
+              date: new Date().getTime(),
+              action: 'checkin',
+              item: data.itemIdentifier
+            }
+          });
+
+          bus.emit(data.busEvent, material);
+        }
+        else {
+          bus.emit(data.errorEvent, err);
+        }
+      });
     },
     function (err) {
-      if (err.message === 'FBS is offline') {
-        var material = {
-          itemIdentifier: data.itemIdentifier,
-          offline: true,
-          ok: '1',
-          itemProperties: {
-            title: data.itemIdentifier
-          }
-        };
-
-        // Store for later processing.
-        bus.emit('storage.append', {
-          type: 'offline',
-          name: data.timestamp,
-          obj: {
-            date: new Date().getTime(),
-            action: 'checkin',
-            item: data.itemIdentifier
-          }
-        });
-
-        bus.emit(data.busEvent, material);
-      }
-      else {
-        bus.emit(data.errorEvent, err);
-      }
+      bus.emit(data.errorEvent, err);
     });
   });
 
@@ -364,8 +432,13 @@ module.exports = function (options, imports, register) {
    * Listen to renew requests.
    */
   bus.on('fbs.renew', function (data) {
-    fbs.renew(data.username, data.password, data.itemIdentifier).then(function (res) {
-      bus.emit(data.busEvent, res);
+    FBS.create(bus).then(function (fbs) {
+      fbs.renew(data.username, data.password, data.itemIdentifier).then(function (res) {
+        bus.emit(data.busEvent, res);
+      },
+      function (err) {
+        bus.emit(data.errorEvent, err);
+      });
     },
     function (err) {
       bus.emit(data.errorEvent, err);
@@ -376,8 +449,13 @@ module.exports = function (options, imports, register) {
    * Listen to renew all requests.
    */
   bus.on('fbs.renew.all', function (data) {
-    fbs.renewAll(data.username, data.password).then(function (res) {
-      bus.emit(data.busEvent, res);
+    FBS.create(bus).then(function (fbs) {
+      fbs.renewAll(data.username, data.password).then(function (res) {
+        bus.emit(data.busEvent, res);
+      },
+      function (err) {
+        bus.emit(data.errorEvent, err);
+      });
     },
     function (err) {
       bus.emit(data.errorEvent, err);
@@ -388,37 +466,43 @@ module.exports = function (options, imports, register) {
    * Listen to block patron requests.
    */
   bus.on('fbs.block', function (data) {
-    fbs.block(data.username, data.reason).then(function (res) {
+    FBS.create(bus).then(function (fbs) {
+      fbs.block(data.username, data.reason).then(function (res) {
         bus.emit(data.busEvent, res);
       },
       function (err) {
         bus.emit(data.errorEvent, err);
       });
+    },
+    function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   /**
    * Listen for fbs.online events.
    */
   bus.on('fbs.online', function (request) {
-    // Check that config exists.
-    if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
-      // Listen to online check event send below.
-      bus.once('network.fbs.online', function (online) {
-        bus.emit(request.busEvent, online);
-      });
+    FBS.create(bus).then(function (fbs) {
+      // Check that config exists.
+      if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
+        // Listen to online check event send below.
+        bus.once('network.fbs.online', function (online) {
+          bus.emit(request.busEvent, online);
+        });
 
-      // Send online check.
-      bus.emit('network.online', {
-        url: fbs.config.endpoint,
-        busEvent: 'network.fbs.online'
-      });
-    }
-    else {
-      bus.emit(request.busEvent, false);
-    }
-  });
-
-  register(null, {
-    fbs: fbs
+        // Send online check.
+        bus.emit('network.online', {
+          url: fbs.config.endpoint,
+          busEvent: 'network.fbs.online'
+        });
+      }
+      else {
+        bus.emit(request.busEvent, false);
+      }
+    });
+  },
+  function (err) {
+    bus.emit(data.errorEvent, err);
   });
 };
