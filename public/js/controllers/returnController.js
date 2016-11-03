@@ -1,8 +1,8 @@
 /**
  * Return page controller.
  */
-angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', 'rfidService',
-  function ($scope, $controller, $location, $timeout, userService, receiptService, rfidService) {
+angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService',
+  function ($scope, $controller, $location, $timeout, userService, receiptService) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -29,7 +29,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       var material = $scope.addTag(tag, $scope.materials);
 
       // Check if all tags in series have been added.
-      if (!material.invalid && !material.loading && !material.returned && material.seriesLength === material.tags.length) {
+      if (!material.invalid && !material.loading && (!material.returned || material.status === 'return.error') && $scope.allTagsInSeries(material)) {
         // If a tag is missing from the device.
         if ($scope.anyTagRemoved(material.tags)) {
           material.tagRemoved = true;
@@ -91,7 +91,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
         }, function (err) {
           $scope.baseResetIdleWatch();
           
-          console.log(err);
+          console.log("Return error", err);
 
           for (i = 0; i < $scope.materials.length; i++) {
             if ($scope.materials[i].id === material.id) {
@@ -159,6 +159,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     /**
      * On destroy.
      */
-    $scope.$on('$destroy', function () {});
+    $scope.$on('$destroy', function () {
+    });
   }
 ]);

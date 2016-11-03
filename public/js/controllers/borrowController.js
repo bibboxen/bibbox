@@ -41,7 +41,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       var material = $scope.addTag(tag, $scope.materials);
 
       // Check if all tags in series have been added.
-      if (!material.invalid && !material.loading && !material.borrowed && material.seriesLength === material.tags.length) {
+      if (!material.invalid && !material.loading && (!material.borrowed || material.status === 'return.error') && $scope.allTagsInSeries(material)) {
         // If a tag is missing from the device.
         if ($scope.anyTagRemoved(material.tags)) {
           material.tagRemoved = true;
@@ -110,7 +110,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           function error(err) {
             $scope.baseResetIdleWatch();
 
-            console.log(err);
+            console.log('Borrow error', err);
 
             for (i = 0; i < $scope.materials.length; i++) {
               if ($scope.materials[i].id === material.id) {

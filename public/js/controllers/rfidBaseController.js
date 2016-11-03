@@ -18,7 +18,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * @param tag
      *   The tag returned from the device.
      */
-    function tagDetected(event, tag) {
+    function tagDetectedHandler(event, tag) {
       $scope.baseResetIdleWatch();
 
       if ($scope.tagDetected) {
@@ -34,7 +34,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * @param tag
      *   The tag returned from the device.
      */
-    function tagRemoved(event, tag) {
+    function tagRemovedHandler(event, tag) {
       $scope.baseResetIdleWatch();
 
       if ($scope.tagRemoved) {
@@ -50,7 +50,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * @param tag
      *   The tag returned from the device.
      */
-    function tagAFISet(event, tag) {
+    function tagAFISetHandler(event, tag) {
       $scope.baseResetIdleWatch();
 
       if ($scope.tagAFISet) {
@@ -59,9 +59,9 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     }
 
     // Register event listeners for RFID events.
-    $scope.$on('rfid.tag.detected', tagDetected);
-    $scope.$on('rfid.tag.removed', tagRemoved);
-    $scope.$on('rfid.tag.afi.set', tagAFISet);
+    $scope.$on('rfid.tagDetected', tagDetectedHandler);
+    $scope.$on('rfid.tagRemoved', tagRemovedHandler);
+    $scope.$on('rfid.tagAFISet', tagAFISetHandler);
 
     // Start listening for rfid events.
     rfidService.start($scope);
@@ -173,6 +173,15 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       }
 
       return false;
+    };
+
+    /**
+     * Are all the tags in the material.tags series present?
+     *
+     * @param material
+     */
+    $scope.allTagsInSeries = function allTagsInSeries(material) {
+      return material.seriesLength === material.tags.length;
     };
 
     /**

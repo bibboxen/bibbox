@@ -21,9 +21,20 @@ var RFID = function (bus, port, afi) {
   // localhost
   var server = new WebSocketServer({ port: port });
 
+  var setAFI = null;
+  var requestTags = null;
+
   // Connection set up.
   server.on('connection', function connection(ws) {
-    var requestTags = function requestTags() {
+    // Cleanup bus events for previous connections.
+    if (requestTags !== null) {
+      bus.removeListener('rfid.tags.request', requestTags);
+    }
+    if (setAFI !== null) {
+      bus.removeListener('rfid.tag.set_afi', setAFI);
+    }
+
+    requestTags = function requestTags() {
       try {
         ws.send(JSON.stringify({
           event: 'detectTags'
@@ -35,7 +46,7 @@ var RFID = function (bus, port, afi) {
       }
     };
 
-    var setAFI = function setAFI(data) {
+    setAFI = function setAFI(data) {
       try {
         ws.send(JSON.stringify({
           event: 'setAFI',
@@ -49,14 +60,8 @@ var RFID = function (bus, port, afi) {
       }
     };
 
-    // Cleanup bus events for previous connections.
-    bus.removeListener('rfid.tags.request', requestTags);
-    bus.removeListener('rfid.tag.set_afi', setAFI);
-
-    // Listener for rfid.tags.detected.request bus event.
+    // Register bus listeners.
     bus.on('rfid.tags.request', requestTags);
-
-    // Listener for rfid.tags.detected.request bus event.
     bus.on('rfid.tag.set_afi', setAFI);
 
     ws.on('message', function incoming(message) {
@@ -85,8 +90,6 @@ var RFID = function (bus, port, afi) {
             console.log('tagSet not implemented.');
             break;
           case 'setAFIResult':
-            console.log(data);
-
             if (data.success) {
               bus.emit('rfid.tag.afi.set', {
                 UID: data.UID,
