@@ -1,9 +1,14 @@
-{{ 'receipt.reservations.headline'|translate }}
------------------------------------------------
+<h2>{{ 'receipt.reservations.headline'|translate }}</h2>
+
 {% for item in items|sort %}
-{{ 'receipt.reservations.id'|translate }} {{ id }}
-{{ title }}
-{{ author }}
-{{ 'receipt.reservations.interestDate'|translate }} {{ interestDate|date }}
-{{ 'receipt.reservations.dk5'|translate }} {{ DK5 }}
+<div class="row-item">
+  <p>
+    {{ 'receipt.reservations.id'|translate }} {{ item.id }}<br />
+    {{ item.title }}<br />
+    {{ item.author }}<br />
+    {{ 'receipt.reservations.interestDate'|translate }} {{ (item.interestDate/1000)|date('d/m/y') }}<br />
+    {{ 'receipt.reservations.dk5'|translate }} {{ item.DK5 }}
+  </p>
+</div>
 {% endfor %}
+<hr/>

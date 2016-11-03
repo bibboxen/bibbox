@@ -12,24 +12,32 @@
 
       background-color: white;
       color: black;
-      font: 15px/15px "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font: 16px/16px "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
-    .line::after {
-      content: "-----------------------------------------------";
+    h2 {
+      font-size: 110%;
+    }
+
+    hr {
+      border: 0;
+      border-top: dashed 1px;
+    }
+
+    .row-item {
+      line-height: 1.2em;
     }
   </style>
 </head>
 <body>
   <!-- Header with library information -->
   <div class="header">
-    <img style="max-width: 100%;display: block;height: 50px;" src="{{ header.brand }}"/>
     {{ library }}
   </div>
 
   <!-- The users name -->
   <div class="borrower">
-    {{ 'receipt.user'|translate }}: {{ name }}
+    <strong>{{ 'receipt.user'|translate }}</strong> {{ username }}
   </div>
 
   {% if loans_new %}
@@ -38,7 +46,7 @@
   </div>
   {% endif %}
 
-  {% if loans %}
+  {% if loans != false %}
   <div class="row loans line">
     {{ loans }}
   </div>
@@ -66,6 +74,8 @@
   <div class="footer">
     {{ footer }}
   </div>
+  <br/>
+.
 </body>
 </html>
 

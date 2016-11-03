@@ -5,11 +5,11 @@
 
 'use strict';
 
-var printer = require('printer');
 var twig = require('twig');
 var nodemailer = require('nodemailer');
 var i18n = require('i18n');
 var wkhtmltopdf = require('wkhtmltopdf');
+var spawn = require('child_process').spawn;
 
 var Q = require('q');
 var fs = require('fs');
@@ -119,10 +119,6 @@ var Notification = function Notification(bus, config, paths, languages) {
   this.printFooterTemplate = twig.twig({
     data: fs.readFileSync(__dirname + '/templates/print/footer.html', 'utf8')
   });
-
-
-  // Get default printer name and use that as printer.
-  this.defaultPrinterName = printer.getDefaultPrinterName();
 };
 
 /**
@@ -162,16 +158,6 @@ Notification.create = function create(bus, paths, languages) {
 };
 
 /**
- * Get name of the default system printer.
- *
- * @returns string
- *   Name of the printer.
- */
-Notification.prototype.getDefaultPrinterName = function getDefaultPrinterName() {
-  return this.defaultPrinterName;
-};
-
-/**
  * Render library information.
  *
  * @param html
@@ -199,16 +185,22 @@ Notification.prototype.renderLibrary = function renderLibrary(html) {
  *
  */
 Notification.prototype.renderFines = function renderFines(html, fines) {
-  if (html) {
-    return this.mailFinesTemplate.render({
-      items: fines
-    });
+  var ret = '';
+
+  if (fines.length) {
+    if (html) {
+      ret = this.mailFinesTemplate.render({
+        items: fines
+      });
+    }
+    else {
+      ret = this.printFinesTemplate.render({
+        items: fines
+      });
+    }
   }
-  else {
-    return this.printFinesTemplate.render({
-      items: fines
-    });
-  }
+
+  return ret;
 };
 
 /**
@@ -226,6 +218,8 @@ Notification.prototype.renderFines = function renderFines(html, fines) {
  * @returns {*}
  */
 Notification.prototype.renderLoans = function renderLoans(html, headline, loans, overdue) {
+  var ret = '';
+
   // Merge information about overdue loans into loans objects.
   overdue.map(function (overdueLoan) {
     loans.find(function (obj) {
@@ -235,18 +229,22 @@ Notification.prototype.renderLoans = function renderLoans(html, headline, loans,
     });
   });
 
-  if (html) {
-    return this.mailLoansTemplate.render({
-      headline: headline,
-      items: loans
-    });
+  if (loans.length) {
+    if (html) {
+      ret = this.mailLoansTemplate.render({
+        headline: headline,
+        items: loans
+      });
+    }
+    else {
+      ret = this.printLoansTemplate.render({
+        headline: headline,
+        items: loans
+      });
+    }
   }
-  else {
-    return this.printLoansTemplate.render({
-      headline: headline,
-      items: loans
-    });
-  }
+
+  return ret;
 };
 
 /**
@@ -262,18 +260,24 @@ Notification.prototype.renderLoans = function renderLoans(html, headline, loans,
  * @returns {*}
  */
 Notification.prototype.renderNewLoans = function renderNewLoans(html, headline, items) {
-  if (html) {
-    return this.mailLoansNewTemplate.render({
-      headline: headline,
-      items: items
-    });
+  var ret = '';
+
+  if (items.length) {
+    if (html) {
+      ret = this.mailLoansNewTemplate.render({
+        headline: headline,
+        items: items
+      });
+    }
+    else {
+      ret = this.printLoansNewTemplate.render({
+        headline: headline,
+        items: items
+      });
+    }
   }
-  else {
-    return this.printLoansNewTemplate.render({
-      headline: headline,
-      items: items
-    });
-  }
+
+  return ret;
 };
 
 /**
@@ -287,16 +291,22 @@ Notification.prototype.renderNewLoans = function renderNewLoans(html, headline, 
  * @returns {*}
  */
 Notification.prototype.renderReadyReservations = function renderReadyReservations(html, reservations) {
-  if (html) {
-    return this.mailReservationsReadyTemplate.render({
-      items: reservations
-    });
+  var ret = '';
+
+  if (reservations.length) {
+    if (html) {
+      ret = this.mailReservationsReadyTemplate.render({
+        items: reservations
+      });
+    }
+    else {
+      ret = this.printReservationsReadyTemplate.render({
+        items: reservations
+      });
+    }
   }
-  else {
-    return this.printReservationsReadyTemplate.render({
-      items: reservations
-    });
-  }
+
+  return ret;
 };
 
 /**
@@ -311,16 +321,22 @@ Notification.prototype.renderReadyReservations = function renderReadyReservation
  *
  */
 Notification.prototype.renderReservations = function renderReservations(html, reservations) {
-  if (html) {
-    return this.mailReservationsTemplate.render({
-      items: reservations
-    });
+  var ret = '';
+
+  if (reservations.length) {
+    if (html) {
+      ret = this.mailReservationsTemplate.render({
+        items: reservations
+      });
+    }
+    else {
+      ret = this.printReservationsTemplate.render({
+        items: reservations
+      });
+    }
   }
-  else {
-    return this.printReservationsTemplate.render({
-      items: reservations
-    });
-  }
+
+  return ret;
 };
 
 /**
@@ -334,16 +350,22 @@ Notification.prototype.renderReservations = function renderReservations(html, re
  * @returns {*}
  */
 Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
-  if (html) {
-    return this.mailCheckInTemplate.render({
-      items: items
-    });
+  var ret = '';
+
+  if (items.length) {
+    if (html) {
+      ret = this.mailCheckInTemplate.render({
+        items: items
+      });
+    }
+    else {
+      ret = this.printCheckInTemplate.render({
+        items: items
+      });
+    }
   }
-  else {
-    return this.printCheckInTemplate.render({
-      items: items
-    });
-  }
+
+  return ret;
 };
 
 /**
@@ -354,16 +376,20 @@ Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
  * @returns {*}
  */
 Notification.prototype.renderFooter = function renderFooter(html) {
+  var ret = '';
+
   if (html) {
-    return this.mailFooterTemplate.render({
+    ret = this.mailFooterTemplate.render({
       content: this.footer.html
     });
   }
   else {
-    return this.printFooterTemplate.render({
+    ret = this.printFooterTemplate.render({
       text: this.footer.text
     });
   }
+
+  return ret;
 };
 
 /**
@@ -423,8 +449,11 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
       // Print it.
-      self.printReceipt(result);
-      deferred.resolve();
+      self.printReceipt(result).then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
+      });
     }
   }, function (err) {
     deferred.reject(err);
@@ -513,8 +542,11 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
       // Print it.
-      self.printReceipt(result);
-      deferred.resolve();
+      self.printReceipt(result).then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
+      });
     }
   }, function (err) {
     deferred.reject(err);
@@ -568,6 +600,11 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       footer: self.renderFooter(mail)
     };
 
+    // Add username to receipt.
+    if (data.hasOwnProperty('personalName') && data.personalName !== '') {
+      context.username = data.personalName;
+    }
+
     var result = '';
     if (mail) {
       if (data.hasOwnProperty('emailAddress') && data.emailAddress !== undefined) {
@@ -586,12 +623,12 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
     else {
       result = self.printTemplate.render(context);
 
-      // Remove empty lines (from template engine if statements).
-      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-
       // Print it.
-      self.printReceipt(result);
-      deferred.resolve();
+      self.printReceipt(result).then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
+      });
     }
   }, function (err) {
     deferred.reject(err);
@@ -647,16 +684,36 @@ Notification.prototype.sendMail = function sendMail(to, content) {
  * @param content
  */
 Notification.prototype.printReceipt = function printReceipt(content) {
+  var deferred = Q.defer();
+  var filename = '/tmp/out.pdf';
 
-  wkhtmltopdf(content, {
+  var writableStream = fs.createWriteStream(filename);
+  var readableStream = wkhtmltopdf(content, {
     'margin-left': 0,
     'margin-right': 0,
-    'margin-top': 10,
-    'margin-bottom': 0,
+    'margin-top': 0,
+    'margin-bottom': 10,
     'page-height': 800,
-    'page-width': 70
-  }).pipe(fs.createWriteStream('/vagrant/out.pdf'));
+    'page-width': 80
+  });
 
+  readableStream.on('data', function(chunk) {
+    writableStream.write(chunk);
+  });
+
+  readableStream.on('end', function() {
+    var lp = spawn('/usr/bin/lp', [ filename ]);
+
+    lp.stderr.on('data', function (data) {
+      deferred.reject(data.toString());
+    });
+
+    lp.on('close', function (code) {
+      deferred.resolve(code);
+    });
+  });
+
+  return deferred.promise;
 };
 
 /**
@@ -746,6 +803,6 @@ module.exports = function (options, imports, register) {
       console.error(err);
     });
   }, function (err) {
-    bus.emit(data.errorEvent, err);
+    console.error(err);
   });
 };

@@ -23,7 +23,7 @@
   "receipt.reservations.ready.pickupLocation": "Afh.sted",
   "receipt.reservations.ready.pickupDate": "Afhentes senest:",
   "receipt.reservations.ready.pickupId": "Reserveringsnr.:",
-  "receipt.reservations.ready.id": "Materialnr.",
+  "receipt.reservations.ready.id": "Materialnr.:",
   "receipt.reservations.ready.title": "Titel:",
   "receipt.reservations.ready.author": "Forfatter:",
   "receipt.checkin.headline": "Afleveret",
@@ -36,5 +36,6 @@
   "receipt.loans.new.title": "Titel:",
   "receipt.loans.new.dueDate": "Afhentes senest:",
   "receipt.loans.new.author": "Forfatter:",
-  "receipt.user": "receipt.user"
+  "receipt.user": "Låner:",
+  "receipt.reservations.id": "Materialnr.:"
 }

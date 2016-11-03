@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "i18n": "^0.8.3",
+    "node-printer": "^1.0.2",
     "nodemailer": "^2.6.0",
-    "printer": "^0.2.2",
     "q": "^1.4.1",
     "twig": "^0.9.5",
     "wkhtmltopdf": "^0.3.3"

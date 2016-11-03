@@ -1,8 +1,15 @@
-{{ headline|translate }}
------------------------------------------------
+<h2>{{ headline|translate }}</h2>
+
 {% for item in items|sort %}
-{{ 'receipt.loans.id'|translate }} {{ item.id }}
-{{ item.title }}{% if item.author %}
-{{ item.author }}{% endif %}
-{{ 'receipt.loans.returnDate'|translate }} {{ item.returnDate|date }}
+<div class="row-item">
+  <p>
+    {{ 'receipt.loans.id'|translate }} {{ item.id }}<br/>
+    {{ item.title }}<br/>
+    {% if item.author %}
+      {{ item.author }}<br/>
+    {% endif %}
+    {{ 'receipt.loans.returnDate'|translate }} {{ (item.returnDate/1000)|date('d/m/y') }}
+  </p>
+</div>
 {% endfor %}
+<hr/>

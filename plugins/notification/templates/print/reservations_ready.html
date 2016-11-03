@@ -1,10 +1,15 @@
-{{ 'receipt.reservations.ready.pickupLocation'|translate }}
------------------------------------------------
+<h2>{{ 'receipt.reservations.ready.pickupLocation'|translate }}</h2>
+
 {% for item in items|sort %}
-Afh.sted: {{ item.pickupLocation }}
-Afhentes senest: {{ item.pickupDate|date }}
-Reserveringsnr.: {{ item.pickupId }}
-Materialnr.: {{ item.id }}
-{{ item.title }}
-{{ item.author }}
+<div class="row-item">
+  <p>
+    {{ 'receipt.reservations.ready.pickupLocation'|translate }} {{ item.pickupLocation }}<br/>
+    {{ 'receipt.reservations.ready.pickupDate'|translate }} {{ item.pickupDate|date }}<br/>
+    {{ 'receipt.reservations.ready.pickupId'|translate }} {{ item.pickupId }}<br/>
+    {{ 'receipt.reservations.ready.id'|translate }} {{ item.id }}<br/>
+    {{ item.title }}<br/>
+    {{ item.author }}
+  </p>
+</div>
 {% endfor %}
+<hr/>
