@@ -18,7 +18,7 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
     function tagsDetected(tags) {
       if (currentScope) {
         for (var i = 0; i < tags.length; i++) {
-          currentScope.$emit('rfid.tag.detected', tags[i]);
+          currentScope.$emit('rfid.tagDetected', tags[i]);
         }
       }
     }
@@ -31,7 +31,7 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      */
     function tagDetected(tag) {
       if (currentScope) {
-        currentScope.$emit('rfid.tag.detected', tag);
+        currentScope.$emit('rfid.tagDetected', tag);
       }
     }
 
@@ -43,7 +43,7 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      */
     function tagRemoved(tag) {
       if (currentScope) {
-        currentScope.$emit('rfid.tag.removed', tag);
+        currentScope.$emit('rfid.tagRemoved', tag);
       }
     }
 
@@ -55,7 +55,7 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      */
     function tagAFISet(tag) {
       if (currentScope) {
-        currentScope.$emit('rfid.tag.afi.set', tag);
+        currentScope.$emit('rfid.tagAFISet', tag);
       }
     }
 
@@ -66,6 +66,7 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      *   The error.
      */
     function rfidError(err) {
+      console.log('rfidErorr', err);
       // @TODO: Handle.
     }
 
@@ -97,11 +98,6 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      */
     this.start = function start(scope) {
       currentScope = scope;
-      proxyService.on('rfid.tags.detected', tagsDetected);
-      proxyService.on('rfid.tag.detected', tagDetected);
-      proxyService.on('rfid.tag.removed', tagRemoved);
-      proxyService.on('rfid.tag.afi.set', tagAFISet);
-      proxyService.on('rfid.error', rfidError);
 
       proxyService.emit('rfid.tags.request');
     };
@@ -110,12 +106,14 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      * Stop listing for barcode events.
      */
     this.stop = function stop() {
-      proxyService.removeListener('rfid.tags.detected', tagsDetected);
-      proxyService.removeListener('rfid.tag.detected', tagDetected);
-      proxyService.removeListener('rfid.tag.removed', tagRemoved);
-      proxyService.removeListener('rfid.tag.afi.set', tagAFISet);
-      proxyService.removeListener('rfid.error', rfidError);
       currentScope = null;
     };
+
+    // Register listeners.
+    proxyService.on('rfid.tags.detected', tagsDetected);
+    proxyService.on('rfid.tag.detected', tagDetected);
+    proxyService.on('rfid.tag.removed', tagRemoved);
+    proxyService.on('rfid.tag.afi.set', tagAFISet);
+    proxyService.on('rfid.error', rfidError);
   }
 ]);
