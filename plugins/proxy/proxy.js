@@ -43,7 +43,10 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
             // this will result in an empty object in the socket connections
             // client.
             if (value instanceof Error) {
-              value = { message: value.message };
+              value = {
+                type: 'error',
+                message: value.message
+              };
             }
             currentSocket.emit(event, value);
             break;
