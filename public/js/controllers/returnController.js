@@ -29,7 +29,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       var material = $scope.addTag(tag, $scope.materials);
 
       // Check if all tags in series have been added.
-      if (!material.invalid && !material.loading && !material.returned && material.seriesLength === material.tags.length) {
+      if (!material.invalid && !material.loading && !material.returned && $scope.allTagsInSeries(material)) {
         // If a tag is missing from the device.
         if ($scope.anyTagRemoved(material.tags)) {
           material.tagRemoved = true;
