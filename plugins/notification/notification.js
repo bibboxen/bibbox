@@ -795,14 +795,4 @@ module.exports = function (options, imports, register) {
       bus.emit(data.errorEvent, err);
     });
   });
-
-  Notification.create(bus, options.paths, options.languages).then(function (notification) {
-    notification.patronReceipt('status', false, '3210519792', '12345').then(function () {
-      console.log('done');
-    }, function (err) {
-      console.error(err);
-    });
-  }, function (err) {
-    console.error(err);
-  });
 };
