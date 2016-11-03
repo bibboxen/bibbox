@@ -7,11 +7,11 @@ Log events to log files.
     * logger.info 
       - Log information to info log.
     * logger.err 
-      - Log information to info log.
+      - Log information to error log.
     * logger.debug
-      - Log information to info log.
-
-  * Emit
+      - Log information to debug log.
+    * logger.fbs
+      - Log information to fbs log.
 
 # Example usage
 

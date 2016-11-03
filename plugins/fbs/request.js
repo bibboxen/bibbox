@@ -103,7 +103,7 @@ Request.prototype.send = function send(message, firstVar, callback) {
     if (online) {
       // Build XML message.
       var xml = self.buildXML(message);
-      self.bus.emit('logger.debug', 'FBS send: ' + xml);
+      self.bus.emit('logger.fbs', 'FBS send: ' + xml);
 
       var options = {
         method: 'POST',
@@ -119,7 +119,7 @@ Request.prototype.send = function send(message, firstVar, callback) {
       request.post(options, function (error, response, body) {
         // Log message from FBS.
         if (body) {
-          self.bus.emit('logger.debug', 'FBS response: ' + body);
+          self.bus.emit('logger.fbs', 'FBS response: ' + body);
         }
 
         var res = null;
@@ -134,7 +134,7 @@ Request.prototype.send = function send(message, firstVar, callback) {
             }
           }
           // Log error message from FBS.
-          self.bus.emit('logger.error', 'FBS error: ' + error);
+          self.bus.emit('logger.fbs', 'FBS error: ' + error);
           callback(error, null);
         }
         else {
@@ -145,7 +145,7 @@ Request.prototype.send = function send(message, firstVar, callback) {
           res = new Response(body, firstVar);
           if (res.hasError()) {
             err = new Error(res.getError());
-            self.bus.emit('logger.error', 'FBS error: ' + err);
+            self.bus.emit('logger.fbs', 'FBS error: ' + err);
           }
 
           callback(err, res);
