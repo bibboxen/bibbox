@@ -1,8 +1,0 @@
-{{ 'receipt.checkin.headline'|translate }}
------------------------------------------------
-{% for item in items|sort %}
-{{ 'receipt.checkin.id'|translate }} {{ item.itemIdentifier }}
-{{ item.itemProperties.title }}{% if item.itemProperties.author %}
-{{ item.itemProperties.author }}{% endif %}
-{{ 'receipt.checkin.transactionDate'|translate }} {{ (item.transactionDate/1000)|date('d/m/y') }}
-{% endfor %}

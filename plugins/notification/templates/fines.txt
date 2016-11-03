@@ -1,7 +1,0 @@
-{{ 'receipt.fines.headline'|translate }}
------------------------------------------------
-{% for item in items|sort %}{% if item.id %}
-{{ 'receipt.fines.id'|translate }} {{ item.id }}{% endif %}{% if item.title %}
-{{ item.title }}{% endif %}
-{{ 'receipt.fines.date'|translate }} {{ item.fineDate|date }} {{ 'receipt.fines.amount'|translate }} {{ item.fineAmount }}
-{% endfor %}

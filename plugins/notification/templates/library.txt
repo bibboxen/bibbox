@@ -1,4 +1,0 @@
-{{ name }}
-{{ address }}
-{{ zipcode }} {{ city }}
-{{ phone }}
