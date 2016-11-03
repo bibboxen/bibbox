@@ -102,7 +102,22 @@ FBS.prototype.login = function login(username, password) {
       deferred.reject(err);
     }
     else {
-      deferred.resolve(res.validPatron === 'Y' && res.validPatronPassword === 'Y');
+      // Check that the user is valid.
+      var valid = res.validPatron === 'Y' && res.validPatronPassword === 'Y';
+
+      // If user is valid check for blocking codes.
+      if (valid) {
+        if (res.patronStatus.chargePrivDenied && res.patronStatus.renewalPrivDenied &&
+            res.patronStatus.recallPrivDenied && res.patronStatus.holdPrivDenied) {
+          deferred.reject(new Error('login.invalid_login_blocked'));
+        }
+        else {
+          deferred.resolve();
+        }
+      }
+      else {
+        deferred.reject(new Error('login.invalid_login_error'));
+      }
     }
   });
 
@@ -296,8 +311,8 @@ module.exports = function (options, imports, register) {
    */
   bus.on('fbs.login', function (data) {
     FBS.create(bus).then(function (fbs) {
-      fbs.login(data.username, data.password).then(function (isLoggedIn) {
-        bus.emit(data.busEvent, isLoggedIn);
+      fbs.login(data.username, data.password).then(function (data) {
+        bus.emit(data.busEvent, data);
       },
       function (err) {
         bus.emit(data.errorEvent, err);

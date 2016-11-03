@@ -25,6 +25,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
         password: ''
       };
 
+      $scope.invalidLoginErrorMessage = 'Unknown login error';
       $scope.invalidLoginError = false;
       $scope.passwordValidationError = false;
       $scope.usernameValidationError = false;
@@ -130,11 +131,10 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
         function error(err) {
           $scope.baseResetIdleWatch();
 
-          console.error('login error: ', err);
-
           resetScope();
           gotoStep('start');
 
+          $scope.invalidLoginErrorMessage = err.message;
           $scope.invalidLoginError = true;
           $scope.loading = false;
         }

@@ -39,6 +39,12 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
         if (whitelistedBusEvents.hasOwnProperty(item)) {
           var reg = new RegExp(whitelistedBusEvents[item]);
           if (reg.test(event)) {
+            // Check if the message about to be emitted is an error message as
+            // this will result in an empty object in the socket connections
+            // client.
+            if (value instanceof Error) {
+              value = { message: value.message };
+            }
             currentSocket.emit(event, value);
             break;
           }
