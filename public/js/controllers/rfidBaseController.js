@@ -176,6 +176,17 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     };
 
     /**
+     * Are all the tags in the material.tags series present?
+     *
+     * @param material
+     */
+    $scope.allTagsInSeries = function allTagsInSeries(material) {
+      if (material.seriesLength !== material.tags.length) {
+        return false;
+      }
+    };
+
+    /**
      * Set AFI on Tag and return material.
      *
      * @param tag
