@@ -181,9 +181,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * @param material
      */
     $scope.allTagsInSeries = function allTagsInSeries(material) {
-      if (material.seriesLength !== material.tags.length) {
-        return false;
-      }
+      return material.seriesLength === material.tags.length;
     };
 
     /**

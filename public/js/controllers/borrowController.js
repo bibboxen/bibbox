@@ -110,7 +110,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           function error(err) {
             $scope.baseResetIdleWatch();
 
-            console.log(err);
+            console.log('Borrow error', err);
 
             for (i = 0; i < $scope.materials.length; i++) {
               if ($scope.materials[i].id === material.id) {
