@@ -13,7 +13,8 @@
     <img src="img/help3.jpg" />
   </div>
 
-  <div class="panel panel-default" data-ng-if="materials && materials.length > 0">
+  <div class="panel panel-default" data-ng-if="materials && materials.length > 0" data-ng-repeat="(key, value) in returnBins">
+    <div class="panel-heading" data-ng-style="{ 'background': value.color}"><h2>{{ value.text }}</h2></div>
     <table class="table">
       <tr>
         <th></th>
@@ -21,7 +22,7 @@
         <th class="text-center">{{ 'return.status' | translate }}</th>
         <th>{{ 'return.information' | translate }}</th>
       </tr>
-      <tr data-ng-repeat="material in materials"
+      <tr data-ng-repeat="material in materials" data-ng-if="material.returnBin && material.returnBin.id === key"
           data-ng-class="{'bg-success': material.status === 'return.success', 'bg-danger': material.status === 'return.error' || material.invalid, 'bg-warning': material.status === 'borrow.awaiting_afi'}">
         <td class="vert-align">{{ $index + 1 }}</td>
         <td class="vert-align">{{ material.title }}</td>
