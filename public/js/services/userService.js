@@ -8,8 +8,8 @@
  */
 
 
-angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 'proxyService', 'userTrackerService',
-  function ($q, $timeout, $location, proxyService, userTrackerService) {
+angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 'config', 'proxyService', 'userTrackerService',
+  function ($q, $timeout, $location, config, proxyService, userTrackerService) {
     'use strict';
 
     this.username = null;
@@ -63,25 +63,8 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
         self.password = password;
         self.loggedIn = true;
 
-        if (self.loggedIn) {
-          // User logged in, so clear tracker service.
-          userTrackerService.clear(username);
-        }
-        else {
-          // User not logged in add/or tracker user login attempt.
-          userTrackerService.add(username);
-
-          // Check if user has tried to many times. If so block the user.
-          if (userTrackerService.check(username)) {
-            userService.block(username, 'To many login attempts: ' + config.loginAttempts.max).then(function () {
-              // @TODO: Inform the user to contact the desk.
-            },
-            function () {
-              // @TODO: What to do...
-              console.log(err);
-            });
-          }
-        }
+        // User logged in, so clear tracker service.
+        userTrackerService.clear(username);
 
         deferred.resolve();
       });
@@ -97,6 +80,21 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
           deferred.resolve(true);
         }
         else {
+          // User not logged in add/or tracker user login attempt.
+          userTrackerService.add(username);
+
+          // Check if user has tried to many times. If so block the user.
+          if (userTrackerService.check(username)) {
+            self.block(username, 'To many login attempts: ' + config.loginAttempts.max).then(function () {
+              // User blocked, so clear tracking.
+              userTrackerService.clear(username);
+            },
+            function () {
+              // @TODO: What to do...
+              console.log(err);
+            });
+          }
+
           self.username = null;
           self.password = null;
           self.loggedIn = false;
