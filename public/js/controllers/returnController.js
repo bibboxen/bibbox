@@ -1,12 +1,17 @@
 /**
  * Return page controller.
  */
-angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService',
-  function ($scope, $controller, $location, $timeout, userService, receiptService) {
+angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', 'config',
+  function ($scope, $controller, $location, $timeout, userService, receiptService, config) {
     'use strict';
 
     // Instantiate/extend base controller.
     $controller('RFIDBaseController', {$scope: $scope});
+
+    if (!config || !config.binSorting) {
+      $scope.baseLogoutRedirect('/');
+      return;
+    }
 
     // Store raw check-in responses as it's need to print receipt.
     var raw_materials = [];
@@ -15,6 +20,8 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     var currentDate = new Date().getTime();
 
     $scope.materials = [];
+
+    $scope.returnBins = config.binSorting.destinations;
 
     /**
      * Handle tag detected.
@@ -53,6 +60,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
                   $scope.materials[i].author = result.itemProperties.author;
                   $scope.materials[i].status = 'return.waiting_afi';
                   $scope.materials[i].information = 'return.is_awaiting_afi';
+                  $scope.materials[i].sortBin = result.sortBin;
 
                   // Turn AFI on.
                   for (i = 0; i < material.tags.length; i++) {
@@ -135,11 +143,21 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
         if (allAFISetToTrue) {
           material.status = 'return.success';
           material.information = 'return.was_successful';
+          material.returnBin = getSortBin(material.sortBin);
           material.loading = false;
           material.returned = true;
         }
       }
     };
+
+    function getSortBin(bin) {
+      if (config.binSorting.bins.hasOwnProperty(bin)) {
+        return config.binSorting.destinations[config.binSorting.bins[bin]];
+      }
+      else {
+        return config.binSorting.destinations[config.binSorting.default_bin];
+      }
+    }
 
     /**
      * Print receipt.

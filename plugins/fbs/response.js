@@ -322,7 +322,8 @@ Response.prototype.variablesResponseTranslation = function variablesResponseTran
     CB: 'chargedItemsLimit',
     BH: 'currencyType',
     BV: 'feeAmount',
-    CC: 'feeLimit'
+    CC: 'feeLimit',
+    CL: 'sortBin'
   };
 
   if (codes.hasOwnProperty(code)) {

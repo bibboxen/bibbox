@@ -40,5 +40,24 @@
   "timeout": {
     "idleTimeout": 15,
     "idleWarn": 7
+  },
+  "binSorting": {
+    "default_bin": "right",
+    "destinations": {
+      "left": {
+        "id": "left",
+        "text": "Stilles på reolen ved vinduet"
+      },
+      "right": {
+        "id": "right",
+        "text": "Læg i den blå kasse til højre",
+        "background_color": "#2d66a6",
+        "color": "#fff"
+      }
+    },
+    "bins": {
+      "102": "left",
+      "701": "left"
+    }
   }
 }
