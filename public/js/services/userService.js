@@ -58,12 +58,12 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
       var uniqueId = CryptoJS.MD5('userServiceLogin' + Date.now());
 
       // Handel response when login request is completed.
-      proxyService.once('fbs.login.success' + uniqueId, function(loggedIn) {
+      proxyService.once('fbs.login.success' + uniqueId, function() {
         self.username = username;
         self.password = password;
-        self.loggedIn = loggedIn;
+        self.loggedIn = true;
 
-        if (loggedIn) {
+        if (self.loggedIn) {
           // User logged in, so clear tracker service.
           userTrackerService.clear(username);
         }

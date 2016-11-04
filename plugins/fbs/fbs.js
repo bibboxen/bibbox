@@ -311,8 +311,8 @@ module.exports = function (options, imports, register) {
    */
   bus.on('fbs.login', function (data) {
     FBS.create(bus).then(function (fbs) {
-      fbs.login(data.username, data.password).then(function (data) {
-        bus.emit(data.busEvent, data);
+      fbs.login(data.username, data.password).then(function () {
+        bus.emit(data.busEvent, {});
       },
       function (err) {
         bus.emit(data.errorEvent, err);

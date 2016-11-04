@@ -112,21 +112,10 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
       $scope.loading = true;
 
       userService.login($scope.user.username, $scope.user.password).then(
-        function success(loggedIn) {
+        function success() {
           $scope.baseResetIdleWatch();
-
           $scope.loading = false;
-
-          if (loggedIn) {
-            $location.path('/' + $routeParams.redirectUrl);
-          }
-          else {
-            resetScope();
-            gotoStep('start');
-
-            $scope.invalidLoginError = true;
-            $scope.loading = false;
-          }
+          $location.path('/' + $routeParams.redirectUrl);
         },
         function error(err) {
           $scope.baseResetIdleWatch();
