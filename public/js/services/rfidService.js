@@ -66,8 +66,10 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      *   The error.
      */
     function rfidError(err) {
-      console.log('rfidErorr', err);
-      // @TODO: Handle.
+      if (currentScope) {
+        console.log('rfidErorr', err);
+        // @TODO: Handle.
+      }
     }
 
     /**

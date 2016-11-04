@@ -18,7 +18,9 @@ angular.module('BibBox').service('barcodeService', ['$q', 'proxyService',
      *   The data processed by the barcode scanner.
      */
     function scanned(data) {
-      currentScope.$emit('barcodeScanned', data);
+      if (currentScope) {
+        currentScope.$emit('barcodeScanned', data);
+      }
     }
 
     /**
@@ -30,7 +32,9 @@ angular.module('BibBox').service('barcodeService', ['$q', 'proxyService',
      *   The error
      */
     function error(err) {
-      currentScope.$emit('barcodeError', err);
+      if (currentScope) {
+        currentScope.$emit('barcodeError', err);
+      }
     }
 
     /**
@@ -41,8 +45,6 @@ angular.module('BibBox').service('barcodeService', ['$q', 'proxyService',
      */
     this.start = function start(scope) {
       currentScope = scope;
-      proxyService.on('barcode.data', scanned);
-      proxyService.on('barcode.err', error);
 
       proxyService.emit('barcode.start');
     };
@@ -51,11 +53,13 @@ angular.module('BibBox').service('barcodeService', ['$q', 'proxyService',
      * Stop listing for barcode events.
      */
     this.stop = function stop() {
-      proxyService.removeListener('barcode.data', scanned);
-      proxyService.removeListener('barcode.err', error);
       currentScope = null;
 
       proxyService.emit('barcode.stop');
     };
+
+    // Register listeners.
+    proxyService.on('barcode.data', scanned);
+    proxyService.on('barcode.err', error);
   }
 ]);

@@ -74,18 +74,6 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
     };
 
     /**
-     * Remove event listeners.
-     *
-     * @param eventName
-     *   Name of the event.
-     * @param callback
-     *   The callback to remove.
-     */
-    this.removeListener = function removeListener(eventName, callback) {
-      socket.removeListener(eventName, callback);
-    };
-
-    /**
      * Register socket listeners.
      *
      * Wrapped in function to allow testing.
