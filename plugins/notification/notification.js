@@ -5,43 +5,33 @@
 
 'use strict';
 
-var printer = require('printer');
 var twig = require('twig');
 var nodemailer = require('nodemailer');
 var i18n = require('i18n');
+var wkhtmltopdf = require('wkhtmltopdf');
+var spawn = require('child_process').spawn;
 
 var Q = require('q');
 var fs = require('fs');
 
-var Notification = function Notification(bus, paths, languages) {
+var Notification = function Notification(bus, config, paths, languages) {
   var self = this;
   this.bus = bus;
 
-  // @TODO: handel config updates.
-  bus.on('notification.loaded.config', function (data) {
-    self.mailConfig = data.mailer;
-    self.headerConfig = data.header;
-    self.libraryHeader = data.library;
-    self.footer = data.footer;
-    self.layouts = data.layouts;
-    self.config = data.config;
+  // Set object config variables.
+  self.mailConfig = config.mailer;
+  self.headerConfig = config.header;
+  self.libraryHeader = config.library;
+  self.footer = config.footer;
+  self.layouts = config.layouts;
+  self.config = config.config;
 
-    self.mailTransporter = nodemailer.createTransport({
-      host: self.mailConfig.host,
-      port: self.mailConfig.port,
-      secure: self.mailConfig.secure,
-      ignoreTLS: !self.mailConfig.secure
-    });
-  });
-
-  bus.on('notification.error.config', function (err) {
-    // @TODO what to do...
-    console.log(err);
-  });
-
-  bus.emit('ctrl.config.notification', {
-    busEvent: 'notification.loaded.config',
-    errorEvent: 'notification.error.config'
+  // Set mails transporter.
+  self.mailTransporter = nodemailer.createTransport({
+    host: self.mailConfig.host,
+    port: self.mailConfig.port,
+    secure: self.mailConfig.secure,
+    ignoreTLS: !self.mailConfig.secure
   });
 
   // Configure I18N with supported languages.
@@ -53,94 +43,118 @@ var Notification = function Notification(bus, paths, languages) {
     directory: __dirname + '/../../' + paths.base + '/' + paths.translations + '/notifications'
   });
 
+  // Extend twig (templates) with translation filter.
   twig.extendFilter('translate', function (str) {
     return i18n.__(str);
   });
 
   // Load template snippets.
   this.mailTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/receipt.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/receipt.html', 'utf8')
   });
-  this.textTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/receipt.txt', 'utf8')
+  this.printTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/receipt.html', 'utf8')
   });
 
   // Load library header templates.
   this.mailLibraryTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/library.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/library.html', 'utf8')
   });
-  this.textLibraryTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/library.txt', 'utf8')
+  this.printLibraryTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/library.html', 'utf8')
   });
 
   // Load fines templates.
   this.mailFinesTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/fines.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/fines.html', 'utf8')
   });
-  this.textFinesTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/fines.txt', 'utf8')
+  this.printFinesTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/fines.html', 'utf8')
   });
 
   // Load loans templates.
   this.mailLoansTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/loans.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/loans.html', 'utf8')
   });
-  this.textLoansTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/loans.txt', 'utf8')
+  this.printLoansTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/loans.html', 'utf8')
   });
 
   // Load new loans templates.
   this.mailLoansNewTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/loans_new.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/loans_new.html', 'utf8')
   });
-  this.textLoansNewTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/loans_new.txt', 'utf8')
+  this.printLoansNewTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/loans_new.html', 'utf8')
   });
 
   // Load reservations ready templates.
   this.mailReservationsReadyTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/reservations_ready.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/reservations_ready.html', 'utf8')
   });
-  this.textReservationsReadyTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/reservations_ready.txt', 'utf8')
+  this.printReservationsReadyTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/reservations_ready.html', 'utf8')
   });
 
   // Load reservations templates.
   this.mailReservationsTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/reservations.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/reservations.html', 'utf8')
   });
-  this.textReservationsTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/reservations.txt', 'utf8')
+  this.printReservationsTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/reservations.html', 'utf8')
   });
 
   // Load check-in templates.
   this.mailCheckInTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/checkin.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/checkin.html', 'utf8')
   });
-  this.textCheckInTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/checkin.txt', 'utf8')
+  this.printCheckInTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/checkin.html', 'utf8')
   });
 
   // Load footer templates.
   this.mailFooterTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/footer.html', 'utf8')
+    data: fs.readFileSync(__dirname + '/templates/mail/footer.html', 'utf8')
   });
-  this.textFooterTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/footer.txt', 'utf8')
+  this.printFooterTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/footer.html', 'utf8')
   });
-
-  // Get default printer name and use that as printer.
-  this.defaultPrinterName = printer.getDefaultPrinterName();
 };
 
 /**
- * Get name of the default system printer.
+ * Create new Notification object.
  *
- * @returns string
- *   Name of the printer.
+ * Static factory function to create Notification object with loaded config.
+ * This pattern used to fix race conditions and to ensure that we have an
+ * constructor without side-effects.
+ *
+ * @param bus
+ *   The event bus
+ * @param paths
+ *   Configuration paths to load default translations.
+ * @param languages
+ *   The configured languages.
+ *
+ * @returns {*|promise}
+ *   Promise that the Notification object is created with configuration.
  */
-Notification.prototype.getDefaultPrinterName = function getDefaultPrinterName() {
-  return this.defaultPrinterName;
+Notification.create = function create(bus, paths, languages) {
+  var deferred = Q.defer();
+
+  bus.once('notification.loaded.config', function (config) {
+    deferred.resolve(new Notification(bus, config, paths, languages))
+  });
+
+  bus.on('notification.error.config', function (err) {
+    deferred.reject(err)
+  });
+
+  bus.emit('ctrl.config.notification', {
+    busEvent: 'notification.loaded.config',
+    errorEvent: 'notification.error.config'
+  });
+
+  return deferred.promise;
 };
 
 /**
@@ -155,7 +169,7 @@ Notification.prototype.renderLibrary = function renderLibrary(html) {
     return this.mailLibraryTemplate.render(this.libraryHeader);
   }
   else {
-    return this.textLibraryTemplate.render(this.libraryHeader);
+    return this.printLibraryTemplate.render(this.libraryHeader);
   }
 };
 
@@ -171,16 +185,22 @@ Notification.prototype.renderLibrary = function renderLibrary(html) {
  *
  */
 Notification.prototype.renderFines = function renderFines(html, fines) {
-  if (html) {
-    return this.mailFinesTemplate.render({
-      items: fines
-    });
+  var ret = '';
+
+  if (fines.length) {
+    if (html) {
+      ret = this.mailFinesTemplate.render({
+        items: fines
+      });
+    }
+    else {
+      ret = this.printFinesTemplate.render({
+        items: fines
+      });
+    }
   }
-  else {
-    return this.textFinesTemplate.render({
-      items: fines
-    });
-  }
+
+  return ret;
 };
 
 /**
@@ -198,6 +218,8 @@ Notification.prototype.renderFines = function renderFines(html, fines) {
  * @returns {*}
  */
 Notification.prototype.renderLoans = function renderLoans(html, headline, loans, overdue) {
+  var ret = '';
+
   // Merge information about overdue loans into loans objects.
   overdue.map(function (overdueLoan) {
     loans.find(function (obj) {
@@ -207,18 +229,22 @@ Notification.prototype.renderLoans = function renderLoans(html, headline, loans,
     });
   });
 
-  if (html) {
-    return this.mailLoansTemplate.render({
-      headline: headline,
-      items: loans
-    });
+  if (loans.length) {
+    if (html) {
+      ret = this.mailLoansTemplate.render({
+        headline: headline,
+        items: loans
+      });
+    }
+    else {
+      ret = this.printLoansTemplate.render({
+        headline: headline,
+        items: loans
+      });
+    }
   }
-  else {
-    return this.textLoansTemplate.render({
-      headline: headline,
-      items: loans
-    });
-  }
+
+  return ret;
 };
 
 /**
@@ -234,18 +260,24 @@ Notification.prototype.renderLoans = function renderLoans(html, headline, loans,
  * @returns {*}
  */
 Notification.prototype.renderNewLoans = function renderNewLoans(html, headline, items) {
-  if (html) {
-    return this.mailLoansNewTemplate.render({
-      headline: headline,
-      items: items
-    });
+  var ret = '';
+
+  if (items.length) {
+    if (html) {
+      ret = this.mailLoansNewTemplate.render({
+        headline: headline,
+        items: items
+      });
+    }
+    else {
+      ret = this.printLoansNewTemplate.render({
+        headline: headline,
+        items: items
+      });
+    }
   }
-  else {
-    return this.textLoansNewTemplate.render({
-      headline: headline,
-      items: items
-    });
-  }
+
+  return ret;
 };
 
 /**
@@ -259,16 +291,22 @@ Notification.prototype.renderNewLoans = function renderNewLoans(html, headline, 
  * @returns {*}
  */
 Notification.prototype.renderReadyReservations = function renderReadyReservations(html, reservations) {
-  if (html) {
-    return this.mailReservationsReadyTemplate.render({
-      items: reservations
-    });
+  var ret = '';
+
+  if (reservations.length) {
+    if (html) {
+      ret = this.mailReservationsReadyTemplate.render({
+        items: reservations
+      });
+    }
+    else {
+      ret = this.printReservationsReadyTemplate.render({
+        items: reservations
+      });
+    }
   }
-  else {
-    return this.textReservationsReadyTemplate.render({
-      items: reservations
-    });
-  }
+
+  return ret;
 };
 
 /**
@@ -283,16 +321,22 @@ Notification.prototype.renderReadyReservations = function renderReadyReservation
  *
  */
 Notification.prototype.renderReservations = function renderReservations(html, reservations) {
-  if (html) {
-    return this.mailReservationsTemplate.render({
-      items: reservations
-    });
+  var ret = '';
+
+  if (reservations.length) {
+    if (html) {
+      ret = this.mailReservationsTemplate.render({
+        items: reservations
+      });
+    }
+    else {
+      ret = this.printReservationsTemplate.render({
+        items: reservations
+      });
+    }
   }
-  else {
-    return this.textReservationsTemplate.render({
-      items: reservations
-    });
-  }
+
+  return ret;
 };
 
 /**
@@ -306,16 +350,22 @@ Notification.prototype.renderReservations = function renderReservations(html, re
  * @returns {*}
  */
 Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
-  if (html) {
-    return this.mailCheckInTemplate.render({
-      items: items
-    });
+  var ret = '';
+
+  if (items.length) {
+    if (html) {
+      ret = this.mailCheckInTemplate.render({
+        items: items
+      });
+    }
+    else {
+      ret = this.printCheckInTemplate.render({
+        items: items
+      });
+    }
   }
-  else {
-    return this.textCheckInTemplate.render({
-      items: items
-    });
-  }
+
+  return ret;
 };
 
 /**
@@ -326,16 +376,20 @@ Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
  * @returns {*}
  */
 Notification.prototype.renderFooter = function renderFooter(html) {
+  var ret = '';
+
   if (html) {
-    return this.mailFooterTemplate.render({
+    ret = this.mailFooterTemplate.render({
       content: this.footer.html
     });
   }
   else {
-    return this.textFooterTemplate.render({
+    ret = this.printFooterTemplate.render({
       text: this.footer.text
     });
   }
+
+  return ret;
 };
 
 /**
@@ -389,14 +443,17 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
       }
     }
     else {
-      result = self.textTemplate.render(context);
+      result = self.printTemplate.render(context);
 
       // Remove empty lines (from template engine if statements).
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
       // Print it.
-      self.printReceipt(result);
-      deferred.resolve();
+      self.printReceipt(result).then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
+      });
     }
   }, function (err) {
     deferred.reject(err);
@@ -479,14 +536,17 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
       }
     }
     else {
-      result = self.textTemplate.render(context);
+      result = self.printTemplate.render(context);
 
       // Remove empty lines (from template engine if statements).
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
       // Print it.
-      self.printReceipt(result);
-      deferred.resolve();
+      self.printReceipt(result).then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
+      });
     }
   }, function (err) {
     deferred.reject(err);
@@ -540,6 +600,11 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       footer: self.renderFooter(mail)
     };
 
+    // Add username to receipt.
+    if (data.hasOwnProperty('personalName') && data.personalName !== '') {
+      context.username = data.personalName;
+    }
+
     var result = '';
     if (mail) {
       if (data.hasOwnProperty('emailAddress') && data.emailAddress !== undefined) {
@@ -556,14 +621,14 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       }
     }
     else {
-      result = self.textTemplate.render(context);
-
-      // Remove empty lines (from template engine if statements).
-      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+      result = self.printTemplate.render(context);
 
       // Print it.
-      self.printReceipt(result);
-      deferred.resolve();
+      self.printReceipt(result).then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
+      });
     }
   }, function (err) {
     deferred.reject(err);
@@ -619,7 +684,36 @@ Notification.prototype.sendMail = function sendMail(to, content) {
  * @param content
  */
 Notification.prototype.printReceipt = function printReceipt(content) {
-  // @TODO: Print the receipt.
+  var deferred = Q.defer();
+  var filename = '/tmp/out.pdf';
+
+  var writableStream = fs.createWriteStream(filename);
+  var readableStream = wkhtmltopdf(content, {
+    'margin-left': 0,
+    'margin-right': 0,
+    'margin-top': 0,
+    'margin-bottom': 10,
+    'page-height': 800,
+    'page-width': 80
+  });
+
+  readableStream.on('data', function(chunk) {
+    writableStream.write(chunk);
+  });
+
+  readableStream.on('end', function() {
+    var lp = spawn('/usr/bin/lp', [ filename ]);
+
+    lp.stderr.on('data', function (data) {
+      deferred.reject(data.toString());
+    });
+
+    lp.on('close', function (code) {
+      deferred.resolve(code);
+    });
+  });
+
+  return deferred.promise;
 };
 
 /**
@@ -627,65 +721,78 @@ Notification.prototype.printReceipt = function printReceipt(content) {
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
-  var notification = new Notification(bus, options.paths, options.languages);
+  //var notification = new Notification(bus, options.paths, options.languages);
+
+  // Create FBS object to use in tests.
+  Notification.create(bus, options.paths, options.languages).then(function (notification) {
+    register(null, {
+      notification: notification
+    });
+  }, function (err) {
+    bus.emit('logger.err', err);
+    register(null, {
+      notification: null
+    });
+  });
 
   /**
    * Listen status receipt events.
    */
   bus.on('notification.status', function (data) {
-    notification.patronReceipt('status', data.mail, data.username, data.password, data.lang).then(
-      function () {
+    Notification.create(bus, options.paths, options.languages).then(function (notification) {
+      notification.patronReceipt('status', data.mail, data.username, data.password, data.lang).then(function () {
         bus.emit(data.busEvent, true);
-      },
-      function (err) {
+      }, function (err) {
         bus.emit(data.errorEvent, err);
-      }
-    );
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   /**
    * Listen status receipt events.
    */
   bus.on('notification.reservations', function (data) {
-    notification.patronReceipt('reservations', data.mail, data.username, data.password, data.lang).then(
-      function () {
+    Notification.create(bus, options.paths, options.languages).then(function (notification) {
+      notification.patronReceipt('reservations', data.mail, data.username, data.password, data.lang).then(function () {
         bus.emit(data.busEvent, true);
-      },
-      function (err) {
+      }, function (err) {
         bus.emit(data.errorEvent, err);
-      }
-    );
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   /**
    * Listen check-out (loans) receipt events.
    */
   bus.on('notification.checkOut', function (data) {
-    notification.checkOutReceipt(data.mail, data.items, data.username, data.password, data.lang).then(
-      function () {
+    Notification.create(bus, options.paths, options.languages).then(function (notification) {
+      notification.checkOutReceipt(data.mail, data.items, data.username, data.password, data.lang).then(function () {
         bus.emit(data.busEvent, true);
       },
       function (err) {
         bus.emit(data.errorEvent, err);
-      }
-    );
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   /**
    * Listen check-in (returns) receipt events.
    */
   bus.on('notification.checkIn', function (data) {
-    notification.checkInReceipt(data.mail, data.items, data.lang).then(
-      function () {
+    Notification.create(bus, options.paths, options.languages).then(function (notification) {
+      notification.checkInReceipt(data.mail, data.items, data.lang).then(function () {
         bus.emit(data.busEvent, true);
-      },
-      function (err) {
+      }, function (err) {
         bus.emit(data.errorEvent, err);
-      }
-    );
-  });
-
-  register(null, {
-    notification: notification
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 };

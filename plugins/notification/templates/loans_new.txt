@@ -1,8 +1,0 @@
-{{ headline|translate }}
------------------------------------------------
-{% for item in items|sort %}
-{{ 'receipt.loans.new.id'|translate }} {{ item.id }}
-{{ item.title }}{% if author %}
-{{ item.author }}{% endif %}
-{{ 'receipt.loans.new.dueDate'|translate }} {{ (item.dueDate/1000)|date('d/m/y') }}
-{% endfor %}

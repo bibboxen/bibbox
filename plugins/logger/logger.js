@@ -14,6 +14,7 @@ var Rotate = require('winston-logrotate').Rotate;
 
 var Logger = function Logger(logs) {
   var levels = winston.config.syslog.levels;
+  levels.fbs = 8;
   winston.setLevels(levels);
 
   if (logs.hasOwnProperty('info')) {
@@ -73,6 +74,24 @@ var Logger = function Logger(logs) {
     });
   }
 
+  if (logs.hasOwnProperty('fbs')) {
+    this.fbsLog = new (winston.Logger)({
+      levels: levels,
+      transports: [
+        new Rotate({
+          file: path.join(__dirname, '../../' + logs.fbs),
+          level: 'fbs',
+          colorize: false,
+          timestamp: true,
+          json: false,
+          max: '100m',
+          keep: 5,
+          compress: false
+        })
+      ],
+      exitOnError: false
+    });
+  }
   if (logs.hasOwnProperty('exception')) {
     this.excepLog = new (winston.Logger)({
       levels: levels,
@@ -134,6 +153,18 @@ Logger.prototype.debug = function debug(message) {
 };
 
 /**
+ * Log fbs message.
+ *
+ * @param message
+ *   The message to send to the logger.
+ */
+Logger.prototype.fbs = function fbs(message) {
+  if (this.fbsLog !== undefined) {
+    this.fbsLog.fbs(message);
+  }
+};
+
+/**
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
@@ -152,6 +183,10 @@ module.exports = function (options, imports, register) {
 
   bus.on('logger.debug', function (message) {
     logger.debug(message);
+  });
+
+  bus.on('logger.fbs', function (message) {
+    logger.fbs(message);
   });
 
   // Register the plugin with the system.

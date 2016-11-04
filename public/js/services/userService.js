@@ -83,8 +83,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
           }
         }
 
-        // The result maybe "true" or "false".
-        deferred.resolve(loggedIn);
+        deferred.resolve();
       });
 
       // Handel errors and the off-line case, which should allow the user to

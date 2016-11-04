@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PBA bon</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      height: 100%;
+      padding: 20px 10px;
+
+      background-color: white;
+      color: black;
+      font: 16px/16px "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    h2 {
+      font-size: 110%;
+    }
+
+    hr {
+      border: 0;
+      border-top: dashed 1px;
+    }
+
+    .row {
+      padding-top: 8px;
+    }
+
+    .row-item {
+      line-height: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header with library information -->
+  <div class="header">
+    {{ library }}
+  </div>
+
+  <!-- The users name -->
+  <div class="borrower">
+    <strong>{{ 'receipt.user'|translate }}</strong> {{ username }}
+  </div>
+
+  {% if loans_new %}
+  <div class="row new-loans line">
+    {{ loans_new }}
+  </div>
+  {% endif %}
+
+  {% if loans != false %}
+  <div class="row loans line">
+    {{ loans }}
+  </div>
+  {% endif %}
+
+  {% if reservations_ready %}
+  <div class="row reservations-ready line">
+    {{ reservations_ready }}
+  </div>
+  {% endif %}
+
+  {% if reservations %}
+  <div class="row reservations line">
+    {{ reservations }}
+  </div>
+  {% endif %}
+
+  {% if fines %}
+  <div class="row fines line">
+    {{ fines }}
+  </div>
+  {% endif %}
+
+  <!-- Footer -->
+  <div class="footer">
+    {{ footer }}
+  </div>
+  <br/>
+.
+</body>
+</html>
+
+
+
+
+
