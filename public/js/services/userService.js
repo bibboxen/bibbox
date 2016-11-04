@@ -88,18 +88,21 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
             self.block(username, 'To many login attempts: ' + config.loginAttempts.max).then(function () {
               // User blocked, so clear tracking.
               userTrackerService.clear(username);
+
+              deferred.reject(err);
             },
             function () {
               // @TODO: What to do...
               console.log(err);
             });
           }
+          else {
+            self.username = null;
+            self.password = null;
+            self.loggedIn = false;
 
-          self.username = null;
-          self.password = null;
-          self.loggedIn = false;
-
-          deferred.reject(err);
+            deferred.reject(err);
+          }
         }
       });
 

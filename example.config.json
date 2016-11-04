@@ -42,6 +42,7 @@
       "^fbs.checkin$",
       "^fbs.renew$",
       "^fbs.renew.all$",
+      "^fbs.block$",
       "^fbs.online$",
       "^notification.status$",
       "^notification.reservations$",
