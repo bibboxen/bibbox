@@ -8,6 +8,11 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     // Instantiate/extend base controller.
     $controller('RFIDBaseController', {$scope: $scope});
 
+    if (!config || !config.binSorting) {
+      $scope.baseLogoutRedirect('/');
+      return;
+    }
+
     // Store raw check-in responses as it's need to print receipt.
     var raw_materials = [];
 
@@ -46,8 +51,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
 
           // Store the raw result (it's used to send with receipts).
           raw_materials.push(result);
-
-          console.log(result);
 
           if (result) {
             if (result.ok === '1') {

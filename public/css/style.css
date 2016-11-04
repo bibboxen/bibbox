@@ -256,3 +256,11 @@ body {
   font-size: 250%;
   color: #f00;
 }
+
+.return-td-status {
+  width: 10%;
+}
+
+.return-td-title {
+  width: 90%;
+}
