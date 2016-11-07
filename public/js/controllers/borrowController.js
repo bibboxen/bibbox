@@ -1,13 +1,15 @@
 /**
  * @file
  * Borrow page controller.
+ *
+ * @extends RFIDBaseController
+ * @implements RFIDBaseInterface
  */
-
 angular.module('BibBox').controller('BorrowController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', '$modal',
   function ($scope, $controller, $location, $timeout, userService, receiptService, $modal) {
     'use strict';
 
-    // Instantiate/extend base controller.
+    // Extend controller scope from the base controller.
     $controller('RFIDBaseController', { $scope: $scope });
 
     // @TODO: Move to base controller.
@@ -31,7 +33,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     /**
      * Handle tag detected.
      *
-     * Called from RFIDBaseController.
+     * Interface method implementation.
      *
      * @param tag
      *   The tag of the material to check-out (borrow).
@@ -69,7 +71,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
                     // Turn AFI off.
                     for (i = 0; i < material.tags.length; i++) {
-                      $scope.setAFI(material.tags[i].UID, false);
+                      $scope.setAFI(material.tags[i].uid, false);
                     }
 
                     break;
@@ -128,10 +130,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       }
     };
 
-   /**
+    /**
      * Tag AFI has been set.
      *
-     * Called from RFIDBaseController.
+     * Interface method implementation.
      *
      * @param tag
      *   The tag returned from the device.
@@ -145,7 +147,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
         // Iterate all tags in material.
         for (var i = 0; i < material.tags.length; i++) {
-          if (material.tags[i].AFI) {
+          if (material.tags[i].afi) {
             allAFISetToFalse = false;
             break;
           }
@@ -160,15 +162,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
         }
       }
     };
-
-    /**
-     * Setup receipt modal.
-     */
-    var receiptModal = $modal({
-      scope: $scope,
-      templateUrl: './views/modal_receipt.html',
-      show: false
-    });
 
     /**
      * Show the receipt modal.
@@ -196,6 +189,18 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
         }
       );
     };
+
+    /**
+     * Setup receipt modal.
+     */
+    var receiptModal = $modal({
+      scope: $scope,
+      templateUrl: './views/modal_receipt.html',
+      show: false
+    });
+
+    // Check that interface methods are implemented.
+    Interface.ensureImplements($scope, RFIDBaseInterface);
 
     /**
      * On destroy.

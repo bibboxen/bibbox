@@ -10,18 +10,42 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
     var currentScope = null;
 
     /**
+     * Tag object.
+     *
+     * Parses the raw tag object from the scanner.
+     *
+     * @TODO: Move this to Java program.
+     *
+     * @param rawTag
+     *   Raw tag information from the scanner.
+     */
+    var Tag = function Tag(rawTag) {
+      this.uid = rawTag.UID;
+
+      // The first 6 chars in the tag MID is not part of the the ID, but used
+      // to indicate part of series.
+      if (rawTag.hasOwnProperty('MID')) {
+        this.mid = rawTag.MID.slice(6);
+        this.seriesLength = parseInt(rawTag.MID.slice(2, 4));
+        this.numberInSeries = parseInt(rawTag.MID.slice(4, 6));
+      }
+
+      this.afi = rawTag.AFI;
+    };
+
+    /**
      * Tags detected.
      *
      * @param tags
      *   The tags that were detected by the RFID.
      */
-    function tagsDetected(tags) {
+    proxyService.on('rfid.tags.detected', function tagsDetected(rawTags) {
       if (currentScope) {
-        for (var i = 0; i < tags.length; i++) {
-          currentScope.$emit('rfid.tagDetected', tags[i]);
+        for (var i = 0; i < rawTags.length; i++) {
+          currentScope.$emit('rfid.tagDetected', new Tag(rawTags[i]));
         }
       }
-    }
+    });
 
     /**
      * Tag detected.
@@ -29,11 +53,11 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      * @param tag
      *   The tag that was detected by the RFID.
      */
-    function tagDetected(tag) {
+    proxyService.on('rfid.tag.detected', function tagDetected(rawTag) {
       if (currentScope) {
-        currentScope.$emit('rfid.tagDetected', tag);
+        currentScope.$emit('rfid.tagDetected', new Tag(rawTag));
       }
-    }
+    });
 
     /**
      * Tag removed.
@@ -41,11 +65,11 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      * @param tag
      *   The tag that was removed from the RFID.
      */
-    function tagRemoved(tag) {
+    proxyService.on('rfid.tag.removed', function tagRemoved(rawTag) {
       if (currentScope) {
-        currentScope.$emit('rfid.tagRemoved', tag);
+        currentScope.$emit('rfid.tagRemoved', new Tag(rawTag));
       }
-    }
+    });
 
     /**
      * The AFI has been set.
@@ -53,11 +77,11 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      * @param tag
      *   The tag where the AFI have been set.
      */
-    function tagAFISet(tag) {
+    proxyService.on('rfid.tag.afi.set', function tagAFISet(rawTag) {
       if (currentScope) {
-        currentScope.$emit('rfid.tagAFISet', tag);
+        currentScope.$emit('rfid.tagAFISet', new Tag(rawTag));
       }
-    }
+    });
 
     /**
      * RFID error.
@@ -65,12 +89,12 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      * @param err
      *   The error.
      */
-    function rfidError(err) {
+    proxyService.on('rfid.error', function rfidError(err) {
       if (currentScope) {
-        console.log('rfidErorr', err);
         // @TODO: Handle.
+        console.log('rfidErorr', err);
       }
-    }
+    });
 
     /**
      * Turn the AFI on/off of the tag.
@@ -87,6 +111,10 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
       proxyService.emit('rfid.tag.set_afi', {
         UID: uid,
         AFI: afi
+      }).then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
       });
 
       return deferred.promise;
@@ -110,12 +138,5 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
     this.stop = function stop() {
       currentScope = null;
     };
-
-    // Register listeners.
-    proxyService.on('rfid.tags.detected', tagsDetected);
-    proxyService.on('rfid.tag.detected', tagDetected);
-    proxyService.on('rfid.tag.removed', tagRemoved);
-    proxyService.on('rfid.tag.afi.set', tagAFISet);
-    proxyService.on('rfid.error', rfidError);
   }
 ]);

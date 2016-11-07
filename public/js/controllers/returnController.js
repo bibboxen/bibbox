@@ -19,8 +19,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     // Used for offline storage.
     var currentDate = new Date().getTime();
 
-    $scope.materials = [];
-
     $scope.returnBins = config.binSorting.destinations;
 
     /**
@@ -64,7 +62,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
 
                   // Turn AFI on.
                   for (i = 0; i < material.tags.length; i++) {
-                    $scope.setAFI(material.tags[i].UID, true);
+                    $scope.setAFI(material.tags[i].uid, true);
                   }
 
                   break;
@@ -98,7 +96,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
           }
         }, function (err) {
           $scope.baseResetIdleWatch();
-          
+
           console.log("Return error", err);
 
           for (i = 0; i < $scope.materials.length; i++) {
@@ -133,7 +131,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
 
         // Iterate all tags in material.
         for (var i = 0; i < material.tags.length; i++) {
-          if (!material.tags[i].AFI) {
+          if (!material.tags[i].afi) {
             allAFISetToTrue = false;
             break;
           }
@@ -150,6 +148,15 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       }
     };
 
+    /**
+     * Get sort bin.
+     *
+     * @param bin
+     *   @TODO: Missing documentation.
+     *
+     * @returns {*}
+     *   @TODO: Missing documentation.
+     */
     function getSortBin(bin) {
       if (config.binSorting.bins.hasOwnProperty(bin)) {
         return config.binSorting.destinations[config.binSorting.bins[bin]];
@@ -173,6 +180,9 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
         }
       );
     };
+
+    // Check that interface methods are implemented.
+    Interface.ensureImplements($scope, RFIDBaseInterface);
 
     /**
      * On destroy.
