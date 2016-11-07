@@ -18,6 +18,7 @@
  */
 var RFID = function (bus, port, afi) {
   var WebSocketServer = require('ws').Server;
+
   // localhost
   var server = new WebSocketServer({ port: port });
 
@@ -26,10 +27,14 @@ var RFID = function (bus, port, afi) {
 
   // Connection set up.
   server.on('connection', function connection(ws) {
+
+    console.log(ws.readyState);
+
     // Cleanup bus events for previous connections.
     if (requestTags !== null) {
       bus.removeListener('rfid.tags.request', requestTags);
     }
+
     if (setAFI !== null) {
       bus.removeListener('rfid.tag.set_afi', setAFI);
     }
@@ -77,18 +82,23 @@ var RFID = function (bus, port, afi) {
           case 'connected':
             bus.emit('rfid.connected');
             break;
+
           case 'tagsDetected':
             bus.emit('rfid.tags.detected', data.tags);
             break;
+
           case 'tagDetected':
             bus.emit('rfid.tag.detected', data.tag);
             break;
+
           case 'tagRemoved':
             bus.emit('rfid.tag.removed', data.tag);
             break;
+
           case 'setTagResult':
             console.log('tagSet not implemented.');
             break;
+
           case 'setAFIResult':
             if (data.success) {
               bus.emit('rfid.tag.afi.set', {
@@ -100,6 +110,7 @@ var RFID = function (bus, port, afi) {
               bus.emit('rfid.error', 'AFI not set!')
             }
             break;
+
           default:
             bus.emit('rfid.error', 'Event not recognized!');
         }

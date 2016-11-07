@@ -108,13 +108,19 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
     this.setAFI = function setAFI(uid, afi) {
       var deferred = $q.defer();
 
+      proxyService.once('rfid.tag.set_afi.success' + uid, function () {
+        deferred.resolve();
+      });
+
+      proxyService.once('rfid.tag.set_afi.error' + uid, function (err) {
+        deferred.reject(err);
+      });
+
       proxyService.emit('rfid.tag.set_afi', {
         UID: uid,
-        AFI: afi
-      }).then(function () {
-        deferred.resolve();
-      }, function (err) {
-        deferred.reject(err);
+        AFI: afi,
+        busEvent: 'rfid.tag.set_afi.success' + uid,
+        errorEvent: 'rfid.tag.set_afi.error' + uid
       });
 
       return deferred.promise;

@@ -17,6 +17,7 @@
       "^rfid.tag.detected$",
       "^rfid.tag.removed$",
       "^rfid.tag.afi.set$",
+      "^rfid.tag.set_afi.[\\w]+$",
       "^barcode.data$",
       "^frontend.[\\w]+$",
       "^fbs.login.[\\w]+$",
