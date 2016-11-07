@@ -6,7 +6,8 @@
   "private": true,
   "dependencies": {
     "jsonfile": "^2.4.0",
-    "merge": "^1.2.0"
+    "proper-lockfile": "^2.0.0",
+    "q": "^1.4.1"
   },
   "plugin": {
     "consumes": [
