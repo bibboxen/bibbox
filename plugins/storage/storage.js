@@ -257,6 +257,9 @@ module.exports = function (options, imports, register) {
         },
         function(err) {
           storage.unlock(file);
+
+          console.log('test');
+
           bus.emit(data.errorEvent, err);
           bus.emit('logger.err', err.message);
         });
@@ -272,9 +275,10 @@ module.exports = function (options, imports, register) {
             bus.emit('logger.err', err.message);
           });
         }
-
-        bus.emit(data.errorEvent, err);
-        bus.emit('logger.err', err.message);
+        else {
+          bus.emit(data.errorEvent, err);
+          bus.emit('logger.err', err.message);
+        }
       });
     }
     else {

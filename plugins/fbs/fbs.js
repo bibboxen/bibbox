@@ -376,13 +376,11 @@ module.exports = function (options, imports, register) {
             }
           };
 
-          bus.on('fbs.checkout.offline.stored', function() {
-            console.log('Stored');
-            bus.emit(data.busEvent, material);
+          bus.once('fbs.checkout.offline.stored' + data.itemIdentifier, function(res) {
+            bus.emit(data.busEvent, res);
           });
 
-          bus.on('fbs.checkout.offline.error', function (err) {
-            console.log(err);
+          bus.once('fbs.checkout.offline.error' + data.itemIdentifier, function (err) {
             bus.emit(data.errorEvent, err);
           });
 
@@ -398,11 +396,9 @@ module.exports = function (options, imports, register) {
               item: data.itemIdentifier
             },
             lockFile: true,
-            busEvent: 'fbs.checkout.offline.stored',
-            errorEvent: 'fbs.checkout.offline.error'
+            busEvent: 'fbs.checkout.offline.stored' + data.itemIdentifier,
+            errorEvent: 'fbs.checkout.offline.error' + data.itemIdentifier
           });
-
-
         }
         else {
           bus.emit(data.errorEvent, err);
@@ -433,6 +429,14 @@ module.exports = function (options, imports, register) {
             }
           };
 
+          bus.once('fbs.checkin.offline.stored' + data.itemIdentifier, function(res) {
+            bus.emit(data.busEvent, res);
+          });
+
+          bus.once('fbs.checkin.offline.error' + data.itemIdentifier, function (err) {
+            bus.emit(data.errorEvent, err);
+          });
+
           // Store for later processing.
           bus.emit('storage.append', {
             type: 'offline',
@@ -441,10 +445,11 @@ module.exports = function (options, imports, register) {
               date: new Date().getTime(),
               action: 'checkin',
               item: data.itemIdentifier
-            }
+            },
+            lockFile: true,
+            busEvent: 'fbs.checkin.offline.stored' + data.itemIdentifier,
+            errorEvent: 'fbs.checkin.offline.error' + data.itemIdentifier
           });
-
-          bus.emit(data.busEvent, material);
         }
         else {
           bus.emit(data.errorEvent, err);
