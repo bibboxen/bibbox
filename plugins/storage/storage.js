@@ -9,9 +9,81 @@
 
 var jsonfile = require('jsonfile');
 var fs = require('fs');
+var lockfile = require('proper-lockfile');
+var Q = require('q');
 
 var Storage = function Storage(bus, paths) {
   this.path = __dirname + '/../../' + paths.base + '/';
+
+  this.retries = {
+    retries: 5,
+    factor: 3,
+    minTimeout: 500,
+    maxTimeout: 1000,
+    randomize: true
+  };
+};
+
+/**
+ * Lock storage.
+ *
+ * @param type
+ *   The type (config, translation or offline).
+ * @param name
+ *   Name of the modules config.
+ *
+ * @returns {*|promise}
+ */
+Storage.prototype.lock = function lock(type, name) {
+  var deferred = Q.defer();
+
+  var file = this.path + type + '/' + name + '.json';
+  lockfile.lock(file, { retries: this.retries}, function (err) {
+    if (err) {
+      deferred.reject(err);
+    }
+    else {
+      deferred.resolve(file);
+    }
+  });
+
+  return deferred.promise;
+};
+
+/**
+ * Un-lock file.
+ *
+ * @param file
+ *   The name of the file returned by the lock function.
+ */
+Storage.prototype.unlock = function unlock(file) {
+  lockfile.unlockSync(file);
+};
+
+/**
+ * Check if storage is locked.
+ *
+ * @param type
+ *   The type (config, translation or offline).
+ * @param name
+ *   Name of the modules config.
+ *
+ * @returns {*|promise}
+ */
+Storage.prototype.isLocked = function isLocked(type, name) {
+  var deferred = Q.defer();
+
+  var file = this.path + type + '/' + name + '.json';
+  lockfile.check(file, function (err, isLocked) {
+    if (err) {
+      deferred.reject(err);
+    }
+    else {
+      deferred.resolve(isLocked);
+    }
+  });
+
+  return deferred.promise;
 };
 
 /**
@@ -25,8 +97,18 @@ var Storage = function Storage(bus, paths) {
  *   JSON object with the config.
  */
 Storage.prototype.load = function load(type, name) {
+  var deferred = Q.defer();
+
   var file = this.path + type + '/' + name + '.json';
-  return jsonfile.readFileSync(file);
+  try {
+    var data = jsonfile.readFileSync(file);
+    deferred.resolve(data);
+  }
+  catch (err) {
+    deferred.reject(err);
+  }
+
+  return deferred.promise;
 };
 
 /**
@@ -42,10 +124,21 @@ Storage.prototype.load = function load(type, name) {
  * @returns {*}
  */
 Storage.prototype.save = function save(type, name, obj) {
+  var deferred = Q.defer();
+
   var file = this.path + type + '/' + name + '.json';
-  return jsonfile.writeFileSync(file, obj, {
-    spaces: 2
-  });
+  try {
+    var res = jsonfile.writeFileSync(file, obj, {
+      spaces: 2
+    });
+
+    deferred.resolve(res);
+  }
+  catch (err) {
+    deferred.reject(err);
+  }
+
+  return deferred.promise;
 };
 
 /**
@@ -61,8 +154,12 @@ Storage.prototype.save = function save(type, name, obj) {
  * @returns {*}
  */
 Storage.prototype.append = function append(type, name, obj) {
+  var deferred = Q.defer();
+
+  var file = this.path + type + '/' + name + '.json';
+  var data;
   try {
-    var data = this.load(type, name);
+    data = jsonfile.readFileSync(file);
     data.push(obj);
   }
   catch (err) {
@@ -71,11 +168,22 @@ Storage.prototype.append = function append(type, name, obj) {
       data = [ obj ];
     }
     else {
-      throw err;
+      deferred.reject(err);
+      return deferred.promise;
     }
   }
 
-  return this.save(type, name, data);
+  try {
+    var res = jsonfile.writeFileSync(file, data, {
+      spaces: 2
+    });
+    deferred.resolve(res);
+  }
+  catch (err) {
+    deferred.reject(err);
+  }
+
+  return deferred.promise;
 };
 
 
@@ -90,13 +198,18 @@ Storage.prototype.append = function append(type, name, obj) {
  * @returns {*}
  */
 Storage.prototype.remove = function append(type, name) {
+  var deferred = Q.defer();
+
+  var file = this.path + type + '/' + name + '.json';
   try {
-    var file = this.path + type + '/' + name + '.json';
     fs.unlinkSync(file);
+    deferred.resolve();
   }
   catch (err) {
-    throw err;
+    deferred.reject(err);
   }
+
+  return deferred.promise;
 };
 
 /**
@@ -110,55 +223,52 @@ module.exports = function (options, imports, register) {
    * Listen to load requests.
    */
   bus.on('storage.load', function (data) {
-    try {
-      bus.emit(data.busEvent, storage.load(data.type, data.name));
-    }
-    catch (err) {
+    storage.load(data.type, data.name).then(function (res) {
+      bus.emit(data.busEvent, res);
+    },
+    function (err) {
       bus.emit(data.busEvent, err);
       bus.emit('logger.err', err.message);
-    }
+    });
   });
 
   /**
    * Listen to save requests.
    */
   bus.on('storage.save', function (data) {
-    try {
-      storage.save(data.type, data.name, data.obj);
-      bus.emit(data.busEvent, true);
-    }
-    catch (err) {
+    storage.save(data.type, data.name, data.obj).then(function (res) {
+      bus.emit(data.busEvent, res);
+    },
+    function (err) {
       bus.emit(data.busEvent, err);
       bus.emit('logger.err', err.message);
-    }
+    });
   });
 
   /**
    * Listen to append requests.
    */
   bus.on('storage.append', function (data) {
-    try {
-      storage.append(data.type, data.name, data.obj);
+    storage.append(data.type, data.name, data.obj).then(function (res) {
       bus.emit(data.busEvent, true);
-    }
-    catch (err) {
+    },
+    function(err) {
       bus.emit(data.busEvent, err);
       bus.emit('logger.err', err.message);
-    }
+    });
   });
 
   /**
    * Listen to remove requests.
    */
   bus.on('storage.remove', function (data) {
-    try {
-      storage.remove(data.type, data.name);
+    storage.remove(data.type, data.name).then(function () {
       bus.emit(data.busEvent, true);
-    }
-    catch (err) {
+    },
+    function (err) {
       bus.emit(data.busEvent, err);
       bus.emit('logger.err', err.message);
-    }
+    });
   });
 
   register(null, {
