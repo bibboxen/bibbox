@@ -25,6 +25,68 @@ var Storage = function Storage(bus, paths) {
 };
 
 /**
+ * Lock storage.
+ *
+ * @param type
+ *   The type (config, translation or offline).
+ * @param name
+ *   Name of the modules config.
+ *
+ * @returns {*|promise}
+ */
+Storage.prototype.lock = function lock(type, name) {
+  var deferred = Q.defer();
+
+  var file = this.path + type + '/' + name + '.json';
+  lockfile.lock(file, { retries: this.retries}, function (err) {
+    if (err) {
+      deferred.reject(err);
+    }
+    else {
+      deferred.resolve(file);
+    }
+  });
+
+  return deferred.promise;
+};
+
+/**
+ * Un-lock file.
+ *
+ * @param file
+ *   The name of the file returned by the lock function.
+ */
+Storage.prototype.unlock = function unlock(file) {
+  lockfile.unlockSync(file);
+};
+
+/**
+ * Check if storage is locked.
+ *
+ * @param type
+ *   The type (config, translation or offline).
+ * @param name
+ *   Name of the modules config.
+ *
+ * @returns {*|promise}
+ */
+Storage.prototype.isLocked = function isLocked(type, name) {
+  var deferred = Q.defer();
+
+  var file = this.path + type + '/' + name + '.json';
+  lockfile.check(file, function (err, isLocked) {
+    if (err) {
+      deferred.reject(err);
+    }
+    else {
+      deferred.resolve(isLocked);
+    }
+  });
+
+  return deferred.promise;
+};
+
+/**
  * Load object from storage.
  *
  * @param type
@@ -38,27 +100,13 @@ Storage.prototype.load = function load(type, name) {
   var deferred = Q.defer();
 
   var file = this.path + type + '/' + name + '.json';
-  lockfile.lock(file, { retries: this.retries}, function (err) {
-    if (err) {
-      deferred.reject(err);
-    }
-    else {
-      try {
-        var data = jsonfile.readFileSync(file);
-
-        // Release the lock.
-        lockfile.unlock(file);
-
-        deferred.resolve(data);
-      }
-      catch (err) {
-        // Release the lock.
-        lockfile.unlock(file);
-
-        deferred.reject(err);
-      }
-    }
-  });
+  try {
+    var data = jsonfile.readFileSync(file);
+    deferred.resolve(data);
+  }
+  catch (err) {
+    deferred.reject(err);
+  }
 
   return deferred.promise;
 };
@@ -79,32 +127,16 @@ Storage.prototype.save = function save(type, name, obj) {
   var deferred = Q.defer();
 
   var file = this.path + type + '/' + name + '.json';
-  lockfile.lock(file, { retries: this.retries}, function (err) {
-    if (err) {
-      if (err.code !== 'ENOENT') {
-        // File do exists. So reject.
-        deferred.reject(err);
-        return;
-      }
-    }
+  try {
+    var res = jsonfile.writeFileSync(file, obj, {
+      spaces: 2
+    });
 
-    try {
-      var res = jsonfile.writeFileSync(file, obj, {
-        spaces: 2
-      });
-
-      // Release the lock.
-      lockfile.unlock(file);
-
-      deferred.resolve(res);
-    }
-    catch (err) {
-      // Release the lock.
-      lockfile.unlock(file);
-
-      deferred.reject(err);
-    }
-  });
+    deferred.resolve(res);
+  }
+  catch (err) {
+    deferred.reject(err);
+  }
 
   return deferred.promise;
 };
@@ -125,50 +157,31 @@ Storage.prototype.append = function append(type, name, obj) {
   var deferred = Q.defer();
 
   var file = this.path + type + '/' + name + '.json';
-  lockfile.lock(file, { retries: this.retries}, function (err) {
-    if (err) {
-      if (err.code !== 'ENOENT') {
-        // File do exists. So reject.
-        deferred.reject(err);
-        return;
-      }
+  var data;
+  try {
+    data = jsonfile.readFileSync(file);
+    data.push(obj);
+  }
+  catch (err) {
+    if (err.code === 'ENOENT') {
+      // File don't exists. Set data to the parsed in object.
+      data = [ obj ];
     }
-
-    var data;
-    try {
-      data = jsonfile.readFileSync(file);
-      data.push(obj);
-    }
-    catch (err) {
-      if (err.code === 'ENOENT') {
-        // File don't exists. Set data to the parsed in object.
-        data = [ obj ];
-      }
-      else {
-        // Release the lock.
-        lockfile.unlock(file);
-        deferred.reject(err);
-
-        return;
-      }
-    }
-
-    try {
-      var res = jsonfile.writeFileSync(file, data, {
-        spaces: 2
-      });
-      // Release the lock.
-      lockfile.unlock(file);
-
-      deferred.resolve(res);
-    }
-    catch (err) {
-      // Release the lock.
-      lockfile.unlock(file);
-
+    else {
       deferred.reject(err);
+      return deferred.promise;
     }
-  });
+  }
+
+  try {
+    var res = jsonfile.writeFileSync(file, data, {
+      spaces: 2
+    });
+    deferred.resolve(res);
+  }
+  catch (err) {
+    deferred.reject(err);
+  }
 
   return deferred.promise;
 };
@@ -188,27 +201,13 @@ Storage.prototype.remove = function append(type, name) {
   var deferred = Q.defer();
 
   var file = this.path + type + '/' + name + '.json';
-  lockfile.lock(file, { retries: this.retries}, function (err) {
-    if (err) {
-      deferred.reject(err);
-      return;
-    }
-
-    try {
-      fs.unlinkSync(file);
-
-      // Release the lock.
-      lockfile.unlock(file);
-
-      deferred.resolve();
-    }
-    catch (err) {
-      // Release the lock.
-      lockfile.unlock(file);
-
-      deferred.reject(err);
-    }
-  });
+  try {
+    fs.unlinkSync(file);
+    deferred.resolve();
+  }
+  catch (err) {
+    deferred.reject(err);
+  }
 
   return deferred.promise;
 };

@@ -71,6 +71,37 @@ it('Save data to offline storage and append more data to it', function (done) {
   }, done);
 });
 
+var file;
+it('Should lock off-line storage', function (done) {
+  setup().then(function (app) {
+    app.services.storage.lock('offline', 'test').then(function(res) {
+      file = res;
+      app.services.storage.isLocked('offline', 'test').then(function (locked) {
+        if (!locked) {
+          done(new Error('File was not locked'));
+        }
+        else {
+          done();
+        }
+      }, done);
+    }, done);
+  }, done);
+});
+
+it('Should un-lock off-line storage', function (done) {
+  setup().then(function (app) {
+    app.services.storage.unlock(file);
+    app.services.storage.isLocked('offline', 'test').then(function (locked) {
+      if (locked) {
+        done(new Error('File was not un-locked'));
+      }
+      else {
+        done();
+      }
+    }, done);
+  }, done);
+});
+
 it('Should remove test files from config storage', function (done) {
   setup().then(function (app) {
     app.services.storage.remove('config', 'test').then(function(res) {
