@@ -42,17 +42,22 @@ Storage.prototype.load = function load(type, name) {
     if (err) {
       deferred.reject(err);
     }
+    else {
+      try {
+        var data = jsonfile.readFileSync(file);
 
-    try {
-      var data = jsonfile.readFileSync(file);
-      deferred.resolve(data);
-    }
-    catch (err) {
-      deferred.reject(err);
-    }
+        // Release the lock.
+        lockfile.unlock(file);
 
-    // Release the lock.
-    lockfile.unlock(file);
+        deferred.resolve(data);
+      }
+      catch (err) {
+        // Release the lock.
+        lockfile.unlock(file);
+
+        deferred.reject(err);
+      }
+    }
   });
 
   return deferred.promise;
@@ -76,21 +81,29 @@ Storage.prototype.save = function save(type, name, obj) {
   var file = this.path + type + '/' + name + '.json';
   lockfile.lock(file, { retries: this.retries}, function (err) {
     if (err) {
-      deferred.reject(err);
+      if (err.code !== 'ENOENT') {
+        // File do exists. So reject.
+        deferred.reject(err);
+        return;
+      }
     }
 
     try {
       var res = jsonfile.writeFileSync(file, obj, {
         spaces: 2
       });
+
+      // Release the lock.
+      lockfile.unlock(file);
+
       deferred.resolve(res);
     }
     catch (err) {
+      // Release the lock.
+      lockfile.unlock(file);
+
       deferred.reject(err);
     }
-
-    // Release the lock.
-    lockfile.unlock(file);
   });
 
   return deferred.promise;
@@ -114,7 +127,11 @@ Storage.prototype.append = function append(type, name, obj) {
   var file = this.path + type + '/' + name + '.json';
   lockfile.lock(file, { retries: this.retries}, function (err) {
     if (err) {
-      deferred.reject(err);
+      if (err.code !== 'ENOENT') {
+        // File do exists. So reject.
+        deferred.reject(err);
+        return;
+      }
     }
 
     var data;
@@ -128,7 +145,11 @@ Storage.prototype.append = function append(type, name, obj) {
         data = [ obj ];
       }
       else {
+        // Release the lock.
+        lockfile.unlock(file);
         deferred.reject(err);
+
+        return;
       }
     }
 
@@ -136,14 +157,17 @@ Storage.prototype.append = function append(type, name, obj) {
       var res = jsonfile.writeFileSync(file, data, {
         spaces: 2
       });
+      // Release the lock.
+      lockfile.unlock(file);
+
       deferred.resolve(res);
     }
     catch (err) {
+      // Release the lock.
+      lockfile.unlock(file);
+
       deferred.reject(err);
     }
-
-    // Release the lock.
-    lockfile.unlock(file);
   });
 
   return deferred.promise;
@@ -167,18 +191,23 @@ Storage.prototype.remove = function append(type, name) {
   lockfile.lock(file, { retries: this.retries}, function (err) {
     if (err) {
       deferred.reject(err);
+      return;
     }
 
     try {
       fs.unlinkSync(file);
+
+      // Release the lock.
+      lockfile.unlock(file);
+
       deferred.resolve();
     }
     catch (err) {
+      // Release the lock.
+      lockfile.unlock(file);
+
       deferred.reject(err);
     }
-
-    // Release the lock.
-    lockfile.unlock(file);
   });
 
   return deferred.promise;
