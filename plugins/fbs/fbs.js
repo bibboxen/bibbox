@@ -377,7 +377,7 @@ module.exports = function (options, imports, register) {
           };
 
           bus.once('fbs.checkout.offline.stored' + data.itemIdentifier, function(res) {
-            bus.emit(data.busEvent, res);
+            bus.emit(data.busEvent, material);
           });
 
           bus.once('fbs.checkout.offline.error' + data.itemIdentifier, function (err) {
