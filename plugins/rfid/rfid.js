@@ -27,9 +27,6 @@ var RFID = function (bus, port, afi) {
 
   // Connection set up.
   server.on('connection', function connection(ws) {
-
-    console.log(ws.readyState);
-
     // Cleanup bus events for previous connections.
     if (requestTags !== null) {
       bus.removeListener('rfid.tags.request', requestTags);
@@ -55,8 +52,8 @@ var RFID = function (bus, port, afi) {
       try {
         ws.send(JSON.stringify({
           event: 'setAFI',
-          UID: data.UID,
-          AFI: data.AFI ? afi.on : afi.off
+          uid: data.uid,
+          afi: data.afi ? afi.on : afi.off
         }));
       }
       catch (err) {
@@ -80,30 +77,29 @@ var RFID = function (bus, port, afi) {
 
         switch(data.event) {
           case 'connected':
+            console.log("Connected");
             bus.emit('rfid.connected');
             break;
 
-          case 'tagsDetected':
+          case 'rfid.tags.detected':
             bus.emit('rfid.tags.detected', data.tags);
             break;
 
-          case 'tagDetected':
+          case 'rfid.tag.detected':
             bus.emit('rfid.tag.detected', data.tag);
             break;
 
-          case 'tagRemoved':
+          case 'rfid.tag.removed':
             bus.emit('rfid.tag.removed', data.tag);
             break;
 
-          case 'setTagResult':
-            console.log('tagSet not implemented.');
-            break;
-
-          case 'setAFIResult':
+          case 'rfid.afi.set':
             if (data.success) {
+              console.log(data.tag);
+
               bus.emit('rfid.tag.afi.set', {
-                UID: data.UID,
-                AFI: data.AFI === afi.on
+                uid: data.tag.uid,
+                afi: data.tag.afi === afi.on
               })
             }
             else {
