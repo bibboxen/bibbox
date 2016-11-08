@@ -262,6 +262,17 @@ module.exports = function (options, imports, register) {
         });
       },
       function(err) {
+        if (err.code === 'ENOENT') {
+          // Could not lock file as it don't exists.
+          storage.append(data.type, data.name, data.obj).then(function (res) {
+            bus.emit(data.busEvent, true);
+          },
+          function(err) {
+            bus.emit(data.errorEvent, err);
+            bus.emit('logger.err', err.message);
+          });
+        }
+
         bus.emit(data.errorEvent, err);
         bus.emit('logger.err', err.message);
       });

@@ -382,7 +382,7 @@ module.exports = function (options, imports, register) {
           });
 
           bus.on('fbs.checkout.offline.error', function (err) {
-            console.log('Error');
+            console.log(err);
             bus.emit(data.errorEvent, err);
           });
 
