@@ -227,7 +227,7 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, res);
     },
     function (err) {
-      bus.emit(data.busEvent, err);
+      bus.emit(data.errorEvent, err);
       bus.emit('logger.err', err.message);
     });
   });
@@ -240,7 +240,7 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, res);
     },
     function (err) {
-      bus.emit(data.busEvent, err);
+      bus.emit(data.errorEvent, err);
       bus.emit('logger.err', err.message);
     });
   });
@@ -249,13 +249,32 @@ module.exports = function (options, imports, register) {
    * Listen to append requests.
    */
   bus.on('storage.append', function (data) {
-    storage.append(data.type, data.name, data.obj).then(function (res) {
-      bus.emit(data.busEvent, true);
-    },
-    function(err) {
-      bus.emit(data.busEvent, err);
-      bus.emit('logger.err', err.message);
-    });
+    if (data.hasOwnProperty('lockFile') && data.lockFile === true) {
+      storage.lock(data.type, data.name).then(function (file) {
+        storage.append(data.type, data.name, data.obj).then(function (res) {
+          storage.unlock(file);
+          bus.emit(data.busEvent, true);
+        },
+        function(err) {
+          storage.unlock(file);
+          bus.emit(data.errorEvent, err);
+          bus.emit('logger.err', err.message);
+        });
+      },
+      function(err) {
+        bus.emit(data.errorEvent, err);
+        bus.emit('logger.err', err.message);
+      });
+    }
+    else {
+      storage.append(data.type, data.name, data.obj).then(function (res) {
+        bus.emit(data.busEvent, true);
+      },
+      function(err) {
+        bus.emit(data.errorEvent, err);
+        bus.emit('logger.err', err.message);
+      });
+    }
   });
 
   /**
@@ -266,7 +285,7 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, true);
     },
     function (err) {
-      bus.emit(data.busEvent, err);
+      bus.emit(data.errorEvent, err);
       bus.emit('logger.err', err.message);
     });
   });

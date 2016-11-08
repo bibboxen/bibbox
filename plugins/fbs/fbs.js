@@ -376,6 +376,16 @@ module.exports = function (options, imports, register) {
             }
           };
 
+          bus.on('fbs.checkout.offline.stored', function() {
+            console.log('Stored');
+            bus.emit(data.busEvent, material);
+          });
+
+          bus.on('fbs.checkout.offline.error', function (err) {
+            console.log('Error');
+            bus.emit(data.errorEvent, err);
+          });
+
           // Store for later processing.
           bus.emit('storage.append', {
             type: 'offline',
@@ -386,10 +396,13 @@ module.exports = function (options, imports, register) {
               password: data.password,
               action: 'checkout',
               item: data.itemIdentifier
-            }
+            },
+            lockFile: true,
+            busEvent: 'fbs.checkout.offline.stored',
+            errorEvent: 'fbs.checkout.offline.error'
           });
 
-          bus.emit(data.busEvent, material);
+
         }
         else {
           bus.emit(data.errorEvent, err);
