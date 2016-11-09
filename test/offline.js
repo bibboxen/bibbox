@@ -7,13 +7,6 @@
 
 'use strict';
 
-var Request = require('./../plugins/fbs/request');
-var Response = require('./../plugins/fbs/response');
-
-var config = require(__dirname + '/config.json');
-
-var Q = require('q');
-
 var app = null;
 var setup = function setup() {
   if (!app) {
@@ -46,7 +39,9 @@ var setup = function setup() {
         packagePath: './../plugins/fbs'
       },
       {
-        packagePath: './../plugins/offline'
+        packagePath: './../plugins/offline',
+        host: config.offline.host,
+        port: config.offline.port
       }
     ];
     app = setupArchitect(plugins, config);
@@ -55,18 +50,43 @@ var setup = function setup() {
   return app;
 };
 
-it.only('should add job to offline queue', function (done) {
+it('should add job to offline checkout queue', function (done) {
   setup().then(function (app) {
     app.services.offline.add('checkout', {
-      username: '3210519700',
+      username: '3210519768',
       password: '12345',
       itemIdentifier: '0000007889',
       busEvent: 'offline.fbs.checkout.success0000007889',
       errorEvent: 'offline.fbs.checkout.error0000007889',
       queued: true
-    });
+    }).then(function (jobId) {
+      try {
+        jobId.should.be.a.Number();
+        done();
+      }
+      catch (err) {
+        done(err);
+      }
+    }, done);
+  }, done);
+});
 
-    done();
+it.only('should add job to offline checkin queue', function (done) {
+  setup().then(function (app) {
+    app.services.offline.add('checkin', {
+      itemIdentifier: '0000007889',
+      busEvent: 'offline.fbs.checkin.success0000007889',
+      errorEvent: 'offline.fbs.checkin.error0000007889',
+      queued: true
+    }).then(function (jobId) {
+      try {
+        jobId.should.be.a.Number();
+        done();
+      }
+      catch (err) {
+        done(err);
+      }
+    }, done);
   }, done);
 });
 

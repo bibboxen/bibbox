@@ -8,6 +8,7 @@
 'use strict';
 
 var Queue = require('bull');
+var Q = require('q');
 
 // Global self is used be queued jobs to get access to the bus.
 var self = null;
@@ -27,41 +28,115 @@ var Offline = function Offline(bus, host, port) {
   this.checkinQueue.process(this.checkin);
   this.checkoutQueue.process(this.checkout);
 
-  this.pause(this.checkinQueue);
-  this.pause(this.checkoutQueue);
+  this.pause('checkin');
+  this.pause('checkout');
 };
 
-Offline.prototype.isRunning = function isRunning(queue) {
+/**
+ * Find queue based on queue type.
+ *
+ * @param type
+ *  The type of queue (checkin or checkout).
+ *
+ * @returns {*}
+ *   The queue if found. If not null.
+ *
+ * @private
+ */
+Offline.prototype._findQueue = function _findQueue(type) {
+  var queue = null;
+
+  switch (type) {
+    case 'checkin':
+      queue = this.checkinQueue;
+      break;
+
+    case 'checkout':
+      queue = this.checkoutQueue;
+      break;
+  }
+
+  return queue;
+};
+
+/**
+ * Check if a queue is running.
+ *
+ * @param type
+ *  The type of queue (checkin or checkout).
+ *
+ * @returns {boolean}
+ *   TRUE if it's running else FALSE.
+ */
+Offline.prototype.isRunning = function isRunning(type) {
+  var queue = this._findQueue(type);
+
   return !queue.paused;
 };
 
-Offline.prototype.pause = function pause(queue) {
+/**
+ * Pause a queue.
+ *
+ * @param type
+ *  The type of queue (checkin or checkout).
+ */
+Offline.prototype.pause = function pause(type) {
   var self = this;
+  var queue = this._findQueue(type);
+
   queue.pause().then(function(){
     self.bus.emit('logger.info', 'Offline queue "' + queue.name + '" is paused.');
   });
 };
 
-Offline.prototype.resume = function resume(queue) {
+/**
+ * Resume a queue.
+ *
+ * @param type
+ *  The type of queue (checkin or checkout).
+ */
+Offline.prototype.resume = function resume(type) {
   var self = this;
+  var queue = this._findQueue(type);
+
   queue.resume().then(function(){
     self.bus.emit('logger.info', 'Offline queue "' + queue.name + '" has resumed.');
   });
 };
 
+/**
+ * Add job to a queue.
+ *
+ * @param type
+ *   The type of queue (checkin or checkout).
+ * @param data
+ *   The data to process.
+ *
+ * @returns {*}
+ *   Promise that resolves to jobId if added else error.
+ */
 Offline.prototype.add = function add(type, data) {
-  console.log('Added - ' + type);
-  switch (type) {
-    case 'checkin':
-      this.checkinQueue.add(data);
-      break;
+  var deferred = Q.defer();
+  var queue = this._findQueue(type);
 
-    case 'checkout':
-      this.checkoutQueue.add(data);
-      break;
-  }
+  queue.add(data).then(function (job) {
+    deferred.resolve(job.jobId);
+  },
+  function (err) {
+    deferred.reject(err);
+  });
+
+  return deferred.promise;
 };
 
+/**
+ * Processing function for check-in jobs.
+ *
+ * @param job
+ *   The job.
+ * @param done
+ *   Callback when done processing.
+ */
 Offline.prototype.checkin = function checkin(job, done) {
   var data = job.data;
 
@@ -78,10 +153,17 @@ Offline.prototype.checkin = function checkin(job, done) {
   console.log(job);
 
   // Send request to FBS.
-  // this.bus.emit('fbs.checkin', job.data);
-  done();
+  self.bus.emit('fbs.checkin', data);
 };
 
+/**
+ * Processing function for checkout jobs.
+ *
+ * @param job
+ *   The job.
+ * @param done
+ *   Callback when done processing.
+ */
 Offline.prototype.checkout = function checkout(job, done) {
   var data = job.data;
 

@@ -5,7 +5,8 @@
   "main": "offline.js",
   "private": true,
   "dependencies": {
-    "bull": "^1.0.0"
+    "bull": "^1.0.0",
+    "q": "^1.4.1"
   },
   "plugin": {
     "consumes": [
