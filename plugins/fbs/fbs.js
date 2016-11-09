@@ -361,12 +361,16 @@ module.exports = function (options, imports, register) {
    * Listen to checkout requests.
    */
   bus.on('fbs.checkout', function (data) {
+    // Check if this is a processing of offline queue.
+    data.queued = data.queued || false;
+
+    // Create FBS object and send checkout request.
     FBS.create(bus).then(function (fbs) {
       fbs.checkout(data.username, data.password, data.itemIdentifier).then(function (res) {
         bus.emit(data.busEvent, res);
       },
       function (err) {
-        if (err.message === 'FBS is offline') {
+        if (err.message === 'FBS is offline' && data.queued === false) {
           var material = {
             itemIdentifier: data.itemIdentifier,
             offline: true,
@@ -390,15 +394,18 @@ module.exports = function (options, imports, register) {
             name: data.username,
             obj: {
               date: new Date().getTime(),
+              action: 'checkout',
               username: data.username,
               password: data.password,
-              action: 'checkout',
-              item: data.itemIdentifier
+              itemIdentifier: data.itemIdentifier
             },
             lockFile: true,
             busEvent: 'fbs.checkout.offline.stored' + data.itemIdentifier,
             errorEvent: 'fbs.checkout.offline.error' + data.itemIdentifier
           });
+
+          // Add to job queue.
+          bus.emit('offline.add.checkout', data);
         }
         else {
           bus.emit(data.errorEvent, err);
@@ -414,12 +421,16 @@ module.exports = function (options, imports, register) {
    * Listen to checkIn requests.
    */
   bus.on('fbs.checkin', function (data) {
+    // Check if this is a processing of offline queue.
+    data.queued = data.queued || false;
+
+    // Create FBS object and send checkin request.
     FBS.create(bus).then(function (fbs) {
       fbs.checkIn(data.itemIdentifier).then(function (res) {
         bus.emit(data.busEvent, res);
       },
       function (err) {
-        if (err.message === 'FBS is offline') {
+        if (err.message === 'FBS is offline' && data.queued === false) {
           var material = {
             itemIdentifier: data.itemIdentifier,
             offline: true,
@@ -442,14 +453,17 @@ module.exports = function (options, imports, register) {
             type: 'offline',
             name: data.timestamp,
             obj: {
-              date: new Date().getTime(),
               action: 'checkin',
-              item: data.itemIdentifier
+              date: new Date().getTime(),
+              itemIdentifier: data.itemIdentifier
             },
             lockFile: true,
             busEvent: 'fbs.checkin.offline.stored' + data.itemIdentifier,
             errorEvent: 'fbs.checkin.offline.error' + data.itemIdentifier
           });
+
+          // Add to job queue.
+          bus.emit('offline.add.checkin', data);
         }
         else {
           bus.emit(data.errorEvent, err);

@@ -71,4 +71,5 @@ importTest('Notification', './notification.js');
 importTest('Proxy', './proxy.js');
 importTest('Translation', './translation.js');
 importTest('RFID', './rfid.js');
-importTest('ctrl', './ctrl.js');
+importTest('Controller', './ctrl.js');
+importTest('Offline', './offline.js');
