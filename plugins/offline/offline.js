@@ -205,10 +205,10 @@ Offline.prototype.checkin = function checkin(job, done) {
 
   self.bus.once(data.busEvent, function (res) {
     if (res.ok == '0') {
+      self.bus.emit('logger.offline', 'error: ' + require('util').inspect(res, true, 10));
       done(new Error(res.screenMessage));
     }
     else {
-      self.bus.emit('logger.offline', 'data: ' + require('util').inspect(res, true, 10));
       done(null, res);
     }
   });
@@ -238,10 +238,10 @@ Offline.prototype.checkout = function checkout(job, done) {
     if (res.ok == '0') {
       // @TODO: Check here screen-message if the user should be changed due to
       //        wrong username or password.
+      self.bus.emit('logger.offline', 'error: ' + require('util').inspect(res, true, 10));
       done(new Error(res.screenMessage));
     }
     else {
-      self.bus.emit('logger.offline', 'data: ' + require('util').inspect(res, true, 10));
       done(null, res);
     }
   });
