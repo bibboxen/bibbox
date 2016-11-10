@@ -389,9 +389,10 @@ module.exports = function (options, imports, register) {
           });
 
           // Store for later processing.
+          var file = data.username;
           bus.emit('storage.append', {
             type: 'offline',
-            name: data.username,
+            name: file,
             obj: {
               date: new Date().getTime(),
               action: 'checkout',
@@ -405,6 +406,7 @@ module.exports = function (options, imports, register) {
           });
 
           // Add to job queue.
+          data.file = file;
           bus.emit('offline.add.checkout', data);
         }
         else {
@@ -449,9 +451,10 @@ module.exports = function (options, imports, register) {
           });
 
           // Store for later processing.
+          var file = data.timestamp;
           bus.emit('storage.append', {
             type: 'offline',
-            name: data.timestamp,
+            name: file,
             obj: {
               action: 'checkin',
               date: new Date().getTime(),
@@ -463,6 +466,7 @@ module.exports = function (options, imports, register) {
           });
 
           // Add to job queue.
+          data.file = file;
           bus.emit('offline.add.checkin', data);
         }
         else {

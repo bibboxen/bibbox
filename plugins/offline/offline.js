@@ -209,6 +209,18 @@ Offline.prototype.checkin = function checkin(job, done) {
       done(new Error(res.screenMessage));
     }
     else {
+      // Remove item form backup files. We don't listen to if it success or
+      // fails the remove as we won't mark the job as failed as it has been
+      // completed at FBS.
+      self.bus('storage.remove.item', {
+        type: 'offline',
+        name: data.file,
+        itemIdentifier: data.itemIdentifier,
+        busEvent: 'offline.remove.item.checkin',
+        errorEvent: 'offline.remove.item.checkin.error'
+      });
+
+      // Success the item have been checked-in.
       done(null, res);
     }
   });
@@ -242,6 +254,18 @@ Offline.prototype.checkout = function checkout(job, done) {
       done(new Error(res.screenMessage));
     }
     else {
+      // Remove item form backup files. We don't listen to if it success or
+      // fails the remove as we won't mark the job as failed as it has been
+      // completed at FBS.
+      self.bus('storage.remove.item', {
+        type: 'offline',
+        name: data.file,
+        itemIdentifier: data.itemIdentifier,
+        busEvent: 'offline.remove.item.checkin',
+        errorEvent: 'offline.remove.item.checkin.error'
+      });
+
+      // Success the item have been checked-out.
       done(null, res);
     }
   });
