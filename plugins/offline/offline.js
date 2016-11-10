@@ -1,8 +1,6 @@
 /**
  * @file
  *
- * @TODO: Run check for offline files every time FBS comes online for more than
- *        x mins.
  */
 
 'use strict';
@@ -22,14 +20,86 @@ var Offline = function Offline(bus, host, port) {
 
   this.bus = bus;
 
+  // Create the queues, if they exists in redis they will just reconnect.
   this.checkinQueue = Queue('Check-in', port, host);
   this.checkoutQueue = Queue('Check-out', port, host);
 
+  // Add job processing functions to the queues.
   this.checkinQueue.process(this.checkin);
   this.checkoutQueue.process(this.checkout);
 
+  // Listen to fail jobs in the check-in queue. As jobs in processing is not
+  // paused when the queue is... we need to handle errors in processing jobs
+  // due to FBS offline.
+  this.checkinQueue.on('failed', function (job, err) {
+    if (err.message === 'FBS is offline') {
+      job.remove().then(function () {
+        // Job remove to re-add it as a new job.
+        self.add('checkin', job.data);
+      },
+      function (err) {
+        // If we can't remove the job... not much we can do.
+        self.bus('logger.offline', err.message);
+      });
+    }
+  });
+
+  // Listen to fail jobs in the check-out queue. As jobs in processing is not
+  // paused when the queue is... we need to handle errors in processing jobs
+  // due to FBS offline.
+  this.checkoutQueue.on('failed', function (job, err) {
+    if (err.message === 'FBS is offline') {
+      job.remove().then(function () {
+          // Job remove to re-add it as a new job.
+          self.add('checkout', job.data);
+        },
+        function (err) {
+          // If we can't remove the job... not much we can do.
+          self.bus('logger.offline', err.message);
+        });
+    }
+  });
+
+  // Start the queues paused.
   this.pause('checkin');
   this.pause('checkout');
+
+  // Book-keeping to track that FBS is relative stable online.
+  var threshold = 10;
+  var currentHold = 0;
+
+  // Listen for FBS offline events.
+  bus.on('offline.fbs.check', function (online) {
+    if (online) {
+      if (currentHold >= threshold) {
+        self.resume('checkin');
+        self.resume('checkout');
+      }
+      else {
+        currentHold++;
+      }
+    }
+    else {
+      currentHold = 0;
+      self.pause('checkin');
+      self.pause('checkout');
+    }
+  });
+
+  // Listen to FBS check error and pause queues (FBS offline).
+  bus.on('offline.fbs.check.error', function () {
+    currentHold = 0;
+    self.pause('checkin');
+    self.pause('checkout');
+  });
+
+  // Send FBS online check requests.
+  setInterval(function () {
+    bus.emit('fbs.online', {
+      busEvent: 'offline.fbs.check',
+      errorEvent: 'offline.fbs.check.error'
+    });
+  } , 5000);
 };
 
 /**
@@ -60,21 +130,6 @@ Offline.prototype._findQueue = function _findQueue(type) {
 };
 
 /**
- * Check if a queue is running.
- *
- * @param type
- *  The type of queue (checkin or checkout).
- *
- * @returns {boolean}
- *   TRUE if it's running else FALSE.
- */
-Offline.prototype.isRunning = function isRunning(type) {
-  var queue = this._findQueue(type);
-
-  return !queue.paused;
-};
-
-/**
  * Pause a queue.
  *
  * @param type
@@ -85,7 +140,7 @@ Offline.prototype.pause = function pause(type) {
   var queue = this._findQueue(type);
 
   queue.pause().then(function(){
-    self.bus.emit('logger.info', 'Offline queue "' + queue.name + '" is paused.');
+    self.bus.emit('logger.offline', 'Queue "' + queue.name + '" is paused.');
   });
 };
 
@@ -100,7 +155,7 @@ Offline.prototype.resume = function resume(type) {
   var queue = this._findQueue(type);
 
   queue.resume().then(function(){
-    self.bus.emit('logger.info', 'Offline queue "' + queue.name + '" has resumed.');
+    self.bus.emit('logger.offline', 'Queue "' + queue.name + '" has resumed.');
   });
 };
 
@@ -119,7 +174,15 @@ Offline.prototype.add = function add(type, data) {
   var deferred = Q.defer();
   var queue = this._findQueue(type);
 
-  queue.add(data).then(function (job) {
+  var opts = {
+    attempts: 5,
+    backoff: {
+      type: 'exponential',
+      delay: 10000
+    }
+  };
+
+  queue.add(data, opts).then(function (job) {
     deferred.resolve(job.jobId);
   },
   function (err) {
@@ -140,17 +203,21 @@ Offline.prototype.add = function add(type, data) {
 Offline.prototype.checkin = function checkin(job, done) {
   var data = job.data;
 
-  self.bus.on(data.busEvent, function (res) {
-    done();
+  self.bus.once(data.busEvent, function (res) {
+    if (res.ok == '0') {
+      done(new Error(res.screenMessage));
+    }
+    else {
+      self.bus.emit('logger.offline', 'data: ' + require('util').inspect(res, true, 10));
+      done(null, res);
+    }
   });
 
-  self.bus.on(job.errorEvent, function (err) {
+  self.bus.once(data.errorEvent, function (err) {
      // Log the failure.
      self.bus.emit('logger.offline', 'error: ' + err.message);
      done(err);
   });
-
-  console.log(job);
 
   // Send request to FBS.
   self.bus.emit('fbs.checkin', data);
@@ -168,12 +235,13 @@ Offline.prototype.checkout = function checkout(job, done) {
   var data = job.data;
 
   self.bus.once(data.busEvent, function (res) {
-    console.log(res);
     if (res.ok == '0') {
+      // @TODO: Check here screen-message if the user should be changed due to
+      //        wrong username or password.
       done(new Error(res.screenMessage));
     }
     else {
-      self.bus.emit('logger.offline', 'data: ' + res);
+      self.bus.emit('logger.offline', 'data: ' + require('util').inspect(res, true, 10));
       done(null, res);
     }
   });

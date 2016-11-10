@@ -424,7 +424,7 @@ module.exports = function (options, imports, register) {
     // Check if this is a processing of offline queue.
     data.queued = data.queued || false;
 
-    // Create FBS object and send checkin request.
+    // Create FBS object and send check-in request.
     FBS.create(bus).then(function (fbs) {
       fbs.checkIn(data.itemIdentifier).then(function (res) {
         bus.emit(data.busEvent, res);
