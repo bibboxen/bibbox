@@ -71,7 +71,7 @@ it('should add job to offline checkout queue', function (done) {
   }, done);
 });
 
-it.only('should add job to offline checkin queue', function (done) {
+it('should add job to offline check-in queue', function (done) {
   setup().then(function (app) {
     app.services.offline.add('checkin', {
       itemIdentifier: '0000007889',
