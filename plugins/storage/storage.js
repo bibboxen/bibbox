@@ -262,8 +262,20 @@ module.exports = function (options, imports, register) {
         });
       },
       function(err) {
-        bus.emit(data.errorEvent, err);
-        bus.emit('logger.err', err.message);
+        if (err.code === 'ENOENT') {
+          // Could not lock file as it don't exists.
+          storage.append(data.type, data.name, data.obj).then(function (res) {
+            bus.emit(data.busEvent, true);
+          },
+          function(err) {
+            bus.emit(data.errorEvent, err);
+            bus.emit('logger.err', err.message);
+          });
+        }
+        else {
+          bus.emit(data.errorEvent, err);
+          bus.emit('logger.err', err.message);
+        }
       });
     }
     else {
@@ -275,6 +287,50 @@ module.exports = function (options, imports, register) {
         bus.emit('logger.err', err.message);
       });
     }
+  });
+
+  /**
+   * Listen to remove item events.
+   */
+  bus.on('storage.remove.item', function (data) {
+    storage.lock(data.type, data.name).then(function (file) {
+      storage.load(data.type, data.name).then(function (res) {
+        var item = res.find(function (item, index) {
+          if (item.itemIdentifier === data.itemIdentifier) {
+            res.splice(index, 1);
+            return true;
+          }
+
+          return false;
+        });
+
+        if (item) {
+          // Item found re-save the file.
+          storage.save(data.type, date.name, res).then(function () {
+            storage.unlock(file);
+            bus.emit(data.busEvent, true);
+          },
+          function (err) {
+            storage.unlock(file);
+            bus.emit(data.errorEvent, err);
+            bus.emit('logger.err', err.message);
+          });
+        }
+        else {
+          storage.unlock(file);
+          bus.emit(data.busEvent, false);
+        }
+      },
+      function (err) {
+        storage.unlock(file);
+        bus.emit(data.errorEvent, err);
+        bus.emit('logger.err', err.message);
+      });
+    },
+    function (err) {
+      bus.emit(data.errorEvent, err);
+      bus.emit('logger.err', err.message);
+    });
   });
 
   /**

@@ -15,6 +15,7 @@ var Rotate = require('winston-logrotate').Rotate;
 var Logger = function Logger(logs) {
   var levels = winston.config.syslog.levels;
   levels.fbs = 8;
+  levels.offline = 9;
   winston.setLevels(levels);
 
   if (logs.hasOwnProperty('info')) {
@@ -92,6 +93,26 @@ var Logger = function Logger(logs) {
       exitOnError: false
     });
   }
+
+  if (logs.hasOwnProperty('offline')) {
+    this.offlineLog = new (winston.Logger)({
+      levels: levels,
+      transports: [
+        new Rotate({
+          file: path.join(__dirname, '../../' + logs.offline),
+          level: 'offline',
+          colorize: false,
+          timestamp: true,
+          json: false,
+          max: '100m',
+          keep: 5,
+          compress: false
+        })
+      ],
+      exitOnError: false
+    });
+  }
+
   if (logs.hasOwnProperty('exception')) {
     this.excepLog = new (winston.Logger)({
       levels: levels,
@@ -165,6 +186,18 @@ Logger.prototype.fbs = function fbs(message) {
 };
 
 /**
+ * Log off-line message.
+ *
+ * @param message
+ *   The message to send to the logger.
+ */
+Logger.prototype.offline = function offline(message) {
+  if (this.offlineLog !== undefined) {
+    this.offlineLog.offline(message);
+  }
+};
+
+/**
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
@@ -187,6 +220,10 @@ module.exports = function (options, imports, register) {
 
   bus.on('logger.fbs', function (message) {
     logger.fbs(message);
+  });
+
+  bus.on('logger.offline', function (message) {
+    logger.offline(message);
   });
 
   // Register the plugin with the system.
