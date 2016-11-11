@@ -9,7 +9,8 @@
     "info": "logs/info.log",
     "error": "logs/error.log",
     "debug": "logs/debug.log",
-    "fbs": "logs/fbs.log"
+    "fbs": "logs/fbs.log",
+    "offline": "logs/offline.log"
   },
   "proxy": {
     "whitelistedBusEvents": [
@@ -70,8 +71,12 @@
   "rfid": {
     "port": 3001,
     "afi": {
-      "on": "194",
-      "off": "7"
+      "on": "7",
+      "off": "194"
     }
+  },
+  "offline": {
+    "host": "127.0.0.1",
+    "port": 6379,
   }
 }

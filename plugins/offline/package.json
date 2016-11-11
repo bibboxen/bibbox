@@ -1,0 +1,22 @@
+{
+  "name": "Offline",
+  "description": "Processing of offline request into a queue",
+  "version": "0.0.1",
+  "main": "offline.js",
+  "private": true,
+  "dependencies": {
+    "bull": "^1.0.0",
+    "q": "^1.4.1"
+  },
+  "plugin": {
+    "consumes": [
+      "bus"
+    ],
+    "provides": [
+      "offline"
+    ]
+  },
+  "devDependencies": {
+    "bull-ui": "^1.2.1"
+  }
+}

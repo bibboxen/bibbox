@@ -227,7 +227,7 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, res);
     },
     function (err) {
-      bus.emit(data.busEvent, err);
+      bus.emit(data.errorEvent, err);
       bus.emit('logger.err', err.message);
     });
   });
@@ -240,7 +240,7 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, res);
     },
     function (err) {
-      bus.emit(data.busEvent, err);
+      bus.emit(data.errorEvent, err);
       bus.emit('logger.err', err.message);
     });
   });
@@ -249,11 +249,86 @@ module.exports = function (options, imports, register) {
    * Listen to append requests.
    */
   bus.on('storage.append', function (data) {
-    storage.append(data.type, data.name, data.obj).then(function (res) {
-      bus.emit(data.busEvent, true);
+    if (data.hasOwnProperty('lockFile') && data.lockFile === true) {
+      storage.lock(data.type, data.name).then(function (file) {
+        storage.append(data.type, data.name, data.obj).then(function (res) {
+          storage.unlock(file);
+          bus.emit(data.busEvent, true);
+        },
+        function(err) {
+          storage.unlock(file);
+          bus.emit(data.errorEvent, err);
+          bus.emit('logger.err', err.message);
+        });
+      },
+      function(err) {
+        if (err.code === 'ENOENT') {
+          // Could not lock file as it don't exists.
+          storage.append(data.type, data.name, data.obj).then(function (res) {
+            bus.emit(data.busEvent, true);
+          },
+          function(err) {
+            bus.emit(data.errorEvent, err);
+            bus.emit('logger.err', err.message);
+          });
+        }
+        else {
+          bus.emit(data.errorEvent, err);
+          bus.emit('logger.err', err.message);
+        }
+      });
+    }
+    else {
+      storage.append(data.type, data.name, data.obj).then(function (res) {
+        bus.emit(data.busEvent, true);
+      },
+      function(err) {
+        bus.emit(data.errorEvent, err);
+        bus.emit('logger.err', err.message);
+      });
+    }
+  });
+
+  /**
+   * Listen to remove item events.
+   */
+  bus.on('storage.remove.item', function (data) {
+    storage.lock(data.type, data.name).then(function (file) {
+      storage.load(data.type, data.name).then(function (res) {
+        var item = res.find(function (item, index) {
+          if (item.itemIdentifier === data.itemIdentifier) {
+            res.splice(index, 1);
+            return true;
+          }
+
+          return false;
+        });
+
+        if (item) {
+          // Item found re-save the file.
+          storage.save(data.type, date.name, res).then(function () {
+            storage.unlock(file);
+            bus.emit(data.busEvent, true);
+          },
+          function (err) {
+            storage.unlock(file);
+            bus.emit(data.errorEvent, err);
+            bus.emit('logger.err', err.message);
+          });
+        }
+        else {
+          storage.unlock(file);
+          bus.emit(data.busEvent, false);
+        }
+      },
+      function (err) {
+        storage.unlock(file);
+        bus.emit(data.errorEvent, err);
+        bus.emit('logger.err', err.message);
+      });
     },
-    function(err) {
-      bus.emit(data.busEvent, err);
+    function (err) {
+      bus.emit(data.errorEvent, err);
       bus.emit('logger.err', err.message);
     });
   });
@@ -266,7 +341,7 @@ module.exports = function (options, imports, register) {
       bus.emit(data.busEvent, true);
     },
     function (err) {
-      bus.emit(data.busEvent, err);
+      bus.emit(data.errorEvent, err);
       bus.emit('logger.err', err.message);
     });
   });

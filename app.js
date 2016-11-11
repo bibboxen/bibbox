@@ -68,6 +68,11 @@ var plugins = [
     packagePath: './plugins/notification',
     paths: config.paths,
     languages: config.languages
+  },
+  {
+    packagePath: './plugins/offline',
+    host: config.offline.host,
+    port: config.offline.port
   }
 ];
 

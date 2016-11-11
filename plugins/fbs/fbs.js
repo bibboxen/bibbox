@@ -361,12 +361,16 @@ module.exports = function (options, imports, register) {
    * Listen to checkout requests.
    */
   bus.on('fbs.checkout', function (data) {
+    // Check if this is a processing of offline queue.
+    data.queued = data.queued || false;
+
+    // Create FBS object and send checkout request.
     FBS.create(bus).then(function (fbs) {
       fbs.checkout(data.username, data.password, data.itemIdentifier).then(function (res) {
         bus.emit(data.busEvent, res);
       },
       function (err) {
-        if (err.message === 'FBS is offline') {
+        if (err.message === 'FBS is offline' && data.queued === false) {
           var material = {
             itemIdentifier: data.itemIdentifier,
             offline: true,
@@ -376,20 +380,34 @@ module.exports = function (options, imports, register) {
             }
           };
 
-          // Store for later processing.
-          bus.emit('storage.append', {
-            type: 'offline',
-            name: data.username,
-            obj: {
-              date: new Date().getTime(),
-              username: data.username,
-              password: data.password,
-              action: 'checkout',
-              item: data.itemIdentifier
-            }
+          bus.once('fbs.checkout.offline.stored' + data.itemIdentifier, function(res) {
+            bus.emit(data.busEvent, material);
           });
 
-          bus.emit(data.busEvent, material);
+          bus.once('fbs.checkout.offline.error' + data.itemIdentifier, function (err) {
+            bus.emit(data.errorEvent, err);
+          });
+
+          // Store for later processing.
+          var file = data.username;
+          bus.emit('storage.append', {
+            type: 'offline',
+            name: file,
+            obj: {
+              date: new Date().getTime(),
+              action: 'checkout',
+              username: data.username,
+              password: data.password,
+              itemIdentifier: data.itemIdentifier
+            },
+            lockFile: true,
+            busEvent: 'fbs.checkout.offline.stored' + data.itemIdentifier,
+            errorEvent: 'fbs.checkout.offline.error' + data.itemIdentifier
+          });
+
+          // Add to job queue.
+          data.file = file;
+          bus.emit('offline.add.checkout', data);
         }
         else {
           bus.emit(data.errorEvent, err);
@@ -405,12 +423,16 @@ module.exports = function (options, imports, register) {
    * Listen to checkIn requests.
    */
   bus.on('fbs.checkin', function (data) {
+    // Check if this is a processing of offline queue.
+    data.queued = data.queued || false;
+
+    // Create FBS object and send check-in request.
     FBS.create(bus).then(function (fbs) {
       fbs.checkIn(data.itemIdentifier).then(function (res) {
         bus.emit(data.busEvent, res);
       },
       function (err) {
-        if (err.message === 'FBS is offline') {
+        if (err.message === 'FBS is offline' && data.queued === false) {
           var material = {
             itemIdentifier: data.itemIdentifier,
             offline: true,
@@ -420,18 +442,32 @@ module.exports = function (options, imports, register) {
             }
           };
 
-          // Store for later processing.
-          bus.emit('storage.append', {
-            type: 'offline',
-            name: data.timestamp,
-            obj: {
-              date: new Date().getTime(),
-              action: 'checkin',
-              item: data.itemIdentifier
-            }
+          bus.once('fbs.checkin.offline.stored' + data.itemIdentifier, function(res) {
+            bus.emit(data.busEvent, material);
           });
 
-          bus.emit(data.busEvent, material);
+          bus.once('fbs.checkin.offline.error' + data.itemIdentifier, function (err) {
+            bus.emit(data.errorEvent, err);
+          });
+
+          // Store for later processing.
+          var file = data.timestamp;
+          bus.emit('storage.append', {
+            type: 'offline',
+            name: file,
+            obj: {
+              action: 'checkin',
+              date: new Date().getTime(),
+              itemIdentifier: data.itemIdentifier
+            },
+            lockFile: true,
+            busEvent: 'fbs.checkin.offline.stored' + data.itemIdentifier,
+            errorEvent: 'fbs.checkin.offline.error' + data.itemIdentifier
+          });
+
+          // Add to job queue.
+          data.file = file;
+          bus.emit('offline.add.checkin', data);
         }
         else {
           bus.emit(data.errorEvent, err);

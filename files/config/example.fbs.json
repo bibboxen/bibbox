@@ -7,5 +7,10 @@
   "loginAttempts": {
     "max": 5,
     "timeLimit": 60
+  },
+  "offline": {
+    "retries": 3,
+    "username": "3210000000",
+    "password": "54321"
   }
 }

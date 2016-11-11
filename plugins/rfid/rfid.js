@@ -52,8 +52,10 @@ var RFID = function (bus, port, afi) {
       try {
         ws.send(JSON.stringify({
           event: 'setAFI',
-          uid: data.uid,
-          afi: data.afi ? afi.on : afi.off
+          tag: {
+            uid: data.uid,
+            afi: data.afi ? afi.on : afi.off
+          }
         }));
       }
       catch (err) {

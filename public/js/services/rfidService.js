@@ -21,15 +21,9 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      */
     var Tag = function Tag(rawTag) {
       this.uid = rawTag.uid;
-
-      // The first 6 chars in the tag mid is not part of the the ID, but used
-      // to indicate part of series.
-      if (rawTag.hasOwnProperty('mid')) {
-        this.mid = rawTag.mid.slice(6);
-        this.seriesLength = parseInt(rawTag.mid.slice(2, 4));
-        this.numberInSeries = parseInt(rawTag.mid.slice(4, 6));
-      }
-
+      this.mid = rawTag.mid;
+      this.numberInSeries = rawTag.numberInSeries;
+      this.seriesLength = rawTag.seriesLength;
       this.afi = rawTag.afi;
     };
 
