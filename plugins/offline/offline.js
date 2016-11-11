@@ -287,7 +287,9 @@ module.exports = function (options, imports, register) {
   var bus = imports.bus;
   var offline = new Offline(bus, options.host, options.port);
 
-  bus.on('offline.add.checkout', function (data) {
+  bus.on('offline.add.checkout', function (obj) {
+    var data = JSON.parse(JSON.stringify(obj));
+
     // Added event info to job.
     data.busEvent = 'offline.fbs.checkout.success' + data.itemIdentifier;
     data.errorEvent = 'offline.fbs.checkout.error' + data.itemIdentifier;
@@ -296,7 +298,9 @@ module.exports = function (options, imports, register) {
     offline.add('checkout', data);
   });
 
-  bus.on('offline.add.checkin', function (data) {
+  bus.on('offline.add.checkin', function (obj) {
+    var data = JSON.parse(JSON.stringify(obj));
+
     // Added event info to job.
     data.busEvent = 'offline.fbs.checkin.success' + data.itemIdentifier;
     data.errorEvent = 'offline.fbs.checkin.error' + data.itemIdentifier;
