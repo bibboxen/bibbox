@@ -212,7 +212,7 @@ Offline.prototype.checkin = function checkin(job, done) {
       // Remove item form backup files. We don't listen to if it success or
       // fails the remove as we won't mark the job as failed as it has been
       // completed at FBS.
-      self.bus('storage.remove.item', {
+      self.bus.emit('storage.remove.item', {
         type: 'offline',
         name: data.file,
         itemIdentifier: data.itemIdentifier,

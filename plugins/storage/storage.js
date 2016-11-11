@@ -304,17 +304,30 @@ module.exports = function (options, imports, register) {
           return false;
         });
 
-        if (item) {
-          // Item found re-save the file.
-          storage.save(data.type, date.name, res).then(function () {
+        if (item !== undefined) {
+          if (res.length) {
+            // Item found re-save the file.
+            storage.save(data.type, data.name, res).then(function () {
+              storage.unlock(file);
+              bus.emit(data.busEvent, true);
+            },
+            function (err) {
+              storage.unlock(file);
+              bus.emit(data.errorEvent, err);
+              bus.emit('logger.err', err.message);
+            });
+          }
+          else {
+            // File data is empty, so remove the file.
             storage.unlock(file);
-            bus.emit(data.busEvent, true);
-          },
-          function (err) {
-            storage.unlock(file);
-            bus.emit(data.errorEvent, err);
-            bus.emit('logger.err', err.message);
-          });
+            storage.remove(data.type, data.name).then(function () {
+              bus.emit(data.busEvent, true);
+            },
+            function (err) {
+              bus.emit(data.errorEvent, err);
+              bus.emit('logger.err', err.message);
+            });
+          }
         }
         else {
           storage.unlock(file);
