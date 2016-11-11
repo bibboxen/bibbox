@@ -20,17 +20,11 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      *   Raw tag information from the scanner.
      */
     var Tag = function Tag(rawTag) {
-      this.uid = rawTag.UID;
-
-      // The first 6 chars in the tag MID is not part of the the ID, but used
-      // to indicate part of series.
-      if (rawTag.hasOwnProperty('MID')) {
-        this.mid = rawTag.MID.slice(6);
-        this.seriesLength = parseInt(rawTag.MID.slice(2, 4));
-        this.numberInSeries = parseInt(rawTag.MID.slice(4, 6));
-      }
-
-      this.afi = rawTag.AFI;
+      this.uid = rawTag.uid;
+      this.mid = rawTag.mid;
+      this.numberInSeries = rawTag.numberInSeries;
+      this.seriesLength = rawTag.seriesLength;
+      this.afi = rawTag.afi;
     };
 
     /**
@@ -117,8 +111,8 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
       });
 
       proxyService.emit('rfid.tag.set_afi', {
-        UID: uid,
-        AFI: afi,
+        uid: uid,
+        afi: afi,
         busEvent: 'rfid.tag.set_afi.success' + uid,
         errorEvent: 'rfid.tag.set_afi.error' + uid
       });
