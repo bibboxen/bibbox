@@ -15,7 +15,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="material in materials" data-ng-if="$index >= (pager.currentPage - 1) * pager.itemsPerPage && $index < pager.currentPage * pager.itemsPerPage">
+        <tr data-ng-repeat="material in materials"
+            data-ng-if="$index >= (pager.currentPage - 1) * pager.itemsPerPage && $index < pager.currentPage * pager.itemsPerPage">
           <td class="vert-align">{{ material.bibliographicId }}</td>
           <td class="vert-align">{{ material.author }}</td>
           <td class="vert-align">{{ material.title }}</td>
@@ -26,7 +27,17 @@
     </table>
   </div>
 
-  <ul data-ng-if="materials.length > pager.itemsPerPage" class="align-right" uib-pagination total-items="materials.length" items-per-page="pager.itemsPerPage" ng-model="pager.currentPage"></ul>
+  <ul uib-pagination
+      data-ng-if="materials.length > pager.itemsPerPage"
+      class="align-right"
+      boundary-link-numbers="true"
+      max-size="3"
+      previous-text="<"
+      next-text=">"
+      total-items="materials.length"
+      items-per-page="pager.itemsPerPage"
+      ng-model="pager.currentPage">
+  </ul>
 
   <div class="buttons-bottom">
     <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()">

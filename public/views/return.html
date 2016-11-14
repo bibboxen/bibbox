@@ -14,7 +14,9 @@
             <th class="return-td-title">{{ 'return.title' | translate }}</th>
             <th class="text-center return-td-status">{{ 'return.status' | translate }}</th>
           </tr>
-          <tr data-ng-repeat="material in value.materials" class="bg-success">
+          <tr data-ng-repeat="material in value.materials"
+              data-ng-if="$index >= (pager.currentPage - 1) * pager.itemsPerPage && $index < pager.currentPage * pager.itemsPerPage"
+              class="bg-success">
             <td class="vert-align">{{ material.title }}</td>
             <td class="vert-align text-center">
               <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
@@ -23,7 +25,18 @@
         </table>
       </div>
 
-      <ul data-ng-if="value.materials.length > value.pager.itemsPerPage" class="align-right" uib-pagination total-items="value.materials.length" items-per-page="value.pager.itemsPerPage" ng-model="value.pager.currentPage"></ul>
+      <ul uib-pagination
+          data-ng-if="value.materials.length > value.pager.itemsPerPage"
+          class="align-right"
+          direction-links="false"
+          boundary-link-numbers="true"
+          max-size="3"
+          previous-text="<"
+          next-text=">"
+          total-items="value.materials.length"
+          items-per-page="value.pager.itemsPerPage"
+          ng-model="value.pager.currentPage">
+      </ul>
     </div>
   </div>
 
