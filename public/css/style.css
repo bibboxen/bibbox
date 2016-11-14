@@ -31,6 +31,8 @@ body {
 
 .container {
   text-align: center;
+  max-height: 580px;
+  overflow: hidden;
 }
 
 .language-icon {
@@ -102,11 +104,11 @@ body {
   margin: 0 auto;
 }
 
-.button-left {
+.align-left {
   float: left;
 }
 
-.button-right {
+.align-right {
   float: right;
 }
 
@@ -116,6 +118,10 @@ body {
 
 .table tbody > tr > td.vert-align {
   vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
 }
 
 .td-center {

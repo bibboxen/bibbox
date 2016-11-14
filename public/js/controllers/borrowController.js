@@ -30,6 +30,12 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      */
     $scope.materials = [];
 
+    // Pager config.
+    $scope.pager = {
+      itemsPerPage: 11,
+      currentPage: 1
+    };
+
     /**
      * Handle tag detected.
      *

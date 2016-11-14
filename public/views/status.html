@@ -22,14 +22,16 @@
         <th>{{ 'status.information' | translate }}</th>
         <th>{{ 'status.actions' | translate }}</th>
       </tr>
-      <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.renewed, 'bg-warning': material.overdue}">
+      <tr data-ng-repeat="material in materials"
+          data-ng-class="{'bg-success': material.renewed, 'bg-warning': material.overdue}"
+          data-ng-if="$index >= (pager.currentPage - 1) * pager.itemsPerPage && $index < pager.currentPage * pager.itemsPerPage">
         <td class="vert-align">{{ $index + 1 }}</td>
         <td class="vert-align">{{ material.title }}</td>
         <td class="vert-align">{{ material.returnDate | date }}</td>
         <td class="vert-align">{{ material.fineItem.fineAmount | currency: ( currentPatron.currencyType | translate )  }}</td>
         <td class="vert-align">{{ material.newDate | date }}</td>
         <td class="vert-align"><spinner data-ng-if="material.loading"></spinner><div data-ng-if="!material.loading">{{ material.information | translate }}</div></td>
-        <td class="vert-align td-right">
+        <td class="vert-align td-right btn-group-xs">
           <a type="button" class="btn btn-info" aria-label="Left Align" data-ng-click="renew(material)">
             <span class="glyphicon glyphicon-refresh"></span> {{ 'status.button.renew' | translate }}
           </a>
@@ -38,21 +40,34 @@
     </table>
   </div>
 
+  <ul uib-pagination
+      data-ng-if="materials.length > pager.itemsPerPage"
+      class="align-right"
+      direction-links="false"
+      boundary-link-numbers="true"
+      max-size="3"
+      previous-text="<"
+      next-text=">"
+      total-items="materials.length"
+      items-per-page="pager.itemsPerPage"
+      ng-model="pager.currentPage">
+  </ul>
+
   <div class="buttons-bottom">
-    <button type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()">
+    <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
     </button>
-    <button type="button" class="btn btn-success button button-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0">
+    <button type="button" class="btn btn-success button align-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0">
       <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
     </button>
-    <button type="button" class="btn btn-success button button-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0">
+    <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0">
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
     </button>
-    <button type="button" class="btn btn-warning button button-left" data-ng-click="showFinesModal()" data-ng-if="currentPatron">
+    <button type="button" class="btn btn-warning button align-left" data-ng-click="showFinesModal()" data-ng-if="currentPatron && currentPatron.feeAmount > 0">
       <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{ 'status.button.fines' | translate }}
     </button>
 
-    <button type="button" class="btn btn-info button button-right" aria-label="Left Align" data-ng-click="renewAll()" data-ng-if="currentPatron">
+    <button type="button" class="btn btn-info button align-right" aria-label="Left Align" data-ng-click="renewAll()" data-ng-if="currentPatron && materials && materials.length > 0">
       <span class="glyphicon glyphicon-refresh"></span> {{ 'status.button.renew_all' | translate }}
     </button>
   </div>

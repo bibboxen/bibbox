@@ -1,12 +1,4 @@
-<nav class="navbar navbar-default navbar-absolute-top">
-  <div>
-    <div class="row row-nav">
-      <div class="col-xs-6 col-md-4"><div class="logo-container"><a href="/"><img src="img/aarhus.png" class="logo"></a></div></div>
-      <div class="col-xs-6 col-md-4 text-center"><h1>{{ 'return.heading' | translate }}</h1></div>
-      <div class="col-xs-6 col-md-4 text-right"><h1 class="text-faded">{{ countdown }}</h1></div>
-    </div>
-  </div>
-</nav>
+<header headline="return.heading" countdown="countdown"></header>
 
 <div class="container">
   <div class="image-help" data-ng-if="!materials || materials.length === 0">
@@ -22,7 +14,9 @@
             <th class="return-td-title">{{ 'return.title' | translate }}</th>
             <th class="text-center return-td-status">{{ 'return.status' | translate }}</th>
           </tr>
-          <tr data-ng-repeat="material in materials" data-ng-if="material.returnBin && material.returnBin.id === key" class="bg-success">
+          <tr data-ng-repeat="material in value.materials"
+              data-ng-if="$index >= (pager.currentPage - 1) * pager.itemsPerPage && $index < pager.currentPage * pager.itemsPerPage"
+              class="bg-success">
             <td class="vert-align">{{ material.title }}</td>
             <td class="vert-align text-center">
               <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
@@ -30,15 +24,27 @@
           </tr>
         </table>
       </div>
+
+      <ul uib-pagination
+          data-ng-if="value.materials.length > value.pager.itemsPerPage"
+          class="align-right"
+          direction-links="false"
+          boundary-link-numbers="true"
+          max-size="3"
+          previous-text="<"
+          next-text=">"
+          total-items="value.materials.length"
+          items-per-page="value.pager.itemsPerPage"
+          ng-model="value.pager.currentPage">
+      </ul>
     </div>
   </div>
 
-
   <div class="buttons-bottom">
-    <button type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()">
+    <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
     </button>
-    <button type="button" class="btn btn-success button button-left" data-ng-click="receipt('printer')" data-ng-if="materials && materials.length > 0">
+    <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="materials && materials.length > 0">
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'return.button.receipt' | translate }}
     </button>
   </div>
