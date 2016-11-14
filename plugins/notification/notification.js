@@ -602,7 +602,7 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       footer: self.renderFooter(mail)
     };
 
-    //console.log(data);
+    console.log(data);
 
     // Add username to receipt.
     if (data.hasOwnProperty('personalName') && data.personalName !== '') {
