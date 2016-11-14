@@ -38,5 +38,6 @@
   "receipt.loans.new.author": "Author:",
   "receipt.user": "Loaner:",
   "receipt.reservations.id": "Material No.",
-  "receipt.fines.total": "Outstanding balance:"
+  "receipt.fines.total": "Outstanding balance:",
+  "receipt.reservations.ready.dk5": "DK5"
 }
