@@ -1,12 +1,4 @@
-<nav class="navbar navbar-default navbar-absolute-top">
-  <div>
-    <div class="row row-nav">
-      <div class="col-xs-6 col-md-4"><div class="logo-container"><a href="/"><img src="img/aarhus.png" class="logo"></a></div></div>
-      <div class="col-xs-6 col-md-4 text-center"><h1>{{ 'login.heading' | translate }}</h1></div>
-      <div class="col-xs-6 col-md-4 text-right"><h1 class="text-faded">{{ countdown }}</h1></div>
-    </div>
-  </div>
-</nav>
+<header headline="login.heading" countdown="countdown"></header>
 
 <spinner-global data-ng-if="loading"></spinner-global>
 
@@ -19,7 +11,7 @@
   <div data-ng-include="'views/login-' + display + '.html'" class="login-container"></div>
 
   <div class="buttons-bottom">
-    <a type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="back()">
+    <a type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="back()">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
     </a>
   </div>

@@ -1,12 +1,4 @@
-<nav class="navbar navbar-default navbar-absolute-top">
-  <div>
-    <div class="row row-nav">
-      <div class="col-xs-6 col-md-4"><div class="logo-container"><a href="/"><img src="img/aarhus.png" class="logo"></a></div></div>
-      <div class="col-xs-6 col-md-4 text-center"><h1>{{ 'borrow.heading' | translate }}</h1></div>
-      <div class="col-xs-6 col-md-4 text-right"><h1 class="text-faded">{{ countdown }}</h1></div>
-    </div>
-  </div>
-</nav>
+<header headline="borrow.heading" countdown="countdown"></header>
 
 <div class="container">
   <div class="image-help" data-ng-if="!materials || materials.length === 0">
@@ -23,6 +15,7 @@
         <th>{{ 'borrow.information' | translate }}</th>
       </tr>
       <tr data-ng-repeat="material in materials"
+          data-ng-if="$index >= (pager.currentPage - 1) * pager.itemsPerPage && $index < pager.currentPage * pager.itemsPerPage"
           data-ng-class="{'bg-success': material.status === 'borrow.success', 'bg-danger': material.status === 'borrow.error' || material.invalid, 'bg-warning': material.status === 'borrow.awaiting_afi'}">
         <td class="vert-align">{{ $index + 1 }}</td>
         <td class="vert-align">{{ material.title }}</td>
@@ -43,14 +36,26 @@
     </table>
   </div>
 
+  <ul uib-pagination
+      data-ng-if="materials.length > pager.itemsPerPage"
+      class="align-right"
+      boundary-link-numbers="true"
+      max-size="3"
+      previous-text="<"
+      next-text=">"
+      total-items="materials.length"
+      items-per-page="pager.itemsPerPage"
+      ng-model="pager.currentPage">
+  </ul>
+
   <div class="buttons-bottom">
-    <button type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()">
+    <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
     </button>
-    <button type="button" class="btn btn-success button button-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress && materials && materials.length > 0">
+    <button type="button" class="btn btn-success button align-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress && materials && materials.length > 0">
       <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'borrow.button.receipt' | translate }}
     </button>
-    <button type="button" class="btn btn-success button button-left" data-ng-click="receipt('printer')" data-ng-if="(!currentPatron || !currentPatron.emailAddress) && materials && materials.length > 0" >
+    <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="(!currentPatron || !currentPatron.emailAddress) && materials && materials.length > 0" >
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'borrow.button.receipt' | translate }}
     </button>
   </div>
