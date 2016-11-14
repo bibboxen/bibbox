@@ -1,38 +1,28 @@
-<nav class="navbar navbar-default navbar-absolute-top">
-  <div>
-    <div class="row row-nav">
-      <div class="col-xs-6 col-md-4"><div class="logo-container"><a href="/"><img src="img/aarhus.png" class="logo"></a></div></div>
-      <div class="col-xs-6 col-md-4 text-center"><h1>{{ 'reservations.heading' | translate }}</h1></div>
-      <div class="col-xs-6 col-md-4 text-right"><h1 class="text-faded">{{ countdown }}</h1></div>
-    </div>
-  </div>
-</nav>
+<header headline="reservations.heading" countdown="countdown"></header>
 
 <spinner-global data-ng-if="loading"></spinner-global>
 
 <div class="container">
   <div class="panel panel-default">
     <table class="table">
-      <tr>
-        <th></th>
-        <th>{{ 'reservations.bibliographic_id' | translate }}</th>
-        <th>{{ 'reservations.title' | translate }}</th>
-        <th>{{ 'reservations.ready' | translate }}</th>
-        <th>{{ 'reservations.interest_date' | translate }}</th>
-        <th>{{ 'reservations.reservation_number' | translate }}</th>
-        <th>{{ 'reservations.pickup_location' | translate }}</th>
-      </tr>
-      <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.ready}">
-        <td class="vert-align">{{ $index + 1 }}</td>
-        <td class="vert-align">{{ material.bibliographicId }}</td>
-        <td class="vert-align">{{ material.title }}</td>
-        <td class="vert-align td-center">
-          <span data-ng-if="material.ready" class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
-        </td>
-        <td class="vert-align">{{ material.interestDate | date }}</td>
-        <td class="vert-align">{{ material.reservationNumber }}</td>
-        <td class="vert-align">{{ material.pickupLocation }}</td>
-      </tr>
+      <thead>
+        <tr>
+          <th>{{ 'reservations.bibliographic_id' | translate }}</th>
+          <th>{{ 'reservations.author' | translate }}</th>
+          <th>{{ 'reservations.title' | translate }}</th>
+          <th>{{ 'reservations.pickup_location' | translate }}</th>
+          <th>{{ 'reservations.pickup_number' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-ng-repeat="material in materials" data-ng-if="material.ready">
+          <td class="vert-align">{{ material.bibliographicId }}</td>
+          <td class="vert-align">{{ material.author }}</td>
+          <td class="vert-align">{{ material.title }}</td>
+          <td class="vert-align">{{ material.pickupLocation }}</td>
+          <td class="vert-align">{{ material.pickupId }}</td>
+        </tr>
+      </tbody>
     </table>
   </div>
 

@@ -38,7 +38,7 @@
     }
   ],
   "timeout": {
-    "idleTimeout": 15,
+    "idleTimeout": 1500,
     "idleWarn": 7
   },
   "binSorting": {

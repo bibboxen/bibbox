@@ -31,6 +31,8 @@ body {
 
 .container {
   text-align: center;
+  max-height: 580px;
+  overflow: auto;
 }
 
 .language-icon {
@@ -262,4 +264,20 @@ body {
 
 .return-td-title {
   width: 90%;
+}
+
+::-webkit-scrollbar
+{
+  width: 20px;  /* for vertical scrollbars */
+  height: 20px; /* for horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track
+{
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb
+{
+  background: rgba(0, 0, 0, 0.5);
 }

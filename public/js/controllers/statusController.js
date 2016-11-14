@@ -121,7 +121,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
           var material;
           if (data.ok === '1') {
             // Update renewed items.
-            if (data.renewedItems !== null) {
+            if (data.hasOwnProperty('renewedItems')) {
               for (i = 0; i < data.renewedItems; i++) {
                 for (material in $scope.materials) {
                   material = $scope.materials[material];
@@ -138,7 +138,7 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
             }
 
             // Update un-renewed items.
-            if (data.unrenewedItems !== null) {
+            if (data.hasOwnProperty('unrenewedItems')) {
               for (i = 0; i < data.unrenewedItems.length; i++) {
                 for (material in $scope.materials) {
                   material = $scope.materials[material];

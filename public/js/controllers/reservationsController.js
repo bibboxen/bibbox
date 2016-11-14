@@ -27,10 +27,34 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
       if ($scope.currentPatron.hasOwnProperty('holdItems')) {
         for (i = 0; i < $scope.currentPatron.holdItems.length; i++) {
           item = angular.copy($scope.currentPatron.holdItems[i]);
-
           item.ready = true;
-
           $scope.materials.push(item);
+
+          item = angular.copy($scope.currentPatron.holdItems[i]);
+          item.ready = true;
+          $scope.materials.push(item);
+          item = angular.copy($scope.currentPatron.holdItems[i]);
+          item.ready = true;
+          $scope.materials.push(item);
+          item = angular.copy($scope.currentPatron.holdItems[i]);
+          item.ready = true;
+          $scope.materials.push(item);
+          item = angular.copy($scope.currentPatron.holdItems[i]);
+          item.ready = true;
+          $scope.materials.push(item);
+          item = angular.copy($scope.currentPatron.holdItems[i]);
+          item.ready = true;
+          $scope.materials.push(item);
+          item = angular.copy($scope.currentPatron.holdItems[i]);
+          item.ready = true;
+          $scope.materials.push(item);
+          item = angular.copy($scope.currentPatron.holdItems[i]);
+          item.ready = true;
+          $scope.materials.push(item);
+          item = angular.copy($scope.currentPatron.holdItems[i]);
+          item.ready = true;
+          $scope.materials.push(item);
+
         }
       }
 

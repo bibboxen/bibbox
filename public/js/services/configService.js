@@ -3,8 +3,8 @@
  * config holds the configuration for the app and accepts config updates.
  */
 
-angular.module('BibBox').service('configService', ['$rootScope', '$translate', 'tmhDynamicLocale', 'proxyService', 'config',
-  function ($rootScope, $translate, tmhDynamicLocale, proxyService, config) {
+angular.module('BibBox').service('configService', ['$rootScope', '$translate', 'tmhDynamicLocale', 'proxyService', 'config', 'Idle',
+  function ($rootScope, $translate, tmhDynamicLocale, proxyService, config, Idle) {
     'use strict';
 
     // Set default language from config. It's need when requesting receipts.
@@ -20,6 +20,10 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
       config.initialized = true;
 
       angular.merge(config, data);
+
+      Idle.setIdle(config.timeout.idleTimeout);
+      Idle.setTimeout(config.timeout.idleWarn);
+
       $rootScope.$emit('config.updated');
     });
 
