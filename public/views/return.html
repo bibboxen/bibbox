@@ -14,7 +14,7 @@
             <th class="return-td-title">{{ 'return.title' | translate }}</th>
             <th class="text-center return-td-status">{{ 'return.status' | translate }}</th>
           </tr>
-          <tr data-ng-repeat="material in materials" data-ng-if="material.returnBin && material.returnBin.id === key" class="bg-success">
+          <tr data-ng-repeat="material in value.materials" class="bg-success">
             <td class="vert-align">{{ material.title }}</td>
             <td class="vert-align text-center">
               <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
@@ -22,9 +22,10 @@
           </tr>
         </table>
       </div>
+
+      <ul data-ng-if="value.materials.length > value.pager.itemsPerPage" class="align-right" uib-pagination total-items="value.materials.length" items-per-page="value.pager.itemsPerPage" ng-model="value.pager.currentPage"></ul>
     </div>
   </div>
-
 
   <div class="buttons-bottom">
     <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()">

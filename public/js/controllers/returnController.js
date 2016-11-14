@@ -1,7 +1,8 @@
 /**
  * Return page controller.
  */
-angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', 'config',
+angular.module('BibBox').controller('ReturnController', [
+  '$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', 'config',
   function ($scope, $controller, $location, $timeout, userService, receiptService, config) {
     'use strict';
 
@@ -20,6 +21,14 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     var currentDate = new Date().getTime();
 
     $scope.returnBins = config.binSorting.destinations;
+
+    for (var i = 0; i < $scope.returnBins.length; i++) {
+      $scope.returnBins[i].materials = [];
+      $scope.returnBins[i].pager = {
+        itemsPerPage: 8,
+        currentPage: 1
+      };
+    }
 
     /**
      * Handle tag detected.
@@ -141,9 +150,11 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
         if (allAFISetToTrue) {
           material.status = 'return.success';
           material.information = 'return.was_successful';
-          material.returnBin = getSortBin(material.sortBin);
           material.loading = false;
           material.returned = true;
+
+          var returnBin = getSortBin(material.sortBin);
+          returnBin.materials.push(material);
         }
       }
     };
@@ -159,10 +170,10 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      */
     function getSortBin(bin) {
       if (config.binSorting.bins.hasOwnProperty(bin)) {
-        return config.binSorting.destinations[config.binSorting.bins[bin]];
+        return $scope.returnBins[config.binSorting.bins[bin]];
       }
       else {
-        return config.binSorting.destinations[config.binSorting.default_bin];
+        return $scope.returnBins[config.binSorting.default_bin];
       }
     }
 
