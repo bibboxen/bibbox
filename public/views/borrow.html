@@ -8,24 +8,20 @@
   <div class="panel panel-default" data-ng-if="materials && materials.length > 0">
     <table class="table">
       <tr>
-        <th></th>
         <th>{{ 'borrow.title' | translate }}</th>
         <th>{{ 'borrow.return_date' | translate }}</th>
-        <th class="text-center">{{ 'borrow.status' | translate }}</th>
+        <th></th>
         <th>{{ 'borrow.information' | translate }}</th>
       </tr>
       <tr data-ng-repeat="material in materials"
           data-ng-if="$index >= (pager.currentPage - 1) * pager.itemsPerPage && $index < pager.currentPage * pager.itemsPerPage"
           data-ng-class="{'bg-success': material.status === 'borrow.success', 'bg-danger': material.status === 'borrow.error' || material.invalid, 'bg-warning': material.status === 'borrow.awaiting_afi'}">
-        <td class="vert-align">{{ $index + 1 }}</td>
         <td class="vert-align">{{ material.title }}</td>
         <td class="vert-align">{{ material.dueDate | date }}</td>
         <td class="vert-align text-center">
           <spinner data-ng-if="material.loading"></spinner>
-          <span data-ng-if="material.status === 'borrow.success'" class="glyphicon glyphicon glyphicon-ok"
-                aria-hidden="true"></span>
-          <span data-ng-if="material.status === 'borrow.error'" class="glyphicon glyphicon glyphicon-remove"
-                aria-hidden="true"></span>
+          <span data-ng-if="!material.loading && material.status === 'borrow.success'" class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
+          <span data-ng-if="!material.loading && material.status === 'borrow.error'" class="glyphicon glyphicon glyphicon-remove" aria-hidden="true"></span>
         </td>
         <td class="vert-align">
           <span data-ng-if="material.seriesLength > 0 && material.tags.length === material.seriesLength">{{ material.information | translate }}</span>

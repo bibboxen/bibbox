@@ -59,6 +59,7 @@
   "borrow.information": "Information",
   "borrow.was_successful": "Materialelån gennemført",
   "borrow.button.receipt": "Kvittering",
+  "borrow.material_invalid": "Ugyldigt materiale",
   "return.heading": "Aflever",
   "return.title": "Titel",
   "return.status": "Status",
