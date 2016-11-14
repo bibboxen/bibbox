@@ -268,8 +268,8 @@ body {
 
 ::-webkit-scrollbar
 {
-  width: 20px;  /* for vertical scrollbars */
-  height: 20px; /* for horizontal scrollbars */
+  width: 30px;  /* for vertical scrollbars */
+  height: 30px; /* for horizontal scrollbars */
 }
 
 ::-webkit-scrollbar-track
