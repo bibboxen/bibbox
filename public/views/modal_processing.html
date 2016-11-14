@@ -1,0 +1,28 @@
+<div class="modal text-center">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="fineModalLabel">{{ 'processing.heading' | translate }}</h2>
+      </div>
+      <div class="modal-body">
+        <h3>Processing</h3>
+
+        <div class="panel panel-default">
+          <table class="table">
+            <tr>
+              <th>{{ 'return.title' | translate }}</th>
+              <th>{{ 'return.information' | translate }}</th>
+            </tr>
+            <tr data-ng-repeat="material in materials" data-ng-class="{'bg-success': material.renewed}" data-ng-if="!material.returned">
+              <td class="vert-align">{{ material.title }}</td>
+              <td class="vert-align">{{ material.information }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info button" data-ng-click="$hide()">{{ 'status.button.ok' | translate }}</button>
+      </div>
+    </div>
+  </div>
+</div>
