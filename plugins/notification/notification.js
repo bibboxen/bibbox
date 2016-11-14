@@ -184,18 +184,20 @@ Notification.prototype.renderLibrary = function renderLibrary(html) {
  * @returns {*}
  *
  */
-Notification.prototype.renderFines = function renderFines(html, fines) {
+Notification.prototype.renderFines = function renderFines(html, fines, total) {
   var ret = '';
 
   if (fines.length) {
     if (html) {
       ret = this.mailFinesTemplate.render({
-        items: fines
+        items: fines,
+        total: total
       });
     }
     else {
       ret = this.printFinesTemplate.render({
-        items: fines
+        items: fines,
+        total: total
       });
     }
   }
@@ -593,12 +595,14 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
       header: self.headerConfig,
       library: self.renderLibrary(mail),
-      fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
+      fines: layout.fines ? self.renderFines(mail, data.fineItems, data.feeAmount) : '',
       loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
       reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
       reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
       footer: self.renderFooter(mail)
     };
+
+    //console.log(data);
 
     // Add username to receipt.
     if (data.hasOwnProperty('personalName') && data.personalName !== '') {

@@ -37,5 +37,6 @@
   "receipt.loans.new.dueDate": "Afhentes senest:",
   "receipt.loans.new.author": "Forfatter:",
   "receipt.user": "Låner:",
-  "receipt.reservations.id": "Materialnr.:"
+  "receipt.reservations.id": "Materialnr.:",
+  "receipt.fines.total": "Mellemværende total:"
 }
