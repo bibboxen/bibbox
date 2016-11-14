@@ -21,6 +21,14 @@ body {
   margin: 1em;
 }
 
+.button-small {
+  height: 40px;
+  min-width: 100px;
+  font-size: 16px;
+  padding: .5em;
+  margin: 1em;
+}
+
 .container {
   text-align: center;
 }
@@ -28,14 +36,6 @@ body {
 .language-icon {
   position: relative;
   top: -2px;
-}
-
-.language-button {
-  height: 40px;
-  min-width: 100px;
-  font-size: 16px;
-  padding: .5em;
-  margin: 1em;
 }
 
 .container-bottom {
@@ -99,7 +99,6 @@ body {
 }
 
 .login-container {
-  width: 450px;
   margin: 0 auto;
 }
 
@@ -263,4 +262,8 @@ body {
 
 .return-td-title {
   width: 90%;
+}
+
+.margins {
+  margin: 1em;
 }

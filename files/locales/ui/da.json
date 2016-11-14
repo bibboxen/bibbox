@@ -14,7 +14,8 @@
 	"language.da": "Dansk",
 
 	"login.heading": "Log ind",
-	"login.scan": "Skan dit sygesikringskort eller lånerkort",
+	"login.scan": "Skan dit sygesikringskort/lånerkort",
+	"login.or": "eller",
 	"login.button.manual_login": "Indtast via tastatur - tryk her!",
 	"login.username": "CPR-nummer",
 	"login.username_short": "CPR",
