@@ -30,7 +30,7 @@
   "reservations.ready": "Klar",
   "reservations.reservation_number": "Kø-nummer",
   "reservations.pickup_location": "Afhentningsfilial",
-  "reservations.pickup_number": "Nummer/Hylde",
+  "reservations.pickup_number": "Nummer",
   "reservations.button.receipt": "Kvittering",
   "reservations.author": "Forfatter",
   "status.heading": "Status / Forny",

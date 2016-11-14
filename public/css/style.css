@@ -32,7 +32,7 @@ body {
 .container {
   text-align: center;
   max-height: 580px;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .language-icon {
@@ -104,11 +104,11 @@ body {
   margin: 0 auto;
 }
 
-.button-left {
+.align-left {
   float: left;
 }
 
-.button-right {
+.align-right {
   float: right;
 }
 
@@ -118,6 +118,10 @@ body {
 
 .table tbody > tr > td.vert-align {
   vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
 }
 
 .td-center {
@@ -264,20 +268,4 @@ body {
 
 .return-td-title {
   width: 90%;
-}
-
-::-webkit-scrollbar
-{
-  width: 30px;  /* for vertical scrollbars */
-  height: 30px; /* for horizontal scrollbars */
-}
-
-::-webkit-scrollbar-track
-{
-  background: rgba(0, 0, 0, 0.1);
-}
-
-::-webkit-scrollbar-thumb
-{
-  background: rgba(0, 0, 0, 0.5);
 }

@@ -18,6 +18,12 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
 
     $scope.materials = [];
 
+    // Pager config.
+    $scope.pager = {
+      itemsPerPage: 11,
+      currentPage: 1
+    };
+
     // Sets $scope.currentPatron to the current logged in patron.
     $scope.baseGetPatron().then(function () {
       var i;
@@ -28,44 +34,6 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
         for (i = 0; i < $scope.currentPatron.holdItems.length; i++) {
           item = angular.copy($scope.currentPatron.holdItems[i]);
           item.ready = true;
-          $scope.materials.push(item);
-
-          item = angular.copy($scope.currentPatron.holdItems[i]);
-          item.ready = true;
-          $scope.materials.push(item);
-          item = angular.copy($scope.currentPatron.holdItems[i]);
-          item.ready = true;
-          $scope.materials.push(item);
-          item = angular.copy($scope.currentPatron.holdItems[i]);
-          item.ready = true;
-          $scope.materials.push(item);
-          item = angular.copy($scope.currentPatron.holdItems[i]);
-          item.ready = true;
-          $scope.materials.push(item);
-          item = angular.copy($scope.currentPatron.holdItems[i]);
-          item.ready = true;
-          $scope.materials.push(item);
-          item = angular.copy($scope.currentPatron.holdItems[i]);
-          item.ready = true;
-          $scope.materials.push(item);
-          item = angular.copy($scope.currentPatron.holdItems[i]);
-          item.ready = true;
-          $scope.materials.push(item);
-          item = angular.copy($scope.currentPatron.holdItems[i]);
-          item.ready = true;
-          $scope.materials.push(item);
-
-        }
-      }
-
-      // Add unavailable items.
-      if ($scope.currentPatron.hasOwnProperty('unavailableHoldItems')) {
-        for (i = 0; i < $scope.currentPatron.unavailableHoldItems.length; i++) {
-          item = angular.copy($scope.currentPatron.unavailableHoldItems[i]);
-
-          item.reservationNumber = '?';
-          item.ready = false;
-
           $scope.materials.push(item);
         }
       }

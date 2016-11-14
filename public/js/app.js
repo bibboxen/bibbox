@@ -10,7 +10,8 @@ angular.module('BibBox', [
   'tmh.dynamicLocale',
   'ngIdle',
   'mgcrea.ngStrap.modal',
-  'ngAnimate'
+  'ngAnimate',
+  'ui.bootstrap'
 ]);
 
 // Set path for dynamic translation loading and set default idle configuration.

@@ -22,6 +22,12 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
     $scope.fineItems = [];
     $scope.currentPatron = null;
 
+    // Pager config.
+    $scope.pager = {
+      itemsPerPage: 11,
+      currentPage: 1
+    };
+
     // Sets $scope.currentPatron to the current logged in patron.
     // Load materials for current user.
     $scope.baseGetPatron().then(function () {

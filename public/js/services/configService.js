@@ -21,6 +21,7 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
 
       angular.merge(config, data);
 
+      // Update idle timeouts
       Idle.setIdle(config.timeout.idleTimeout);
       Idle.setTimeout(config.timeout.idleWarn);
 
