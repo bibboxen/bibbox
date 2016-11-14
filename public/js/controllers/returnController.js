@@ -22,9 +22,9 @@ angular.module('BibBox').controller('ReturnController', [
 
     $scope.returnBins = config.binSorting.destinations;
 
-    for (var i = 0; i < $scope.returnBins.length; i++) {
-      $scope.returnBins[i].materials = [];
-      $scope.returnBins[i].pager = {
+    for (var bin in $scope.returnBins) {
+      $scope.returnBins[bin].materials = [];
+      $scope.returnBins[bin].pager = {
         itemsPerPage: 8,
         currentPage: 1
       };
