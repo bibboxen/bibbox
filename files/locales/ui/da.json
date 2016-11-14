@@ -16,7 +16,7 @@
 	"login.heading": "Log ind",
 	"login.scan": "Skan dit sygesikringskort/lånerkort",
 	"login.or": "eller",
-	"login.button.manual_login": "Indtast via tastatur - tryk her!",
+	"login.button.manual_login": "Indtast via tastatur",
 	"login.username": "CPR-nummer",
 	"login.username_short": "CPR",
 	"login.username_help": "Indtast CPR-nummer og tryk Enter",
