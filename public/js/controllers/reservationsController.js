@@ -35,12 +35,6 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
           item = angular.copy($scope.currentPatron.holdItems[i]);
           item.ready = true;
           $scope.materials.push(item);
-
-          for (var k = 0; k < 50; k++) {
-            item = angular.copy($scope.currentPatron.holdItems[i]);
-            item.ready = true;
-            $scope.materials.push(item);
-          }
         }
       }
     }, function (err) {
