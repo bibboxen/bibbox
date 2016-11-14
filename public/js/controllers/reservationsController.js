@@ -70,13 +70,16 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
 
       receiptService.reservations(credentials.username, credentials.password, type).then(
         function (status) {
-          $scope.baseLogoutRedirect();
+          // Ignore.
         },
         function (err) {
           // @TODO: what to do...
           console.log(err);
         }
       );
+
+      // Always return to frontpage.
+      $scope.baseLogoutRedirect();
     };
 
     /**

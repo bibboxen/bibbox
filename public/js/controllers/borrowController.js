@@ -181,13 +181,16 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
       receiptService.borrow(credentials.username, credentials.password, $scope.materials, type).then(
         function (status) {
-          $scope.baseLogoutRedirect();
+          // Ignore.
         },
         function (err) {
-          // @TODO: Better message than alert.
-          alert(err.message);
+          // @TODO: Report error to user.
+          console.log(err);
         }
       );
+
+      // Always return to frontpage.
+      $scope.baseLogoutRedirect();
     };
 
     /**

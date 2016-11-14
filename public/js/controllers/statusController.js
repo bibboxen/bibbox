@@ -208,13 +208,16 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
       // @TODO: handel error etc.
       receiptService.status(creds.username, creds.password, type).then(
         function (status) {
-          $scope.baseLogoutRedirect();
+          // Ignore.
         },
         function (err) {
           // @TODO: what to do...
           console.log(err);
         }
       );
+
+      // Always return to frontpage.
+      $scope.baseLogoutRedirect();
     };
 
     /**

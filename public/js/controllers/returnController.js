@@ -172,13 +172,16 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     $scope.receipt = function receipt() {
       receiptService.returnReceipt(raw_materials, 'printer').then(
         function (status) {
-          $scope.baseLogoutRedirect();
+          // Ignore.
         },
         function (err) {
-          /// @TODO: what to do...
+          /// @TODO: Report error to user.
           console.log(err);
         }
       );
+
+      // Always return to frontpage.
+      $scope.baseLogoutRedirect();
     };
 
     // Check that interface methods are implemented.

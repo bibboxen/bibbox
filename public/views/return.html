@@ -38,7 +38,7 @@
     <button type="button" class="btn btn-danger button button-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
     </button>
-    <button type="button" class="btn btn-success button button-left" data-ng-click="receipt('printer')" data-ng-show="materials && materials.length > 0">
+    <button type="button" class="btn btn-success button button-left" data-ng-click="receipt('printer')" data-ng-if="materials && materials.length > 0">
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'return.button.receipt' | translate }}
     </button>
   </div>
