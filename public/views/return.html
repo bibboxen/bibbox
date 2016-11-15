@@ -7,7 +7,7 @@
 
   <div class="row" data-ng-if="materials && materials.length > 0">
     <div>
-      Scanned materials: {{material.length}} - Processing: {{ baseGetProcessingResults() }}
+      Scanned materials: {{materials.length}} - Processing: {{ baseGetProcessingResults() }}
     </div>
 
     <div class="col-md-6" data-ng-repeat="(key, bin) in returnBins">
