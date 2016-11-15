@@ -244,7 +244,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       var n = 0;
 
       for (var i = 0; i < $scope.materials.length; i++) {
-        if ($scope.materials[i].status === 'return.error' || $scope.materials[i].status === 'borrow.error') {
+        if ($scope.materials[i].invalid || $scope.materials[i].status === 'return.error' || $scope.materials[i].status === 'borrow.error') {
           n++;
         }
       }
