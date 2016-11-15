@@ -1,0 +1,30 @@
+[
+  {
+    "uid": "E00401505EB0AFDX",
+    "mid": "0000006584",
+    "afi": 7,
+    "seriesLength": 1,
+    "numberInSeries": 1
+  },
+  {
+    "uid": "E00401505EB0A00X",
+    "mid": "0000002244",
+    "afi": 7,
+    "seriesLength": 1,
+    "numberInSeries": 1
+  },
+  {
+    "uid": "E00401505EB0A00X",
+    "mid": "0000008885",
+    "afi": 7,
+    "seriesLength": 2,
+    "numberInSeries": 1
+  },
+  {
+    "uid": "E00401505EB0A00X",
+    "mid": "0000008885",
+    "afi": 7,
+    "seriesLength": 2,
+    "numberInSeries": 2
+  }
+]
