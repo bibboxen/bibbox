@@ -42,6 +42,9 @@ angular.module('BibBox').controller('ReturnController', [
       var i;
       var material = $scope.addTag(tag, $scope.materials);
 
+      // Restart idle timeout.
+      $scope.baseResetIdleWatch();
+
       // Check if all tags in series have been added.
       if (!material.invalid && !material.loading && (!material.returned || material.status === 'return.error') && $scope.allTagsInSeries(material)) {
         // If a tag is missing from the device.
@@ -132,7 +135,7 @@ angular.module('BibBox').controller('ReturnController', [
      *   The tag returned from the device.
      */
     $scope.tagAFISet = function itemAFISet(tag) {
-      var material = $scope.setAFIonTagReturnMaterial(tag);
+      var material = $scope.updateMaterialAFI(tag);
 
       // If the tag belongs to a material in $scope.materials.
       if (material) {

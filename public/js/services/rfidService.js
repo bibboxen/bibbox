@@ -28,15 +28,28 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
     };
 
     /**
+     * Helper function to check current scope for a give method.
+     *
+     * @param method
+     *   Method to lookup
+     *
+     * @returns {*|boolean}
+     *   True if it exists else false.
+     */
+    function hasMethod(method) {
+      return currentScope[method] && typeof currentScope[method] === 'function';
+    }
+
+    /**
      * Tags detected.
      *
      * @param tags
      *   The tags that were detected by the RFID.
      */
     proxyService.on('rfid.tags.detected', function tagsDetected(rawTags) {
-      if (currentScope) {
+      if (currentScope && hasMethod('tagDetected')) {
         for (var i = 0; i < rawTags.length; i++) {
-          currentScope.$emit('rfid.tagDetected', new Tag(rawTags[i]));
+          currentScope.tagDetected(new Tag(rawTags[i]));
         }
       }
     });
@@ -48,8 +61,8 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      *   The tag that was detected by the RFID.
      */
     proxyService.on('rfid.tag.detected', function tagDetected(rawTag) {
-      if (currentScope) {
-        currentScope.$emit('rfid.tagDetected', new Tag(rawTag));
+      if (currentScope && hasMethod('tagDetected')) {
+        currentScope.tagDetected(new Tag(rawTag));
       }
     });
 
@@ -60,8 +73,8 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      *   The tag that was removed from the RFID.
      */
     proxyService.on('rfid.tag.removed', function tagRemoved(rawTag) {
-      if (currentScope) {
-        currentScope.$emit('rfid.tagRemoved', new Tag(rawTag));
+      if (currentScope && hasMethod('tagRemoved')) {
+        currentScope.tagRemoved(new Tag(rawTag));
       }
     });
 
@@ -72,8 +85,8 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      *   The tag where the AFI have been set.
      */
     proxyService.on('rfid.tag.afi.set', function tagAFISet(rawTag) {
-      if (currentScope) {
-        currentScope.$emit('rfid.tagAFISet', new Tag(rawTag));
+      if (currentScope && hasMethod('tagAFISet')) {
+        currentScope.tagAFISet(new Tag(rawTag));
       }
     });
 
@@ -84,9 +97,8 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      *   The error.
      */
     proxyService.on('rfid.error', function rfidError(err) {
-      if (currentScope) {
-        // @TODO: Handle.
-        console.log('rfidErorr', err);
+      if (currentScope && hasMethod('rfidError')) {
+        currentScope.rfidError(err);
       }
     });
 
@@ -100,24 +112,10 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
      * @returns {Function}
      */
     this.setAFI = function setAFI(uid, afi) {
-      var deferred = $q.defer();
-
-      proxyService.once('rfid.tag.set_afi.success' + uid, function () {
-        deferred.resolve();
-      });
-
-      proxyService.once('rfid.tag.set_afi.error' + uid, function (err) {
-        deferred.reject(err);
-      });
-
       proxyService.emit('rfid.tag.set_afi', {
         uid: uid,
-        afi: afi,
-        busEvent: 'rfid.tag.set_afi.success' + uid,
-        errorEvent: 'rfid.tag.set_afi.error' + uid
+        afi: afi
       });
-
-      return deferred.promise;
     };
 
     /**

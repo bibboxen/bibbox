@@ -5,6 +5,8 @@
 
 'use strict';
 
+var debug = require('debug')('bibbox:rfid');
+
 /**
  * This object encapsulates the connector to RFID.
  *
@@ -32,8 +34,8 @@ var RFID = function (bus, port, afi) {
     var fakeTags = require('./fakeTags.json');
 
     // Show in console that we are in debug mode.
-    console.log('RFID debug mode.');
-    console.log('RFID fake tags loaded: ' + fakeTags.length);
+    debug('RFID debug mode.');
+    debug('RFID fake tags loaded: ' + fakeTags.length);
 
     // Send connected event.
     bus.emit('rfid.connected');
@@ -51,7 +53,7 @@ var RFID = function (bus, port, afi) {
     bus.on('rfid.tag.set_afi', function (data) {
       // Check if tag exists in fakeTags and return index.
       var index = fakeTags.findIndex(function (tag, index) {
-        if (tag.uid == data.uid) {
+        if (tag.uid === data.uid) {
           // Tag found change afi.
           fakeTags[index].afi = data.afi;
           return true;
@@ -60,7 +62,7 @@ var RFID = function (bus, port, afi) {
       });
 
       // Tag found so return fakeTags afi for that tag.
-      if (index) {
+      if (index != -1) {
         bus.emit('rfid.tag.afi.set', {
           uid: fakeTags[index].uid,
           afi: fakeTags[index].afi === afi.on
@@ -90,8 +92,8 @@ var RFID = function (bus, port, afi) {
           }));
         }
         catch (err) {
-          console.log(err);
-          // Ignore.
+          bus.emit('logger.err', err.message);
+          debug(err.message);
         }
       };
 
@@ -106,8 +108,8 @@ var RFID = function (bus, port, afi) {
           }));
         }
         catch (err) {
-          console.log(err);
-          // Ignore.
+          bus.emit('logger.err', err.message);
+          debug(err.message);
         }
       };
 
@@ -126,8 +128,8 @@ var RFID = function (bus, port, afi) {
 
           switch(data.event) {
             case 'connected':
-              console.log("Connected");
               bus.emit('rfid.connected');
+              debug('Connected to web-socket');
               break;
 
             case 'rfid.tags.detected':
@@ -144,24 +146,25 @@ var RFID = function (bus, port, afi) {
 
             case 'rfid.afi.set':
               if (data.success) {
-                console.log(data.tag);
-
                 bus.emit('rfid.tag.afi.set', {
                   uid: data.tag.uid,
                   afi: data.tag.afi === afi.on
                 })
               }
               else {
-                bus.emit('rfid.error', 'AFI not set!')
+                bus.emit('rfid.error', 'AFI not set!');
+                debug('AFI not set for uid: ' + data.tag.uid);
               }
               break;
 
             default:
               bus.emit('rfid.error', 'Event not recognized!');
+              debug('Event not recognized!');
           }
         }
         catch (err) {
           bus.emit('rfid.error', 'JSON parse error: ' + err);
+          debug('JSON parse error: ' + err);
         }
       });
     });

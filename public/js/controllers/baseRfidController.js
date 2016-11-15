@@ -28,46 +28,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     // Used to hold materials.
     $scope.materials = [];
 
-    /**
-     * Handler for when tag is detected.
-     *
-     * @param event
-     *   The event.
-     * @param tag
-     *   The tag returned from the device.
-     */
-    $scope.$on('rfid.tagDetected', function tagDetected(event, tag) {
-      $scope.baseResetIdleWatch();
-      $scope.tagDetected(tag);
-    });
-
-    /**
-     * Handler for when tag is removed.
-     *
-     * @param event
-     *   The event.
-     * @param tag
-     *   The tag returned from the device.
-     */
-    $scope.$on('rfid.tagRemoved', function tagRemoved(event, tag) {
-      $scope.baseResetIdleWatch();
-      $scope.tagRemoved(tag);
-    });
-
-    /**
-     * The AFI has been set for a tag.
-     *
-     * @param event
-     *   The event.
-     * @param tag
-     *   The tag returned from the device.
-     */
-    $scope.$on('rfid.tagAFISet', function tagAFISet(event, tag) {
-      $scope.baseResetIdleWatch();
-      $scope.tagAFISet(tag);
-    });
-
-    // Start listening for RDIF events.
+    // Start listening for rfid events.
     rfidService.start($scope);
 
     /**
@@ -78,6 +39,9 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     $scope.tagRemoved = function itemRemoved(tag) {
       var material = false;
       var i;
+
+      // Restart idle timeout.
+      $scope.baseResetIdleWatch();
 
       // Check if material has already been added to the list.
       for (i = 0; i < $scope.materials.length; i++) {
@@ -191,7 +155,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * @returns material
      *   The material that contains the tag.
      */
-    $scope.setAFIonTagReturnMaterial = function setAFIonTagReturnMaterial(tag) {
+    $scope.updateMaterialAFI = function updateMaterialAFI(tag) {
       var i, j, material;
 
       // Locate tag.
@@ -227,6 +191,9 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      *   boolean: AFI on/off.
      */
     $scope.setAFI = function setAFI(uid, afi) {
+      // Restart idle timeout.
+      $scope.baseResetIdleWatch();
+
       rfidService.setAFI(uid, afi);
     };
 

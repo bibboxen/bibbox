@@ -415,6 +415,7 @@ module.exports = function (options, imports, register) {
       });
     },
     function (err) {
+      debug(err);
       bus.emit(data.errorEvent, err);
     });
   });
@@ -475,6 +476,7 @@ module.exports = function (options, imports, register) {
       });
     },
     function (err) {
+      debug(err);
       bus.emit(data.errorEvent, err);
     });
   });

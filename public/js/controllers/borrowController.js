@@ -51,6 +51,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       var i;
       var material = $scope.addTag(tag, $scope.materials);
 
+      // Restart idle timeout.
+      $scope.baseResetIdleWatch();
+
       // Check if all tags in series have been added.
       if (!material.invalid && !material.loading && (!material.borrowed || material.status === 'return.error') && $scope.allTagsInSeries(material)) {
         // If a tag is missing from the device.
@@ -151,22 +154,17 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      *   The tag returned from the device.
      */
     $scope.tagAFISet = function itemAFISet(tag) {
-      var material = $scope.setAFIonTagReturnMaterial(tag);
+      var material = $scope.updateMaterialAFI(tag);
 
       // If the tag belongs to a material in $scope.materials.
       if (material) {
-        var allAFISetToFalse = true;
-
-        // Iterate all tags in material.
-        for (var i = 0; i < material.tags.length; i++) {
-          if (material.tags[i].afi) {
-            allAFISetToFalse = false;
-            break;
-          }
-        }
+        // Iterate all tags in material and return tag if is true.
+        var fund = material.tags.find(function (tag, index) {
+          return tag.afi;
+        });
 
         // If all AFIs have been turned off mark the material as borrowed.
-        if (allAFISetToFalse) {
+        if (!fund) {
           material.status = 'borrow.success';
           material.information = 'borrow.was_successful';
           material.loading = false;
