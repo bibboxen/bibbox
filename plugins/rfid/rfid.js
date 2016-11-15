@@ -21,36 +21,45 @@ var RFID = function (bus, port, afi) {
 
   // Check if we are in RFID debug mode. Will return basic fake Id's to emulate
   // an RFID reader during development and testing.
-  var debug = process.env.RFID_DEBUG || false;
+  var rfid_debug = process.env.RFID_DEBUG || false;
 
   // localhost
   var server = new WebSocketServer({ port: port });
 
   var setAFI = null;
   var requestTags = null;
-  if (debug) {
+  if (rfid_debug) {
     var fakeTags = require('./fakeTags.json');
 
+    // Show in console that we are in debug mode.
     console.log('RFID debug mode.');
     console.log('RFID fake tags loaded: ' + fakeTags.length);
 
     // Send connected event.
     bus.emit('rfid.connected');
 
-    // Register bus listeners.
+    /**
+     * Tag request fake response.
+     */
     bus.on('rfid.tags.request', function () {
       bus.emit('rfid.tags.detected', fakeTags);
     });
 
+    /**
+     * Set AFI fake response.
+     */
     bus.on('rfid.tag.set_afi', function (data) {
+      // Check if tag exists in fakeTags and return index.
       var index = fakeTags.findIndex(function (tag, index) {
         if (tag.uid == data.uid) {
+          // Tag found change afi.
           fakeTags[index].afi = data.afi;
           return true;
         }
         return false;
       });
 
+      // Tag found so return fakeTags afi for that tag.
       if (index) {
         bus.emit('rfid.tag.afi.set', {
           uid: fakeTags[index].uid,
