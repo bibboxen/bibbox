@@ -253,6 +253,23 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     };
 
     /**
+     * Get number of incomplete materials.
+     *
+     * @returns {number}
+     */
+    $scope.baseGetIncompleteMaterials = function baseGetIncompleteMaterials() {
+      var n = 0;
+
+      for (var i = 0; i < $scope.materials.length; i++) {
+        if (!$scope.allTagsInSeries($scope.materials[i])) {
+          n++;
+        }
+      }
+
+      return n;
+    };
+
+    /**
      * Set the AFI on tag with UID.
      *
      * @param uid

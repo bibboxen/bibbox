@@ -13,7 +13,7 @@
             </tr>
             <tr data-ng-repeat="material in materials" data-ng-class="{'bg-danger': materials.invalid || material.status === 'return.error' || material.status === 'borrow.error'}" data-ng-if="!material.returned">
               <td class="vert-align">{{ material.title }}</td>
-              <td class="vert-align">{{ material.invalid ? 'processing.invalid_material' : '' }}{{ material.information }}</td>
+              <td class="vert-align">{{ material.invalid ? 'processing.invalid_material' : '' | translate }}{{ material.information }}</td>
             </tr>
           </table>
         </div>
