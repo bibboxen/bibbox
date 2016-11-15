@@ -5,7 +5,7 @@
   <p>
     {{ 'receipt.loans.new.id'|translate }} {{ item.id }}<br/>
     {{ item.title }}<br/>
-    {% if author %}
+    {% if item.author %}
       {{ item.author }}<br/>
     {% endif %}
     {{ 'receipt.loans.new.dueDate'|translate }} {{ (item.dueDate/1000)|date('d/m/y') }}
