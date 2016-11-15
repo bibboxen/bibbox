@@ -5,13 +5,17 @@
     <img src="img/help3.jpg" />
   </div>
 
-  <div class="row" data-ng-if="materials && materials.length > 0">
-    <div>
-      {{ 'scanning.scanned_items' | translate }}: {{materials.length}} -
-      {{ 'scanning.processing_items' | translate }}: {{ baseGetProcessingResults() }} -
-      {{ 'scanning.error_items' | translate }}: {{ baseGetErrorResults() }}
+  <div class="processing-results-wrapper" data-ng-if="!materials || materials.length > 0">
+    <div class="panel panel-default processing-results text-right">
+      <span>{{ materials.length }} {{ 'processing.scanned_items' | translate }},</span>
+      <span data-ng-if="baseGetProcessingResults() > 0">{{ baseGetProcessingResults() }} {{ 'processing.processing_items' | translate }}</span>
+      <button type="button" class="btn btn-sm btn-danger" data-ng-click="showProcessingModal()" data-ng-if="baseGetErrorResults() > 0">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{ baseGetErrorResults() }} {{ 'processing.error_items' | translate }}
+      </button>
     </div>
+  </div>
 
+  <div class="row" data-ng-if="!materials || materials.length > 0">
     <div class="col-md-6" data-ng-repeat="(key, bin) in returnBins">
       <div class="panel panel-default">
         <div class="panel-heading" data-ng-style="{ 'background': (bin.background_color ? bin.background_color : null), 'color': (bin.color ? bin.color : null)}"><h4>{{ bin.text }}</h4></div>
@@ -52,10 +56,6 @@
     </button>
     <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="materials && materials.length > 0">
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'return.button.receipt' | translate }}
-    </button>
-
-    <button type="button" class="btn btn-success button align-left" data-ng-click="showProcessingModal()">
-      <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'borrow.button.receipt' | translate }}
     </button>
   </div>
 </div>
