@@ -226,7 +226,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     $scope.baseGetProcessingResults = function baseGetProcessingResults() {
       var n = 0;
 
-      for (i = 0; i < $scope.materials.length; i++) {
+      for (var i = 0; i < $scope.materials.length; i++) {
         if ($scope.materials.loading) {
           n++;
         }
