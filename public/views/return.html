@@ -6,6 +6,10 @@
   </div>
 
   <div class="row" data-ng-if="materials && materials.length > 0">
+    <div>
+      Scanned materials: {{material.length}} - Processing: {{ baseGetProcessingResults() }}
+    </div>
+
     <div class="col-md-6" data-ng-repeat="(key, bin) in returnBins">
       <div class="panel panel-default">
         <div class="panel-heading" data-ng-style="{ 'background': (bin.background_color ? bin.background_color : null), 'color': (bin.color ? bin.color : null)}"><h4>{{ bin.text }}</h4></div>

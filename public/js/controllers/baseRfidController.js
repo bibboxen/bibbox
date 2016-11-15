@@ -219,6 +219,23 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     };
 
     /**
+     * Get number of materials that are processing.
+     *
+     * @returns {number}
+     */
+    $scope.baseGetProcessingResults = function baseGetProcessingResults() {
+      var n = 0;
+
+      for (i = 0; i < $scope.materials.length; i++) {
+        if ($scope.materials.loading) {
+          n++;
+        }
+      }
+
+      return n;
+    };
+
+    /**
      * Set the AFI on tag with UID.
      *
      * @param uid
