@@ -173,6 +173,8 @@ angular.module('BibBox').controller('ReturnController', [
      * Print receipt.
      */
     $scope.receipt = function receipt() {
+      // Raw materials contains all loaned in the library system (also those who
+      // have failed AFI sets, as they are still loaned in LMS)
       receiptService.returnReceipt(raw_materials, 'printer').then(
         function (status) {
           // Ignore.

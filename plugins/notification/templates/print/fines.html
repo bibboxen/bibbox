@@ -12,8 +12,8 @@
     {{ 'receipt.fines.date'|translate }} {{ (item.fineDate/1000)|date("d/m/y") }} {{ 'receipt.fines.amount'|translate }} {{ item.fineAmount }}
   </p>
 </div>
+{% endfor %}
 <div class="row-item">
   <p>{{ 'receipt.fines.total'|translate }} {{ total }}</p>
 </div>
-{% endfor %}
 <hr/>

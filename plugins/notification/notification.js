@@ -447,6 +447,9 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
     else {
       result = self.printTemplate.render(context);
 
+      // Remove empty lines (from template engine if statements).
+      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+
       // Print it.
       self.printReceipt(result).then(function () {
         deferred.resolve();
@@ -505,15 +508,13 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
     }
   });
 
-  console.log(items);
-
   // Listen for status notification message.
   this.bus.once('notification.patronReceipt', function (data) {
     var context = {
       name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
       header: self.headerConfig,
       library: self.renderLibrary(mail),
-      fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
+      fines: layout.fines ? self.renderFines(mail, data.fineItems, data.feeAmount) : '',
       loans_new: layout.loans_new ? self.renderNewLoans(mail, 'receipt.loans.new.headline', items) : '',
       loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
       reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
@@ -525,6 +526,9 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
     if (mail) {
       if (data.hasOwnProperty('emailAddress') && data.emailAddress !== undefined) {
         result = self.mailTemplate.render(context);
+
+        // Remove empty lines (from template engine if statements).
+        result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
         self.sendMail(data.emailAddress, result).then(function () {
           deferred.resolve();
@@ -620,6 +624,9 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
     }
     else {
       result = self.printTemplate.render(context);
+
+      // Remove empty lines (from template engine if statements).
+      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
       // Print it.
       self.printReceipt(result).then(function () {
