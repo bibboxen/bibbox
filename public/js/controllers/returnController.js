@@ -2,8 +2,8 @@
  * Return page controller.
  */
 angular.module('BibBox').controller('ReturnController', [
-  '$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', 'config',
-  function ($scope, $controller, $location, $timeout, userService, receiptService, config) {
+  '$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', 'config', '$modal',
+  function ($scope, $controller, $location, $timeout, userService, receiptService, config, $modal) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -197,6 +197,23 @@ angular.module('BibBox').controller('ReturnController', [
       // Always return to frontpage.
       $scope.baseLogoutRedirect();
     };
+
+
+    /**
+     * Show the processing modal.
+     */
+    $scope.showProcessingModal = function showProcessingModal() {
+      processingModal.$promise.then(processingModal.show);
+    };
+
+    /**
+     * Setup processing modal.
+     */
+    var processingModal = $modal({
+      scope: $scope,
+      templateUrl: './views/modal_processing.html',
+      show: false
+    });
 
     // Check that interface methods are implemented.
     Interface.ensureImplements($scope, RFIDBaseInterface);
