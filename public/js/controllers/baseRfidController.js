@@ -227,7 +227,24 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       var n = 0;
 
       for (var i = 0; i < $scope.materials.length; i++) {
-        if ($scope.materials.loading) {
+        if ($scope.materials[i].loading) {
+          n++;
+        }
+      }
+
+      return n;
+    };
+
+    /**
+     * Get number of materials that is in error state.
+     *
+     * @returns {number}
+     */
+    $scope.baseGetErrorResults = function baseGetErrorResults() {
+      var n = 0;
+
+      for (var i = 0; i < $scope.materials.length; i++) {
+        if ($scope.materials[i].status === 'return.error' || $scope.materials[i].status === 'borrow.error') {
           n++;
         }
       }
