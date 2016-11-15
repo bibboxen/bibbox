@@ -23,6 +23,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     // Sets $scope.currentPatron to the current logged in patron.
     $scope.baseGetPatron();
 
+    // Store raw check-in responses as it's need to print receipt.
+    var raw_materials = [];
+
     /**
      * Contains the array of materials scanned.
      *
@@ -79,6 +82,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                     for (i = 0; i < material.tags.length; i++) {
                       $scope.setAFI(material.tags[i].uid, false);
                     }
+
+                    // Store the raw result (it's used to send with receipts).
+                    raw_materials.push(result);
 
                     break;
                   }
@@ -185,7 +191,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     $scope.receipt = function receipt(type) {
       var credentials = userService.getCredentials();
 
-      receiptService.borrow(credentials.username, credentials.password, $scope.materials, type).then(
+      receiptService.borrow(credentials.username, credentials.password, raw_materials, type).then(
         function (status) {
           // Ignore.
         },
@@ -195,7 +201,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
         }
       );
 
-      // Always return to frontpage.
+      // Always return to front page.
       $scope.baseLogoutRedirect();
     };
 

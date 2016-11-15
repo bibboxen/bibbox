@@ -56,9 +56,6 @@ angular.module('BibBox').controller('ReturnController', [
         userService.checkIn(material.id, currentDate).then(function (result) {
           $scope.baseResetIdleWatch();
 
-          // Store the raw result (it's used to send with receipts).
-          raw_materials.push(result);
-
           if (result) {
             if (result.ok === '1') {
               for (i = 0; i < $scope.materials.length; i++) {
@@ -73,6 +70,9 @@ angular.module('BibBox').controller('ReturnController', [
                   for (i = 0; i < material.tags.length; i++) {
                     $scope.setAFI(material.tags[i].uid, true);
                   }
+
+                  // Store the raw result (it's used to send with receipts).
+                  raw_materials.push(result);
 
                   break;
                 }

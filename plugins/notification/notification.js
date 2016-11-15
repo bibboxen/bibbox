@@ -447,9 +447,6 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
     else {
       result = self.printTemplate.render(context);
 
-      // Remove empty lines (from template engine if statements).
-      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-
       // Print it.
       self.printReceipt(result).then(function () {
         deferred.resolve();
@@ -508,6 +505,8 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
     }
   });
 
+  console.log(items);
+
   // Listen for status notification message.
   this.bus.once('notification.patronReceipt', function (data) {
     var context = {
@@ -539,9 +538,6 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
     }
     else {
       result = self.printTemplate.render(context);
-
-      // Remove empty lines (from template engine if statements).
-      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
       // Print it.
       self.printReceipt(result).then(function () {
@@ -601,8 +597,6 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
       footer: self.renderFooter(mail)
     };
-
-    console.log(data);
 
     // Add username to receipt.
     if (data.hasOwnProperty('personalName') && data.personalName !== '') {

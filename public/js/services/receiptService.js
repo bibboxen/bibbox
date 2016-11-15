@@ -102,12 +102,12 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
         deferred.reject(err);
       });
 
-      proxyService.emit('notification.checkOut', 'notification.response', null, {
+      proxyService.emit('notification.checkOut', {
         username: username,
         password: password,
+        items: items,
         mail: type === 'mail',
         lang: tmhDynamicLocale.get(),
-        items: items,
         busEvent: 'notification.response',
         errorEvent: 'notification.error'
       });
