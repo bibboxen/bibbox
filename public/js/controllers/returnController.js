@@ -99,9 +99,6 @@ angular.module('BibBox').controller('ReturnController', [
                 $scope.materials[i].status = 'return.error';
                 $scope.materials[i].information = 'return.was_not_successful';
                 $scope.materials[i].loading = false;
-
-                // @TODO: How can this be retried?
-
                 break;
               }
             }
@@ -116,9 +113,6 @@ angular.module('BibBox').controller('ReturnController', [
               $scope.materials[i].status = 'return.error';
               $scope.materials[i].information = 'return.was_not_successful';
               $scope.materials[i].loading = false;
-
-              // @TODO: How can this be retried?
-
               break;
             }
           }
@@ -139,18 +133,13 @@ angular.module('BibBox').controller('ReturnController', [
 
       // If the tag belongs to a material in $scope.materials.
       if (material) {
-        var allAFISetToTrue = true;
+        // Iterate all tags in material and return tag afi if is true.
+        var found = material.tags.find(function (tag, index) {
+          return tag.afi;
+        });
 
-        // Iterate all tags in material.
-        for (var i = 0; i < material.tags.length; i++) {
-          if (!material.tags[i].afi) {
-            allAFISetToTrue = false;
-            break;
-          }
-        }
-
-        // If all AFIs have been turned off mark the material as returned.
-        if (allAFISetToTrue) {
+        // If all AFIs have been turned off mark the material as borrowed.
+        if (!found) {
           material.status = 'return.success';
           material.information = 'return.was_successful';
           material.loading = false;
@@ -194,7 +183,7 @@ angular.module('BibBox').controller('ReturnController', [
         }
       );
 
-      // Always return to frontpage.
+      // Always return to front page.
       $scope.baseLogoutRedirect();
     };
 

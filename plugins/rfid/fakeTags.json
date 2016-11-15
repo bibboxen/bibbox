@@ -26,5 +26,12 @@
     "afi": 7,
     "seriesLength": 2,
     "numberInSeries": 2
+  },
+  {
+    "uid": "E00401505EB0A40X",
+    "mid": "0000000000",
+    "afi": 7,
+    "seriesLength": 1,
+    "numberInSeries": 1
   }
 ]

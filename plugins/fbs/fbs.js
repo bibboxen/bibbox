@@ -410,6 +410,7 @@ module.exports = function (options, imports, register) {
           bus.emit('offline.add.checkout', data);
         }
         else {
+          debug(err);
           bus.emit(data.errorEvent, err);
         }
       });
@@ -471,6 +472,7 @@ module.exports = function (options, imports, register) {
           bus.emit('offline.add.checkin', data);
         }
         else {
+          debug(err);
           bus.emit(data.errorEvent, err);
         }
       });
