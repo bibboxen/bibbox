@@ -6,16 +6,16 @@
   </div>
 
   <div class="row" data-ng-if="materials && materials.length > 0">
-    <div class="col-md-6" data-ng-repeat="(key, value) in returnBins">
+    <div class="col-md-6" data-ng-repeat="(key, bin) in returnBins">
       <div class="panel panel-default">
-        <div class="panel-heading" data-ng-style="{ 'background': (value.background_color ? value.background_color : null), 'color': (value.color ? value.color : null)}"><h4>{{ value.text }}</h4></div>
+        <div class="panel-heading" data-ng-style="{ 'background': (bin.background_color ? bin.background_color : null), 'color': (bin.color ? bin.color : null)}"><h4>{{ bin.text }}</h4></div>
         <table class="table">
           <tr>
             <th class="return-td-title">{{ 'return.title' | translate }}</th>
             <th class="text-center return-td-status">{{ 'return.status' | translate }}</th>
           </tr>
-          <tr data-ng-repeat="material in value.materials"
-              data-ng-if="$index >= (pager.currentPage - 1) * pager.itemsPerPage && $index < pager.currentPage * pager.itemsPerPage"
+          <tr data-ng-repeat="material in bin.materials"
+              data-ng-if="$index >= (bin.pager.currentPage - 1) * bin.pager.itemsPerPage && $index < bin.pager.currentPage * bin.pager.itemsPerPage"
               class="bg-success">
             <td class="vert-align">{{ material.title }}</td>
             <td class="vert-align text-center">
@@ -26,16 +26,16 @@
       </div>
 
       <ul uib-pagination
-          data-ng-if="value.materials.length > value.pager.itemsPerPage"
+          data-ng-if="bin.materials.length > bin.pager.itemsPerPage"
           class="align-right"
           direction-links="false"
           boundary-link-numbers="true"
           max-size="3"
           previous-text="<"
           next-text=">"
-          total-items="value.materials.length"
-          items-per-page="value.pager.itemsPerPage"
-          ng-model="value.pager.currentPage">
+          total-items="bin.materials.length"
+          items-per-page="bin.pager.itemsPerPage"
+          ng-model="bin.pager.currentPage">
       </ul>
     </div>
   </div>
