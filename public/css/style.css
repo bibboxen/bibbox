@@ -269,3 +269,9 @@ body {
 .return-td-title {
   width: 90%;
 }
+
+.processing-results {
+  font-size: 16px;
+  padding: .5em;
+  right: 0;
+}

@@ -219,6 +219,57 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     };
 
     /**
+     * Get number of materials that are processing.
+     *
+     * @returns {number}
+     */
+    $scope.baseGetProcessingResults = function baseGetProcessingResults() {
+      var n = 0;
+
+      for (var i = 0; i < $scope.materials.length; i++) {
+        if ($scope.materials[i].loading) {
+          n++;
+        }
+      }
+
+      return n;
+    };
+
+    /**
+     * Get number of materials that is in error state.
+     *
+     * @returns {number}
+     */
+    $scope.baseGetErrorResults = function baseGetErrorResults() {
+      var n = 0;
+
+      for (var i = 0; i < $scope.materials.length; i++) {
+        if ($scope.materials[i].invalid || $scope.materials[i].status === 'return.error' || $scope.materials[i].status === 'borrow.error') {
+          n++;
+        }
+      }
+
+      return n;
+    };
+
+    /**
+     * Get number of incomplete materials.
+     *
+     * @returns {number}
+     */
+    $scope.baseGetIncompleteMaterials = function baseGetIncompleteMaterials() {
+      var n = 0;
+
+      for (var i = 0; i < $scope.materials.length; i++) {
+        if (!$scope.allTagsInSeries($scope.materials[i])) {
+          n++;
+        }
+      }
+
+      return n;
+    };
+
+    /**
      * Set the AFI on tag with UID.
      *
      * @param uid

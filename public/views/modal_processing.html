@@ -1,0 +1,26 @@
+<div class="modal text-center">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="fineModalLabel">{{ 'processing.heading' | translate }}</h2>
+      </div>
+      <div class="modal-body">
+        <div class="panel panel-default">
+          <table class="table">
+            <tr>
+              <th>{{ 'processing.title' | translate }}</th>
+              <th>{{ 'processing.information' | translate }}</th>
+            </tr>
+            <tr data-ng-repeat="material in materials" data-ng-class="{'bg-danger': materials.invalid || material.status === 'return.error' || material.status === 'borrow.error'}" data-ng-if="!material.returned">
+              <td class="vert-align">{{ material.title }}</td>
+              <td class="vert-align">{{ material.invalid ? 'processing.invalid_material' : '' | translate }}{{ material.information }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info button" data-ng-click="$hide()">{{ 'processing.button.ok' | translate }}</button>
+      </div>
+    </div>
+  </div>
+</div>
