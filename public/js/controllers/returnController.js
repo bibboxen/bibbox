@@ -153,8 +153,12 @@ angular.module('BibBox').controller('ReturnController', [
           material.loading = false;
           material.returned = true;
 
+          // Place the material in the correct sorting bin.
           var returnBin = getSortBin(material.sortBin);
           returnBin.materials.push(material);
+
+          // Update the pager to show latest result.
+          returnBin.pager.currentPage = Math.ceil(returnBin.materials.length / returnBin.pager.itemsPerPage);
         }
       }
     };
