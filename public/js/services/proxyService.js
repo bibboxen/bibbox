@@ -84,6 +84,16 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
         $location.path('/');
         $route.reload();
       });
+
+      // Listen for disconnection with the backend.
+      socket.on('disconnect', function() {
+        $rootScope.$emit('connection.error');
+      });
+
+      // Listen for connection with the backend.
+      socket.on('connected', function() {
+        $rootScope.$emit('connection.connected');
+      });
     };
 
     // Initialize.

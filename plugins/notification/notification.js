@@ -412,22 +412,26 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
   var deferred = Q.defer();
   var layout = self.layouts.checkIn;
 
+  console.log('h1');
+
   // Set current language.
   i18n.setLocale(lang ? lang : self.config.default_lang);
 
   // Listen for status notification message.
   this.bus.once('notification.patronReceipt', function (data) {
     var context = {
-      name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
-      header: self.headerConfig,
-      library: self.renderLibrary(mail),
-      fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
-      loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
-      reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
-      reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
-      footer: self.renderFooter(mail),
-      check_ins: layout.check_ins ? self.renderCheckIn(mail, items) : ''
+      //name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
+      //header: self.headerConfig,
+      //library: self.renderLibrary(mail),
+      //fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
+      //loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
+      //reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
+      //reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
+      //footer: self.renderFooter(mail),
+      //check_ins: layout.check_ins ? self.renderCheckIn(mail, items) : ''
     };
+
+    console.log('h2');
 
     var result = '';
     if (mail) {
@@ -449,6 +453,8 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
 
       // Remove empty lines (from template engine if statements).
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+
+      console.log('h3');
 
       // Print it.
       self.printReceipt(result).then(function () {

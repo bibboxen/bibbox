@@ -39,11 +39,24 @@ angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', 
         $scope.error = false;
       }
 
-      // Handel error in loading config.
+      // Handel error in loading config (out-of-order).
       $rootScope.$on('config.error', function () {
         $scope.error = true;
         $scope.loading = false;
       });
+
+      // Handle connection errors (out-of-order).
+      $rootScope.$on('connection.error', function () {
+        $scope.error = true;
+        $scope.loading = false;
+      })
+
+      // Handle re-connection.
+      $rootScope.$on('connection.connected', function () {
+        if ($scope.error === true) {
+          $scope.error = false;
+        }
+      })
     };
     init();
 
