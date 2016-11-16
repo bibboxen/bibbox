@@ -31,6 +31,9 @@ var RFID = function (bus, port, afi) {
   // When client connects to RFID web-socket this will be set.
   var currentWebSocket = null;
 
+  // Inform the UI that connection with RFID is closed.
+  bus.emit('rfid.closed');
+
   var setAFI = function setAFI(data) {
     try {
       currentWebSocket.send(JSON.stringify({
@@ -107,9 +110,6 @@ var RFID = function (bus, port, afi) {
     server.on('connection', function connection(ws) {
       currentWebSocket = ws;
 
-      // Inform the UI that connection with RFID is open.
-      bus.emit('rfid.connected');
-      debug('Web-socket connected');
 
       // Register bus listeners.
       bus.on('rfid.tags.request', requestTags);
@@ -139,7 +139,7 @@ var RFID = function (bus, port, afi) {
           switch(data.event) {
             case 'connected':
               bus.emit('rfid.connected');
-              debug('Connected to web-socket');
+              debug('Web-socket connected');
               break;
 
             case 'rfid.tags.detected':
