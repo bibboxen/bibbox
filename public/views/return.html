@@ -25,7 +25,7 @@
             <th class="return-td-title">{{ 'return.title' | translate }}</th>
             <th class="text-center return-td-status">{{ 'return.status' | translate }}</th>
           </tr>
-          <tr data-ng-repeat="material in bin.materials"
+          <tr data-ng-repeat="material in bin.materials track by $index"
               data-ng-if="$index >= (bin.pager.currentPage - 1) * bin.pager.itemsPerPage && $index < bin.pager.currentPage * bin.pager.itemsPerPage"
               class="bg-success">
             <td class="vert-align">{{ material.title }}</td>
