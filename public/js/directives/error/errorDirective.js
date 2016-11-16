@@ -18,7 +18,7 @@
         restrict: 'E',
         replace: false,
         link: function (scope) {
-          scope.outOfOrder = false;
+          scope.outOfOrder = true;
 
           if (!$rootScope.hasOwnProperty('outOfOrderLocks')) {
             $rootScope.outOfOrderLocks = [];

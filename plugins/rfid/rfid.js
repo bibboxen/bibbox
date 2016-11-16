@@ -31,9 +31,6 @@ var RFID = function (bus, port, afi) {
   // When client connects to RFID web-socket this will be set.
   var currentWebSocket = null;
 
-  // Inform the UI that connection with RFID is closed.
-  bus.emit('rfid.closed');
-
   var setAFI = function setAFI(data) {
     try {
       currentWebSocket.send(JSON.stringify({
@@ -67,7 +64,7 @@ var RFID = function (bus, port, afi) {
 
     // Fake connect to get online.
     bus.emit('rfid.connected');
-    debug('Web-socket connected');
+    debug('Web-socket fake connected');
 
     // Show in console that we are in debug mode.
     debug('RFID debug mode.');
