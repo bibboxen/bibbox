@@ -25,11 +25,40 @@ var RFID = function (bus, port, afi) {
   // an RFID reader during development and testing.
   var rfid_debug = process.env.RFID_DEBUG || false;
 
-  // localhost
+  // Create web-socket server on localhost (127.0.0.1).
   var server = new WebSocketServer({ port: port });
 
-  var setAFI = null;
-  var requestTags = null;
+  // When client connects to RFID web-socket this will be set.
+  var currentWebSocket = null;
+
+  var setAFI = function setAFI(data) {
+    try {
+      currentWebSocket.send(JSON.stringify({
+        event: 'setAFI',
+        tag: {
+          uid: data.uid,
+          afi: data.afi ? afi.on : afi.off
+        }
+      }));
+    }
+    catch (err) {
+      bus.emit('logger.err', err.message);
+      debug(err.message);
+    }
+  };
+
+  var requestTags = function requestTags() {
+    try {
+      currentWebSocket.send(JSON.stringify({
+        event: 'detectTags'
+      }));
+    }
+    catch (err) {
+      bus.emit('logger.err', err.message);
+      debug(err.message);
+    }
+  };
+
   if (rfid_debug) {
     var fakeTags = require('./fakeTags.json');
 
@@ -76,46 +105,16 @@ var RFID = function (bus, port, afi) {
   else {
     // Connection set up.
     server.on('connection', function connection(ws) {
-      // Cleanup bus events for previous connections.
-      if (requestTags !== null) {
-        bus.removeListener('rfid.tags.request', requestTags);
-      }
-
-      if (setAFI !== null) {
-        bus.removeListener('rfid.tag.set_afi', setAFI);
-      }
-
-      requestTags = function requestTags() {
-        try {
-          ws.send(JSON.stringify({
-            event: 'detectTags'
-          }));
-        }
-        catch (err) {
-          bus.emit('logger.err', err.message);
-          debug(err.message);
-        }
-      };
-
-      setAFI = function setAFI(data) {
-        try {
-          ws.send(JSON.stringify({
-            event: 'setAFI',
-            tag: {
-              uid: data.uid,
-              afi: data.afi ? afi.on : afi.off
-            }
-          }));
-        }
-        catch (err) {
-          bus.emit('logger.err', err.message);
-          debug(err.message);
-        }
-      };
-
       // Register bus listeners.
       bus.on('rfid.tags.request', requestTags);
       bus.on('rfid.tag.set_afi', setAFI);
+
+      // Cleanup bus events for previous connections.
+      ws.on('close', function close() {
+        console.log('Removed events');
+        bus.removeListener('rfid.tags.request', requestTags);
+        bus.removeListener('rfid.tag.set_afi', setAFI);
+      });
 
       ws.on('message', function incoming(message) {
         try {
@@ -145,6 +144,7 @@ var RFID = function (bus, port, afi) {
               break;
 
             case 'rfid.afi.set':
+              console.log(data);
               if (data.success) {
                 bus.emit('rfid.tag.afi.set', {
                   uid: data.tag.uid,

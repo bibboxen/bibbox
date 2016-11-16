@@ -113,9 +113,6 @@ angular.module('BibBox').controller('ReturnController', [
           }
         }, function (err) {
           $scope.baseResetIdleWatch();
-
-          console.log("Return error", err);
-
           for (i = 0; i < $scope.materials.length; i++) {
             if ($scope.materials[i].id === material.id) {
               $scope.materials[i].status = 'return.error';
