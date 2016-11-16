@@ -141,7 +141,7 @@ angular.module('BibBox').controller('ReturnController', [
 
       // If the tag belongs to a material in $scope.materials.
       if (material) {
-        // Iterate all tags in material and return tag afi if is true.
+        // Iterate all tags in material and return tag if afi is false.
         var found = material.tags.find(function (tag, index) {
           return tag.afi;
         });
@@ -200,7 +200,6 @@ angular.module('BibBox').controller('ReturnController', [
       // Always return to front page.
       $scope.baseLogoutRedirect();
     };
-
 
     /**
      * Show the processing modal.

@@ -11,6 +11,8 @@
  * @function tagAFISet
  *   @param A tag object from the RFID scanner.
  *
+ * @interface
+ *
  * @type {Interface}
  */
 RFIDBaseInterface = new Interface( 'RFIDBaseInterface', [
