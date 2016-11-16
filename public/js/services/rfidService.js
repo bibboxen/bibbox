@@ -102,16 +102,6 @@ angular.module('BibBox').service('rfidService', ['$q', '$rootScope', 'proxyServi
       }
     });
 
-    // Listen for disconnection with the backend.
-    proxyService.on('rfid.closed', function() {
-      $rootScope.$emit('out-of-order.enable', 'rfid');
-    });
-
-    // Listen for connection with the backend.
-    proxyService.on('rfid.connected', function() {
-      $rootScope.$emit('out-of-order.disable', 'rfid');
-    });
-
     /**
      * Turn the AFI on/off of the tag.
      *

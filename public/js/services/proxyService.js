@@ -91,6 +91,16 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
         $rootScope.$emit('out-of-order.disable', 'nodejs');
       });
 
+      // Listen for disconnection with the backend.
+      socket.on('rfid.closed', function() {
+        $rootScope.$emit('out-of-order.enable', 'rfid');
+      });
+
+      // Listen for connection with the backend.
+      socket.on('rfid.connected', function() {
+        $rootScope.$emit('out-of-order.disable', 'rfid');
+      });
+
       // Reloads the browser on the 'frontend.reload' event.
       socket.on('frontend.reload', function () {
         $location.path('/');
