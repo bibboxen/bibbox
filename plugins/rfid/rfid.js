@@ -65,6 +65,10 @@ var RFID = function (bus, port, afi) {
   if (rfid_debug) {
     var fakeTags = require('./fakeTags.json');
 
+    // Fake connect to get online.
+    bus.emit('rfid.connected');
+    debug('Web-socket connected');
+
     // Show in console that we are in debug mode.
     debug('RFID debug mode.');
     debug('RFID fake tags loaded: ' + fakeTags.length);
@@ -109,7 +113,6 @@ var RFID = function (bus, port, afi) {
     // Connection set up.
     server.on('connection', function connection(ws) {
       currentWebSocket = ws;
-
 
       // Register bus listeners.
       bus.on('rfid.tags.request', requestTags);
