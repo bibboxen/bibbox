@@ -251,6 +251,15 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     };
 
     /**
+     * RFID error handler.
+     *
+     * @param err
+     */
+    $scope.rfidError = function rfidError(err) {
+      console.log(err);
+    };
+
+    /**
      * On destroy.
      */
     $scope.$on('$destroy', function () {
