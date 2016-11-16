@@ -11,6 +11,8 @@
  * @function tagAFISet
  *   @param A tag object from the RFID scanner.
  *
+ * @interface
+ *
  * @type {Interface}
  */
 RFIDBaseInterface = new Interface( 'RFIDBaseInterface', [
@@ -188,15 +190,15 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * @returns {number}
      */
     $scope.baseGetProcessingResults = function baseGetProcessingResults() {
-      var n = 0;
+      var numberOfProcessingResults = 0;
 
       for (var i = 0; i < $scope.materials.length; i++) {
         if ($scope.materials[i].loading) {
-          n++;
+          numberOfProcessingResults++;
         }
       }
 
-      return n;
+      return numberOfProcessingResults;
     };
 
     /**
@@ -205,15 +207,15 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * @returns {number}
      */
     $scope.baseGetErrorResults = function baseGetErrorResults() {
-      var n = 0;
+      var numberOfErrorResults = 0;
 
       for (var i = 0; i < $scope.materials.length; i++) {
         if ($scope.materials[i].invalid || $scope.materials[i].status === 'return.error' || $scope.materials[i].status === 'borrow.error') {
-          n++;
+          numberOfErrorResults++;
         }
       }
 
-      return n;
+      return numberOfErrorResults;
     };
 
     /**
@@ -222,15 +224,15 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * @returns {number}
      */
     $scope.baseGetIncompleteMaterials = function baseGetIncompleteMaterials() {
-      var n = 0;
+      var numberOfIncompleteMaterials = 0;
 
       for (var i = 0; i < $scope.materials.length; i++) {
         if (!$scope.allTagsInSeries($scope.materials[i])) {
-          n++;
+          numberOfIncompleteMaterials++;
         }
       }
 
-      return n;
+      return numberOfIncompleteMaterials;
     };
 
     /**

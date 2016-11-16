@@ -33,9 +33,16 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      */
     $scope.materials = [];
 
+    /**
+     * Keep track of borrowed materials.
+     *
+     * @type {Array}
+     */
+    $scope.borrowedMaterials = [];
+
     // Pager config.
     $scope.pager = {
-      itemsPerPage: 11,
+      itemsPerPage: 10,
       currentPage: 1
     };
 
@@ -158,7 +165,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
       // If the tag belongs to a material in $scope.materials.
       if (material) {
-        // Iterate all tags in material and return tag afi if is true.
+        // Iterate all tags in material and return tag if afi true.
         var found = material.tags.find(function (tag, index) {
           return tag.afi;
         });
@@ -169,6 +176,16 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           material.information = 'borrow.was_successful';
           material.loading = false;
           material.borrowed = true;
+
+          // See if material was already added to borrowed materials.
+          found = $scope.borrowedMaterials.find(function (item, index) {
+            return item.id === material.id;
+          });
+
+          // Add to borrowed materials.
+          if (!found) {
+            $scope.borrowedMaterials.push(material);
+          }
         }
       }
     };
@@ -214,6 +231,22 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       show: false
     });
 
+    /**
+     * Show the processing modal.
+     */
+    $scope.showProcessingModal = function showProcessingModal() {
+      processingModal.$promise.then(processingModal.show);
+    };
+
+    /**
+     * Setup processing modal.
+     */
+    var processingModal = $modal({
+      scope: $scope,
+      templateUrl: './views/modal_processing.html',
+      show: false
+    });
+
     // Check that interface methods are implemented.
     Interface.ensureImplements($scope, RFIDBaseInterface);
 
@@ -226,6 +259,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     $scope.$on('$destroy', function () {
       userService.logout();
       receiptModal.hide();
+      processingModal.hide();
     });
   }
 ]);

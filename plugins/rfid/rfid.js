@@ -84,14 +84,14 @@ var RFID = function (bus, port, afi) {
       var index = fakeTags.findIndex(function (tag, index) {
         if (tag.uid === data.uid) {
           // Tag found change afi.
-          fakeTags[index].afi = data.afi;
+          fakeTags[index].afi = data.afi ? afi.on : afi.off;
           return true;
         }
         return false;
       });
 
       // Tag found so return fakeTags afi for that tag.
-      if (index != -1) {
+      if (index !== -1) {
         bus.emit('rfid.tag.afi.set', {
           uid: fakeTags[index].uid,
           afi: fakeTags[index].afi === afi.on

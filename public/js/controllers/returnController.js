@@ -138,12 +138,12 @@ angular.module('BibBox').controller('ReturnController', [
 
       // If the tag belongs to a material in $scope.materials.
       if (material) {
-        // Iterate all tags in material and return tag afi if is true.
+        // Iterate all tags in material and return tag if afi is false.
         var found = material.tags.find(function (tag, index) {
-          return tag.afi;
+          return !tag.afi;
         });
 
-        // If all AFIs have been turned off mark the material as borrowed.
+        // If all AFIs have been turned on mark the material as borrowed.
         if (!found) {
           material.status = 'return.success';
           material.information = 'return.was_successful';
@@ -152,10 +152,19 @@ angular.module('BibBox').controller('ReturnController', [
 
           // Place the material in the correct sorting bin.
           var returnBin = getSortBin(material.sortBin);
-          returnBin.materials.push(material);
 
-          // Update the pager to show latest result.
-          returnBin.pager.currentPage = Math.ceil(returnBin.materials.length / returnBin.pager.itemsPerPage);
+          // See if material was already added to borrowed materials.
+          found = returnBin.materials.find(function (item, index) {
+            return item.id === material.id;
+          });
+
+          // Add to material to return bin.
+          if (!found) {
+            returnBin.materials.push(material);
+
+            // Update the pager to show latest result.
+            returnBin.pager.currentPage = Math.ceil(returnBin.materials.length / returnBin.pager.itemsPerPage);
+          }
         }
       }
     };
@@ -163,11 +172,11 @@ angular.module('BibBox').controller('ReturnController', [
     /**
      * Get sort bin.
      *
-     * @param bin
-     *   @TODO: Missing documentation.
+     * @param {string} bin
+     *   The bin number.
      *
      * @returns {*}
-     *   @TODO: Missing documentation.
+     *   The bin the material should be added to.
      */
     function getSortBin(bin) {
       if (config.binSorting.bins.hasOwnProperty(bin)) {
@@ -197,7 +206,6 @@ angular.module('BibBox').controller('ReturnController', [
       // Always return to front page.
       $scope.baseLogoutRedirect();
     };
-
 
     /**
      * Show the processing modal.

@@ -1,0 +1,11 @@
+<div class="processing-results-wrapper" data-ng-if="materials && materials.length > 0">
+  <div class="panel panel-default processing-results text-right">
+    <span>{{ materials.length }} {{ 'processing.scanned_items' | translate }}.</span>
+    <span data-ng-if="baseGetIncompleteMaterials() > 0"> {{ baseGetIncompleteMaterials() }} {{ 'processing.incomplete_items' | translate }}.</span>
+    <span data-ng-if="baseGetProcessingResults() > 0"> {{ baseGetProcessingResults() }} {{ 'processing.processing_items' | translate }}.</span>
+    <button type="button" class="btn btn-sm btn-{{ baseGetErrorResults() > 0 ? 'danger' : 'default' }}" data-ng-click="showProcessingModal()">
+      <span data-ng-if="baseGetErrorResults() > 0"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{ baseGetErrorResults() }} {{ 'processing.error_items' | translate }}</span>
+      <span data-ng-if="baseGetErrorResults() === 0">{{ 'processing.button.status' | translate }}</span>
+    </button>
+  </div>
+</div>
