@@ -111,6 +111,10 @@ var RFID = function (bus, port, afi) {
     server.on('connection', function connection(ws) {
       currentWebSocket = ws;
 
+      // Inform the UI that connection with RFID is open.
+      bus.emit('rfid.connected');
+      debug('Web-socket connected');
+
       // Register bus listeners.
       bus.on('rfid.tags.request', requestTags);
       bus.on('rfid.tag.set_afi', setAFI);
@@ -137,11 +141,6 @@ var RFID = function (bus, port, afi) {
           }
 
           switch(data.event) {
-            case 'connected':
-              bus.emit('rfid.connected');
-              debug('Web-socket connected');
-              break;
-
             case 'rfid.tags.detected':
               bus.emit('rfid.tags.detected', data.tags);
               break;
