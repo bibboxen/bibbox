@@ -109,6 +109,7 @@ var RFID = function (bus, port, afi) {
 
       // Inform the UI that connection with RFID is open.
       bus.emit('rfid.connected');
+      debug('Web-socket connected');
 
       // Register bus listeners.
       bus.on('rfid.tags.request', requestTags);
@@ -121,6 +122,7 @@ var RFID = function (bus, port, afi) {
 
         // Inform the UI that connection with RFID is closed.
         bus.emit('rfid.closed');
+        debug('Web-socket closed');
 
         currentWebSocket = null;
       });
