@@ -46,7 +46,7 @@ angular.module('BibBox').controller('ReturnController', [
       $scope.baseResetIdleWatch();
 
       // Check if all tags in series have been added.
-      if (!material.invalid && !material.loading && (!material.returned || material.status === 'return.error') && $scope.allTagsInSeries(material)) {
+      if (!material.invalid && !material.loading && (!material.success || material.status === 'error') && $scope.allTagsInSeries(material)) {
         // If a tag is missing from the device.
         if ($scope.anyTagRemoved(material.tags)) {
           material.tagRemoved = true;
@@ -73,9 +73,25 @@ angular.module('BibBox').controller('ReturnController', [
                 if ($scope.materials[i].id === result.itemIdentifier) {
                   $scope.materials[i].title = result.itemProperties.title;
                   $scope.materials[i].author = result.itemProperties.author;
-                  $scope.materials[i].status = 'return.waiting_afi';
+                  $scope.materials[i].status = 'awaiting_afi';
                   $scope.materials[i].information = 'return.is_awaiting_afi';
                   $scope.materials[i].sortBin = result.sortBin;
+
+                  // Place the material in the correct sorting bin.
+                  var returnBin = getSortBin(material.sortBin);
+
+                  // See if material was already added to borrowed materials.
+                  var found = returnBin.materials.find(function (item, index) {
+                    return item.id === material.id;
+                  });
+
+                  // Add to material to return bin.
+                  if (!found) {
+                    returnBin.materials.push(material);
+
+                    // Update the pager to show latest result.
+                    returnBin.pager.currentPage = Math.ceil(returnBin.materials.length / returnBin.pager.itemsPerPage);
+                  }
 
                   // Turn AFI on.
                   for (i = 0; i < material.tags.length; i++) {
@@ -94,7 +110,7 @@ angular.module('BibBox').controller('ReturnController', [
                 if ($scope.materials[i].id === result.itemIdentifier) {
                   $scope.materials[i].loading = false;
                   $scope.materials[i].information = result.screenMessage;
-                  $scope.materials[i].status = 'return.error';
+                  $scope.materials[i].status = 'error';
 
                   break;
                 }
@@ -104,7 +120,7 @@ angular.module('BibBox').controller('ReturnController', [
           else {
             for (i = 0; i < $scope.materials.length; i++) {
               if ($scope.materials[i].id === material.id) {
-                $scope.materials[i].status = 'return.error';
+                $scope.materials[i].status = 'error';
                 $scope.materials[i].information = 'return.was_not_successful';
                 $scope.materials[i].loading = false;
                 break;
@@ -118,7 +134,7 @@ angular.module('BibBox').controller('ReturnController', [
 
           for (i = 0; i < $scope.materials.length; i++) {
             if ($scope.materials[i].id === material.id) {
-              $scope.materials[i].status = 'return.error';
+              $scope.materials[i].status = 'error';
               $scope.materials[i].information = 'return.was_not_successful';
               $scope.materials[i].loading = false;
               break;
@@ -148,26 +164,10 @@ angular.module('BibBox').controller('ReturnController', [
 
         // If all AFIs have been turned on mark the material as borrowed.
         if (!found) {
-          material.status = 'return.success';
+          material.status = 'success';
           material.information = 'return.was_successful';
           material.loading = false;
-          material.returned = true;
-
-          // Place the material in the correct sorting bin.
-          var returnBin = getSortBin(material.sortBin);
-
-          // See if material was already added to borrowed materials.
-          found = returnBin.materials.find(function (item, index) {
-            return item.id === material.id;
-          });
-
-          // Add to material to return bin.
-          if (!found) {
-            returnBin.materials.push(material);
-
-            // Update the pager to show latest result.
-            returnBin.pager.currentPage = Math.ceil(returnBin.materials.length / returnBin.pager.itemsPerPage);
-          }
+          material.success = true;
         }
       }
     };
