@@ -3,12 +3,12 @@
 {% for item in items|sort %}
 <div class="row-item">
   <p>
-    {{ 'receipt.loans.new.id'|translate }} {{ item.id }}<br/>
-    {{ item.title }}<br/>
+    {{ item.itemProperties.title }}<br/>
+    {{ 'receipt.loans.id'|translate }} {{ item.itemIdentifier }}<br/>
     {% if item.author %}
-      {{ item.author }}<br/>
+    {{ item.itemProperties.author }}<br/>
     {% endif %}
-    {{ 'receipt.loans.new.dueDate'|translate }} {{ (item.dueDate/1000)|date('d/m/y') }}
+    {{ 'receipt.loans.returnDate'|translate }} {{ (item.dueDate/1000)|date('d/m/y') }}
   </p>
 </div>
 {% endfor %}

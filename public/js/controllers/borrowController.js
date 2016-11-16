@@ -189,6 +189,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     $scope.receipt = function receipt(type) {
       var credentials = userService.getCredentials();
 
+      // Raw materials contains all loaned in the library system (also those who
+      // have failed AFI sets, as they are still loaned in LMS)
       receiptService.borrow(credentials.username, credentials.password, raw_materials, type).then(
         function (status) {
           // Ignore.
