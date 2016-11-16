@@ -19,6 +19,8 @@
       "^rfid.tag.removed$",
       "^rfid.tag.afi.set$",
       "^rfid.tag.set_afi.[\\w]+$",
+      "^rfid.closed$",
+      "^rfid.connected$",
       "^barcode.data$",
       "^frontend.[\\w]+$",
       "^fbs.login.[\\w]+$",
@@ -35,8 +37,6 @@
     "whitelistedSocketEvents": [
       "^rfid.tags.request$",
       "^rfid.tag.set_afi$",
-      "^rfid.closed$",
-      "^rfid.connected$",
       "^barcode.start$",
       "^barcode.stop$",
       "^barcode.list$",
