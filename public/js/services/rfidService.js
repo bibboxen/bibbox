@@ -3,8 +3,8 @@
  * Handles rfid events.
  */
 
-angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
-  function ($q, proxyService) {
+angular.module('BibBox').service('rfidService', ['$q', '$rootScope', 'proxyService',
+  function ($q, $rootScope, proxyService) {
     'use strict';
 
     var currentScope = null;
@@ -100,6 +100,16 @@ angular.module('BibBox').service('rfidService', ['$q', 'proxyService',
       if (currentScope && hasMethod('rfidError')) {
         currentScope.rfidError(err);
       }
+    });
+
+    // Listen for disconnection with the backend.
+    proxyService.on('rfid.closed', function() {
+      $rootScope.$emit('connection.error');
+    });
+
+    // Listen for connection with the backend.
+    proxyService.on('connected', function() {
+      $rootScope.$emit('connection.connected');
     });
 
     /**

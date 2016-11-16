@@ -35,6 +35,8 @@
     "whitelistedSocketEvents": [
       "^rfid.tags.request$",
       "^rfid.tag.set_afi$",
+      "^rfid.closed$",
+      "^rfid.connected$",
       "^barcode.start$",
       "^barcode.stop$",
       "^barcode.list$",

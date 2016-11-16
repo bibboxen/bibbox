@@ -107,18 +107,25 @@ var RFID = function (bus, port, afi) {
     server.on('connection', function connection(ws) {
       currentWebSocket = ws;
 
+      // Inform the UI that connection with RFID is open.
+      bus.emit('rfid.connected');
+
       // Register bus listeners.
       bus.on('rfid.tags.request', requestTags);
       bus.on('rfid.tag.set_afi', setAFI);
 
       // Cleanup bus events for previous connections.
-      ws.on('close', function close() {
-        console.log('Removed events');
+      currentWebSocket.on('close', function close() {
         bus.removeListener('rfid.tags.request', requestTags);
         bus.removeListener('rfid.tag.set_afi', setAFI);
+
+        // Inform the UI that connection with RFID is closed.
+        bus.emit('rfid.closed');
+
+        currentWebSocket = null;
       });
 
-      ws.on('message', function incoming(message) {
+      currentWebSocket.on('message', function incoming(message) {
         try {
           var data = JSON.parse(message);
 
@@ -146,7 +153,6 @@ var RFID = function (bus, port, afi) {
               break;
 
             case 'rfid.afi.set':
-              console.log(data);
               if (data.success) {
                 bus.emit('rfid.tag.afi.set', {
                   uid: data.tag.uid,
