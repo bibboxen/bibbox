@@ -225,6 +225,7 @@ angular.module('BibBox').controller('ReturnController', [
      * On destroy.
      */
     $scope.$on('$destroy', function () {
+      processingModal.hide();
     });
   }
 ]);
