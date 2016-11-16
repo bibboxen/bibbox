@@ -177,8 +177,15 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           material.loading = false;
           material.borrowed = true;
 
+          // See if material was already added to borrowed materials.
+          found = $scope.borrowedMaterials.find(function (item, index) {
+            return item.id === material.id;
+          });
+
           // Add to borrowed materials.
-          $scope.borrowedMaterials.push(material);
+          if (!found) {
+            $scope.borrowedMaterials.push(material);
+          }
         }
       }
     };
