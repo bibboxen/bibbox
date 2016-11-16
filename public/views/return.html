@@ -14,14 +14,15 @@
         <table class="table">
           <tr>
             <th class="return-td-title">{{ 'return.title' | translate }}</th>
-            <th class="text-center return-td-status">{{ 'return.status' | translate }}</th>
+            <th></th>
           </tr>
           <tr data-ng-repeat="material in bin.materials track by $index"
               data-ng-if="$index >= (bin.pager.currentPage - 1) * bin.pager.itemsPerPage && $index < bin.pager.currentPage * bin.pager.itemsPerPage"
-              class="bg-success">
+              data-ng-class="{'bg-success': material.success, 'bg-warning': material.status === 'awaiting_afi'}">
             <td class="vert-align">{{ material.title }}</td>
-            <td class="vert-align text-center">
-              <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
+            <td>
+              <span class="glyphicon glyphicon-ok" aria-hidden="true" data-ng-if="material.success"></span>
+              <span class="glyphicon glyphicon-lock" aria-hidden="true" data-ng-if="material.status === 'awaiting_afi'"></span>
             </td>
           </tr>
         </table>

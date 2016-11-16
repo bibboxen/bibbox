@@ -62,7 +62,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       $scope.baseResetIdleWatch();
 
       // Check if all tags in series have been added.
-      if (!material.invalid && !material.loading && (!material.borrowed || material.status === 'return.error') && $scope.allTagsInSeries(material)) {
+      if (!material.invalid && !material.loading && (!material.success || material.status === 'error') && $scope.allTagsInSeries(material)) {
         // If a tag is missing from the device.
         if ($scope.anyTagRemoved(material.tags)) {
           material.tagRemoved = true;
@@ -83,10 +83,20 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                   if ($scope.materials[i].id === result.itemIdentifier) {
                     $scope.materials[i].title = result.itemProperties.title;
                     $scope.materials[i].author = result.itemProperties.author;
-                    $scope.materials[i].status = 'borrow.awaiting_afi';
+                    $scope.materials[i].status = 'awaiting_afi';
                     $scope.materials[i].information = 'borrow.is_awaiting_afi';
                     $scope.materials[i].dueDate = result.dueDate;
-                    $scope.materials[i].borrowed = true;
+                    $scope.materials[i].success = true;
+
+                    // See if material was already added to borrowed materials.
+                    var found = $scope.borrowedMaterials.find(function (item, index) {
+                      return item.id === material.id;
+                    });
+
+                    // Add to borrowed materials if not found.
+                    if (!found) {
+                      $scope.borrowedMaterials.push(material);
+                    }
 
                     // Turn AFI off.
                     for (i = 0; i < material.tags.length; i++) {
@@ -105,7 +115,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                   if ($scope.materials[i].id === result.itemIdentifier) {
                     $scope.materials[i].loading = false;
                     $scope.materials[i].information = result.screenMessage;
-                    $scope.materials[i].status = 'borrow.error';
+                    $scope.materials[i].status = 'error';
 
                     if (result.itemProperties) {
                       $scope.materials[i].title = result.itemProperties.title;
@@ -120,7 +130,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
             else {
               for (i = 0; i < $scope.materials.length; i++) {
                 if ($scope.materials[i].id === material.id) {
-                  $scope.materials[i].status = 'borrow.error';
+                  $scope.materials[i].status = 'error';
                   $scope.materials[i].information = 'borrow.was_not_successful';
                   $scope.materials[i].loading = false;
 
@@ -138,7 +148,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
             for (i = 0; i < $scope.materials.length; i++) {
               if ($scope.materials[i].id === material.id) {
-                $scope.materials[i].status = 'borrow.error';
+                $scope.materials[i].status = 'error';
                 $scope.materials[i].information = 'borrow.was_not_successful';
                 $scope.materials[i].loading = false;
 
@@ -172,20 +182,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
         // If all AFIs have been turned off mark the material as borrowed.
         if (!found) {
-          material.status = 'borrow.success';
+          material.status = 'success';
           material.information = 'borrow.was_successful';
           material.loading = false;
-          material.borrowed = true;
-
-          // See if material was already added to borrowed materials.
-          found = $scope.borrowedMaterials.find(function (item, index) {
-            return item.id === material.id;
-          });
-
-          // Add to borrowed materials.
-          if (!found) {
-            $scope.borrowedMaterials.push(material);
-          }
+          material.success = true;
         }
       }
     };

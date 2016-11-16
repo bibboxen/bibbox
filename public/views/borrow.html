@@ -14,14 +14,19 @@
         <th>{{ 'borrow.author' | translate }}</th>
         <th>{{ 'borrow.title' | translate }}</th>
         <th>{{ 'borrow.return_date' | translate }}</th>
+        <th></th>
       </tr>
       <tr data-ng-repeat="material in borrowedMaterials track by $index"
           data-ng-if="$index >= (pager.currentPage - 1) * pager.itemsPerPage && $index < pager.currentPage * pager.itemsPerPage"
-          class="bg-success">
+          data-ng-class="{'bg-success': material.success, 'bg-warning': material.status === 'awaiting_afi'}">
         <td class="vert-align">{{ material.id }}</td>
         <td class="vert-align">{{ material.author }}</td>
         <td class="vert-align">{{ material.title }}</td>
         <td class="vert-align">{{ material.dueDate | date }}</td>
+        <td>
+          <span class="glyphicon glyphicon-ok" aria-hidden="true" data-ng-if="material.success"></span>
+          <span class="glyphicon glyphicon-lock" aria-hidden="true" data-ng-if="material.status === 'awaiting_afi'"></span>
+        </td>
       </tr>
     </table>
   </div>

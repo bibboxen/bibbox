@@ -12,8 +12,8 @@
               <th>{{ 'processing.information' | translate }}</th>
             </tr>
             <tr data-ng-repeat="material in materials"
-                data-ng-class="{'bg-danger': materials.invalid || material.status === 'return.error' || material.status === 'borrow.error'}"
-                data-ng-if="!material.returned && !material.borrowed">
+                data-ng-class="{'bg-danger': materials.invalid || material.status === 'error'}"
+                data-ng-if="!material.success">
               <td class="vert-align">{{ material.title }}</td>
               <td class="vert-align">
                 <span data-ng-if="material.seriesLength > 0 && material.tags.length === material.seriesLength">{{ material.information | translate }}</span>
