@@ -143,7 +143,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * @param material
      */
     $scope.allTagsInSeries = function allTagsInSeries(material) {
-      return material.seriesLength === material.tags.length;
+      return material.seriesLength > 0 && material.seriesLength === material.tags.length;
     };
 
     /**
