@@ -11,9 +11,17 @@
               <th>{{ 'processing.title' | translate }}</th>
               <th>{{ 'processing.information' | translate }}</th>
             </tr>
-            <tr data-ng-repeat="material in materials" data-ng-class="{'bg-danger': materials.invalid || material.status === 'return.error' || material.status === 'borrow.error'}" data-ng-if="!material.returned">
+            <tr data-ng-repeat="material in materials"
+                data-ng-class="{'bg-danger': materials.invalid || material.status === 'return.error' || material.status === 'borrow.error'}"
+                data-ng-if="!material.returned && !material.borrowed">
               <td class="vert-align">{{ material.title }}</td>
-              <td class="vert-align">{{ material.invalid ? 'processing.invalid_material' : '' | translate }}{{ material.information }}</td>
+              <td class="vert-align">
+                <span data-ng-if="material.seriesLength > 0 && material.tags.length === material.seriesLength">{{ material.information | translate }}</span>
+                <span data-ng-if="material.seriesLength > 0 && material.tags.length !== material.seriesLength">
+                  {{ material.tags.length }} / {{ material.seriesLength }} {{ 'processing.materials_scanned' | translate }}
+                </span>
+                <span data-ng-if="material.invalid">{{ 'processing.invalid_material' | translate }}</span>
+              </td>
             </tr>
           </table>
         </div>
