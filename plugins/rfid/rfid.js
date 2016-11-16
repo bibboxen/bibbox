@@ -105,6 +105,8 @@ var RFID = function (bus, port, afi) {
   else {
     // Connection set up.
     server.on('connection', function connection(ws) {
+      currentWebSocket = ws;
+
       // Register bus listeners.
       bus.on('rfid.tags.request', requestTags);
       bus.on('rfid.tag.set_afi', setAFI);
