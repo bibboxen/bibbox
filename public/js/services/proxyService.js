@@ -79,20 +79,22 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
      * Wrapped in function to allow testing.
      */
     this.registerListeners = function registerListeners() {
+
+
+      // Listen for disconnection with the backend.
+      socket.on('disconnect', function() {
+        $rootScope.$emit('out-of-order.enable', 'nodejs');
+      });
+
+      // Listen for connection with the backend.
+      socket.on('reconnect', function() {
+        $rootScope.$emit('out-of-order.disable', 'nodejs');
+      });
+
       // Reloads the browser on the 'frontend.reload' event.
       socket.on('frontend.reload', function () {
         $location.path('/');
         $route.reload();
-      });
-
-      // Listen for disconnection with the backend.
-      socket.on('disconnect', function() {
-        $rootScope.$emit('connection.error');
-      });
-
-      // Listen for connection with the backend.
-      socket.on('connected', function() {
-        $rootScope.$emit('connection.connected');
       });
     };
 

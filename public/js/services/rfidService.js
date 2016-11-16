@@ -104,12 +104,12 @@ angular.module('BibBox').service('rfidService', ['$q', '$rootScope', 'proxyServi
 
     // Listen for disconnection with the backend.
     proxyService.on('rfid.closed', function() {
-      $rootScope.$emit('connection.error');
+      $rootScope.$emit('out-of-order.enable', 'rfid');
     });
 
     // Listen for connection with the backend.
-    proxyService.on('connected', function() {
-      $rootScope.$emit('connection.connected');
+    proxyService.on('rfid.connected', function() {
+      $rootScope.$emit('out-of-order.disable', 'rfid');
     });
 
     /**

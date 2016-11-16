@@ -12,13 +12,43 @@
 (function () {
   'use strict';
 
-  angular.module('BibBox').directive('error', [
-    function () {
+  angular.module('BibBox').directive('error', ['$rootScope',
+    function ($rootScope) {
       return {
         restrict: 'E',
         replace: false,
+        link: function (scope) {
+          scope.outOfOrder = false;
+
+          if (!$rootScope.hasOwnProperty('outOfOrderLocks')) {
+            $rootScope.outOfOrderLocks = [];
+          }
+          else {
+            scope.outOfOrder = $rootScope.outOfOrderLocks.length > 0;
+          }
+
+          // Listen to out of order enable overlay events.
+          $rootScope.$on('out-of-order.enable', function (event, type) {
+            $rootScope.outOfOrderLocks.push(type);
+
+            // Error; so enable the overlay.
+            scope.outOfOrder = true;
+          });
+
+          // Listen to out of order disable overlay events.
+          $rootScope.$on('out-of-order.disable', function (event, type) {
+            var index = $rootScope.outOfOrderLocks.indexOf(type);
+            if (index !== -1) {
+              $rootScope.outOfOrderLocks.splice(index, 1);
+            }
+
+            // Check if it should be disabled. It's only disabled if all errors
+            // are resolved.
+            scope.outOfOrder = $rootScope.outOfOrderLocks.length > 0;
+          });
+        },
         template: `
-<div class="error-overlay">
+<div  data-ng-if="outOfOrder" class="error-overlay">
   <nav class="navbar navbar-default navbar-absolute-top">
     <div>
       <div class="row row-nav">
