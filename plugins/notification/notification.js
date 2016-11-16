@@ -412,7 +412,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
   var deferred = Q.defer();
   var layout = self.layouts.checkIn;
 
-  console.log('h1');
+  console.log(items);
 
   // Set current language.
   i18n.setLocale(lang ? lang : self.config.default_lang);
@@ -430,8 +430,6 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
       //footer: self.renderFooter(mail),
       //check_ins: layout.check_ins ? self.renderCheckIn(mail, items) : ''
     };
-
-    console.log('h2');
 
     var result = '';
     if (mail) {

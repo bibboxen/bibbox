@@ -15,7 +15,9 @@ angular.module('BibBox').controller('ReturnController', [
     }
 
     // Store raw check-in responses as it's need to print receipt.
-    var raw_materials = [];
+    var raw_materials = {
+      unknown: []
+    };
 
     // Used for offline storage.
     var currentDate = new Date().getTime();
@@ -59,14 +61,6 @@ angular.module('BibBox').controller('ReturnController', [
         userService.checkIn(material.id, currentDate).then(function (result) {
           $scope.baseResetIdleWatch();
 
-          /**
-           * @TODO: If the result don't have a patronIdentifier the return has
-           *       not been borrowed, should that be an error. It makes it hard
-           *       to sort the receipt, when it's missing.
-           * @TODO: Ask Anders!
-           */
-
-
           if (result) {
             if (result.ok === '1') {
               for (i = 0; i < $scope.materials.length; i++) {
@@ -99,7 +93,16 @@ angular.module('BibBox').controller('ReturnController', [
                   }
 
                   // Store the raw result (it's used to send with receipts).
-                  raw_materials.push(result);
+                  if (result.hasOwnProperty('patronIdentifier')) {
+                    if (!raw_materials.hasOwnProperty('patronIdentifier')) {
+                      raw_materials[result.patronIdentifier] = [];
+                    }
+
+                    raw_materials[result.patronIdentifier].push(result);
+                  }
+                  else {
+                    raw_materials.unknown.push(result);
+                  }
 
                   break;
                 }

@@ -49,14 +49,14 @@ angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', 
       $rootScope.$on('connection.error', function () {
         $scope.error = true;
         $scope.loading = false;
-      })
+      });
 
       // Handle re-connection.
       $rootScope.$on('connection.connected', function () {
         if ($scope.error === true) {
           $scope.error = false;
         }
-      })
+      });
     };
     init();
 
