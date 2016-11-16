@@ -422,59 +422,60 @@
                         </td>
                       </tr>
 
-                      {% if check_ins %}
-                      <tr style="padding: 0;vertical-align: top;text-align: left;">
-                        <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0px 0px 10px;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;border-collapse: collapse !important;">
-                          {{ check_ins }}
-                          <br/>
-                        </td>
-                      </tr>
-                      {% endif %}
+                      {% for patron in patrons %}
+                        {% if patron.check_ins %}
+                        <tr style="padding: 0;vertical-align: top;text-align: left;">
+                          <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0px 0px 10px;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;border-collapse: collapse !important;">
+                            {{ patron.check_ins }}
+                            <br/>
+                          </td>
+                        </tr>
+                        {% endif %}
 
-                      {% if loans_new %}
-                      <tr style="padding: 0;vertical-align: top;text-align: left;">
-                        <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0px 0px 10px;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;border-collapse: collapse !important;">
-                          {{ loans_new }}
-                          <br/>
-                        </td>
-                      </tr>
-                      {% endif %}
+                        {% if patron.loans_new %}
+                        <tr style="padding: 0;vertical-align: top;text-align: left;">
+                          <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0px 0px 10px;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;border-collapse: collapse !important;">
+                            {{ patron.loans_new }}
+                            <br/>
+                          </td>
+                        </tr>
+                        {% endif %}
 
-                      {% if loans %}
-                      <tr style="padding: 0;vertical-align: top;text-align: left;">
-                        <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0px 0px 10px;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;border-collapse: collapse !important;">
-                          {{ loans }}
-                          <br/>
-                        </td>
-                      </tr>
-                      {% endif %}
+                        {% if patron.loans %}
+                        <tr style="padding: 0;vertical-align: top;text-align: left;">
+                          <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0px 0px 10px;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;border-collapse: collapse !important;">
+                            {{ patron.loans }}
+                            <br/>
+                          </td>
+                        </tr>
+                        {% endif %}
 
-                      {% if reservations_ready %}
-                      <tr style="padding: 0;vertical-align: top;text-align: left;">
-                        <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0px 0px 10px;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;border-collapse: collapse !important;">
-                          {{ reservations_ready }}
-                          <br/>
-                        </td>
-                      </tr>
-                      {% endif %}
+                        {% if patron.reservations_ready %}
+                        <tr style="padding: 0;vertical-align: top;text-align: left;">
+                          <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0px 0px 10px;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;border-collapse: collapse !important;">
+                            {{ patron.reservations_ready }}
+                            <br/>
+                          </td>
+                        </tr>
+                        {% endif %}
 
-                      {% if reservations %}
-                      <tr style="padding: 0;vertical-align: top;text-align: left;">
-                        <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0px 0px 10px;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;border-collapse: collapse !important;">
-                          {{ reservations }}
-                          <br/>
-                         </td>
-                      </tr>
-                      {% endif %}
+                        {% if patron.reservations %}
+                        <tr style="padding: 0;vertical-align: top;text-align: left;">
+                          <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0px 0px 10px;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;border-collapse: collapse !important;">
+                            {{ patron.reservations }}
+                            <br/>
+                           </td>
+                        </tr>
+                        {% endif %}
 
-                      {% if fines %}
-                      <tr style="padding: 0;vertical-align: top;text-align: left;">
-                        <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0px 0px 10px;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;border-collapse: collapse !important;">
-                          {{ fines }}
-                        </td>
-                      </tr>
-                      {% endif %}
-
+                        {% if patron.fines %}
+                        <tr style="padding: 0;vertical-align: top;text-align: left;">
+                          <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 0px 0px 10px;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 19px;font-size: 14px;border-collapse: collapse !important;">
+                            {{ patron.fines }}
+                          </td>
+                        </tr>
+                        {% endif %}
+                      {% endfor %}
                     </table>
                   </td>
                 </tr>

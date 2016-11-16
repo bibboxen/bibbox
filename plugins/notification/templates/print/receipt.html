@@ -39,40 +39,48 @@
     {{ library }}
   </div>
 
-  <!-- The users name -->
-  <div class="borrower">
-    <strong>{{ 'receipt.user'|translate }}</strong> {{ username }}
-  </div>
+  {% for patron in patrons %}
+    <!-- The users name -->
+    <div class="borrower">
+      <strong>{{ 'receipt.user'|translate }}</strong> {{ patron.name }}
+    </div>
 
-  {% if loans_new %}
-  <div class="row new-loans line">
-    {{ loans_new }}
-  </div>
-  {% endif %}
+    {% if patron.loans_new %}
+    <div class="row new-loans line">
+      {{ patron.loans_new }}
+    </div>
+    {% endif %}
 
-  {% if loans != false %}
-  <div class="row loans line">
-    {{ loans }}
-  </div>
-  {% endif %}
+    {% if patron.check_ins %}
+    <div class="row new-loans line">
+      {{ patron.check_ins }}
+    </div>
+    {% endif %}
 
-  {% if reservations_ready %}
-  <div class="row reservations-ready line">
-    {{ reservations_ready }}
-  </div>
-  {% endif %}
+    {% if patron.loans != false %}
+    <div class="row loans line">
+      {{ patron.loans }}
+    </div>
+    {% endif %}
 
-  {% if reservations %}
-  <div class="row reservations line">
-    {{ reservations }}
-  </div>
-  {% endif %}
+    {% if patron.reservations_ready %}
+    <div class="row reservations-ready line">
+      {{ patron.reservations_ready }}
+    </div>
+    {% endif %}
 
-  {% if fines %}
-  <div class="row fines line">
-    {{ fines }}
-  </div>
-  {% endif %}
+    {% if patron.reservations %}
+    <div class="row reservations line">
+      {{ patron.reservations }}
+    </div>
+    {% endif %}
+
+    {% if patron.fines %}
+    <div class="row fines line">
+      {{ patron.fines }}
+    </div>
+    {% endif %}
+  {% endfor %}
 
   <!-- Footer -->
   <div class="footer">

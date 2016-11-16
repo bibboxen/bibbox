@@ -412,70 +412,73 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
   var deferred = Q.defer();
   var layout = self.layouts.checkIn;
 
-  console.log(items);
 
   // Set current language.
   i18n.setLocale(lang ? lang : self.config.default_lang);
 
-  // Listen for status notification message.
-  this.bus.once('notification.patronReceipt', function (data) {
-    var context = {
-      //name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
-      //header: self.headerConfig,
-      //library: self.renderLibrary(mail),
-      //fines: layout.fines ? self.renderFines(mail, data.fineItems) : '',
-      //loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
-      //reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
-      //reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
-      //footer: self.renderFooter(mail),
-      //check_ins: layout.check_ins ? self.renderCheckIn(mail, items) : ''
-    };
+  // Build outer context.
+  var context = {
+    header: self.headerConfig,
+    library: self.renderLibrary(mail),
+    footer: self.renderFooter(mail),
+    patrons: []
+  };
 
-    var result = '';
-    if (mail) {
-      if (data.hasOwnProperty('emailAddress') && data.emailAddress !== undefined) {
-        result = self.mailTemplate.render(context);
+  // Build promise with patron information.
+  var patrons = [];
+  for (var username in items) {
+    var promise = this.getPatronInformation(username);
+    patrons.push(promise);
+  }
 
-        self.sendMail(data.emailAddress, result).then(function () {
-          deferred.resolve();
-        }, function (err) {
-          deferred.reject(err);
-        });
+  Q.allSettled(patrons).then(function (results) {
+    var content;
+    results.forEach(function (result) {
+      if (result.state === "fulfilled") {
+        var patron = result.value;
+        var id = patron.patronIdentifier.split(":")[1];
+        content = {
+          name: patron.hasOwnProperty('homeAddress') ? patron.homeAddress.Name : 'Unknown',
+          fines: layout.fines ? self.renderFines(mail, patron.fineItems) : '',
+          loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patron.chargedItems, patron.overdueItems) : '',
+          reservations: layout.reservations ? self.renderReservations(mail, patron.unavailableHoldItems) : '',
+          reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, patron.holdItems) : '',
+          check_ins: layout.check_ins ? self.renderCheckIn(mail, items[id]) : ''
+        };
+
+        context.patrons.push(JSON.parse(JSON.stringify(content)));
       }
       else {
-        deferred.reject(new Error('No mail address'));
+        var data = result.reason;
+        if (data.message !== 'Unknown patron') {
+          deferred.reject(data);
+          // End processing.
+          return;
+        }
+
+        // Unknown patrons (item was not checkout before check-in etc.).
+        content = {
+          name: 'Unknown user',
+          check_ins: layout.check_ins ? self.renderCheckIn(mail, items['unknown']) : ''
+        };
+
+        context.patrons.push(JSON.parse(JSON.stringify(content)));
       }
-    }
-    else {
-      result = self.printTemplate.render(context);
-
-      // Remove empty lines (from template engine if statements).
-      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-
-      console.log('h3');
-
-      // Print it.
-      self.printReceipt(result).then(function () {
-        deferred.resolve();
-      }, function (err) {
-        deferred.reject(err);
-      });
-    }
-  }, function (err) {
-    deferred.reject(err);
-  });
-
-  // Request the data to use in the notification.
-  if (items.length && items[0].hasOwnProperty('patronIdentifier')) {
-    this.bus.emit('fbs.patron', {
-      username: items[0].patronIdentifier,
-      password: '',
-      busEvent: 'notification.patronReceipt'
     });
-  }
-  else {
-    deferred.reject(new Error('First return has no patron information'));
-  }
+
+    // Render receipt.
+    var result = self.printTemplate.render(context);
+
+    // Remove empty lines (from template engine if statements).
+    result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+
+    // Print it.
+    self.printReceipt(result).then(function () {
+      deferred.resolve();
+    }, function (err) {
+      deferred.reject(err);
+    });
+  });
 
   return deferred.promise;
 };
@@ -512,18 +515,20 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
     }
   });
 
-  // Listen for status notification message.
-  this.bus.once('notification.patronReceipt', function (data) {
+  this.getPatronInformation(username, password).then(function (data) {
+    // Build outer context.
     var context = {
-      name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
       header: self.headerConfig,
       library: self.renderLibrary(mail),
-      fines: layout.fines ? self.renderFines(mail, data.fineItems, data.feeAmount) : '',
-      loans_new: layout.loans_new ? self.renderNewLoans(mail, 'receipt.loans.new.headline', items) : '',
-      loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
-      reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
-      reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
-      footer: self.renderFooter(mail)
+      footer: self.renderFooter(mail),
+      patrons: [{
+        name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
+        fines: layout.fines ? self.renderFines(mail, data.fineItems, data.feeAmount) : '',
+        loans_new: layout.loans_new ? self.renderNewLoans(mail, 'receipt.loans.new.headline', items) : '',
+        loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
+        reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
+        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
+      }]
     };
 
     var result = '';
@@ -558,13 +563,6 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
     deferred.reject(err);
   });
 
-   // Request the data to use in the notification.
-   this.bus.emit('fbs.patron', {
-     username: username,
-     password: password,
-     busEvent: 'notification.patronReceipt'
-   });
-
   return deferred.promise;
 };
 
@@ -594,16 +592,18 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
   i18n.setLocale(lang ? lang : self.config.default_lang);
 
   // Listen for status notification message.
-  this.bus.once('notification.patronReceipt', function (data) {
+  this.getPatronInformation(username, password).then(function (data) {
     var context = {
-      name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
       header: self.headerConfig,
       library: self.renderLibrary(mail),
-      fines: layout.fines ? self.renderFines(mail, data.fineItems, data.feeAmount) : '',
-      loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
-      reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
-      reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
-      footer: self.renderFooter(mail)
+      footer: self.renderFooter(mail),
+      patrons: [{
+        name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
+        fines: layout.fines ? self.renderFines(mail, data.fineItems, data.feeAmount) : '',
+        loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
+        reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
+        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : ''
+      }]
     };
 
     // Add username to receipt.
@@ -643,11 +643,60 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
     deferred.reject(err);
   });
 
+  return deferred.promise;
+};
+
+/**
+ * Get an patrons information from FBS.
+ *
+ * @param username
+ *   The ID of the patron to fetch.
+ * @param password
+ *   Optional: the patrons password.
+ *
+ * @returns {*|promise}
+ *   Resolves with the patrons information or rejected with error object.
+ */
+Notification.prototype.getPatronInformation = function getPatronInformation(username, password) {
+  var deferred = Q.defer();
+  var self = this;
+  var busEvent = 'notification.checkInReceipt' + username;
+  var errorEvent = 'notification.checkInReceipt.error' + username;
+
+  // Check if password was given (defaults to empty string as this still will
+  // give use the users information).
+  password = password || '';
+
+  // Clean the id.
+  if (username.indexOf(':') !== -1) {
+    username = username.split(":")[1];
+  }
+
+  this.bus.once(busEvent, function (data) {
+    if (data.validPatron === 'N') {
+      deferred.reject(new Error('Unknown patron'));
+    }
+    else {
+      deferred.resolve(data);
+    }
+
+    // Remove the not needed error event listener.
+    self.bus.removeAllListeners(errorEvent);
+  });
+
+  this.bus.once(errorEvent, function (err) {
+    deferred.reject(err);
+
+    // Remove the not needed event listener.
+    self.bus.removeAllListeners(busEvent);
+  });
+
   // Request the data to use in the notification.
   this.bus.emit('fbs.patron', {
     username: username,
     password: password,
-    busEvent: 'notification.patronReceipt'
+    busEvent: busEvent,
+    errorEvent: errorEvent,
   });
 
   return deferred.promise;

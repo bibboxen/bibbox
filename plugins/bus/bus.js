@@ -28,7 +28,8 @@ module.exports = function (options, imports, register) {
       off: emitter.off,
       once: emitter.once,
       many: emitter.many,
-      removeListener: emitter.removeListener
+      removeListener: emitter.removeListener,
+      removeAllListeners: emitter.removeAllListeners
     }
   });
 };
