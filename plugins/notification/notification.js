@@ -103,6 +103,9 @@ var Notification = function Notification(bus, config, paths, languages) {
   this.printLoansNewTemplate = twig.twig({
     data: fs.readFileSync(__dirname + '/templates/print/loans_new.html', 'utf8')
   });
+  this.printLoansNewOfflineTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/loans_new_offline.html', 'utf8')
+  });
 
   // Load reservations ready templates.
   this.mailReservationsReadyTemplate = twig.twig({
@@ -127,7 +130,9 @@ var Notification = function Notification(bus, config, paths, languages) {
   this.printCheckInTemplate = twig.twig({
     data: fs.readFileSync(__dirname + '/templates/print/checkin.html', 'utf8')
   });
-
+  this.printCheckInOfflineTemplate = twig.twig({
+    data: fs.readFileSync(__dirname + '/templates/print/checkin_offline.html', 'utf8')
+  });
   // Load footer templates.
   this.mailFooterTemplate = twig.twig({
     data: fs.readFileSync(__dirname + '/templates/mail/footer.html', 'utf8')
@@ -301,6 +306,26 @@ Notification.prototype.renderNewLoans = function renderNewLoans(html, headline, 
 };
 
 /**
+ * Render new loans list in offline mode.
+ *
+ * @param items
+ *   The new loan items.
+ *
+ * @returns {*}
+ */
+Notification.prototype.renderNewLoansOffline = function renderNewLoansOffline(items) {
+  var ret = '';
+
+  if (items.length) {
+    ret = this.printLoansNewOfflineTemplate.render({
+      items: items
+    });
+  }
+
+  return ret;
+};
+
+/**
  * Render reservations ready for pick-up.
  *
  * @param html
@@ -387,6 +412,27 @@ Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
 
   return ret;
 };
+
+/**
+ * Render checked in offline items.
+ *
+ * @param items
+ *   Returned items.
+ *
+ * @returns {*}
+ */
+Notification.prototype.renderCheckInOffline = function renderCheckInOffline(items) {
+  var ret = '';
+
+  if (items.length) {
+    ret = this.printCheckInOfflineTemplate.render({
+      items: items
+    });
+  }
+
+  return ret;
+};
+
 
 /**
  * Render footer.
@@ -502,6 +548,51 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
 };
 
 /**
+ * Check in receipt (return items) in offline mode.
+ *
+ * @param items
+ *   The newly checked in items.
+ * @param lang
+ *   The language code the receipt language.
+ *
+ * @return {*|promise}
+ *   Resolved or error message on failure.
+ */
+Notification.prototype.checkInOfflineReceipt = function checkInOfflineReceipt(items, lang) {
+  var self = this;
+  var deferred = Q.defer();
+
+  // Set current language.
+  i18n.setLocale(lang ? lang : self.config.default_lang);
+
+  // Build outer context.
+  var context = {
+    header: self.headerConfig,
+    library: self.renderLibrary(false),
+    footer: self.renderFooter(false),
+    patrons: [{
+      name: 'Unknown user',
+      check_ins: self.renderCheckInOffline(items['unknown'])
+    }]
+  };
+
+  // Render receipt.
+  var result = self.printTemplate.render(context);
+
+  // Remove empty lines (from template engine if statements).
+  result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+
+  // Print it.
+  self.printReceipt(result).then(function () {
+    deferred.resolve();
+  }, function (err) {
+    deferred.reject(err);
+  });
+
+  return deferred.promise;
+};
+
+/**
  * Check out receipt (loan items).
  *
  * @param mail
@@ -525,13 +616,6 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
 
   // Set current language.
   i18n.setLocale(lang ? lang : self.config.default_lang);
-
-  // Filter out failed loans.
-  items.map(function (item, index) {
-    if (item.status === 'borrow.error') {
-      items.splice(index, 1);
-    }
-  });
 
   this.getPatronInformation(username, password).then(function (data) {
     // Build outer context.
@@ -577,6 +661,47 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
         deferred.reject(err);
       });
     }
+  }, function (err) {
+    deferred.reject(err);
+  });
+
+  return deferred.promise;
+};
+
+/**
+ * Check out receipt (loan items) offline mode.
+ *
+ * @param items
+ *   The newly checked out item.
+ * @param lang
+ *   The language code the receipt language.
+ *
+ * @return {*|promise}
+ *   Resolved or error message on failure.
+ */
+Notification.prototype.checkOutOfflineReceipt = function checkOutOfflineReceipt(items, lang) {
+  var self = this;
+  var deferred = Q.defer();
+
+  // Set current language.
+  i18n.setLocale(lang ? lang : self.config.default_lang);
+
+  // Build outer context.
+  var context = {
+    header: self.headerConfig,
+    library: self.renderLibrary(false),
+    footer: self.renderFooter(false),
+    patrons: [{
+      name: 'Unknown user',
+      loans_new: self.renderNewLoansOffline(items)
+    }]
+  };
+
+  var result = self.printTemplate.render(context);
+
+  // Print it.
+  self.printReceipt(result).then(function () {
+    deferred.resolve();
   }, function (err) {
     deferred.reject(err);
   });
@@ -858,11 +983,42 @@ module.exports = function (options, imports, register) {
   });
 
   /**
+   * Listen check-out offline (loans) receipt events.
+   */
+  bus.on('notification.checkOutOffline', function (data) {
+    Notification.create(bus, options.paths, options.languages).then(function (notification) {
+      notification.checkOutOfflineReceipt(data.items, data.lang).then(function () {
+          bus.emit(data.busEvent, true);
+        },
+        function (err) {
+          bus.emit(data.errorEvent, err);
+        });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
+  });
+
+  /**
    * Listen check-in (returns) receipt events.
    */
   bus.on('notification.checkIn', function (data) {
     Notification.create(bus, options.paths, options.languages).then(function (notification) {
       notification.checkInReceipt(data.mail, data.items, data.lang).then(function () {
+        bus.emit(data.busEvent, true);
+      }, function (err) {
+        bus.emit(data.errorEvent, err);
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
+  });
+
+  /**
+   * Listen check-in offline (returns) receipt events.
+   */
+  bus.on('notification.checkInOffline', function (data) {
+    Notification.create(bus, options.paths, options.languages).then(function (notification) {
+      notification.checkInOfflineReceipt(data.items, data.lang).then(function () {
         bus.emit(data.busEvent, true);
       }, function (err) {
         bus.emit(data.errorEvent, err);

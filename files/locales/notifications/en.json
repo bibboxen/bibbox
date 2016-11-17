@@ -39,5 +39,6 @@
   "receipt.user": "Loaner:",
   "receipt.reservations.id": "Material No.",
   "receipt.fines.total": "Outstanding balance:",
-  "receipt.reservations.ready.dk5": "DK5"
+  "receipt.reservations.ready.dk5": "DK5",
+  "fbs.offline.title": "Emergency system"
 }

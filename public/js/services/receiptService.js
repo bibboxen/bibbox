@@ -8,6 +8,38 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
     'use strict';
 
     /**
+     * Check if we are in offline mode.
+     *
+     * This is done by checking the first item for offline property.
+     *
+     * @param items
+     *   The items that are about to be checked-out or checked-in.
+     * @returns {*}
+     *   True if offline else false.
+     * @private
+     */
+    function _isOffline(items) {
+      var item;
+      if (Object.prototype.toString.call(items) === '[object Array]') {
+        item = items[0];
+      }
+      else {
+        for (var key in items) {
+          if (items[key].length) {
+            item = items[key][0];
+          }
+        }
+      }
+
+      // Check if this is off-line materials.
+      if (item.hasOwnProperty('offline')) {
+        return item.offline
+      }
+
+      return false;
+    }
+
+    /**
      * States receipt.
      *
      * @param username
@@ -102,15 +134,25 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
         deferred.reject(err);
       });
 
-      proxyService.emit('notification.checkOut', {
-        username: username,
-        password: password,
-        items: items,
-        mail: type === 'mail',
-        lang: tmhDynamicLocale.get(),
-        busEvent: 'notification.response',
-        errorEvent: 'notification.error'
-      });
+      if (_isOffline(items)) {
+        proxyService.emit('notification.checkOutOffline', {
+          items: items,
+          lang: tmhDynamicLocale.get(),
+          busEvent: 'notification.response',
+          errorEvent: 'notification.error'
+        });
+      }
+      else {
+        proxyService.emit('notification.checkOut', {
+          username: username,
+          password: password,
+          items: items,
+          mail: type === 'mail',
+          lang: tmhDynamicLocale.get(),
+          busEvent: 'notification.response',
+          errorEvent: 'notification.error'
+        });
+      }
 
       return deferred.promise;
     };
@@ -136,13 +178,23 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
         deferred.reject(err);
       });
 
-      proxyService.emit('notification.checkIn', {
-        mail: type === 'mail',
-        lang: tmhDynamicLocale.get(),
-        items: items,
-        busEvent: 'notification.response',
-        errorEvent: 'notification.error'
-      });
+      if (_isOffline(items)) {
+        proxyService.emit('notification.checkInOffline', {
+          lang: tmhDynamicLocale.get(),
+          items: items,
+          busEvent: 'notification.response',
+          errorEvent: 'notification.error'
+        });
+      }
+      else {
+        proxyService.emit('notification.checkIn', {
+          mail: type === 'mail',
+          lang: tmhDynamicLocale.get(),
+          items: items,
+          busEvent: 'notification.response',
+          errorEvent: 'notification.error'
+        });
+      }
 
       return deferred.promise;
     };

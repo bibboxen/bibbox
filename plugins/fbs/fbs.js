@@ -376,7 +376,8 @@ module.exports = function (options, imports, register) {
             offline: true,
             ok: '1',
             itemProperties: {
-              title: data.itemIdentifier
+              id: data.itemIdentifier,
+              title: 'fbs.offline.title'
             }
           };
 
@@ -440,7 +441,8 @@ module.exports = function (options, imports, register) {
             offline: true,
             ok: '1',
             itemProperties: {
-              title: data.itemIdentifier
+              id: data.itemIdentifier,
+              title: 'fbs.offline.title'
             }
           };
 

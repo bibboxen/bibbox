@@ -1,0 +1,11 @@
+<h2>{{ 'receipt.loans.new.headline'|translate }}</h2>
+
+{% for item in items|sortOnField('itemIdentifier') %}
+<div class="row-item">
+  <p>
+    {{ item.itemProperties.title|translate }}<br/>
+    {{ 'receipt.loans.id'|translate }} {{ item.itemIdentifier }}<br/>
+  </p>
+</div>
+{% endfor %}
+<hr/>

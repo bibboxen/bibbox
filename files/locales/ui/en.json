@@ -64,5 +64,6 @@
 
   "return.button.receipt": "Receipt",
 
-  "out_of_order.text": "Temporarily out of service"
+  "out_of_order.text": "Temporarily out of service",
+  "fbs.offline.title": "Emergency system"
 }
