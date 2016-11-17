@@ -456,7 +456,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
         var patron = result.value;
         var id = patron.patronIdentifier.split(":")[1];
         content = {
-          name: patron.hasOwnProperty('homeAddress') ? patron.homeAddress.Name : 'Unknown',
+          name: patron.hasOwnProperty('personalName') ? patron.personalName : 'Unknown',
           fines: layout.fines ? self.renderFines(mail, patron.fineItems) : '',
           loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patron.chargedItems, patron.overdueItems) : '',
           reservations: layout.reservations ? self.renderReservations(mail, patron.unavailableHoldItems) : '',
@@ -540,7 +540,7 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
       library: self.renderLibrary(mail),
       footer: self.renderFooter(mail),
       patrons: [{
-        name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
+        name: data.hasOwnProperty('personalName') ? data.personalName : 'Unknown',
         fines: layout.fines ? self.renderFines(mail, data.fineItems, data.feeAmount) : '',
         loans_new: layout.loans_new ? self.renderNewLoans(mail, 'receipt.loans.new.headline', items) : '',
         loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
@@ -616,7 +616,7 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       library: self.renderLibrary(mail),
       footer: self.renderFooter(mail),
       patrons: [{
-        name: data.hasOwnProperty('homeAddress') ? data.homeAddress.Name : 'Unknown',
+        name: data.hasOwnProperty('personalName') ? data.personalName : 'Unknown',
         fines: layout.fines ? self.renderFines(mail, data.fineItems, data.feeAmount) : '',
         loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
         reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',

@@ -356,11 +356,12 @@ Response.prototype.parseVariables = function parseVariables() {
         // Home address.
         case 'BD':
           val = val.split('%');
+          console.log(val);
           self[keyTrans] = {
-            Name: entities.decode(val.shift()),
-            Street: val.shift(),
-            zipcode: val.shift(),
-            city: val.shift()
+            street: entities.decode(val.shift()),
+            postalCode: val.shift(),
+            city: val.shift(),
+            country: val.shift()
           };
           break;
 
