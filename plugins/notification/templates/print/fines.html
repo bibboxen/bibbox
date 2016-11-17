@@ -1,6 +1,6 @@
 <h2>{{ 'receipt.fines.headline'|translate }}</h2>
 
-{% for item in items|sort %}
+{% for item in items|sortOnField('fineDate') %}
 <div class="row-item">
   <p>
     {% if item.id %}

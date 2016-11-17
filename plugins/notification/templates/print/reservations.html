@@ -1,6 +1,6 @@
 <h2>{{ 'receipt.reservations.headline'|translate }}</h2>
 
-{% for item in items|sort %}
+{% for item in items|sortOnField('interestDate') %}
 <div class="row-item">
   <p>
     {{ 'receipt.reservations.id'|translate }} {{ item.id }}<br />

@@ -48,6 +48,22 @@ var Notification = function Notification(bus, config, paths, languages) {
     return i18n.__(str);
   });
 
+  // Extend twig with a better sort method.
+  twig.extendFilter('sortOnField', function (items, param) {
+    var field = param.shift();
+
+    return items.sort(function (a, b) {
+      if (a[field] < b[field]) {
+        return -1;
+      }
+      if (a[field] > b[field]) {
+        return 1;
+      }
+
+      return 0;
+    });
+  });
+
   // Load template snippets.
   this.mailTemplate = twig.twig({
     data: fs.readFileSync(__dirname + '/templates/mail/receipt.html', 'utf8')
@@ -180,6 +196,8 @@ Notification.prototype.renderLibrary = function renderLibrary(html) {
  *   If TRUE HTML is outputted else clean text.
  * @param fines
  *   The fine elements to render.
+ * @param total
+ *   The total amount for all fines.
  *
  * @returns {*}
  *
