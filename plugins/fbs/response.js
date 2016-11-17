@@ -356,7 +356,6 @@ Response.prototype.parseVariables = function parseVariables() {
         // Home address.
         case 'BD':
           val = val.split('%');
-          console.log(val);
           self[keyTrans] = {
             street: entities.decode(val.shift()),
             postalCode: val.shift(),

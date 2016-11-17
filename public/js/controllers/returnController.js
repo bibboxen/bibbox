@@ -15,9 +15,7 @@ angular.module('BibBox').controller('ReturnController', [
     }
 
     // Store raw check-in responses as it's need to print receipt.
-    var raw_materials = {
-      unknown: []
-    };
+    var raw_materials = {};
 
     // Used for offline storage.
     var currentDate = new Date().getTime();
@@ -101,6 +99,9 @@ angular.module('BibBox').controller('ReturnController', [
                     raw_materials[result.patronIdentifier].push(result);
                   }
                   else {
+                    if (!raw_materials.hasOwnProperty('unknown')) {
+                      raw_materials.unknown = [];
+                    }
                     raw_materials.unknown.push(result);
                   }
 
