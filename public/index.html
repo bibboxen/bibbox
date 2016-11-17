@@ -3,33 +3,53 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>BibBox</title>
 
-  <!-- Load angular -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/lib/jquery-1.11.1.min.js"></script>
   <script src="js/lib/angular.min.js"></script>
   <script src="js/lib/angular-route.min.js"></script>
+  <script src="js/lib/angular-translate.min.js"></script>
+  <script src="js/lib/tmhDynamicLocale.min.js"></script>
+  <script src="js/lib/locales/angular-locale_da.js"></script>
+  <script src="js/lib/angular-idle.min.js"></script>
+  <script src="js/lib/angular-strap.min.js"></script>
+  <script src="js/lib/angular-strap.tpl.min.js"></script>
+  <script src="js/lib/ui-bootstrap-custom-tpls-2.2.0.min.js"></script>
+  <script src="js/lib/angular-animate.min.js"></script>
+  <script src="js/lib/interface.js"></script>
+
   <script src="js/app.js"></script>
-
-  <!-- Controllers -->
-  <script src="js/controllers/mainControllers.js"></script>
-
-  <!-- Utils -->
+  <script src="js/services/configService.js"></script>
+  <script src="js/translations.js"></script>
+  <script src="js/routing.js"></script>
+  <script src="js/controllers/baseController.js"></script>
+  <script src="js/controllers/baseRfidController.js"></script>
+  <script src="js/controllers/borrowController.js"></script>
+  <script src="js/controllers/indexController.js"></script>
+  <script src="js/controllers/reservationsController.js"></script>
+  <script src="js/controllers/returnController.js"></script>
+  <script src="js/controllers/statusController.js"></script>
+  <script src="js/controllers/loginController.js"></script>
+  <script src="js/directives/keypad/keypadDirective.js"></script>
+  <script src="js/directives/spinner/spinnerDirective.js"></script>
+  <script src="js/directives/error/errorDirective.js"></script>
+  <script src="js/directives/header/headerDirective.js"></script>
+  <script src="js/services/proxyService.js"></script>
+  <script src="js/services/userTrackerService.js"></script>
+  <script src="js/services/userService.js"></script>
+  <script src="js/services/receiptService.js"></script>
+  <script src="js/services/barcodeService.js"></script>
+  <script src="js/services/rfidService.js"></script>
   <script src="js/lib/md5.js"></script>
-
-  <!-- Load bootstrap theme -->
-  <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/bootstrap-theme.min.css">
-
-  <script src="js/lib/jquery-1.11.1.min.js"></script>
   <script src="js/lib/bootstrap.min.js"></script>
 
-  <!-- Local styles -->
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/bootstrap-theme.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-ng-app="BibBox">
-  <div class="container">
-    <!-- Placeholder for the route templets -->
-    <div ng-view></div>
-  </div>
+  <div ng-view></div>
 </body>
 </html>

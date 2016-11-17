@@ -1,0 +1,23 @@
+{
+  "name": "fbs",
+  "description": "Communication with FBS",
+  "version": "0.0.1",
+  "main": "fbs.js",
+  "private": true,
+  "plugin": {
+    "consumes": [
+      "bus",
+      "ctrl"
+    ],
+    "provides": [
+      "fbs"
+    ]
+  },
+  "dependencies": {
+    "debug": "^2.2.0",
+    "handlebars": "^4.0.5",
+    "html-entities": "^1.2.0",
+    "q": "^1.4.1",
+    "request": "^2.75.0"
+  }
+}

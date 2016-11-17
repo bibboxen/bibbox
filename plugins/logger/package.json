@@ -9,6 +9,9 @@
     "winston-logrotate": "^1.0.0"
   },
   "plugin": {
+    "consumes": [
+      "bus"
+    ],
     "provides": [
       "logger"
     ]

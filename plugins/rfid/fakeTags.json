@@ -1,0 +1,37 @@
+[
+  {
+    "uid": "E00401505EB0AFDX",
+    "mid": "0000006584",
+    "afi": 7,
+    "seriesLength": 1,
+    "numberInSeries": 1
+  },
+  {
+    "uid": "E00401505EB0A10X",
+    "mid": "0000002244",
+    "afi": 7,
+    "seriesLength": 1,
+    "numberInSeries": 1
+  },
+  {
+    "uid": "E00401505EB0A20X",
+    "mid": "0000008885",
+    "afi": 7,
+    "seriesLength": 2,
+    "numberInSeries": 1
+  },
+  {
+    "uid": "E00401505EB0A30X",
+    "mid": "0000008885",
+    "afi": 7,
+    "seriesLength": 2,
+    "numberInSeries": 2
+  },
+  {
+    "uid": "E00401505EB0A40X",
+    "mid": "0000000000",
+    "afi": 7,
+    "seriesLength": 1,
+    "numberInSeries": 1
+  }
+]

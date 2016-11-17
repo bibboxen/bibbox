@@ -1,1 +1,277 @@
-body {}
+body {
+  -webkit-user-select: none; /* Chrome all / Safari all */
+  -moz-user-select: none; /* Firefox all */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* Likely future */
+}
+
+.logo {
+  height: 60px;
+}
+
+.logo-container {
+  padding: 1em 0.5em;
+}
+
+.button {
+  height: 50px;
+  min-width: 160px;
+  font-size: 18px;
+  padding: .65em;
+  margin: 1em;
+}
+
+.button-small {
+  height: 40px;
+  min-width: 100px;
+  font-size: 16px;
+  padding: .5em;
+  margin: 1em;
+}
+
+.container {
+  text-align: center;
+  max-height: 580px;
+  overflow: hidden;
+}
+
+.language-icon {
+  position: relative;
+  top: -2px;
+}
+
+.container-bottom {
+  position: absolute;
+  bottom: 50px;
+  margin: 0 auto;
+  width: 100%;
+  left: 0;
+}
+
+.navbar {
+  background: #eee;
+}
+
+.page-header-frontpage {
+  margin-bottom: 80px;
+}
+
+.numpad-key {
+  width: 60px;
+  height: 60px;
+  font-size: 20px;
+  padding: .7em;
+  margin: 5px;
+}
+
+.numpad-container {
+  text-align: center;
+  margin: 0 auto;
+  padding: 1em;
+  width: 380px;
+}
+
+.numpad-key-zero {
+  width: 210px;
+  height: 60px;
+  font-size: 20px;
+  padding: .7em;
+  margin: 5px;
+}
+
+.numpad-enter {
+  width: 120px;
+  height: 200px;
+  font-size: 20px;
+  padding: .7em;
+  padding-top: 3.8em;
+  margin: 5px;
+}
+
+.numpad-back {
+  width: 120px;
+  height: 60px;
+  font-size: 20px;
+  padding: .7em;
+  margin: 5px;
+}
+
+.numpad-float {
+  float: left;
+}
+
+.login-container {
+  margin: 0 auto;
+}
+
+.align-left {
+  float: left;
+}
+
+.align-right {
+  float: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.table tbody > tr > td.vert-align {
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.td-center {
+  text-align: center;
+}
+
+.td-right {
+  text-align: center;
+}
+
+.is-not-disabled {
+  cursor: default !important;
+  background-color: #fff !important;
+}
+
+.buttons-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+
+.btn-default {
+  background-image: linear-gradient(to bottom, #eee 0, #d0d0d0 100%);
+}
+
+.btn-default:hover, .btn-default:focus {
+  background-color: #d0d0d0;
+  background-position: 0 -15px;
+}
+
+.row-nav {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.text-faded {
+  color: #aaa;
+}
+
+.spinner-global-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.spinner-circle {
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #888;
+  -webkit-animation: spin 1s infinite linear;
+  animation: spin 1s infinite linear;
+}
+
+.spinner-circle-global {
+  box-sizing: border-box;
+  width: 80px;
+  height: 80px;
+  border-radius: 100%;
+  border: 10px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #888;
+  -webkit-animation: spin 1s infinite linear;
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.modal-backdrop.am-fade {
+  opacity: .5;
+  transition: opacity .15s linear;
+}
+.modal-backdrop.am-fade .ng-enter {
+  opacity: 0;
+}
+.modal-backdrop.am-fade .ng-enter .ng-enter-active {
+  opacity: .5;
+}
+.modal-backdrop.am-fade .ng-leave {
+  opacity: .5;
+}
+.modal-backdrop.am-fade .ng-leave .ng-leave-active {
+  opacity: 0;
+}
+
+.modal {
+  overflow: hidden;
+}
+
+.image-help {
+  z-index: -1;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* The Overlay (background) */
+.error-overlay {
+  /* Height & width depends on how you want to reveal the overlay (see JS below) */
+  height: 100%;
+  width: 100%;
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  background-color: rgb(256,256,256); /* Black fallback color */
+  overflow-x: hidden; /* Disable horizontal scroll */
+}
+
+/* Position the content inside the overlay */
+.error-content {
+  position: relative;
+  top: 25%; /* 25% from the top */
+  width: 100%; /* 100% width */
+  text-align: center; /* Centered text/links */
+  margin-top: 30px; /* 30px top margin to avoid conflict with the close button on smaller screens */
+}
+
+.error {
+  font-size: 250%;
+  color: #f00;
+}
+
+.return-td-status {
+  width: 10%;
+}
+
+.return-td-title {
+  width: 90%;
+}
+
+.processing-results {
+  font-size: 16px;
+  padding: .5em;
+  right: 0;
+}

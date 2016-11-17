@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:sip password="{{ password }}" login="{{ username }}" xsi:schemaLocation="http://axiell.com/Schema/sip.xsd" xmlns:ns1="http://axiell.com/Schema/sip.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <request>{{ message }}</request>
+</ns1:sip>

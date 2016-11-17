@@ -1,0 +1,63 @@
+{
+  "features": [
+    {
+      "text": "menu.borrow",
+      "require_online": false,
+      "url": "/#/login/borrow",
+      "icon": "glyphicon-tasks"
+    },
+    {
+      "text": "menu.status",
+      "require_online": true,
+      "url": "/#/login/status",
+      "icon": "glyphicon-refresh"
+    },
+    {
+      "text": "menu.reservations",
+      "require_online": true,
+      "url": "/#/login/reservations",
+      "icon": "glyphicon-list-alt"
+    },
+    {
+      "text": "menu.return",
+      "require_online": false,
+      "url": "/#/return",
+      "icon": "glyphicon-time"
+    }
+  ],
+  "languages": [
+    {
+      "text": "language.da",
+      "langKey": "da",
+      "icon": "img/flags/DK.png"
+    },
+    {
+      "text": "language.en",
+      "langKey": "en",
+      "icon": "img/flags/GB.png"
+    }
+  ],
+  "timeout": {
+    "idleTimeout": 15,
+    "idleWarn": 7
+  },
+  "binSorting": {
+    "default_bin": "right",
+    "destinations": {
+      "left": {
+        "id": "left",
+        "text": "Stilles på reolen ved vinduet"
+      },
+      "right": {
+        "id": "right",
+        "text": "Læg i den blå kasse til højre",
+        "background_color": "#2d66a6",
+        "color": "#fff"
+      }
+    },
+    "bins": {
+      "102": "left",
+      "701": "left"
+    }
+  }
+}

@@ -8,5 +8,8 @@
     "provides": [
       "bus"
     ]
+  },
+  "dependencies": {
+    "eventemitter2": "^2.1.3"
   }
 }

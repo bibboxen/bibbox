@@ -1,0 +1,18 @@
+{
+  "name": "ctrl",
+  "description": "Controller (ctrl) handles configuration and application stuff",
+  "version": "0.0.1",
+  "main": "ctrl.js",
+  "private": true,
+  "plugin": {
+    "consumes": [
+      "bus"
+    ],
+    "provides": [
+      "ctrl"
+    ]
+  },
+  "dependencies": {
+    "q": "^1.4.1"
+  }
+}

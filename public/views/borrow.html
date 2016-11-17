@@ -1,0 +1,58 @@
+<header headline="borrow.heading" countdown="countdown"></header>
+
+<div class="container">
+  <div class="image-help" data-ng-if="!materials || materials.length === 0">
+    <img src="img/help2.jpg" />
+  </div>
+
+  <div data-ng-include="'/views/processing.html'"></div>
+
+  <div class="panel panel-default" data-ng-if="materials && materials.length > 0">
+    <table class="table">
+      <tr>
+        <th>{{ 'borrow.id' | translate }}</th>
+        <th>{{ 'borrow.author' | translate }}</th>
+        <th>{{ 'borrow.title' | translate }}</th>
+        <th>{{ 'borrow.return_date' | translate }}</th>
+        <th></th>
+      </tr>
+      <tr data-ng-repeat="material in borrowedMaterials track by $index"
+          data-ng-if="$index >= (pager.currentPage - 1) * pager.itemsPerPage && $index < pager.currentPage * pager.itemsPerPage"
+          data-ng-class="{'bg-success': material.success, 'bg-warning': material.status === 'awaiting_afi'}">
+        <td class="vert-align">{{ material.id }}</td>
+        <td class="vert-align">{{ material.author }}</td>
+        <!-- Title here is translated, as it may be offline title -->
+        <td class="vert-align">{{ material.title | translate }}</td>
+        <td class="vert-align">{{ material.dueDate | date }}</td>
+        <td>
+          <span class="glyphicon glyphicon-ok" aria-hidden="true" data-ng-if="material.success"></span>
+          <span class="glyphicon glyphicon-lock" aria-hidden="true" data-ng-if="material.status === 'awaiting_afi'"></span>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <ul uib-pagination
+      data-ng-if="borrowedMaterials.length > pager.itemsPerPage"
+      class="align-right"
+      boundary-link-numbers="true"
+      max-size="3"
+      previous-text="<"
+      next-text=">"
+      total-items="borrowedMaterials.length"
+      items-per-page="pager.itemsPerPage"
+      ng-model="pager.currentPage">
+  </ul>
+
+  <div class="buttons-bottom">
+    <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
+    </button>
+    <button type="button" class="btn btn-success button align-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress && materials && materials.length > 0">
+      <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'borrow.button.receipt' | translate }}
+    </button>
+    <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="(!currentPatron || !currentPatron.emailAddress) && materials && materials.length > 0" >
+      <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'borrow.button.receipt' | translate }}
+    </button>
+  </div>
+</div>

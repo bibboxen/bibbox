@@ -1,0 +1,11 @@
+{
+  "username": 1234567890,
+  "pin": 1234,
+  "fbs_username": "xxxx",
+  "fbs_password": "xxxx",
+  "paths": {
+    "base": "files",
+    "translations": "locales",
+    "config": "config"
+  }
+}

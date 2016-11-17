@@ -1,0 +1,54 @@
+<header headline="return.heading" countdown="countdown"></header>
+
+<div class="container">
+  <div class="image-help" data-ng-if="!materials || materials.length === 0">
+    <img src="img/help3.jpg" />
+  </div>
+
+  <div data-ng-include="'/views/processing.html'"></div>
+
+  <div class="row" data-ng-if="materials && materials.length > 0">
+    <div class="col-md-6" data-ng-repeat="(key, bin) in returnBins">
+      <div class="panel panel-default">
+        <div class="panel-heading" data-ng-style="{ 'background': (bin.background_color ? bin.background_color : null), 'color': (bin.color ? bin.color : null)}"><h4>{{ bin.text }}</h4></div>
+        <table class="table">
+          <tr>
+            <th class="return-td-title">{{ 'return.title' | translate }}</th>
+            <th></th>
+          </tr>
+          <tr data-ng-repeat="material in bin.materials track by $index"
+              data-ng-if="$index >= (bin.pager.currentPage - 1) * bin.pager.itemsPerPage && $index < bin.pager.currentPage * bin.pager.itemsPerPage"
+              data-ng-class="{'bg-success': material.success, 'bg-warning': material.status === 'awaiting_afi'}">
+            <!-- Title here is translated, as it may be offline title -->
+            <td class="vert-align">{{ material.title | translate }}</td>
+            <td>
+              <span class="glyphicon glyphicon-ok" aria-hidden="true" data-ng-if="material.success"></span>
+              <span class="glyphicon glyphicon-lock" aria-hidden="true" data-ng-if="material.status === 'awaiting_afi'"></span>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <ul uib-pagination
+          data-ng-if="bin.materials.length > bin.pager.itemsPerPage"
+          class="align-right"
+          boundary-link-numbers="true"
+          max-size="3"
+          previous-text="<"
+          next-text=">"
+          total-items="bin.materials.length"
+          items-per-page="bin.pager.itemsPerPage"
+          ng-model="bin.pager.currentPage">
+      </ul>
+    </div>
+  </div>
+
+  <div class="buttons-bottom">
+    <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
+    </button>
+    <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="materials && materials.length > 0">
+      <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'return.button.receipt' | translate }}
+    </button>
+  </div>
+</div>

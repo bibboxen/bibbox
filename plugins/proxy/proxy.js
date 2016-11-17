@@ -1,0 +1,139 @@
+/**
+ * @file
+ * Proxy for forwarding events between frontend (connected through socket.io) and the bus.
+ */
+
+'use strict';
+
+/**
+ * This object encapsulates the proxy.
+ *
+ * @param server
+ * @param bus
+ * @param whitelistedBusEvents
+ * @param whitelistedSocketEvents
+ *
+ * @constructor
+ */
+var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents) {
+  var io = require('socket.io')(server);
+
+  // Add wildcard support for socket.
+  var wildcard = require('socketio-wildcard')();
+  io.use(wildcard);
+
+  var currentSocket = null;
+
+  /**
+   * Handler for bus events.
+   *
+   * If a socket has been set and the event has been accepted, emit it.
+   *
+   * @param event
+   * @param value
+   */
+  var busEventHandler = function busEventHandler(event, value) {
+    if (currentSocket) {
+      // Test for each white list RegExp.
+      for (var item in whitelistedBusEvents) {
+        if (whitelistedBusEvents.hasOwnProperty(item)) {
+          var reg = new RegExp(whitelistedBusEvents[item]);
+          if (reg.test(event)) {
+            // Check if the message about to be emitted is an error message as
+            // this will result in an empty object in the socket connections
+            // client.
+            if (value instanceof Error) {
+              value = {
+                type: 'error',
+                message: value.message
+              };
+            }
+            currentSocket.emit(event, value);
+            break;
+          }
+        }
+      }
+    }
+  };
+
+  /**
+   * Handler for socket events.
+   *
+   * @param event
+   */
+  var socketEventHandler = function socketEventHandler(event) {
+    // Test for each white list RegExp.
+    for (var item in whitelistedSocketEvents) {
+      if (whitelistedSocketEvents.hasOwnProperty(item)) {
+        var reg = new RegExp(whitelistedSocketEvents[item]);
+
+        if (reg.test(event.data[0])) {
+          bus.emit(event.data[0], event.data[1]);
+          break;
+        }
+      }
+    }
+  };
+
+  /**
+   * Listen to new socket connections.
+   */
+  io.on('connection', function (socket) {
+    // If a connection has already been set up, remove listeners from previous.
+    if (currentSocket) {
+      bus.offAny(busEventHandler);
+    }
+
+    // Set current socket.
+    currentSocket = socket;
+
+    // Register event listener for all bus events.
+    bus.onAny(busEventHandler);
+
+    // Register event listener for all socket events.
+    socket.on('*', socketEventHandler);
+
+    // Emit configuration to client.
+    bus.once('proxy.config.ui', function (data) {
+      socket.emit('config.ui.update', data);
+    });
+    bus.once('proxy.config.ui.error', function (err) {
+      socket.emit('config.ui.update.error', err);
+    });
+    bus.emit('ctrl.config.ui', {
+      busEvent: 'proxy.config.ui',
+      errorEvent: 'proxy.config.ui.error'
+    });
+
+    // Emit translation to client.
+    bus.once('proxy.config.ui.translation', function (data) {
+      socket.emit('config.ui.translations.update', data);
+    });
+    bus.once('proxy.config.ui.translation.error', function (err) {
+      socket.emit('config.ui.translations.error', err);
+    });
+    bus.emit('ctrl.config.ui.translations', {
+      busEvent: 'proxy.config.ui.translation',
+      errorEvent: 'proxy.config.ui.translation.error'
+    });
+
+    // Handle socket error events.
+    socket.on('error', function (err) {
+      bus.emit('logger.err', err);
+
+      // @TODO: Handle! How?
+      console.error(err);
+    });
+  });
+};
+
+/**
+ * Register the plugin with architect.
+ */
+module.exports = function (options, imports, register) {
+  var proxy = new Proxy(imports.server, imports.bus, options.whitelistedBusEvents, options.whitelistedSocketEvents);
+
+  register(null, {
+    proxy: proxy
+  });
+};

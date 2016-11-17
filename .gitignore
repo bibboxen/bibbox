@@ -4,3 +4,6 @@ config.json
 .DS_Store
 *.pid
 .idea
+coverage
+files/offline/*.json
+files/config/fbs.json

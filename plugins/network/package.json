@@ -1,0 +1,19 @@
+{
+  "name": "network",
+  "description": "Network checker",
+  "version": "0.0.1",
+  "main": "network.js",
+  "private": true,
+  "plugin": {
+    "consumes": [
+      "bus"
+    ],
+    "provides": [
+      "network"
+    ]
+  },
+  "dependencies": {
+    "connection-tester": "^0.1.1",
+    "q": "^1.4.1"
+  }
+}

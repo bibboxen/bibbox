@@ -1,0 +1,15 @@
+<h2>{{ headline|translate }}</h2>
+
+{% for item in items|sortOnField('dueDate') %}
+<div class="row-item">
+  <p>
+    {{ item.itemProperties.title }}<br/>
+    {{ 'receipt.loans.id'|translate }} {{ item.itemIdentifier }}<br/>
+    {% if item.author %}
+    {{ item.itemProperties.author }}<br/>
+    {% endif %}
+    {{ 'receipt.loans.returnDate'|translate }} {{ (item.dueDate/1000)|date('d/m/y') }}
+  </p>
+</div>
+{% endfor %}
+<hr/>

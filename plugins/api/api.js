@@ -1,30 +1,23 @@
 /**
  * @file
- * Added API to send content into the search engine
+ * API
  */
 
-var Q = require('q');
+'use strict';
 
 /**
- * This object encapsulate the RESET API.
+ * This object encapsulates the API.
  *
  * @param app
- * @param logger
  * @param options
+ * @param bus
  *
  * @constructor
  */
-var API = function (app, logger, options) {
-  "use strict";
-
-  var self = this;
-  this.logger = logger;
-
-  /**
-   * Default get request.
-   */
+var API = function (app, options, bus) {
+  // Default get request.
   app.get('/api', function (req, res) {
-    res.send('Please see documentation about using this api.');
+    res.status(501).send('Please see documentation about using this api.');
   });
 };
 
@@ -33,11 +26,11 @@ var API = function (app, logger, options) {
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
-  "use strict";
-
   // Create the API routes using the API object.
-  var api = new API(imports.app, imports.logger, options);
+  var api = new API(imports.app, options, imports.bus);
 
   // This plugin extends the server plugin and do not provide new services.
-  register(null, null);
+  register(null, {
+    api: api
+  });
 };

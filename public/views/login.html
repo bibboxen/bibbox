@@ -1,9 +1,18 @@
-<form class="form-signin" role="form" ng-submit="login()">
-  <h2 class="form-signin-heading">Please sign in <br /><small>Search node</small></h2>
-    <label for="inputEmail" class="sr-only">Username</label>
-    <input id="inputEmail" class="form-control" placeholder="Username" required="" type="text" ng-model="user.username">
-    <label for="inputPassword" class="sr-only">Password</label>
-    <input id="inputPassword" class="form-control" placeholder="Password" required="" type="password" ng-model="user.password">
-    <div data-ng-show="message" class="alert alert-warning" role="alert">{{ message }}</div>
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-</form>
+<header headline="login.heading" countdown="countdown"></header>
+
+<spinner-global data-ng-if="loading"></spinner-global>
+
+<div class="container">
+  <div class="alert alert-danger" role="alert" data-ng-if="invalidLoginError">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    {{ invalidLoginErrorMessage | translate }}
+  </div>
+
+  <div data-ng-include="'views/login-' + display + '.html'" class="login-container"></div>
+
+  <div class="buttons-bottom">
+    <a type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="back()">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
+    </a>
+  </div>
+</div>

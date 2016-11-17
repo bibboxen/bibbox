@@ -3,21 +3,19 @@
  * This is a wrapper class to handel the system logger.
  */
 
+'use strict';
+
 // Node core modules.
-var fs = require('fs');
 var path = require('path');
 
 // NPM modules.
 var winston = require('winston');
 var Rotate = require('winston-logrotate').Rotate;
 
-/**
- * Define the Base object (constructor).
- */
 var Logger = function Logger(logs) {
-  "use strict";
-
   var levels = winston.config.syslog.levels;
+  levels.fbs = 8;
+  levels.offline = 9;
   winston.setLevels(levels);
 
   if (logs.hasOwnProperty('info')) {
@@ -77,6 +75,44 @@ var Logger = function Logger(logs) {
     });
   }
 
+  if (logs.hasOwnProperty('fbs')) {
+    this.fbsLog = new (winston.Logger)({
+      levels: levels,
+      transports: [
+        new Rotate({
+          file: path.join(__dirname, '../../' + logs.fbs),
+          level: 'fbs',
+          colorize: false,
+          timestamp: true,
+          json: false,
+          max: '100m',
+          keep: 5,
+          compress: false
+        })
+      ],
+      exitOnError: false
+    });
+  }
+
+  if (logs.hasOwnProperty('offline')) {
+    this.offlineLog = new (winston.Logger)({
+      levels: levels,
+      transports: [
+        new Rotate({
+          file: path.join(__dirname, '../../' + logs.offline),
+          level: 'offline',
+          colorize: false,
+          timestamp: true,
+          json: false,
+          max: '100m',
+          keep: 5,
+          compress: false
+        })
+      ],
+      exitOnError: false
+    });
+  }
+
   if (logs.hasOwnProperty('exception')) {
     this.excepLog = new (winston.Logger)({
       levels: levels,
@@ -93,8 +129,7 @@ var Logger = function Logger(logs) {
         }),
         new (winston.transports.Console)({
           colorize: true,
-          level: 'exceptions-file',
-          timestamp: timeFormatFn
+          level: 'exceptions-file'
         })
       ],
       exitOnError: true
@@ -109,8 +144,6 @@ var Logger = function Logger(logs) {
  *   The message to send to the logger.
  */
 Logger.prototype.error = function error(message) {
-  "use strict";
-
   if (this.errorLog !== undefined) {
     this.errorLog.error(message);
   }
@@ -123,8 +156,6 @@ Logger.prototype.error = function error(message) {
  *   The message to send to the logger.
  */
 Logger.prototype.info = function info(message) {
-  "use strict";
-
   if (this.infoLog !== undefined) {
     this.infoLog.info(message);
   }
@@ -137,10 +168,32 @@ Logger.prototype.info = function info(message) {
  *   The message to send to the logger.
  */
 Logger.prototype.debug = function debug(message) {
-  "use strict";
-
   if (this.debugLog !== undefined) {
     this.debugLog.debug(message);
+  }
+};
+
+/**
+ * Log fbs message.
+ *
+ * @param message
+ *   The message to send to the logger.
+ */
+Logger.prototype.fbs = function fbs(message) {
+  if (this.fbsLog !== undefined) {
+    this.fbsLog.fbs(message);
+  }
+};
+
+/**
+ * Log off-line message.
+ *
+ * @param message
+ *   The message to send to the logger.
+ */
+Logger.prototype.offline = function offline(message) {
+  if (this.offlineLog !== undefined) {
+    this.offlineLog.offline(message);
   }
 };
 
@@ -148,12 +201,33 @@ Logger.prototype.debug = function debug(message) {
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
-  "use strict";
-
   var logger = new Logger(options.logs);
+
+  // Add event listeners to logging events on the bus. For some reason they need
+  // to have a inner function to work!
+  var bus = imports.bus;
+  bus.on('logger.err', function (message) {
+    logger.error(message);
+  });
+
+  bus.on('logger.info', function (message) {
+    logger.info(message);
+  });
+
+  bus.on('logger.debug', function (message) {
+    logger.debug(message);
+  });
+
+  bus.on('logger.fbs', function (message) {
+    logger.fbs(message);
+  });
+
+  bus.on('logger.offline', function (message) {
+    logger.offline(message);
+  });
 
   // Register the plugin with the system.
   register(null, {
-    "logger": logger
+    logger: logger
   });
 };

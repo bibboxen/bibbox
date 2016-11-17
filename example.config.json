@@ -1,0 +1,86 @@
+{
+  "port": 3010,
+  "allowed": [ "127.0.0.1", "::ffff:192.168.50.1" ],
+  "barcode": {
+    "vid": 1529,
+    "pid": 8710
+  },
+  "logs": {
+    "info": "logs/info.log",
+    "error": "logs/error.log",
+    "debug": "logs/debug.log",
+    "fbs": "logs/fbs.log",
+    "offline": "logs/offline.log"
+  },
+  "proxy": {
+    "whitelistedBusEvents": [
+      "^rfid.tags.detected$",
+      "^rfid.tag.detected$",
+      "^rfid.tag.removed$",
+      "^rfid.tag.afi.set$",
+      "^rfid.tag.set_afi.[\\w]+$",
+      "^rfid.closed$",
+      "^rfid.connected$",
+      "^barcode.data$",
+      "^frontend.[\\w]+$",
+      "^fbs.login.[\\w]+$",
+      "^fbs.patron.[\\w]+$",
+      "^fbs.checkout.[\\w]+$",
+      "^fbs.checkin.[\\w]+$",
+      "^fbs.renew.[\\w]+$",
+      "^fbs.renew.all.[\\w]+$",
+      "^fbs.block.[\\w]+$",
+      "^fbs.online.[\\w]+$",
+      "^notification.response$",
+      "^notification.error$"
+    ],
+    "whitelistedSocketEvents": [
+      "^rfid.tags.request$",
+      "^rfid.tag.set_afi$",
+      "^barcode.start$",
+      "^barcode.stop$",
+      "^barcode.list$",
+      "^fbs.login$",
+      "^fbs.patron$",
+      "^fbs.checkout$",
+      "^fbs.checkin$",
+      "^fbs.renew$",
+      "^fbs.renew.all$",
+      "^fbs.block$",
+      "^fbs.online$",
+      "^notification.status$",
+      "^notification.reservations$",
+      "^notification.checkIn$",
+      "^notification.checkInOffline$",
+      "^notification.checkOut$",
+      "^notification.checkOutOffline$",
+      "^config.ui.update$",
+      "^config.ui.update.error$",
+      "^config.ui.translations.update$",
+      "^config.ui.translations.error$"
+    ]
+  },
+  "ctrl": {
+    "port": 3050,
+    "allowed": [ "127.0.0.1", "::ffff:192.168.50.1" ]
+  },
+  "languages": {
+    "locales": ["en", "da"],
+    "defaultLocale": "da"
+  },
+  "paths": {
+    "base": "files",
+    "translations": "locales"
+  },
+  "rfid": {
+    "port": 3001,
+    "afi": {
+      "on": "7",
+      "off": "194"
+    }
+  },
+  "offline": {
+    "host": "127.0.0.1",
+    "port": 6379
+  }
+}
