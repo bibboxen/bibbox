@@ -500,14 +500,13 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
     results.forEach(function (result) {
       if (result.state === "fulfilled") {
         var patron = result.value;
-        var id = patron.patronIdentifier.split(":")[1];
         content = {
           name: patron.hasOwnProperty('personalName') ? patron.personalName : 'Unknown',
           fines: layout.fines ? self.renderFines(mail, patron.fineItems) : '',
           loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patron.chargedItems, patron.overdueItems) : '',
           reservations: layout.reservations ? self.renderReservations(mail, patron.unavailableHoldItems) : '',
           reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, patron.holdItems) : '',
-          check_ins: layout.check_ins ? self.renderCheckIn(mail, items[id]) : ''
+          check_ins: layout.check_ins ? self.renderCheckIn(mail, items[patron.patronIdentifier]) : ''
         };
 
         context.patrons.push(JSON.parse(JSON.stringify(content)));
