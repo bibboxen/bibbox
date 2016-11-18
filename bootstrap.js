@@ -245,6 +245,7 @@ Bootstrap.prototype.stopApp = function stopApp() {
  */
 Bootstrap.prototype.updateApp = function updateApp(version) {
   var self = this;
+  var deferred = Q.defer();
 
   debug('Update called.');
 
@@ -253,9 +254,15 @@ Bootstrap.prototype.updateApp = function updateApp(version) {
   // @TODO: check it's up and fetch then checkout version.
   spawn('git', ['fetch']).on('close', function (code) {
     spawn('git', ['checkout', version]).on('close', function (code) {
-      self.restartApp();
+      self.restartApp().then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
+      });
     });
   });
+
+  return deferred.promise;
 };
 
 // Get the show on the road.
