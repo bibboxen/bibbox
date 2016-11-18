@@ -82,5 +82,13 @@
   "offline": {
     "host": "127.0.0.1",
     "port": 6379
+  },
+  "bootstrap": {
+    "ssl": {
+      "key": "server.key",
+      "cert": "server.crt"
+    },
+    "allowed": [ "127.0.0.1", "::ffff:192.168.50.1" ],
+    "port": 8080
   }
 }
