@@ -171,11 +171,15 @@ Bootstrap.prototype.getVersion = function getVersion() {
   var git = spawn('git', ['describe', '--exact-match', '--tags']);
 
   git.stdout.on('data', function (data) {
-    deferred.resolve(data.toString().replace("\n", ''));
+    var version = data.toString().replace("\n", '');
+    debug('Version: ' + version);
+    deferred.resolve(version);
   });
 
   git.stderr.on('data', function (data) {
-    deferred.reject(data.toString().replace("\n", ''));
+    var err = data.toString().replace("\n", '');
+    debug('Version error: ' + err);
+    deferred.reject(err);
   });
 
   return deferred.promise;
