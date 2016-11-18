@@ -7,3 +7,4 @@ config.json
 coverage
 files/offline/*.json
 files/config/fbs.json
+*.pem

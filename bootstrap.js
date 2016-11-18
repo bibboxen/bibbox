@@ -8,39 +8,108 @@
 var debug = require('debug')('bibbox:bootstrap');
 var fork = require('child_process').fork;
 var spawn = require('child_process').spawn;
+var UrlParser = require('url');
+var queryString = require('querystring');
+
 var config = require(__dirname + '/config.json');
+var Q = require('q');
 
 var Bootstrap = function Bootstrap() {
   var self = this;
+  this.bibbox = null;
+  this.alive = 0;
 
-  self.bibbox = null;
-  self.sockets = {};
+  var https = require('https');
+  var fs = require('fs');
 
-  // Create http server which only sends a simple page.
-  var app = require('http').createServer(function (req, res) {
-    res.writeHead(200);
-    res.write('<H1>BibBox ctrl</H1>');
-    res.write('<p>Use web-socket for communication with the application.</p>');
-    res.end();
-  });
+  var options = {
+    key: fs.readFileSync(__dirname + '/'  + config.bootstrap.ssl.key),
+    cert: fs.readFileSync(__dirname + '/' + config.bootstrap.ssl.cert)
+  };
 
-  // Connect web-socket to the http server.
-  var io = require('socket.io')(app);
+  var server = https.createServer(options, function (req, res) {
+    var ip = self.getRemoteIp(req);
+    var url = req.url;
+    if (config.bootstrap.allowed.indexOf(ip) > -1) {
+      debug('Requested url: "' + url + '" from: "' + ip + '" allowed');
+      res.setHeader('Content-Type', 'application/json');
+      res.writeHead(200);
 
-  // Listen for connections.
-  app.listen(config.ctrl.port);
+      url = UrlParser.parse(url);
+      switch (url.pathname) {
+        case '/bootstrap/restart':
+          self.restartApp().then(function () {
+            res.write(JSON.stringify({
+              pid: self.bibbox.pid,
+              status: 'running'
+            }));
+            res.end();
 
-  io.on('connection', function (socket) {
-    self.sockets[socket.id] = socket;
+          }, function (err) {
+            res.write(JSON.stringify({
+              pid: 0,
+              status: 'stopped',
+              error: err.message
+            }));
+            res.end();
+          });
 
-    socket.on('restart', function (data) {
-      self.restartApp();
-    });
+          break;
 
-    socket.on('update', function (data) {
-      self.updateApp(data);
-    });
-  });
+        case '/bootstrap/update':
+          var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
+          if (query.hasOwnProperty('version')) {
+            self.updateApp(query.version).then(function () {
+
+            }, function (err) {
+              res.write(JSON.stringify({
+                error: err.message
+              }));
+              res.end();
+            });
+          }
+          else {
+            res.write(JSON.stringify({
+              error: 'Missing version in query string'
+            }));
+            res.end();
+          }
+          break;
+
+
+        case '/bootstrap/alive':
+          if (self.bibbox) {
+            res.write(JSON.stringify({
+              status: 'running',
+              pid: self.bibbox.pid,
+              time: Math.round(self.alive/1000)
+            }));
+          }
+          else {
+            res.write(JSON.stringify({
+              status: 'stopped',
+              pid: 0,
+              time: Math.round(self.alive/1000)
+            }));
+          }
+          res.end();
+          break;
+
+        default:
+          res.write('Hello World!');
+          res.end();
+          break;
+      }
+    }
+    else {
+      debug('Requested url: "' + url + '" from: "' + ip + '" denied');
+      res.writeHead(401);
+      res.write('Unauthorized');
+      res.end();
+    }
+  }).listen(config.bootstrap.port);
+
+  debug('Https server started at: ' + config.bootstrap.port);
 };
 
 // Extend the object with event emitter.
@@ -49,52 +118,122 @@ var util = require('util');
 util.inherits(Bootstrap, eventEmitter);
 
 /**
+ * Get remote IP.
+ *
+ * Get the IP of the client.
+ *
+ * @param req
+ *   The http request.
+ *
+ * @returns {*}
+ *   The IP as an string.
+ */
+Bootstrap.prototype.getRemoteIp = function getRemoteIp(req) {
+  var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress;
+
+  // Take the first ip if this is a proxy list.
+  if (ip.indexOf(',') !== -1) {
+    ip = ip.split(',').unshift();
+  }
+
+  return ip;
+};
+
+/**
  * Restart the application.
+ *
+ * @return promise
+ *   Resolves if app have been re-started.
  */
 Bootstrap.prototype.restartApp = function restartApp() {
+  var self = this;
+  var deferred = Q.defer();
+
   debug('Restart called.');
-  this.stopApp();
-  this.startApp();
+
+  Q.all([
+    self.stopApp(),
+    self.startApp()
+  ]).then(function () {
+    deferred.resolve();
+  }).catch(function (err) {
+    console.log(err);
+    deferred.reject(err);
+  });
+
+  return deferred.promise;
 };
 
 /**
  * Start the application as a child process.
+ *
+ * @return promise
+ *   Resolves if app have been started and the old one closed.
  */
 Bootstrap.prototype.startApp = function startApp() {
+  var deferred = Q.defer();
   var self = this;
+
   var app = fork('app.js');
   debug('Started new application with pid: ' + app.pid);
 
-  // This minor hack is to ensure correct pid information during debug on close.
-  if (!self.bibbox) {
-    self.bibbox = app;
-  }
+  // Event handler for startup errors.
+  function startupError(code) {
+    debug('Bibbox not started exit code: ' + app.exitCode);
 
-  app.on('message', function (message) {
-    for (var id in self.sockets) {
-      var socket = self.sockets[id];
-      socket.emit('message', message);
+    deferred.reject(app.exitCode);
+  }
+  app.once('close', startupError);
+
+  // Listen for "ready" events.
+  app.once('message', function (message) {
+    if (message.hasOwnProperty('ready')) {
+      app.removeListener('close', startupError);
+
+      debug('Bibbox is ready with pid: ' + app.pid);
+      self.bibbox = app;
+      self.bibbox.on('message', function (message) {
+        // React to ping events.
+        if (message.hasOwnProperty('ping')) {
+          self.alive = message.ping;
+        }
+      });
+
+      deferred.resolve();
     }
   });
 
-  // Handle close event.
-  app.on('close', function (code) {
-    // First print info about the closing app.
-    debug('Stopped application with pid: ' + self.bibbox.pid + ' and exit code: ' + self.bibbox.exitCode);
-
-    // Switch the internal point to the new one.
-    self.bibbox = app;
-  });
+  return deferred.promise;
 };
 
 /**
  * Stop the application.
+ *
+ * @return promise
+ *   Resolves if app have been closed.
  */
 Bootstrap.prototype.stopApp = function stopApp() {
-  debug('App stopped.');
+  var deferred = Q.defer();
+  var self = this;
+
+  debug('Stop BibBox');
+
+  this.bibbox.on('error', function (err) {
+    debug('Error: ' + err.message);
+    deferred.reject(err);
+  });
+
+  // Handle close event.
+  this.bibbox.on('close', function (code) {
+    debug('Stopped application with pid: ' + self.bibbox.pid + ' and exit code: ' + self.bibbox.exitCode);
+
+    deferred.resolve();
+  });
 
   // Kill the application.
-  this.bibbox.kill('SIGHUP');
+  this.bibbox.kill('SIGTERM');
+
+  return deferred.promise;
 };
 
 

@@ -95,4 +95,11 @@ setInterval(function () {
       ping: new Date().getTime()
     });
   }
-}, 1000);
+}, 10000);
+
+// Inform bootstrap that it's ready.
+if (process.send) {
+  process.send({
+    ready: true
+  });
+}
