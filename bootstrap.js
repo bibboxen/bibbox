@@ -8,6 +8,9 @@
 var debug = require('debug')('bibbox:bootstrap');
 var fork = require('child_process').fork;
 var spawn = require('child_process').spawn;
+var UrlParser = require('url');
+var queryString = require('querystring');
+
 var config = require(__dirname + '/config.json');
 var Q = require('q');
 
@@ -32,8 +35,8 @@ var Bootstrap = function Bootstrap() {
       res.setHeader('Content-Type', 'application/json');
       res.writeHead(200);
 
-      switch (url) {
-
+      url = UrlParser.parse(url);
+      switch (url.pathname) {
         case '/bootstrap/restart':
           self.restartApp().then(function () {
             res.write(JSON.stringify({
@@ -46,7 +49,7 @@ var Bootstrap = function Bootstrap() {
             res.write(JSON.stringify({
               pid: 0,
               status: 'stopped',
-              err: err.message
+              error: err.message
             }));
             res.end();
           });
@@ -54,6 +57,23 @@ var Bootstrap = function Bootstrap() {
           break;
 
         case '/bootstrap/update':
+          var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
+          if (query.hasOwnProperty('version')) {
+            self.updateApp(query.version).then(function () {
+
+            }, function (err) {
+              res.write(JSON.stringify({
+                error: err.message
+              }));
+              res.end();
+            });
+          }
+          else {
+            res.write(JSON.stringify({
+              error: 'Missing version in query string'
+            }));
+            res.end();
+          }
           break;
 
 
