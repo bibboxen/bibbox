@@ -60,7 +60,17 @@ var Bootstrap = function Bootstrap() {
           var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
           if (query.hasOwnProperty('version')) {
             self.updateApp(query.version).then(function () {
-
+              self.getVersion().then(function (version) {
+                res.write(JSON.stringify({
+                  version: version
+                }));
+                res.end();
+              }, function (err) {
+                res.write(JSON.stringify({
+                  error: err,
+                }));
+                res.end();
+              });
             }, function (err) {
               res.write(JSON.stringify({
                 error: err.message
@@ -76,14 +86,25 @@ var Bootstrap = function Bootstrap() {
           }
           break;
 
-
         case '/bootstrap/alive':
           if (self.bibbox) {
-            res.write(JSON.stringify({
-              status: 'running',
-              pid: self.bibbox.pid,
-              time: Math.round(self.alive/1000)
-            }));
+            self.getVersion().then(function (version) {
+              res.write(JSON.stringify({
+                status: 'running',
+                pid: self.bibbox.pid,
+                version: version,
+                time: Math.round(self.alive/1000)
+              }));
+              res.end();
+            }, function (err) {
+              res.write(JSON.stringify({
+                status: 'running',
+                pid: self.bibbox.pid,
+                version: err,
+                time: Math.round(self.alive/1000)
+              }));
+              res.end();
+            });
           }
           else {
             res.write(JSON.stringify({
@@ -91,8 +112,8 @@ var Bootstrap = function Bootstrap() {
               pid: 0,
               time: Math.round(self.alive/1000)
             }));
+            res.end();
           }
-          res.end();
           break;
 
         default:
@@ -137,6 +158,27 @@ Bootstrap.prototype.getRemoteIp = function getRemoteIp(req) {
   }
 
   return ip;
+};
+
+/**
+ * Get the current version.
+ *
+ * @returns {*|promise}
+ *   Resolve with version or reject with git output.
+ */
+Bootstrap.prototype.getVersion = function getVersion() {
+  var deferred = Q.defer();
+  var git = spawn('git', ['describe', '--exact-match', '--tags']);
+
+  git.stdout.on('data', function (data) {
+    deferred.resolve(data.toString().replace("\n", ''));
+  });
+
+  git.stderr.on('data', function (data) {
+    deferred.reject(data.toString().replace("\n", ''));
+  });
+
+  return deferred.promise;
 };
 
 /**
