@@ -37,6 +37,8 @@
       "icon": "img/flags/GB.png"
     }
   ],
+  "display_more_materials": false,
+  "display_fines": true,
   "timeout": {
     "idleTimeout": 15,
     "idleWarn": 7

@@ -17,7 +17,7 @@
         <th></th>
         <th>{{ 'status.title' | translate }}</th>
         <th>{{ 'status.return_date' | translate }}</th>
-        <th>{{ 'status.fine' | translate }}</th>
+        <th data-ng-if="displayFines">{{ 'status.fine' | translate }}</th>
         <th>{{ 'status.new_date' | translate }}</th>
         <th>{{ 'status.information' | translate }}</th>
         <th>{{ 'status.actions' | translate }}</th>
@@ -28,7 +28,7 @@
         <td class="vert-align">{{ $index + 1 }}</td>
         <td class="vert-align">{{ material.title }}</td>
         <td class="vert-align">{{ material.returnDate | date }}</td>
-        <td class="vert-align">{{ material.fineItem.fineAmount | currency: ( currentPatron.currencyType | translate )  }}</td>
+        <td data-ng-if="displayFines" class="vert-align">{{ material.fineItem.fineAmount | currency: ( currentPatron.currencyType | translate )  }}</td>
         <td class="vert-align">{{ material.newDate | date }}</td>
         <td class="vert-align"><spinner data-ng-if="material.loading"></spinner><div data-ng-if="!material.loading">{{ material.information | translate }}</div></td>
         <td class="vert-align td-right btn-group-xs">
@@ -63,7 +63,7 @@
     <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0">
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
     </button>
-    <button type="button" class="btn btn-warning button align-left" data-ng-click="showFinesModal()" data-ng-if="currentPatron && currentPatron.feeAmount > 0">
+    <button type="button" class="btn btn-warning button align-left" data-ng-click="showFinesModal()" data-ng-if="displayFines && currentPatron && currentPatron.feeAmount > 0">
       <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{ 'status.button.fines' | translate }}
     </button>
 
