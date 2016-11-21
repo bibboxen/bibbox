@@ -296,14 +296,17 @@ Bootstrap.prototype.updateApp = function updateApp(version) {
   debug('Update called.');
 
   // Update from github.com.
-  // @TODO: error handling etc.
-  // @TODO: check it's up and fetch then checkout version.
   spawn('git', ['fetch']).on('close', function (code) {
+    // Checkout version.
     spawn('git', ['checkout', version]).on('close', function (code) {
-      self.restartApp().then(function () {
-        deferred.resolve();
-      }, function (err) {
-        deferred.reject(err);
+      // Copy config file.
+      spawn('cp', ['example.config.json', 'config.json']).on('close', function (code) {
+        // Restart the application.
+        self.restartApp().then(function () {
+          deferred.resolve();
+        }, function (err) {
+          deferred.reject(err);
+        });
       });
     });
   });
