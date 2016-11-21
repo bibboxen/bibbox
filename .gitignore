@@ -7,4 +7,6 @@ config.json
 coverage
 files/offline/*.json
 files/config/fbs.json
+files/config/notification.json
+files/config/ui.json
 *.pem

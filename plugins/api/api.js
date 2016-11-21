@@ -19,6 +19,53 @@ var API = function (app, options, bus) {
   app.get('/api', function (req, res) {
     res.status(501).send('Please see documentation about using this api.');
   });
+
+  // Configuration requests.
+  app.post('/api/config', function (req, res) {
+    console.log(req.body);
+
+    bus.once('storage.config.saved', function (status) {
+      console.log('yeah');
+    });
+    bus.emit('storage.save', {
+      type: 'config',
+      name: 'ui',
+      obj: req.body.ui,
+      busEvent: 'storage.config.saved'
+    });
+    bus.emit('storage.save', {
+      type: 'config',
+      name: 'fbs',
+      obj: req.body.fbs,
+      busEvent: 'storage.config.saved'
+    });
+    bus.emit('storage.save', {
+      type: 'config',
+      name: 'notification',
+      obj: req.body.notification,
+      busEvent: 'storage.config.saved'
+    });
+
+    res.status(200).send('Config!');
+  });
+
+  // Translations requests.
+  app.post('/api/translations', function (req, res) {
+    console.log(req.body);
+    res.status(200).send('Translations!');
+  });
+
+  // Restart UI requests.
+  app.post('/api/restart_ui', function (req, res) {
+    console.log(req.body);
+    res.status(200).send('Restart UI!');
+  });
+
+  // Restart node requests.
+  app.post('/api/restart_node', function (req, res) {
+    console.log(req.body);
+    res.status(200).send('Restart Node!');
+  });
 };
 
 
