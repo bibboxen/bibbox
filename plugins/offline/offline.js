@@ -50,13 +50,13 @@ var Offline = function Offline(bus, host, port) {
   this.checkoutQueue.on('failed', function (job, err) {
     if (err.message === 'FBS is offline') {
       job.remove().then(function () {
-          // Job remove to re-add it as a new job.
-          self.add('checkout', job.data);
-        },
-        function (err) {
-          // If we can't remove the job... not much we can do.
-          self.bus('logger.offline', err.message);
-        });
+        // Job remove to re-add it as a new job.
+        self.add('checkout', job.data);
+      },
+      function (err) {
+        // If we can't remove the job... not much we can do.
+        self.bus('logger.offline', err.message);
+      });
     }
   });
 
@@ -99,7 +99,7 @@ var Offline = function Offline(bus, host, port) {
       busEvent: 'offline.fbs.check',
       errorEvent: 'offline.fbs.check.error'
     });
-  } , 5000);
+  }, 5000);
 };
 
 /**
@@ -139,7 +139,7 @@ Offline.prototype.pause = function pause(type) {
   var self = this;
   var queue = this._findQueue(type);
 
-  queue.pause().then(function(){
+  queue.pause().then(function () {
     self.bus.emit('logger.offline', 'Queue "' + queue.name + '" is paused.');
   });
 };
@@ -154,7 +154,7 @@ Offline.prototype.resume = function resume(type) {
   var self = this;
   var queue = this._findQueue(type);
 
-  queue.resume().then(function(){
+  queue.resume().then(function () {
     self.bus.emit('logger.offline', 'Queue "' + queue.name + '" has resumed.');
   });
 };
@@ -204,7 +204,7 @@ Offline.prototype.checkin = function checkin(job, done) {
   var data = job.data;
 
   self.bus.once(data.busEvent, function (res) {
-    if (res.ok == '0') {
+    if (res.ok === '0') {
       self.bus.emit('logger.offline', 'error: ' + require('util').inspect(res, true, 10));
       done(new Error(res.screenMessage));
     }
@@ -226,9 +226,9 @@ Offline.prototype.checkin = function checkin(job, done) {
   });
 
   self.bus.once(data.errorEvent, function (err) {
-     // Log the failure.
-     self.bus.emit('logger.offline', 'error: ' + err.message);
-     done(err);
+    // Log the failure.
+    self.bus.emit('logger.offline', 'error: ' + err.message);
+    done(err);
   });
 
   // Send request to FBS.
@@ -247,7 +247,7 @@ Offline.prototype.checkout = function checkout(job, done) {
   var data = job.data;
 
   self.bus.once(data.busEvent, function (res) {
-    if (res.ok == '0') {
+    if (res.ok === '0') {
       // @TODO: Check here screen-message if the user should be changed due to
       //        wrong username or password.
       self.bus.emit('logger.offline', 'error: ' + require('util').inspect(res, true, 10));

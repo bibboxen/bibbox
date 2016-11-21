@@ -120,9 +120,6 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
     // Handle socket error events.
     socket.on('error', function (err) {
       bus.emit('logger.err', err);
-
-      // @TODO: Handle! How?
-      console.error(err);
     });
   });
 };

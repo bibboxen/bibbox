@@ -164,12 +164,12 @@ module.exports = function (options, imports, register) {
    */
   bus.on('ctrl.config.fbs', function (data) {
     ctrl.getFBSConfig().then(function (config) {
-        bus.emit(data.busEvent, config);
-      },
-      function (err) {
-        bus.emit('logger.err', 'CTRL: ' + err);
-        bus.emit(data.errorEvent, err);
-      });
+      bus.emit(data.busEvent, config);
+    },
+    function (err) {
+      bus.emit('logger.err', 'CTRL: ' + err);
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   register(null, {

@@ -205,7 +205,7 @@ angular.module('BibBox').controller('ReturnController', [
           // Ignore.
         },
         function (err) {
-          /// @TODO: Report error to user.
+          // @TODO: Report error to user.
           console.log(err);
         }
       );

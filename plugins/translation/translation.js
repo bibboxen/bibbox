@@ -12,7 +12,7 @@ var i18n = require('i18n');
 /**
  * This object encapsulates translation.
  */
-var Translation = function (bus, paths,languages) {
+var Translation = function (bus, paths, languages) {
   // Configure I18N with supported languages.
   i18n.configure({
     locales: languages.locales,

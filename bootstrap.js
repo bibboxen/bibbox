@@ -23,11 +23,11 @@ var Bootstrap = function Bootstrap() {
   var fs = require('fs');
 
   var options = {
-    key: fs.readFileSync(__dirname + '/'  + config.bootstrap.ssl.key),
+    key: fs.readFileSync(__dirname + '/' + config.bootstrap.ssl.key),
     cert: fs.readFileSync(__dirname + '/' + config.bootstrap.ssl.cert)
   };
 
-  var server = https.createServer(options, function (req, res) {
+  https.createServer(options, function (req, res) {
     var ip = self.getRemoteIp(req);
     var url = req.url;
     if (config.bootstrap.allowed.indexOf(ip) > -1) {
@@ -67,7 +67,7 @@ var Bootstrap = function Bootstrap() {
                 res.end();
               }, function (err) {
                 res.write(JSON.stringify({
-                  error: err,
+                  error: err
                 }));
                 res.end();
               });
@@ -93,7 +93,7 @@ var Bootstrap = function Bootstrap() {
                 status: 'running',
                 pid: self.bibbox.pid,
                 version: version,
-                time: Math.round(self.alive/1000)
+                time: Math.round(self.alive / 1000)
               }));
               res.end();
             }, function (err) {
@@ -101,7 +101,7 @@ var Bootstrap = function Bootstrap() {
                 status: 'running',
                 pid: self.bibbox.pid,
                 version: err,
-                time: Math.round(self.alive/1000)
+                time: Math.round(self.alive / 1000)
               }));
               res.end();
             });
@@ -110,7 +110,7 @@ var Bootstrap = function Bootstrap() {
             res.write(JSON.stringify({
               status: 'stopped',
               pid: 0,
-              time: Math.round(self.alive/1000)
+              time: Math.round(self.alive / 1000)
             }));
             res.end();
           }
@@ -203,7 +203,6 @@ Bootstrap.prototype.restartApp = function restartApp() {
   ]).then(function () {
     deferred.resolve();
   }).catch(function (err) {
-    console.log(err);
     deferred.reject(err);
   });
 

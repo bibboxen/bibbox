@@ -48,11 +48,11 @@ FBS.create = function create(bus) {
   var deferred = Q.defer();
 
   bus.once('fbs.config.loaded', function (config) {
-    deferred.resolve(new FBS(bus, config))
+    deferred.resolve(new FBS(bus, config));
   });
 
   bus.once('fbs.config.error', function (err) {
-    deferred.reject(err)
+    deferred.reject(err);
   });
 
   bus.emit('ctrl.config.fbs', {
@@ -381,7 +381,7 @@ module.exports = function (options, imports, register) {
             }
           };
 
-          bus.once('fbs.checkout.offline.stored' + data.itemIdentifier, function(res) {
+          bus.once('fbs.checkout.offline.stored' + data.itemIdentifier, function (res) {
             bus.emit(data.busEvent, material);
           });
 
@@ -446,7 +446,7 @@ module.exports = function (options, imports, register) {
             }
           };
 
-          bus.once('fbs.checkin.offline.stored' + data.itemIdentifier, function(res) {
+          bus.once('fbs.checkin.offline.stored' + data.itemIdentifier, function (res) {
             bus.emit(data.busEvent, material);
           });
 
@@ -560,6 +560,6 @@ module.exports = function (options, imports, register) {
     });
   },
   function (err) {
-    bus.emit(data.errorEvent, err);
+    bus.emit(request.errorEvent, err);
   });
 };
