@@ -14,6 +14,9 @@ angular.module('BibBox').controller('ReturnController', [
       return;
     }
 
+    // Display more than one book.
+    $scope.imageDisplayMoreBooks = config.display_more_materials;
+
     // Store raw check-in responses as it's need to print receipt.
     var raw_materials = {};
 
