@@ -22,23 +22,23 @@ var API = function (app, options, bus) {
 
   // Configuration requests.
   app.post('/api/config', function (req, res) {
-    console.log(req.body);
-
-    bus.once('storage.config.saved', function (status) {
-      console.log('yeah');
-    });
+    // Save ui config.
     bus.emit('storage.save', {
       type: 'config',
       name: 'ui',
       obj: req.body.ui,
       busEvent: 'storage.config.saved'
     });
+
+    // Save fbs config.
     bus.emit('storage.save', {
       type: 'config',
       name: 'fbs',
       obj: req.body.fbs,
       busEvent: 'storage.config.saved'
     });
+
+    // Save notification config.
     bus.emit('storage.save', {
       type: 'config',
       name: 'notification',
@@ -51,14 +51,38 @@ var API = function (app, options, bus) {
 
   // Translations requests.
   app.post('/api/translations', function (req, res) {
-    console.log(req.body);
+    // Save ui translation strings.
+    if (req.body.hasOwnProperty('ui')) {
+      for (var key in req.body.ui) {
+        bus.emit('storage.save', {
+          type: 'locales',
+          name: 'ui/' + key,
+          obj: req.body.ui[key],
+          busEvent: 'storage.translation.saved'
+        });
+      }
+    }
+
+    // Save notification translation strings.
+    if (req.body.hasOwnProperty('notification')) {
+      for (var key in req.body.notification) {
+        bus.emit('storage.save', {
+          type: 'locales',
+          name: 'notifications/' + key,
+          obj: req.body.notification[key],
+          busEvent: 'storage.translation.saved'
+        });
+      }
+    }
+
     res.status(200).send('Translations!');
   });
 
   // Restart UI requests.
   app.post('/api/restart_ui', function (req, res) {
-    console.log(req.body);
-    res.status(200).send('Restart UI!');
+    bus.emit('frontend.reload');
+
+    res.status(200).send('Restarted UI!');
   });
 
   // Restart node requests.
