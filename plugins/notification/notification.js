@@ -163,11 +163,11 @@ Notification.create = function create(bus, paths, languages) {
   var deferred = Q.defer();
 
   bus.once('notification.loaded.config', function (config) {
-    deferred.resolve(new Notification(bus, config, paths, languages))
+    deferred.resolve(new Notification(bus, config, paths, languages));
   });
 
   bus.on('notification.error.config', function (err) {
-    deferred.reject(err)
+    deferred.reject(err);
   });
 
   bus.emit('ctrl.config.notification', {
@@ -498,7 +498,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
   Q.allSettled(patrons).then(function (results) {
     var content;
     results.forEach(function (result) {
-      if (result.state === "fulfilled") {
+      if (result.state === 'fulfilled') {
         var patron = result.value;
         content = {
           name: patron.hasOwnProperty('personalName') ? patron.personalName : 'Unknown',
@@ -628,7 +628,7 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
         loans_new: layout.loans_new ? self.renderNewLoans(mail, 'receipt.loans.new.headline', items) : '',
         loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
         reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
-        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : '',
+        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : ''
       }]
     };
 
@@ -838,7 +838,7 @@ Notification.prototype.getPatronInformation = function getPatronInformation(user
     username: username,
     password: password,
     busEvent: busEvent,
-    errorEvent: errorEvent,
+    errorEvent: errorEvent
   });
 
   return deferred.promise;
@@ -897,11 +897,11 @@ Notification.prototype.printReceipt = function printReceipt(content) {
     'page-width': 80
   });
 
-  readableStream.on('data', function(chunk) {
+  readableStream.on('data', function (chunk) {
     writableStream.write(chunk);
   });
 
-  readableStream.on('end', function() {
+  readableStream.on('end', function () {
     var lp = spawn('/usr/bin/lp', [ filename ]);
 
     lp.stderr.on('data', function (data) {

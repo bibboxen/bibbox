@@ -82,22 +82,22 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
 
 
       // Listen for disconnection with the backend.
-      socket.on('disconnect', function() {
+      socket.on('disconnect', function () {
         $rootScope.$emit('out-of-order.enable', 'nodejs');
       });
 
       // Listen for connection with the backend.
-      socket.on('reconnect', function() {
+      socket.on('reconnect', function () {
         $rootScope.$emit('out-of-order.disable', 'nodejs');
       });
 
       // Listen for disconnection with the backend.
-      socket.on('rfid.closed', function() {
+      socket.on('rfid.closed', function () {
         $rootScope.$emit('out-of-order.enable', 'rfid');
       });
 
       // Listen for connection with the backend.
-      socket.on('rfid.connected', function() {
+      socket.on('rfid.connected', function () {
         $rootScope.$emit('out-of-order.disable', 'rfid');
       });
 

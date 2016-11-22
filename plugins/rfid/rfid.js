@@ -99,10 +99,10 @@ var RFID = function (bus, port, afi) {
         bus.emit('rfid.tag.afi.set', {
           uid: fakeTags[index].uid,
           afi: fakeTags[index].afi === afi.on
-        })
+        });
       }
       else {
-        bus.emit('rfid.error', 'AFI not set!')
+        bus.emit('rfid.error', 'AFI not set!');
       }
     });
   }
@@ -140,7 +140,7 @@ var RFID = function (bus, port, afi) {
             return;
           }
 
-          switch(data.event) {
+          switch (data.event) {
             case 'rfid.tags.detected':
               bus.emit('rfid.tags.detected', data.tags);
               break;
@@ -158,7 +158,7 @@ var RFID = function (bus, port, afi) {
                 bus.emit('rfid.tag.afi.set', {
                   uid: data.tag.uid,
                   afi: data.tag.afi === afi.on
-                })
+                });
               }
               else {
                 bus.emit('rfid.error', 'AFI not set!');

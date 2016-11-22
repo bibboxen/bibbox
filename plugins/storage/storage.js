@@ -38,7 +38,7 @@ Storage.prototype.lock = function lock(type, name) {
   var deferred = Q.defer();
 
   var file = this.path + type + '/' + name + '.json';
-  lockfile.lock(file, { retries: this.retries}, function (err) {
+  lockfile.lock(file, { retries: this.retries }, function (err) {
     if (err) {
       deferred.reject(err);
     }
@@ -255,19 +255,19 @@ module.exports = function (options, imports, register) {
           storage.unlock(file);
           bus.emit(data.busEvent, true);
         },
-        function(err) {
+        function (err) {
           storage.unlock(file);
           bus.emit(data.errorEvent, err);
           bus.emit('logger.err', err.message);
         });
       },
-      function(err) {
+      function (err) {
         if (err.code === 'ENOENT') {
           // Could not lock file as it don't exists.
           storage.append(data.type, data.name, data.obj).then(function (res) {
             bus.emit(data.busEvent, true);
           },
-          function(err) {
+          function (err) {
             bus.emit(data.errorEvent, err);
             bus.emit('logger.err', err.message);
           });
@@ -282,7 +282,7 @@ module.exports = function (options, imports, register) {
       storage.append(data.type, data.name, data.obj).then(function (res) {
         bus.emit(data.busEvent, true);
       },
-      function(err) {
+      function (err) {
         bus.emit(data.errorEvent, err);
         bus.emit('logger.err', err.message);
       });

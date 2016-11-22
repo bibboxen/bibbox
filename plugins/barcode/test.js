@@ -2,18 +2,19 @@
  * @file
  * Helper to setup usb barcode on new machines.
  */
+'use strict';
 
 var config = require('./../../config.json');
 
 var bus = null;
 var b = require('./../bus/bus.js');
-b({}, {}, function (a ,r) {
+b({}, {}, function (a, r) {
   bus = r.bus;
 });
 
 var barcode = null;
-var b = require('./barcode.js');
-b({ vid: config.barcode.vid, pid: config.barcode.pid}, {bus: bus }, function (a ,r) {
+b = require('./barcode.js');
+b({vid: config.barcode.vid, pid: config.barcode.pid}, {bus: bus}, function (a, r) {
   barcode = r.barcode;
 });
 
@@ -28,10 +29,12 @@ barcode.on('code', function (data) {
 });
 barcode.start();
 
-process.on('SIGINT', function() {
+process.on('SIGINT', function () {
   stop = true;
 });
 
 (function wait () {
-  if (!stop) setTimeout(wait, 100);
+  if (!stop) {
+    setTimeout(wait, 100);
+  }
 })();

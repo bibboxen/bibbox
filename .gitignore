@@ -1,10 +1,12 @@
 node_modules
 config.json
 *.log
+logs/*.*
 .DS_Store
 *.pid
 .idea
 coverage
 files/offline/*.json
 files/config/fbs.json
-*.pem
+*.key
+*.crt

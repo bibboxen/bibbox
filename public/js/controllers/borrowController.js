@@ -5,8 +5,8 @@
  * @extends RFIDBaseController
  * @implements RFIDBaseInterface
  */
-angular.module('BibBox').controller('BorrowController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', '$modal',
-  function ($scope, $controller, $location, $timeout, userService, receiptService, $modal) {
+angular.module('BibBox').controller('BorrowController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', '$modal', 'config',
+  function ($scope, $controller, $location, $timeout, userService, receiptService, $modal, config) {
     'use strict';
 
     // Extend controller scope from the base controller.
@@ -17,6 +17,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       $scope.baseLogoutRedirect('/');
       return;
     }
+
+    // Display more than one book.
+    $scope.imageDisplayMoreBooks = config.display_more_materials;
 
     $scope.loading = true;
 

@@ -3,8 +3,9 @@
  * Status page controller.
  */
 
-angular.module('BibBox').controller('StatusController', ['$scope', '$controller', '$location', '$translate', '$timeout', 'userService', 'receiptService', '$modal',
-  function ($scope, $controller, $location, $translate, $timeout, userService, receiptService, $modal) {
+angular.module('BibBox').controller('StatusController', [
+  '$scope', '$controller', '$location', '$translate', '$timeout', 'userService', 'receiptService', '$modal', 'config',
+  function ($scope, $controller, $location, $translate, $timeout, userService, receiptService, $modal, config) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -17,6 +18,9 @@ angular.module('BibBox').controller('StatusController', ['$scope', '$controller'
       $scope.baseLogoutRedirect('/');
       return;
     }
+
+    // Should fines by displayed?
+    $scope.displayFines = config.display_fines;
 
     $scope.materials = [];
     $scope.fineItems = [];

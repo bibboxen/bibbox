@@ -79,18 +79,19 @@ var Logger = function Logger(logs) {
     this.fbsLog = new (winston.Logger)({
       levels: levels,
       transports: [
-        new Rotate({
-          file: path.join(__dirname, '../../' + logs.fbs),
+        new (winston.transports.DailyRotateFile)({
+          name: 'fbs-file',
+          filename: path.join(__dirname, '../../' + logs.fbs),
           level: 'fbs',
           colorize: false,
+          datePattern: '.dd-MM-yyTHH',
           timestamp: true,
           json: false,
-          max: '100m',
-          keep: 5,
-          compress: false
+          maxFiles: 30,
+          zippedArchive: false
         })
       ],
-      exitOnError: false
+      exitOnError: true
     });
   }
 
@@ -110,29 +111,6 @@ var Logger = function Logger(logs) {
         })
       ],
       exitOnError: false
-    });
-  }
-
-  if (logs.hasOwnProperty('exception')) {
-    this.excepLog = new (winston.Logger)({
-      levels: levels,
-      transports: [
-        new Rotate({
-          file: path.join(__dirname, '../../' + logs.exception),
-          level: 'exceptions-file',
-          colorize: false,
-          timestamp: true,
-          json: false,
-          max: '100m',
-          keep: 5,
-          compress: false
-        }),
-        new (winston.transports.Console)({
-          colorize: true,
-          level: 'exceptions-file'
-        })
-      ],
-      exitOnError: true
     });
   }
 };
