@@ -33,7 +33,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
 
       // Check if this is off-line materials.
       if (item.hasOwnProperty('offline')) {
-        return item.offline
+        return item.offline;
       }
 
       return false;

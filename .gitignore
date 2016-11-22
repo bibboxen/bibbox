@@ -1,6 +1,7 @@
 node_modules
 config.json
 *.log
+logs/*.*.*
 .DS_Store
 *.pid
 .idea
@@ -14,5 +15,5 @@ files/locales/translations/*
 !files/locales/ui/example.*
 !files/locales/translations/example.*
 *.pem
-server.crt
-server.key
+*.key
+*.crt

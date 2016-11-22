@@ -58,7 +58,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
       var uniqueId = CryptoJS.MD5('userServiceLogin' + Date.now());
 
       // Handel response when login request is completed.
-      proxyService.once('fbs.login.success' + uniqueId, function() {
+      proxyService.once('fbs.login.success' + uniqueId, function () {
         self.username = username;
         self.password = password;
         self.loggedIn = true;
@@ -194,11 +194,11 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     this.renew = function renew(itemIdentifier) {
       var deferred = $q.defer();
 
-      proxyService.once('fbs.renew.success' + itemIdentifier, function(result) {
+      proxyService.once('fbs.renew.success' + itemIdentifier, function (result) {
         deferred.resolve(result);
       });
 
-      proxyService.once('fbs.renew.error' + itemIdentifier, function(err) {
+      proxyService.once('fbs.renew.error' + itemIdentifier, function (err) {
         deferred.resolve(err);
       });
 
@@ -232,7 +232,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
 
       proxyService.emit('fbs.renew.all', {
         busEvent: 'fbs.renew.all.success' + uniqueId,
-        errorEvent:  'fbs.renew.all.error' + uniqueId,
+        errorEvent: 'fbs.renew.all.error' + uniqueId,
         username: this.username,
         password: this.password
       });
@@ -259,7 +259,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
 
       proxyService.emit('fbs.block', {
         busEvent: 'fbs.block.success' + uniqueId,
-        errorEvent:  'fbs.block.error' + uniqueId,
+        errorEvent: 'fbs.block.error' + uniqueId,
         username: username,
         password: reason
       });
@@ -321,6 +321,6 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
       });
 
       return deferred.promise;
-    }
+    };
   }
 ]);

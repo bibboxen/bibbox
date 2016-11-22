@@ -23,11 +23,11 @@ var Bootstrap = function Bootstrap() {
   var fs = require('fs');
 
   var options = {
-    key: fs.readFileSync(__dirname + '/'  + config.bootstrap.ssl.key),
+    key: fs.readFileSync(__dirname + '/' + config.bootstrap.ssl.key),
     cert: fs.readFileSync(__dirname + '/' + config.bootstrap.ssl.cert)
   };
 
-  var server = https.createServer(options, function (req, res) {
+  https.createServer(options, function (req, res) {
     var ip = self.getRemoteIp(req);
     var url = req.url;
     if (config.bootstrap.allowed.indexOf(ip) > -1) {
@@ -67,7 +67,7 @@ var Bootstrap = function Bootstrap() {
                 res.end();
               }, function (err) {
                 res.write(JSON.stringify({
-                  error: err,
+                  error: err
                 }));
                 res.end();
               });
@@ -93,7 +93,7 @@ var Bootstrap = function Bootstrap() {
                 status: 'running',
                 pid: self.bibbox.pid,
                 version: version,
-                time: Math.round(self.alive/1000)
+                time: Math.round(self.alive / 1000)
               }));
               res.end();
             }, function (err) {
@@ -101,7 +101,7 @@ var Bootstrap = function Bootstrap() {
                 status: 'running',
                 pid: self.bibbox.pid,
                 version: err,
-                time: Math.round(self.alive/1000)
+                time: Math.round(self.alive / 1000)
               }));
               res.end();
             });
@@ -110,7 +110,7 @@ var Bootstrap = function Bootstrap() {
             res.write(JSON.stringify({
               status: 'stopped',
               pid: 0,
-              time: Math.round(self.alive/1000)
+              time: Math.round(self.alive / 1000)
             }));
             res.end();
           }
@@ -203,7 +203,6 @@ Bootstrap.prototype.restartApp = function restartApp() {
   ]).then(function () {
     deferred.resolve();
   }).catch(function (err) {
-    console.log(err);
     deferred.reject(err);
   });
 
@@ -220,7 +219,7 @@ Bootstrap.prototype.startApp = function startApp() {
   var deferred = Q.defer();
   var self = this;
 
-  var app = fork('app.js');
+  var app = fork(__dirname + '/app.js');
   debug('Started new application with pid: ' + app.pid);
 
   // Event handler for startup errors.
@@ -296,14 +295,17 @@ Bootstrap.prototype.updateApp = function updateApp(version) {
   debug('Update called.');
 
   // Update from github.com.
-  // @TODO: error handling etc.
-  // @TODO: check it's up and fetch then checkout version.
   spawn('git', ['fetch']).on('close', function (code) {
+    // Checkout version.
     spawn('git', ['checkout', version]).on('close', function (code) {
-      self.restartApp().then(function () {
-        deferred.resolve();
-      }, function (err) {
-        deferred.reject(err);
+      // Copy config file.
+      spawn('cp', ['example.config.json', 'config.json']).on('close', function (code) {
+        // Restart the application.
+        self.restartApp().then(function () {
+          deferred.resolve();
+        }, function (err) {
+          deferred.reject(err);
+        });
       });
     });
   });

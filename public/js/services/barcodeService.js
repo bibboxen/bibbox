@@ -19,7 +19,7 @@ angular.module('BibBox').service('barcodeService', ['$q', 'proxyService',
      */
     function scanned(data) {
       if (currentScope) {
-        currentScope.$emit('barcodeScanned', data);
+        currentScope.barcodeScanned(data);
       }
     }
 
@@ -33,7 +33,7 @@ angular.module('BibBox').service('barcodeService', ['$q', 'proxyService',
      */
     function error(err) {
       if (currentScope) {
-        currentScope.$emit('barcodeError', err);
+        currentScope.barcodeError(err);
       }
     }
 

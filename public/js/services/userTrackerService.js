@@ -38,7 +38,7 @@ angular.module('BibBox').service('userTrackerService', ['$interval', 'config',
         loginAttempts[username] = {
           date: new Date().getTime(),
           attempts: 0
-        }
+        };
       }
 
       // Incremented login attempt.
