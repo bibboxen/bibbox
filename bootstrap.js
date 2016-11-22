@@ -219,7 +219,7 @@ Bootstrap.prototype.startApp = function startApp() {
   var deferred = Q.defer();
   var self = this;
 
-  var app = fork('app.js');
+  var app = fork(__dirname + '/app.js');
   debug('Started new application with pid: ' + app.pid);
 
   // Event handler for startup errors.
