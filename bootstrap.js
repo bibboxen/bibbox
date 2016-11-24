@@ -39,6 +39,8 @@ var Bootstrap = function Bootstrap() {
       res.writeHead(200);
       url = UrlParser.parse(url);
 
+      // Check if this is a post request, if it is parse the request an wait for
+      // the data.
       if (req.method == 'POST') {
         self.parseBody(req).then(function (body) {
           self.handleRequest(req, res, url, body);
@@ -69,6 +71,21 @@ var eventEmitter = require('events').EventEmitter;
 var util = require('util');
 util.inherits(Bootstrap, eventEmitter);
 
+/**
+ * Handler for the request.
+ *
+ * This is used after the body have been parsed into JSON, if it was a post
+ * request.
+ *
+ * @param req
+ *  HTTP request object.
+ * @param res
+ *  HTTP response object.
+ * @param url
+ *   The URL the request came in on.
+ * @param body
+ *   The body pay-load as JSON, if post request else undefined.
+ */
 Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) {
   var self = this;
 

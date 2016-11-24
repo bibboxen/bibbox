@@ -185,28 +185,38 @@ module.exports = function (options, imports, register) {
         break;
 
       case 'config':
-        bus.emit('storage.save', {
-          type: 'config',
-          name: 'ui',
-          obj: data.config.ui,
-          busEvent: 'storage.config.saved'
-        });
+        if (data.config.hasOwnProperty('ui')) {
+          // Save UI configuration.
+          bus.emit('storage.save', {
+            type: 'config',
+            name: 'ui',
+            obj: data.config.ui,
+            busEvent: 'storage.config.saved'
+          });
+        }
 
-        // Save fbs config.
-        bus.emit('storage.save', {
-          type: 'config',
-          name: 'fbs',
-          obj: data.config.fbs,
-          busEvent: 'storage.config.saved'
-        });
+        if (data.config.hasOwnProperty('fbs')) {
+          // Save fbs config.
+          bus.emit('storage.save', {
+            type: 'config',
+            name: 'fbs',
+            obj: data.config.fbs,
+            busEvent: 'storage.config.saved'
+          });
+        }
 
-        // Save notification config.
-        bus.emit('storage.save', {
-          type: 'config',
-          name: 'notification',
-          obj: data.config.notification,
-          busEvent: 'storage.config.saved'
-        });
+        if (data.config.hasOwnProperty('notification')) {
+          // Save notification config.
+          bus.emit('storage.save', {
+            type: 'config',
+            name: 'notification',
+            obj: data.config.notification,
+            busEvent: 'storage.config.saved'
+          });
+        }
+
+        // @TODO: Emit configuration update to the UI.
+
         break;
 
       case 'translations':
@@ -234,7 +244,7 @@ module.exports = function (options, imports, register) {
           }
         }
 
-        // @TODO: Emit translations to UI.
+        // @TODO: Emit translations update to the UI.
 
         break;
     }
