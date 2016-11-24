@@ -31,7 +31,13 @@ var Translation = function (bus, paths, languages) {
   // @TODO: Avoid more than one push when multiple language files are changed.
   fs.watch(directory, function(event, filename) {
     process.nextTick(function () {
-      bus.emit('config.ui.translations.update', {translations: self.getTranslations()});
+      var langCode = filename.split('.json')[0];
+      var translations = {};
+      translations[langCode] = self.getTranslationsLang(langCode);
+
+      bus.emit('config.ui.translations.update', {
+        translations: translations
+      });
     });
   });
 };

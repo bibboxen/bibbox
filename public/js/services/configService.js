@@ -47,8 +47,12 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
      * translations are refreshed.
      */
     proxyService.on('config.ui.translations.update', function (data) {
-      // Override translations.
-      config.translations = data.translations;
+      // Update languages.
+      for (var langCode in data.translations) {
+        if (data.translations.hasOwnProperty(langCode)) {
+          config.translations[langCode] = data.translations[langCode];
+        }
+      }
 
       // Mark config as initialized, so the application can present the UI.
       config.initialized = true;
