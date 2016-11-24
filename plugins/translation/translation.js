@@ -8,6 +8,7 @@
 'use strict';
 
 var i18n = require('i18n');
+var fs = require('fs');
 
 /**
  * This object encapsulates translation.
@@ -27,9 +28,10 @@ var Translation = function (bus, paths, languages) {
 
   // Watch for changes in the translations files and send them in next tick to
   // give n18l an change to reload..
+  // @TODO: Avoid more than one push when multiple language files are changed.
   fs.watch(directory, function(event, filename) {
     process.nextTick(function () {
-      bus.emit('config.ui.translations.update', self.getTranslations());
+      bus.emit('config.ui.translations.update', {translations: self.getTranslations()});
     });
   });
 };

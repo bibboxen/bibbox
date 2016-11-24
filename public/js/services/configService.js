@@ -47,13 +47,15 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
      * translations are refreshed.
      */
     proxyService.on('config.ui.translations.update', function (data) {
-      // Mark config as initialized, so the application can present the UI.
-      config.initialized = true;
-
       // Override translations.
       config.translations = data.translations;
 
+      // Mark config as initialized, so the application can present the UI.
+      config.initialized = true;
+
       $rootScope.$emit('config.translations.updated');
+
+      // Refresh translations.
       $translate.refresh();
     });
 
