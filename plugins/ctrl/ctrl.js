@@ -125,12 +125,12 @@ module.exports = function (options, imports, register) {
    */
   bus.on('ctrl.config.ui', function (data) {
     ctrl.getUiConfig().then(function (res) {
-      bus.emit(data.busEvent, res);
-    },
-    function (err) {
-      bus.emit('logger.err', 'CTRL: ' + err);
-      bus.emit(data.errorEvent, err);
-    });
+        bus.emit(data.busEvent, res);
+      },
+      function (err) {
+        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit(data.errorEvent, err);
+      });
   });
 
   /**
@@ -138,12 +138,12 @@ module.exports = function (options, imports, register) {
    */
   bus.on('ctrl.config.ui.translations', function (data) {
     ctrl.getTranslations().then(function (translations) {
-      bus.emit(data.busEvent, {translations: translations});
-    },
-    function (err) {
-      bus.emit('logger.err', 'CTRL: ' + err);
-      bus.emit(data.errorEvent, err);
-    });
+        bus.emit(data.busEvent, {translations: translations});
+      },
+      function (err) {
+        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit(data.errorEvent, err);
+      });
   });
 
   /**
@@ -151,12 +151,12 @@ module.exports = function (options, imports, register) {
    */
   bus.on('ctrl.config.notification', function (data) {
     ctrl.getNotificationConfig().then(function (config) {
-      bus.emit(data.busEvent, config);
-    },
-    function (err) {
-      bus.emit('logger.err', 'CTRL: ' + err);
-      bus.emit(data.errorEvent, err);
-    });
+        bus.emit(data.busEvent, config);
+      },
+      function (err) {
+        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit(data.errorEvent, err);
+      });
   });
 
   /**
@@ -164,12 +164,12 @@ module.exports = function (options, imports, register) {
    */
   bus.on('ctrl.config.fbs', function (data) {
     ctrl.getFBSConfig().then(function (config) {
-      bus.emit(data.busEvent, config);
-    },
-    function (err) {
-      bus.emit('logger.err', 'CTRL: ' + err);
-      bus.emit(data.errorEvent, err);
-    });
+        bus.emit(data.busEvent, config);
+      },
+      function (err) {
+        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit(data.errorEvent, err);
+      });
   });
 
   /**
@@ -185,11 +185,19 @@ module.exports = function (options, imports, register) {
         break;
 
       case 'config':
+        bus.once('storage.config.ui.saved', function () {
+          // Emit translation to client.
+          bus.emit('ctrl.config.ui', {
+            busEvent: 'config.ui.update',
+            errorEvent: 'config.ui.update.error'
+          });
+        });
+
         bus.emit('storage.save', {
           type: 'config',
           name: 'ui',
           obj: data.config.ui,
-          busEvent: 'storage.config.saved'
+          busEvent: 'storage.config.ui.saved'
         });
 
         // Save fbs config.
@@ -197,7 +205,7 @@ module.exports = function (options, imports, register) {
           type: 'config',
           name: 'fbs',
           obj: data.config.fbs,
-          busEvent: 'storage.config.saved'
+          busEvent: 'storage.config.fbs.saved'
         });
 
         // Save notification config.
@@ -205,11 +213,35 @@ module.exports = function (options, imports, register) {
           type: 'config',
           name: 'notification',
           obj: data.config.notification,
-          busEvent: 'storage.config.saved'
+          busEvent: 'storage.config.notification.saved'
         });
         break;
 
       case 'translations':
+        var numberOfSaves = 0;
+        var numberOfLanguages = Object.keys(data.translations.ui).length;
+
+        // Detect saves.
+        bus.on('storage.translation.ui.saved', function () {
+          numberOfSaves++;
+
+          // Only send translations when all files have been saved.
+          if (numberOfSaves === numberOfLanguages) {
+            // @TODO: Why is the timeout necessary? Is it i18n?
+            setTimeout(
+              function () {
+                // Emit translation to client.
+                bus.emit('ctrl.config.ui.translations', {
+                  busEvent: 'config.ui.translations.update',
+                  errorEvent: 'config.ui.translations.error'
+                });
+              }
+            , 1000);
+
+            bus.off('storage.translation.ui.saved', this);
+          }
+        });
+
         // Save ui translation strings.
         if (data.translations.hasOwnProperty('ui')) {
           for (var key in data.translations.ui) {
@@ -217,7 +249,7 @@ module.exports = function (options, imports, register) {
               type: 'locales',
               name: 'ui/' + key,
               obj: data.translations.ui[key],
-              busEvent: 'storage.translation.saved'
+              busEvent: 'storage.translation.ui.saved'
             });
           }
         }
@@ -229,13 +261,10 @@ module.exports = function (options, imports, register) {
               type: 'locales',
               name: 'notifications/' + key,
               obj: data.translations.notification[key],
-              busEvent: 'storage.translation.saved'
+              busEvent: 'storage.translation.notifications.saved'
             });
           }
         }
-
-        // @TODO: Emit translations to UI.
-
         break;
     }
   });

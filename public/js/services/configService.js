@@ -19,6 +19,11 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
       // Mark config as initialized, so the application can present the UI.
       config.initialized = true;
 
+      // Make sure features and languages are completely replaced.
+      // @TODO: Find more elegant solution.
+      config.features = [];
+      config.languages = [];
+
       angular.merge(config, data);
 
       // Update idle timeouts
@@ -45,7 +50,9 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
       // Mark config as initialized, so the application can present the UI.
       config.initialized = true;
 
-      angular.merge(config, data);
+      // Override translations.
+      config.translations = data.translations;
+
       $rootScope.$emit('config.translations.updated');
       $translate.refresh();
     });
