@@ -178,66 +178,68 @@ module.exports = function (options, imports, register) {
    * This is done via the process communication with the bootstrap process that
    * has forked this app.
    */
-  if (process.send) {
-    process.on('message', function (data) {
-      switch (data.command) {
-        case 'reloadUi':
-          bus.emit('frontend.reload');
-          break;
+  process.on('message', function (data) {
+    switch (data.command) {
+      case 'reloadUi':
+        bus.emit('frontend.reload');
+        break;
 
-        case 'config':
-          bus.emit('storage.save', {
-            type: 'config',
-            name: 'ui',
-            obj: data.config.ui,
-            busEvent: 'storage.config.saved'
-          });
+      case 'config':
+        bus.emit('storage.save', {
+          type: 'config',
+          name: 'ui',
+          obj: data.config.ui,
+          busEvent: 'storage.config.saved'
+        });
 
-          // Save fbs config.
-          bus.emit('storage.save', {
-            type: 'config',
-            name: 'fbs',
-            obj: data.config.fbs,
-            busEvent: 'storage.config.saved'
-          });
+        // Save fbs config.
+        bus.emit('storage.save', {
+          type: 'config',
+          name: 'fbs',
+          obj: data.config.fbs,
+          busEvent: 'storage.config.saved'
+        });
 
-          // Save notification config.
-          bus.emit('storage.save', {
-            type: 'config',
-            name: 'notification',
-            obj: data.config.notification,
-            busEvent: 'storage.config.saved'
-          });
-          break;
+        // Save notification config.
+        bus.emit('storage.save', {
+          type: 'config',
+          name: 'notification',
+          obj: data.config.notification,
+          busEvent: 'storage.config.saved'
+        });
+        break;
 
-        case 'translations':
-          // Save ui translation strings.
-          if (data.translations.hasOwnProperty('ui')) {
-            for (var key in req.body.ui) {
-              bus.emit('storage.save', {
-                type: 'locales',
-                name: 'ui/' + key,
-                obj: data.translations.ui[key],
-                busEvent: 'storage.translation.saved'
-              });
-            }
+      case 'translations':
+        // Save ui translation strings.
+        if (data.translations.hasOwnProperty('ui')) {
+          for (var key in data.translations.ui) {
+            bus.emit('storage.save', {
+              type: 'locales',
+              name: 'ui/' + key,
+              obj: data.translations.ui[key],
+              busEvent: 'storage.translation.saved'
+            });
           }
+        }
 
-          // Save notification translation strings.
-          if (data.translations.hasOwnProperty('notification')) {
-            for (var key in req.body.notification) {
-              bus.emit('storage.save', {
-                type: 'locales',
-                name: 'notifications/' + key,
-                obj: data.translations.notification[key],
-                busEvent: 'storage.translation.saved'
-              });
-            }
+        // Save notification translation strings.
+        if (data.translations.hasOwnProperty('notification')) {
+          for (var key in data.translations.notification) {
+            bus.emit('storage.save', {
+              type: 'locales',
+              name: 'notifications/' + key,
+              obj: data.translations.notification[key],
+              busEvent: 'storage.translation.saved'
+            });
           }
-          break;
-      }
-    });
-  }
+        }
+
+        // @TODO: Emit translations to UI.
+
+        break;
+    }
+  });
+
 
   register(null, {
     ctrl: ctrl

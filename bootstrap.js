@@ -39,156 +39,18 @@ var Bootstrap = function Bootstrap() {
       res.writeHead(200);
       url = UrlParser.parse(url);
 
-      /**
-       * Restart NodeJS application.
-       */
-      switch (url.pathname) {
-        case '/restart/application':
-          self.restartApp().then(function () {
-            res.write(JSON.stringify({
-              pid: self.bibbox.pid,
-              status: 'running'
-            }));
-            res.end();
-
-          }, function (err) {
-            res.write(JSON.stringify({
-              pid: 0,
-              status: 'stopped',
-              error: err.message
-            }));
-            res.end();
-          });
-
-          break;
-
-        /**
-         * Send reload event to the UI.
-         */
-        case '/restart/ui':
-          self.bibbox.send({
-            command: 'reloadUi'
-          });
+      if (req.method == 'POST') {
+        self.parseBody(req).then(function (body) {
+          self.handleRequest(req, res, url, body);
+        }, function (err) {
           res.write(JSON.stringify({
-            status: 'Reload sent',
+            error: err
           }));
           res.end();
-          break;
-
-        /**
-         * Update based on pull from github.
-         *
-         * @query version
-         *   String with the tag to checkout.
-         */
-        case '/update/pull':
-          var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
-          if (query.hasOwnProperty('version')) {
-            self.updateApp(query.version).then(function () {
-              self.getVersion().then(function (version) {
-                res.write(JSON.stringify({
-                  version: version
-                }));
-                res.end();
-              }, function (err) {
-                res.write(JSON.stringify({
-                  error: err
-                }));
-                res.end();
-              });
-            }, function (err) {
-              res.write(JSON.stringify({
-                error: err.message
-              }));
-              res.end();
-            });
-          }
-          else {
-            res.write(JSON.stringify({
-              error: 'Missing version in query string'
-            }));
-            res.end();
-          }
-          break;
-
-        /**
-         * Update based on release file.
-         *
-         * @query url
-         *   String with URL to release file on github.
-         */
-        case '/update/download':
-          var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
-          if (query.hasOwnProperty('url')) {
-
-          }
-          else {
-            res.write(JSON.stringify({
-              error: 'Missing file in query string'
-            }));
-            res.end();
-          }
-          break;
-
-        case '/config':
-          self.bibbox.send({
-            command: 'config',
-            config: req.body
-          });
-          res.write(JSON.stringify({
-            status: 'Config sent',
-          }));
-          res.end();
-          break;
-
-        case '/translations':
-          self.bibbox.send({
-            command: 'config',
-            translations: req.body
-          });
-          res.write(JSON.stringify({
-            status: 'Config sent',
-          }));
-          res.end();
-          break;
-
-        /**
-         * Alive (last sean and version).
-         */
-        case '/alive':
-          if (self.bibbox) {
-            self.getVersion().then(function (version) {
-              res.write(JSON.stringify({
-                status: 'running',
-                pid: self.bibbox.pid,
-                version: version,
-                time: Math.round(self.alive / 1000)
-              }));
-              res.end();
-            }, function (err) {
-              res.write(JSON.stringify({
-                status: 'running',
-                pid: self.bibbox.pid,
-                version: err,
-                time: Math.round(self.alive / 1000)
-              }));
-              res.end();
-            });
-          }
-          else {
-            res.write(JSON.stringify({
-              status: 'stopped',
-              pid: 0,
-              time: Math.round(self.alive / 1000)
-            }));
-            res.end();
-          }
-          break;
-
-        default:
-          res.write('Hello World!');
-          res.end();
-          break;
+        });
+      }
+      else {
+        self.handleRequest(req, res, url);
       }
     }
     else {
@@ -206,6 +68,207 @@ var Bootstrap = function Bootstrap() {
 var eventEmitter = require('events').EventEmitter;
 var util = require('util');
 util.inherits(Bootstrap, eventEmitter);
+
+Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) {
+  var self = this;
+
+  body = body || false;
+
+  /**
+   * Restart NodeJS application.
+   */
+  switch (url.pathname) {
+    case '/restart/application':
+      self.restartApp().then(function () {
+        res.write(JSON.stringify({
+          pid: self.bibbox.pid,
+          status: 'running'
+        }));
+        res.end();
+
+      }, function (err) {
+        res.write(JSON.stringify({
+          pid: 0,
+          status: 'stopped',
+          error: err.message
+        }));
+        res.end();
+      });
+
+      break;
+
+    /**
+     * Send reload event to the UI.
+     */
+    case '/restart/ui':
+      self.bibbox.send({
+        command: 'reloadUi'
+      });
+      res.write(JSON.stringify({
+        status: 'Reload sent',
+      }));
+      res.end();
+      break;
+
+    /**
+     * Update based on pull from github.
+     *
+     * @query version
+     *   String with the tag to checkout.
+     */
+    case '/update/pull':
+      var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
+      if (query.hasOwnProperty('version')) {
+        self.updateApp(query.version).then(function () {
+          self.getVersion().then(function (version) {
+            res.write(JSON.stringify({
+              version: version
+            }));
+            res.end();
+          }, function (err) {
+            res.write(JSON.stringify({
+              error: err
+            }));
+            res.end();
+          });
+        }, function (err) {
+          res.write(JSON.stringify({
+            error: err.message
+          }));
+          res.end();
+        });
+      }
+      else {
+        res.write(JSON.stringify({
+          error: 'Missing version in query string'
+        }));
+        res.end();
+      }
+      break;
+
+    /**
+     * Update based on release file.
+     *
+     * @query url
+     *   String with URL to release file on github.
+     */
+    case '/update/download':
+      var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
+      if (query.hasOwnProperty('url')) {
+
+      }
+      else {
+        res.write(JSON.stringify({
+          error: 'Missing file in query string'
+        }));
+        res.end();
+      }
+      break;
+
+    /**
+     * Send update config to bibbox.
+     */
+    case '/config':
+      self.bibbox.send({
+        command: 'config',
+        config: body
+      });
+      res.write(JSON.stringify({
+        status: 'Config sent',
+      }));
+      res.end();
+      break;
+
+    /**
+     * Send update translations to bibbox.
+     */
+    case '/translations':
+      self.bibbox.send({
+        command: 'translations',
+        translations: body
+      });
+      res.write(JSON.stringify({
+        status: 'Config sent',
+      }));
+      res.end();
+      break;
+
+    /**
+     * Alive (last sean and version).
+     */
+    case '/alive':
+      if (self.bibbox) {
+        self.getVersion().then(function (version) {
+          res.write(JSON.stringify({
+            status: 'running',
+            pid: self.bibbox.pid,
+            version: version,
+            time: Math.round(self.alive / 1000)
+          }));
+          res.end();
+        }, function (err) {
+          res.write(JSON.stringify({
+            status: 'running',
+            pid: self.bibbox.pid,
+            version: err,
+            time: Math.round(self.alive / 1000)
+          }));
+          res.end();
+        });
+      }
+      else {
+        res.write(JSON.stringify({
+          status: 'stopped',
+          pid: 0,
+          time: Math.round(self.alive / 1000)
+        }));
+        res.end();
+      }
+      break;
+
+    default:
+      res.write('Hello World!');
+      res.end();
+      break;
+  }
+};
+
+/**
+ * Parse POST request body.
+ *
+ * @param req
+ *   Request object.
+ *
+ * @returns {*|promise}
+ *   Resolved if parsed else rejected.
+ */
+Bootstrap.prototype.parseBody = function parseBody(req) {
+  var deferred = Q.defer();
+
+  var body = '';
+
+  req.on('data', function (data) {
+    body += data;
+
+    // Too much POST data, kill the connection!
+    // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
+    if (body.length > 1e6) {
+      req.connection.destroy();
+      deferred.reject('Killed');
+    }
+  });
+
+  req.on('end', function () {
+    if (body === '') {
+      deferred.resolve();
+    }
+    else {
+      deferred.resolve(JSON.parse(body));
+    }
+  });
+
+  return deferred.promise;
+};
 
 /**
  * Get remote IP.
