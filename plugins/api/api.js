@@ -15,7 +15,7 @@
  * @constructor
  */
 var API = function (app, options, bus) {
-  // Default get request.
+/*  // Default get request.
   app.get('/api', function (req, res) {
     res.status(501).send('Please see documentation about using this api.');
   });
@@ -89,7 +89,7 @@ var API = function (app, options, bus) {
   app.post('/api/restart_node', function (req, res) {
     console.log(req.body);
     res.status(200).send('Restart Node!');
-  });
+  });*/
 };
 
 
