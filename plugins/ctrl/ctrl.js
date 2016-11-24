@@ -185,36 +185,43 @@ module.exports = function (options, imports, register) {
         break;
 
       case 'config':
-        bus.once('storage.config.ui.saved', function () {
-          // Emit translation to client.
-          bus.emit('ctrl.config.ui', {
-            busEvent: 'config.ui.update',
-            errorEvent: 'config.ui.update.error'
+        if (data.config.hasOwnProperty('ui')) {
+          bus.once('storage.config.ui.saved', function () {
+            // Emit translation to client.
+            bus.emit('ctrl.config.ui', {
+              busEvent: 'config.ui.update',
+              errorEvent: 'config.ui.update.error'
+            });
           });
-        });
 
-        bus.emit('storage.save', {
-          type: 'config',
-          name: 'ui',
-          obj: data.config.ui,
-          busEvent: 'storage.config.ui.saved'
-        });
+          // Save UI configuration.
+          bus.emit('storage.save', {
+            type: 'config',
+            name: 'ui',
+            obj: data.config.ui,
+            busEvent: 'storage.config.saved'
+          });
+        }
 
-        // Save fbs config.
-        bus.emit('storage.save', {
-          type: 'config',
-          name: 'fbs',
-          obj: data.config.fbs,
-          busEvent: 'storage.config.fbs.saved'
-        });
+        if (data.config.hasOwnProperty('fbs')) {
+          // Save fbs config.
+          bus.emit('storage.save', {
+            type: 'config',
+            name: 'fbs',
+            obj: data.config.fbs,
+            busEvent: 'storage.config.saved'
+          });
+        }
 
-        // Save notification config.
-        bus.emit('storage.save', {
-          type: 'config',
-          name: 'notification',
-          obj: data.config.notification,
-          busEvent: 'storage.config.notification.saved'
-        });
+        if (data.config.hasOwnProperty('notification')) {
+          // Save notification config.
+          bus.emit('storage.save', {
+            type: 'config',
+            name: 'notification',
+            obj: data.config.notification,
+            busEvent: 'storage.config.saved'
+          });
+        }
         break;
 
       case 'translations':

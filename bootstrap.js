@@ -14,6 +14,9 @@ var queryString = require('querystring');
 var config = require(__dirname + '/config.json');
 var Q = require('q');
 
+var fs = require('fs');
+var https = require('https');
+
 var rfid_debug = process.env.RFID_DEBUG || false;
 
 var Bootstrap = function Bootstrap() {
@@ -21,9 +24,6 @@ var Bootstrap = function Bootstrap() {
   this.bibbox = null;
   this.rfidApp = null;
   this.alive = 0;
-
-  var https = require('https');
-  var fs = require('fs');
 
   var options = {
     key: fs.readFileSync(__dirname + '/' + config.bootstrap.ssl.key),
@@ -39,6 +39,8 @@ var Bootstrap = function Bootstrap() {
       res.writeHead(200);
       url = UrlParser.parse(url);
 
+      // Check if this is a post request, if it is parse the request an wait for
+      // the data.
       if (req.method == 'POST') {
         self.parseBody(req).then(function (body) {
           self.handleRequest(req, res, url, body);
@@ -69,6 +71,21 @@ var eventEmitter = require('events').EventEmitter;
 var util = require('util');
 util.inherits(Bootstrap, eventEmitter);
 
+/**
+ * Handler for the request.
+ *
+ * This is used after the body have been parsed into JSON, if it was a post
+ * request.
+ *
+ * @param req
+ *  HTTP request object.
+ * @param res
+ *  HTTP response object.
+ * @param url
+ *   The URL the request came in on.
+ * @param body
+ *   The body pay-load as JSON, if post request else undefined.
+ */
 Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) {
   var self = this;
 
@@ -106,6 +123,17 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       });
       res.write(JSON.stringify({
         status: 'Reload sent',
+      }));
+      res.end();
+      break;
+
+    /**
+     * Send reboot computer.
+     */
+    case '/reboot':
+      spawn('/sbin/reboot');
+      res.write(JSON.stringify({
+        status: 'Reboot started',
       }));
       res.end();
       break;
@@ -155,7 +183,22 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
     case '/update/download':
       var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
       if (query.hasOwnProperty('url')) {
+        var dest = '';
 
+        downloadFile(query.url, dest, function () {
+          // Unpack file
+
+          // Check dir
+
+          // Update symlink.
+
+
+
+
+
+
+
+        })
       }
       else {
         res.write(JSON.stringify({
@@ -231,6 +274,34 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       res.end();
       break;
   }
+};
+
+/**
+ * Down load file over https.
+ *
+ * @param url
+ *   Url to download
+ * @param dest
+ *   Where to download the file.
+ * @param cb
+ *   Callback when downloaded.
+ */
+Bootstrap.prototype.downnloadFile = function downloadFile(url, dest, cb) {
+  var file = fs.createWriteStream(dest);
+  https.get(url, function(response) {
+    response.pipe(file);
+    file.on('finish', function() {
+      // close() is async, call cb after close completes.
+      file.close(cb);
+    });
+  }).on('error', function(err) {
+    // Delete the file async. (But we don't check the result)
+    fs.unlink(dest);
+
+    if (cb) {
+      cb(err);
+    }
+  });
 };
 
 /**
@@ -331,7 +402,9 @@ Bootstrap.prototype.restartApp = function restartApp() {
 
   Q.all([
     self.stopApp(),
-    self.startApp()
+    self.startApp(),
+    self.stopRRID(),
+    self.startRFID()
   ]).then(function () {
     deferred.resolve();
   }).catch(function (err) {
@@ -356,7 +429,7 @@ Bootstrap.prototype.startApp = function startApp() {
 
   // Start RFID java application.
   if (!rfid_debug) {
-    this.rfidApp = fork(__dirname + '/start_rfid.sh');
+    this.rfidApp = spawn(__dirname + '/start_rfid.sh');
     debug('Started new rfid application with pid: ' + this.rfidApp.pid);
   }
 
@@ -390,6 +463,37 @@ Bootstrap.prototype.startApp = function startApp() {
 };
 
 /**
+ * Start the RFID application as a new process.
+ *
+ * @return promise
+ *   Resolves if stated.
+ */
+Bootstrap.prototype.startRFID = function startRFID() {
+  var deferred = Q.defer();
+
+  // Event handler for startup errors.
+  function startupError(code) {
+    debug('RFID not started exit code: ' + app.exitCode);
+
+    deferred.reject(app.exitCode);
+  }
+
+  if (!rfid_debug) {
+    var app = spawn(__dirname + '/start_rfid.sh');
+    debug('Started new rfid application with pid: ' + app.pid);
+
+    app.once('close', startupError);
+  }
+  else {
+    debug('RFID not started in DEBUG mode.')
+  }
+
+  deferred.resolve();
+
+  return deferred.promise;
+};
+
+/**
  * Stop the application.
  *
  * @return promise
@@ -413,23 +517,44 @@ Bootstrap.prototype.stopApp = function stopApp() {
     deferred.resolve();
   });
 
-  // Handle close event.
-  if (this.rfidApp) {
-    this.rfidApp.on('close', function (code) {
-      debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
-    });
-  }
-
-  if (this.rfidApp) {
-    this.rfidApp.kill('SIGTERM');
-  }
-
   // Kill the application.
   this.bibbox.kill('SIGTERM');
 
   return deferred.promise;
 };
 
+/**
+ * Stop the RFID application.
+ *
+ * @return promise
+ *   Resolves if app have been closed.
+ */
+Bootstrap.prototype.stopRRID = function stopRFID() {
+  var deferred = Q.defer();
+
+  debug('Stop RFID');
+
+  if (!rfid_debug) {
+    this.rfidApp.on('error', function (err) {
+      debug('Error: ' + err.message);
+      deferred.reject(err);
+    });
+
+    this.rfidApp.on('close', function (code) {
+      debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
+
+      deferred.resolve();
+    });
+
+    this.rfidApp.kill('SIGTERM');
+  }
+  else {
+    debug('RFID not stopped, as we are in DEBUG mode.');
+    deferred.resolve();
+  }
+
+  return deferred.promise;
+};
 
 /**
  * Pull version form git-hub and restart application.
@@ -465,6 +590,7 @@ Bootstrap.prototype.updateApp = function updateApp(version) {
 // Get the show on the road.
 var bs = new Bootstrap();
 bs.startApp();
+bs.startRFID();
 
 /**
  * Handle bootstrap process exit and errors.
@@ -478,6 +604,7 @@ function exitHandler(options, err) {
   }
   if (options.exit) {
     bs.stopApp();
+    bs.stopRRID();
     process.exit();
   }
 }
