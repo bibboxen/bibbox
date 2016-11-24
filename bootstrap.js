@@ -385,7 +385,9 @@ Bootstrap.prototype.restartApp = function restartApp() {
 
   Q.all([
     self.stopApp(),
-    self.startApp()
+    self.startApp(),
+    self.stopRRID(),
+    self.startRFID()
   ]).then(function () {
     deferred.resolve();
   }).catch(function (err) {
@@ -444,6 +446,37 @@ Bootstrap.prototype.startApp = function startApp() {
 };
 
 /**
+ * Start the RFID application as a new process.
+ *
+ * @return promise
+ *   Resolves if stated.
+ */
+Bootstrap.prototype.startRFID = function startRFID() {
+  var deferred = Q.defer();
+
+  if (!rfid_debug) {
+    var app = spawn(__dirname + '/start_rfid.sh');
+
+    debug('Started new rfid application with pid: ' + app.pid);
+
+    // Event handler for startup errors.
+    function startupError(code) {
+      debug('RFID not started exit code: ' + app.exitCode);
+
+      deferred.reject(app.exitCode);
+    }
+    app.once('close', startupError);
+  }
+  else {
+    debug('RFID not started in DEBUG mode.')
+  }
+
+  deferred.resolve();
+
+  return deferred.promise;
+};
+
+/**
  * Stop the application.
  *
  * @return promise
@@ -467,23 +500,44 @@ Bootstrap.prototype.stopApp = function stopApp() {
     deferred.resolve();
   });
 
-  // Handle close event.
-  if (this.rfidApp) {
-    this.rfidApp.on('close', function (code) {
-      debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
-    });
-  }
-
-  if (this.rfidApp) {
-    this.rfidApp.kill('SIGTERM');
-  }
-
   // Kill the application.
   this.bibbox.kill('SIGTERM');
 
   return deferred.promise;
 };
 
+/**
+ * Stop the RFID application.
+ *
+ * @return promise
+ *   Resolves if app have been closed.
+ */
+Bootstrap.prototype.stopRRID = function stopRFID() {
+  var deferred = Q.defer();
+
+  debug('Stop RFID');
+
+  if (!rfid_debug) {
+    this.rfidApp.on('error', function (err) {
+      debug('Error: ' + err.message);
+      deferred.reject(err);
+    });
+
+    this.rfidApp.on('close', function (code) {
+      debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
+
+      deferred.resolve();
+    });
+
+    this.rfidApp.kill('SIGTERM');
+  }
+  else {
+    debug('RFID not stopped, as we are in DEBUG mode.');
+    deferred.resolve();
+  }
+
+  return deferred.promise;
+};
 
 /**
  * Pull version form git-hub and restart application.
@@ -519,6 +573,7 @@ Bootstrap.prototype.updateApp = function updateApp(version) {
 // Get the show on the road.
 var bs = new Bootstrap();
 bs.startApp();
+bs.startRFID();
 
 /**
  * Handle bootstrap process exit and errors.
@@ -532,6 +587,7 @@ function exitHandler(options, err) {
   }
   if (options.exit) {
     bs.stopApp();
+    bs.stopRRID();
     process.exit();
   }
 }
