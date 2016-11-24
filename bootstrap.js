@@ -43,7 +43,7 @@ var Bootstrap = function Bootstrap() {
        * Restart NodeJS application.
        */
       switch (url.pathname) {
-        case '/restart':
+        case '/restart/application':
           self.restartApp().then(function () {
             res.write(JSON.stringify({
               pid: self.bibbox.pid,
@@ -60,6 +60,19 @@ var Bootstrap = function Bootstrap() {
             res.end();
           });
 
+          break;
+
+        /**
+         * Send reload event to the UI.
+         */
+        case '/restart/ui':
+          self.bibbox.send({
+            command: 'reloadUi'
+          });
+          res.write(JSON.stringify({
+            status: 'Reload sent',
+          }));
+          res.end();
           break;
 
         /**
@@ -115,6 +128,28 @@ var Bootstrap = function Bootstrap() {
             }));
             res.end();
           }
+          break;
+
+        case '/config':
+          self.bibbox.send({
+            command: 'config',
+            config: req.body
+          });
+          res.write(JSON.stringify({
+            status: 'Config sent',
+          }));
+          res.end();
+          break;
+
+        case '/translations':
+          self.bibbox.send({
+            command: 'config',
+            translations: req.body
+          });
+          res.write(JSON.stringify({
+            status: 'Config sent',
+          }));
+          res.end();
           break;
 
         /**
@@ -316,14 +351,17 @@ Bootstrap.prototype.stopApp = function stopApp() {
   });
 
   // Handle close event.
-  this.rfidApp.on('close', function (code) {
-    debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
+  if (this.rfidApp) {
+    this.rfidApp.on('close', function (code) {
+      debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
+    });
+  }
 
-    deferred.resolve();
-  });
+  if (this.rfidApp) {
+    this.rfidApp.kill('SIGTERM');
+  }
 
   // Kill the application.
-  this.rfidApp.kill('SIGTERM');
   this.bibbox.kill('SIGTERM');
 
   return deferred.promise;
