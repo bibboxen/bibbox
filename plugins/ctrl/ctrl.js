@@ -235,15 +235,13 @@ module.exports = function (options, imports, register) {
           // Only send translations when all files have been saved.
           if (numberOfSaves === numberOfLanguages) {
             // @TODO: Why is the timeout necessary? Is it i18n?
-            setTimeout(
-              function () {
-                // Emit translation to client.
-                bus.emit('ctrl.config.ui.translations', {
-                  busEvent: 'config.ui.translations.update',
-                  errorEvent: 'config.ui.translations.error'
-                });
-              }
-            , 1000);
+            setTimeout(function () {
+              // Emit translation to client.
+              bus.emit('ctrl.config.ui.translations', {
+                busEvent: 'config.ui.translations.update',
+                errorEvent: 'config.ui.translations.error'
+              });
+            }, 1000);
 
             bus.off('storage.translation.ui.saved', this);
           }
