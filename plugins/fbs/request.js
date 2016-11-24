@@ -220,13 +220,16 @@ Request.prototype.patronInformation = function patronInformation(patronId, patro
  *   Pin code/password for the patron.
  * @param itemIdentifier
  *   The item to checkout.
+ * @param checkedOutDate
+ *   Timestamp for the time that the item was checked out.
  * @param callback
  *   Function to call when completed request to FBS.
  */
-Request.prototype.checkout = function checkout(patronId, patronPassword, itemIdentifier, callback) {
+Request.prototype.checkout = function checkout(patronId, patronPassword, itemIdentifier, checkedOutDate, callback) {
   var self = this;
   var transactionDate = self.encodeTime();
-  var message = '11NN' + transactionDate + transactionDate + '|AO' + self.agency + '|AA' + patronId + '|AB' + itemIdentifier + '|AC|CH|AD' + patronPassword + '|';
+  var checkedOutDateEncoded = self.encodeTime(checkedOutDate);
+  var message = '11NN' + transactionDate + checkedOutDateEncoded + '|AO' + self.agency + '|AA' + patronId + '|AB' + itemIdentifier + '|AC|CH|AD' + patronPassword + '|';
 
   self.send(message, 'AO', callback);
 };
@@ -236,13 +239,16 @@ Request.prototype.checkout = function checkout(patronId, patronPassword, itemIde
  *
  * @param itemIdentifier
  *   The item to checkout.
+ * @param checkedInDate
+ *   Timestamp for the time that the item was returned.
  * @param callback
  *   Function to call when completed request to FBS.
  */
-Request.prototype.checkIn = function checkIn(itemIdentifier, callback) {
+Request.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate, callback) {
   var self = this;
   var transactionDate = self.encodeTime();
-  var message = '09N' + transactionDate + transactionDate + '|AP' + self.location + '|AO' + self.agency + '|AB' + itemIdentifier + '|AC|CH|';
+  var checkedInDateEncoded = self.encodeTime(checkedInDate);
+  var message = '09N' + transactionDate + checkedInDateEncoded + '|AP' + self.location + '|AO' + self.agency + '|AB' + itemIdentifier + '|AC|CH|';
 
   self.send(message, 'AO', callback);
 };

@@ -160,15 +160,17 @@ FBS.prototype.patronInformation = function patronInformation(username, password)
  *   The patrons password.
  * @param itemIdentifier
  *   The item to checkout.
+ * @param checkedOutDate
+ *   Timestamp for the time that the item was checked out.
  *
  * @return {*|promise}
  *   JSON object with information or error message on failure.
  */
-FBS.prototype.checkout = function checkout(username, password, itemIdentifier) {
+FBS.prototype.checkout = function checkout(username, password, itemIdentifier, checkedOutDate) {
   var deferred = Q.defer();
 
   var req = new Request(this.bus, this.config);
-  req.checkout(username, password, itemIdentifier, function (err, res) {
+  req.checkout(username, password, itemIdentifier, checkedOutDate, function (err, res) {
     if (err) {
       deferred.reject(err);
     }
@@ -185,15 +187,17 @@ FBS.prototype.checkout = function checkout(username, password, itemIdentifier) {
  *
  * @param itemIdentifier
  *   The item to checkout.
+ * @param checkedInDate
+ *   Timestamp for the time that the item was returned.
  *
  * @return {*|promise}
  *   JSON object with information or error message on failure.
  */
-FBS.prototype.checkIn = function checkIn(itemIdentifier) {
+FBS.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate) {
   var deferred = Q.defer();
 
   var req = new Request(this.bus, this.config);
-  req.checkIn(itemIdentifier, function (err, res) {
+  req.checkIn(itemIdentifier, checkedInDate, function (err, res) {
     if (err) {
       deferred.reject(err);
     }
@@ -364,9 +368,12 @@ module.exports = function (options, imports, register) {
     // Check if this is a processing of offline queue.
     data.queued = data.queued || false;
 
+    // Set checked-out date if not set.
+    data.checkedOutDate = data.checkedOutDate || new Date().getTime();
+
     // Create FBS object and send checkout request.
     FBS.create(bus).then(function (fbs) {
-      fbs.checkout(data.username, data.password, data.itemIdentifier).then(function (res) {
+      fbs.checkout(data.username, data.password, data.itemIdentifier, data.checkedOutDate).then(function (res) {
         bus.emit(data.busEvent, res);
       },
       function (err) {
@@ -395,7 +402,7 @@ module.exports = function (options, imports, register) {
             type: 'offline',
             name: file,
             obj: {
-              date: new Date().getTime(),
+              date: data.checkedInDate,
               action: 'checkout',
               username: data.username,
               password: data.password,
@@ -429,9 +436,12 @@ module.exports = function (options, imports, register) {
     // Check if this is a processing of offline queue.
     data.queued = data.queued || false;
 
+    // Set checked-in date if not set.
+    data.checkedInDate = data.checkedInDate || new Date().getTime();
+
     // Create FBS object and send check-in request.
     FBS.create(bus).then(function (fbs) {
-      fbs.checkIn(data.itemIdentifier).then(function (res) {
+      fbs.checkIn(data.itemIdentifier, data.checkedInDate).then(function (res) {
         bus.emit(data.busEvent, res);
       },
       function (err) {
@@ -461,7 +471,7 @@ module.exports = function (options, imports, register) {
             name: file,
             obj: {
               action: 'checkin',
-              date: new Date().getTime(),
+              date: data.checkedInDate,
               itemIdentifier: data.itemIdentifier
             },
             lockFile: true,
