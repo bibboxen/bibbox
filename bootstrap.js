@@ -14,9 +14,12 @@ var queryString = require('querystring');
 var config = require(__dirname + '/config.json');
 var Q = require('q');
 
+var rfid_debug = process.env.RFID_DEBUG || false;
+
 var Bootstrap = function Bootstrap() {
   var self = this;
   this.bibbox = null;
+  this.rfidApp = null;
   this.alive = 0;
 
   var https = require('https');
@@ -34,10 +37,13 @@ var Bootstrap = function Bootstrap() {
       debug('Requested url: "' + url + '" from: "' + ip + '" allowed');
       res.setHeader('Content-Type', 'application/json');
       res.writeHead(200);
-
       url = UrlParser.parse(url);
+
+      /**
+       * Restart NodeJS application.
+       */
       switch (url.pathname) {
-        case '/bootstrap/restart':
+        case '/restart':
           self.restartApp().then(function () {
             res.write(JSON.stringify({
               pid: self.bibbox.pid,
@@ -56,7 +62,13 @@ var Bootstrap = function Bootstrap() {
 
           break;
 
-        case '/bootstrap/update':
+        /**
+         * Update based on pull from github.
+         *
+         * @query version
+         *   String with the tag to checkout.
+         */
+        case '/update/pull':
           var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
           if (query.hasOwnProperty('version')) {
             self.updateApp(query.version).then(function () {
@@ -86,7 +98,29 @@ var Bootstrap = function Bootstrap() {
           }
           break;
 
-        case '/bootstrap/alive':
+        /**
+         * Update based on release file.
+         *
+         * @query url
+         *   String with URL to release file on github.
+         */
+        case '/update/download':
+          var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
+          if (query.hasOwnProperty('url')) {
+
+          }
+          else {
+            res.write(JSON.stringify({
+              error: 'Missing file in query string'
+            }));
+            res.end();
+          }
+          break;
+
+        /**
+         * Alive (last sean and version).
+         */
+        case '/alive':
           if (self.bibbox) {
             self.getVersion().then(function (version) {
               res.write(JSON.stringify({
@@ -222,6 +256,12 @@ Bootstrap.prototype.startApp = function startApp() {
   var app = fork(__dirname + '/app.js');
   debug('Started new application with pid: ' + app.pid);
 
+  // Start RFID java application.
+  if (!rfid_debug) {
+    this.rfidApp = fork(__dirname + '/start_rfid.sh');
+    debug('Started new rfid application with pid: ' + this.rfidApp.pid);
+  }
+
   // Event handler for startup errors.
   function startupError(code) {
     debug('Bibbox not started exit code: ' + app.exitCode);
@@ -275,7 +315,15 @@ Bootstrap.prototype.stopApp = function stopApp() {
     deferred.resolve();
   });
 
+  // Handle close event.
+  this.rfidApp.on('close', function (code) {
+    debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
+
+    deferred.resolve();
+  });
+
   // Kill the application.
+  this.rfidApp.kill('SIGTERM');
   this.bibbox.kill('SIGTERM');
 
   return deferred.promise;
