@@ -13,13 +13,24 @@ var i18n = require('i18n');
  * This object encapsulates translation.
  */
 var Translation = function (bus, paths, languages) {
+  var self = this;
+
   // Configure I18N with supported languages.
+  var directory = __dirname + '/../../' + paths.base + '/' + paths.translations + '/ui';
   i18n.configure({
     locales: languages.locales,
     defaultLocale: languages.defaultLocale,
     indent: '  ',
     autoReload: true,
-    directory: __dirname + '/../../' + paths.base + '/' + paths.translations + '/ui'
+    directory: directory
+  });
+
+  // Watch for changes in the translations files and send them in next tick to
+  // give n18l an change to reload..
+  fs.watch(directory, function(event, filename) {
+    process.nextTick(function () {
+      bus.emit('config.ui.translations.update', self.getTranslations());
+    });
   });
 };
 

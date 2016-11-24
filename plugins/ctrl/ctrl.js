@@ -106,8 +106,9 @@ CTRL.prototype.getTranslations = function getTranslations() {
       deferred.resolve(data);
     }
   });
-  this.bus.emit('translations.request', {busEvent: 'translations.request.languages'});
-
+  this.bus.emit('translations.request', {
+    busEvent: 'translations.request.languages'
+  });
 
   return deferred.promise;
 };
