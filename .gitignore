@@ -8,5 +8,12 @@ logs/*.*.*
 coverage
 files/offline/*.json
 files/config/fbs.json
+files/config/notification.json
+files/config/ui.json
+files/locales/ui/*
+files/locales/translations/*
+!files/locales/ui/example.*
+!files/locales/translations/example.*
+*.pem
 *.key
 *.crt
