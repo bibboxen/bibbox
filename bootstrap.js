@@ -128,6 +128,17 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       break;
 
     /**
+     * Send reboot computer.
+     */
+    case '/reboot':
+      spawn('/sbin/reboot');
+      res.write(JSON.stringify({
+        status: 'Reboot started',
+      }));
+      res.end();
+      break;
+
+    /**
      * Update based on pull from github.
      *
      * @query version
@@ -180,6 +191,12 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
           // Check dir
 
           // Update symlink.
+
+
+
+
+
+
 
         })
       }
@@ -454,17 +471,17 @@ Bootstrap.prototype.startApp = function startApp() {
 Bootstrap.prototype.startRFID = function startRFID() {
   var deferred = Q.defer();
 
+  // Event handler for startup errors.
+  function startupError(code) {
+    debug('RFID not started exit code: ' + app.exitCode);
+
+    deferred.reject(app.exitCode);
+  }
+
   if (!rfid_debug) {
     var app = spawn(__dirname + '/start_rfid.sh');
-
     debug('Started new rfid application with pid: ' + app.pid);
 
-    // Event handler for startup errors.
-    function startupError(code) {
-      debug('RFID not started exit code: ' + app.exitCode);
-
-      deferred.reject(app.exitCode);
-    }
     app.once('close', startupError);
   }
   else {
