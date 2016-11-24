@@ -32,7 +32,11 @@
       "^fbs.block.[\\w]+$",
       "^fbs.online.[\\w]+$",
       "^notification.response$",
-      "^notification.error$"
+      "^notification.error$",
+      "^config.ui.update$",
+      "^config.ui.update.error$",
+      "^config.ui.translations.update$",
+      "^config.ui.translations.error$"
     ],
     "whitelistedSocketEvents": [
       "^rfid.tags.request$",
@@ -53,11 +57,7 @@
       "^notification.checkIn$",
       "^notification.checkInOffline$",
       "^notification.checkOut$",
-      "^notification.checkOutOffline$",
-      "^config.ui.update$",
-      "^config.ui.update.error$",
-      "^config.ui.translations.update$",
-      "^config.ui.translations.error$"
+      "^notification.checkOutOffline$"
     ]
   },
   "ctrl": {
