@@ -39,9 +39,6 @@ var plugins = [
     packagePath: './plugins/network'
   },
   {
-    packagePath: './plugins/api'
-  },
-  {
     packagePath: './plugins/barcode',
     pid: config.barcode.pid,
     vid: config.barcode.vid

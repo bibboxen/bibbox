@@ -39,6 +39,10 @@
   ],
   "display_more_materials": false,
   "display_fines": true,
+  "login": {
+    "allow_scan": true,
+    "allow_manual": true
+  },
   "timeout": {
     "idleTimeout": 15,
     "idleWarn": 7

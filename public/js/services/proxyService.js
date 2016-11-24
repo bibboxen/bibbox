@@ -3,8 +3,8 @@
  * proxyService for communication with backend.
  */
 
-angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location', '$route',
-  function ($rootScope, $q, $location, $route) {
+angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location', '$window',
+  function ($rootScope, $q, $location, $window) {
     'use strict';
 
     /**
@@ -104,7 +104,7 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
       // Reloads the browser on the 'frontend.reload' event.
       socket.on('frontend.reload', function () {
         $location.path('/');
-        $route.reload();
+        $window.location.reload();
       });
     };
 
