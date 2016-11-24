@@ -14,6 +14,9 @@ var queryString = require('querystring');
 var config = require(__dirname + '/config.json');
 var Q = require('q');
 
+var fs = require('fs');
+var https = require('https');
+
 var rfid_debug = process.env.RFID_DEBUG || false;
 
 var Bootstrap = function Bootstrap() {
@@ -21,9 +24,6 @@ var Bootstrap = function Bootstrap() {
   this.bibbox = null;
   this.rfidApp = null;
   this.alive = 0;
-
-  var https = require('https');
-  var fs = require('fs');
 
   var options = {
     key: fs.readFileSync(__dirname + '/' + config.bootstrap.ssl.key),
@@ -155,7 +155,16 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
     case '/update/download':
       var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
       if (query.hasOwnProperty('url')) {
+        var dest = '';
 
+        downloadFile(query.url, dest, function () {
+          // Unpack file
+
+          // Check dir
+
+          // Update symlink.
+
+        })
       }
       else {
         res.write(JSON.stringify({
@@ -231,6 +240,34 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       res.end();
       break;
   }
+};
+
+/**
+ * Down load file over https.
+ *
+ * @param url
+ *   Url to download
+ * @param dest
+ *   Where to download the file.
+ * @param cb
+ *   Callback when downloaded.
+ */
+Bootstrap.prototype.downnloadFile = function downloadFile(url, dest, cb) {
+  var file = fs.createWriteStream(dest);
+  https.get(url, function(response) {
+    response.pipe(file);
+    file.on('finish', function() {
+      // close() is async, call cb after close completes.
+      file.close(cb);
+    });
+  }).on('error', function(err) {
+    // Delete the file async. (But we don't check the result)
+    fs.unlink(dest);
+
+    if (cb) {
+      cb(err);
+    }
+  });
 };
 
 /**
@@ -356,7 +393,7 @@ Bootstrap.prototype.startApp = function startApp() {
 
   // Start RFID java application.
   if (!rfid_debug) {
-    this.rfidApp = fork(__dirname + '/start_rfid.sh');
+    this.rfidApp = spawn(__dirname + '/start_rfid.sh');
     debug('Started new rfid application with pid: ' + this.rfidApp.pid);
   }
 
