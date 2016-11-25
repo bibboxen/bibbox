@@ -183,10 +183,15 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
     case '/update/download':
       var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
       if (query.hasOwnProperty('url')) {
-        var dest = '';
+        var urlParser = require('url');
+        var path = require('path');
+        var dest = __dirname + '/../' + path.basename(urlParser.parse(query.url).pathname);
 
-        downloadFile(query.url, dest, function () {
+        self.downloadFile(query.url, dest).then(function (file) {
+          console.log(file);
+
           // Unpack file
+          var tar = spawn('tar', ['zxf', file, __dirname + '/../']);
 
           // Check dir
 
@@ -197,12 +202,15 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
 
 
 
-
+          res.end();
+        },
+        function (err) {
+          console.log(err);
         })
       }
       else {
         res.write(JSON.stringify({
-          error: 'Missing file in query string'
+          error: 'Missing url in query string'
         }));
         res.end();
       }
@@ -283,25 +291,28 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
  *   Url to download
  * @param dest
  *   Where to download the file.
- * @param cb
- *   Callback when downloaded.
+ *
+ * @returns {*|promise}
  */
-Bootstrap.prototype.downnloadFile = function downloadFile(url, dest, cb) {
+Bootstrap.prototype.downloadFile = function downloadFile(url, dest) {
+  var deferred = Q.defer();
   var file = fs.createWriteStream(dest);
-  https.get(url, function(response) {
-    response.pipe(file);
-    file.on('finish', function() {
-      // close() is async, call cb after close completes.
-      file.close(cb);
-    });
-  }).on('error', function(err) {
-    // Delete the file async. (But we don't check the result)
-    fs.unlink(dest);
+  var request = require('request');
 
-    if (cb) {
-      cb(err);
-    }
+  file.on('finish', function() {
+    file.close();
+    deferred.resolve(dest);
   });
+
+  request({
+    followAllRedirects: true,
+    method: 'get',
+    url: url
+  }).on('error', function (err) {
+    deferred.reject(err);
+  }).pipe(file);
+
+  return deferred.promise;
 };
 
 /**
@@ -479,7 +490,7 @@ Bootstrap.prototype.startRFID = function startRFID() {
   }
 
   if (!rfid_debug) {
-    var app = spawn(__dirname + '/start_rfid.sh');
+    var app = spawn('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/feig; cd ' + __dirname + '/plugins/rfid/device; java -jar rfid.jar');
     debug('Started new rfid application with pid: ' + app.pid);
 
     app.once('close', startupError);
