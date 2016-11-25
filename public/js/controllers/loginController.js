@@ -133,12 +133,10 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
     /**
      * Barcode result handler.
      *
-     * @param event
-     *   The event.
      * @param data
      *   The barcode scanned.
      */
-    $scope.barcodeScanned = function barcodeScanned(event, data) {
+    $scope.barcodeScanned = function barcodeScanned(data) {
       if ($scope.display === 'start') {
         $scope.user.username = data;
         $scope.usernameEntered();
@@ -148,14 +146,12 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
     /**
      * Barcode error handler.
      *
-     * @param event
-     *   The event.
      * @param err
      *   The error thrown.
      */
-    $scope.barcodeError = function barcodeError(event, err) {
+    $scope.barcodeError = function barcodeError(err) {
       // @TODO: inform user that barcode as failed and switch to manual.
-      console.log('barcodeError', event, err);
+      console.log('barcodeError', err);
     };
 
     // Start listen to barcode events.
