@@ -516,20 +516,25 @@ Bootstrap.prototype.stopApp = function stopApp() {
 
   debug('Stop BibBox');
 
-  this.bibbox.on('error', function (err) {
-    debug('Error: ' + err.message);
-    deferred.reject(err);
-  });
+  if (this.bibbox) {
+    this.bibbox.on('error', function (err) {
+      debug('Error: ' + err.message);
+      deferred.reject(err);
+    });
 
-  // Handle close event.
-  this.bibbox.on('close', function (code) {
-    debug('Stopped application with pid: ' + self.bibbox.pid + ' and exit code: ' + self.bibbox.exitCode);
+    // Handle close event.
+    this.bibbox.on('close', function (code) {
+      debug('Stopped application with pid: ' + self.bibbox.pid + ' and exit code: ' + self.bibbox.exitCode);
 
-    deferred.resolve();
-  });
+      deferred.resolve();
+    });
 
-  // Kill the application.
-  this.bibbox.kill('SIGTERM');
+    // Kill the application.
+    this.bibbox.kill('SIGTERM');
+  }
+  else {
+    deferred.resolve('Not running').
+  }
 
   return deferred.promise;
 };
@@ -545,23 +550,28 @@ Bootstrap.prototype.stopRRID = function stopRFID() {
 
   debug('Stop RFID');
 
-  if (!rfid_debug) {
-    this.rfidApp.on('error', function (err) {
-      debug('Error: ' + err.message);
-      deferred.reject(err);
-    });
+  if (this.rfidApp) {
+    if (!rfid_debug) {
+      this.rfidApp.on('error', function (err) {
+        debug('Error: ' + err.message);
+        deferred.reject(err);
+      });
 
-    this.rfidApp.on('close', function (code) {
-      debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
+      this.rfidApp.on('close', function (code) {
+        debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
 
+        deferred.resolve();
+      });
+
+      this.rfidApp.kill('SIGTERM');
+    }
+    else {
+      debug('RFID not stopped, as we are in DEBUG mode.');
       deferred.resolve();
-    });
-
-    this.rfidApp.kill('SIGTERM');
+    }
   }
   else {
-    debug('RFID not stopped, as we are in DEBUG mode.');
-    deferred.resolve();
+    deferred.resolve('Not running.')
   }
 
   return deferred.promise;
