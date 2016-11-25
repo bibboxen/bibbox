@@ -79,8 +79,6 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
      * Wrapped in function to allow testing.
      */
     this.registerListeners = function registerListeners() {
-
-
       // Listen for disconnection with the backend.
       socket.on('disconnect', function () {
         $rootScope.$emit('out-of-order.enable', 'nodejs');

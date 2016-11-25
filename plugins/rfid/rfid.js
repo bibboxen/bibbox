@@ -71,7 +71,10 @@ var RFID = function (bus, port, afi) {
     debug('RFID fake tags loaded: ' + fakeTags.length);
 
     // Send connected event.
-    bus.emit('rfid.connected');
+    // Emulate that the connection is tested every 10s.
+    setInterval(function () {
+      bus.emit('rfid.connected');
+    }, 10000);
 
     /**
      * Tag request fake response.
@@ -141,6 +144,16 @@ var RFID = function (bus, port, afi) {
           }
 
           switch (data.event) {
+            case 'rfid.offline':
+              bus.emit('rfid.closed');
+
+              break;
+
+            case 'rfid.online':
+              bus.emit('rfid.connected');
+
+              break;
+
             case 'rfid.tags.detected':
               bus.emit('rfid.tags.detected', data.tags);
               break;
