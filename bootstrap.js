@@ -533,7 +533,7 @@ Bootstrap.prototype.stopApp = function stopApp() {
     this.bibbox.kill('SIGTERM');
   }
   else {
-    deferred.resolve('Not running').
+    deferred.resolve('Not running.');
   }
 
   return deferred.promise;
