@@ -212,7 +212,11 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
               // Update symlink.
               debug('Update symlink.');
 
-              fs.symlink(dir, __dirname + '/../bibbox', function (err, data) {
+              var target = __dirname;
+              target = target.substr(0, target.lastIndexOf('/')) + '/bibbox';
+
+              fs.unlinkSync(target);
+              fs.symlink(dir, target, function (err, data) {
                 if (err) {
                   res.write(JSON.stringify({
                     error: err.message
