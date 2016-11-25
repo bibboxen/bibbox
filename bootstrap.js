@@ -487,7 +487,6 @@ Bootstrap.prototype.startRFID = function startRFID() {
     var env = process.env;
     env.LD_LIBRARY_PATH = '/opt/feig';
     var app = spawn('java', [ '-jar', __dirname + '/plugins/rfid/device/rfid.jar'], { env: env });
-    console.log(spawn)
     debug('Started new rfid application with pid: ' + app.pid);
 
     app.once('close', startupError);
