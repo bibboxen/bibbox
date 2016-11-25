@@ -148,17 +148,14 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
       if (query.hasOwnProperty('version')) {
         self.updateApp(query.version).then(function () {
-          self.getVersion().then(function (version) {
-            res.write(JSON.stringify({
-              version: version
-            }));
-            res.end();
-          }, function (err) {
-            res.write(JSON.stringify({
-              error: err
-            }));
-            res.end();
-          });
+          res.write(JSON.stringify({
+            status: 'Restating the application'
+          }));
+          res.end();
+
+          // Restart the application to allow supervisor to reboot the
+          // application.
+          process.exit();
         }, function (err) {
           res.write(JSON.stringify({
             error: err.message
