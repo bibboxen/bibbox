@@ -188,25 +188,70 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
         var dest = __dirname + '/../' + path.basename(urlParser.parse(query.url).pathname);
 
         self.downloadFile(query.url, dest).then(function (file) {
-          console.log(file);
+            var version = path.basename(file).slice(0, -7);
+            var dir =__dirname + '/../' + version;
 
-          // Unpack file
-          var tar = spawn('tar', ['zxf', file, __dirname + '/../']);
+            debug('File downloaded to: ' + file);
 
-          // Check dir
+            // Unpack file
+            if (!fs.existsSync(dir)){
+              fs.mkdirSync(dir);
+            }
 
-          // Update symlink.
+            var tar = spawn('tar', ['-zxf', file, '-C', dir]);
+            tar.stderr.on('data', function (data) {
+              debug('Err unpacking file: ' + data.toString());
+              res.write(JSON.stringify({
+                error: data.toString()
+              }));
+              res.end();
+              return;
+            });
 
+            tar.on('exit', (code) => {
+              // Update symlink.
+              debug('Update symlink.');
 
+              fs.symlink(dir, __dirname + '/../bibbox', function (err, data) {
+                if (err) {
+                  res.write(JSON.stringify({
+                    error: err.message
+                  }));
+                  res.end();
+                }
+                else {
+                  self.restartApp().then(function () {
+                    self.getVersion().then(function (version) {
+                      res.write(JSON.stringify({
+                        version: version
+                      }));
+                      res.end();
+                    },
+                    function (err) {
+                      res.write(JSON.stringify({
+                        error: err.message
+                      }));
+                      res.end();
+                    });
+                  },
+                  function (err) {
+                    res.write(JSON.stringify({
+                      error: err.message
+                    }));
+                    res.end();
+                  });
+                }
+              });
 
-
-
-
-          res.end();
-        },
-        function (err) {
-          console.log(err);
-        })
+            });
+          },
+          function (err) {
+            res.write(JSON.stringify({
+              status: 'error',
+              error: err.message
+            }));
+            res.end();
+          })
       }
       else {
         res.write(JSON.stringify({
@@ -215,6 +260,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
         res.end();
       }
       break;
+
 
     /**
      * Send update config to bibbox.
