@@ -18,21 +18,20 @@
         restrict: 'E',
         replace: false,
         link: function (scope) {
+          // Assume we are out of order.
           scope.outOfOrder = true;
 
           if (!$rootScope.hasOwnProperty('outOfOrderLocks')) {
             // Assume 'nodejs' is connected.
+            // Assume we have no translations and config, and that the rfid is not running.
             $rootScope.outOfOrderLocks = ['rfid', 'config', 'translations'];
           }
           else {
             scope.outOfOrder = $rootScope.outOfOrderLocks.length > 0;
           }
 
-          scope.outOfOrderLocks = $rootScope.outOfOrderLocks;
-
           // Listen to out of order enable overlay events.
           $rootScope.$on('out-of-order.enable', function (event, type) {
-            console.log(type);
             $rootScope.outOfOrderLocks.push(type);
 
             // Error; so enable the overlay.
@@ -41,7 +40,6 @@
 
           // Listen to out of order disable overlay events.
           $rootScope.$on('out-of-order.disable', function (event, type) {
-            console.log(type);
             var index = $rootScope.outOfOrderLocks.indexOf(type);
             if (index !== -1) {
               $rootScope.outOfOrderLocks.splice(index, 1);
@@ -65,9 +63,6 @@
   </nav>
 
   <div class="error-content">
-    
-  !!DEBUG! Remove before commit!!: <div data-ng-repeat="out in outOfOrderLocks">{{out}}</div>
-
     <span class="error">{{ 'out_of_order.text' | translate }}</span>
   </div>
 </div>`
