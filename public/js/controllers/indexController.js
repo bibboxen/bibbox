@@ -26,6 +26,7 @@ angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', 
         $scope.features = config.features;
         $scope.loading = false;
         $scope.error = false;
+        $scope.$emit('out-of-order.disable');
       });
 
       $rootScope.$on('config.translations.updated', function () {

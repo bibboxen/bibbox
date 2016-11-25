@@ -141,6 +141,16 @@ var RFID = function (bus, port, afi) {
           }
 
           switch (data.event) {
+            case 'rfid.offline':
+              console.log('rfid.offline');
+
+              break;
+
+            case 'rfid.online':
+              console.log('rfid.online');
+
+              break;
+
             case 'rfid.tags.detected':
               bus.emit('rfid.tags.detected', data.tags);
               break;
