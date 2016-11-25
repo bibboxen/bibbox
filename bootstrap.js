@@ -189,7 +189,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
 
         self.downloadFile(query.url, dest).then(function (file) {
             var version = path.basename(file).slice(0, -7);
-            var dir =__dirname + '/../' + version;
+            var dir = __dirname.substr(0, __dirname.lastIndexOf('/')) + '/' + version;
 
             debug('File downloaded to: ' + file);
 
