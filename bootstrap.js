@@ -438,12 +438,6 @@ Bootstrap.prototype.startApp = function startApp() {
   var app = fork(__dirname + '/app.js');
   debug('Started new application with pid: ' + app.pid);
 
-  // Start RFID java application.
-  if (!rfid_debug) {
-    this.rfidApp = spawn(__dirname + '/start_rfid.sh');
-    debug('Started new rfid application with pid: ' + this.rfidApp.pid);
-  }
-
   // Event handler for startup errors.
   function startupError(code) {
     debug('Bibbox not started exit code: ' + app.exitCode);
@@ -492,7 +486,8 @@ Bootstrap.prototype.startRFID = function startRFID() {
   if (!rfid_debug) {
     var env = process.env;
     env.LD_LIBRARY_PATH = '/opt/feig';
-    var app = spawn('java', [ '-jar ', __dirname + '/plugins/rfid/device/rfid.jar'], { env: env });
+    var app = spawn('java', [ '-jar', __dirname + '/plugins/rfid/device/rfid.jar'], { env: env });
+    console.log(spawn)
     debug('Started new rfid application with pid: ' + app.pid);
 
     app.once('close', startupError);
