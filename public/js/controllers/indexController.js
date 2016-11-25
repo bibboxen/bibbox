@@ -26,11 +26,12 @@ angular.module('BibBox').controller('IndexController', ['$rootScope', '$scope', 
         $scope.features = config.features;
         $scope.loading = false;
         $scope.error = false;
-        $scope.$emit('out-of-order.disable');
+        $scope.$emit('out-of-order.disable', 'config');
       });
 
       $rootScope.$on('config.translations.updated', function () {
         $scope.languages = config.languages;
+        $scope.$emit('out-of-order.disable', 'translations');
       });
 
       if (config.initialized) {
