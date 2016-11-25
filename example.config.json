@@ -32,7 +32,11 @@
       "^fbs.block.[\\w]+$",
       "^fbs.online.[\\w]+$",
       "^notification.response$",
-      "^notification.error$"
+      "^notification.error$",
+      "^config.ui.update$",
+      "^config.ui.update.error$",
+      "^config.ui.translations.update$",
+      "^config.ui.translations.error$"
     ],
     "whitelistedSocketEvents": [
       "^rfid.tags.request$",
@@ -53,11 +57,7 @@
       "^notification.checkIn$",
       "^notification.checkInOffline$",
       "^notification.checkOut$",
-      "^notification.checkOutOffline$",
-      "^config.ui.update$",
-      "^config.ui.update.error$",
-      "^config.ui.translations.update$",
-      "^config.ui.translations.error$"
+      "^notification.checkOutOffline$"
     ]
   },
   "ctrl": {
@@ -88,7 +88,7 @@
       "key": "server.key",
       "cert": "server.crt"
     },
-    "allowed": [ "127.0.0.1", "::ffff:192.168.50.1", "10.215.16.142" ],
+    "allowed": [ "127.0.0.1", "::ffff:192.168.50.1", "::ffff:10.215.16.142" ],
     "port": 443
   }
 }

@@ -16,9 +16,8 @@ var self = null;
  * @constructor
  */
 var Offline = function Offline(bus, host, port) {
-  self = this;
-
   this.bus = bus;
+  self = this;
 
   // Create the queues, if they exists in redis they will just reconnect.
   this.checkinQueue = Queue('Check-in', port, host);

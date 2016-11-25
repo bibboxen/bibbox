@@ -39,6 +39,8 @@ var Bootstrap = function Bootstrap() {
       res.writeHead(200);
       url = UrlParser.parse(url);
 
+      // Check if this is a post request, if it is parse the request an wait for
+      // the data.
       if (req.method == 'POST') {
         self.parseBody(req).then(function (body) {
           self.handleRequest(req, res, url, body);
@@ -69,6 +71,21 @@ var eventEmitter = require('events').EventEmitter;
 var util = require('util');
 util.inherits(Bootstrap, eventEmitter);
 
+/**
+ * Handler for the request.
+ *
+ * This is used after the body have been parsed into JSON, if it was a post
+ * request.
+ *
+ * @param req
+ *  HTTP request object.
+ * @param res
+ *  HTTP response object.
+ * @param url
+ *   The URL the request came in on.
+ * @param body
+ *   The body pay-load as JSON, if post request else undefined.
+ */
 Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) {
   var self = this;
 
@@ -111,6 +128,17 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       break;
 
     /**
+     * Send reboot computer.
+     */
+    case '/reboot':
+      spawn('/sbin/reboot');
+      res.write(JSON.stringify({
+        status: 'Reboot started',
+      }));
+      res.end();
+      break;
+
+    /**
      * Update based on pull from github.
      *
      * @query version
@@ -120,17 +148,14 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
       if (query.hasOwnProperty('version')) {
         self.updateApp(query.version).then(function () {
-          self.getVersion().then(function (version) {
-            res.write(JSON.stringify({
-              version: version
-            }));
-            res.end();
-          }, function (err) {
-            res.write(JSON.stringify({
-              error: err
-            }));
-            res.end();
-          });
+          res.write(JSON.stringify({
+            status: 'Restating the application'
+          }));
+          res.end();
+
+          // Restart the application to allow supervisor to reboot the
+          // application.
+          process.exit();
         }, function (err) {
           res.write(JSON.stringify({
             error: err.message
@@ -155,24 +180,79 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
     case '/update/download':
       var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
       if (query.hasOwnProperty('url')) {
-        var dest = '';
+        var urlParser = require('url');
+        var path = require('path');
+        var dest = __dirname + '/../' + path.basename(urlParser.parse(query.url).pathname);
 
-        downloadFile(query.url, dest, function () {
-          // Unpack file
+        self.downloadFile(query.url, dest).then(function (file) {
+            var version = path.basename(file).slice(0, -7);
+            var dir = __dirname.substr(0, __dirname.lastIndexOf('/')) + '/' + version;
 
-          // Check dir
+            debug('File downloaded to: ' + file);
 
-          // Update symlink.
+            // Unpack file
+            if (!fs.existsSync(dir)){
+              fs.mkdirSync(dir);
+            }
 
-        })
+            var tar = spawn('tar', ['-zxf', file, '-C', dir]);
+            tar.stderr.on('data', function (data) {
+              debug('Err unpacking file: ' + data.toString());
+              res.write(JSON.stringify({
+                error: data.toString()
+              }));
+              res.end();
+              return;
+            });
+
+            tar.on('exit', (code) => {
+              // Update symlink.
+              debug('Update symlink.');
+
+              // File unpacked, so clean up.
+              fs.unlinkSync(file);
+
+              var target = __dirname;
+              target = target.substr(0, target.lastIndexOf('/')) + '/bibbox';
+
+              fs.unlinkSync(target);
+              fs.symlink(dir, target, function (err, data) {
+                if (err) {
+                  res.write(JSON.stringify({
+                    error: err.message
+                  }));
+                  res.end();
+                }
+                else {
+                  res.write(JSON.stringify({
+                    status: 'Restating the application'
+                  }));
+                  res.end();
+
+                  // Restart the application to allow supervisor to reboot the
+                  // application.
+                  process.exit();
+                }
+              });
+
+            });
+          },
+          function (err) {
+            res.write(JSON.stringify({
+              status: 'error',
+              error: err.message
+            }));
+            res.end();
+          })
       }
       else {
         res.write(JSON.stringify({
-          error: 'Missing file in query string'
+          error: 'Missing url in query string'
         }));
         res.end();
       }
       break;
+
 
     /**
      * Send update config to bibbox.
@@ -249,25 +329,28 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
  *   Url to download
  * @param dest
  *   Where to download the file.
- * @param cb
- *   Callback when downloaded.
+ *
+ * @returns {*|promise}
  */
-Bootstrap.prototype.downnloadFile = function downloadFile(url, dest, cb) {
+Bootstrap.prototype.downloadFile = function downloadFile(url, dest) {
+  var deferred = Q.defer();
   var file = fs.createWriteStream(dest);
-  https.get(url, function(response) {
-    response.pipe(file);
-    file.on('finish', function() {
-      // close() is async, call cb after close completes.
-      file.close(cb);
-    });
-  }).on('error', function(err) {
-    // Delete the file async. (But we don't check the result)
-    fs.unlink(dest);
+  var request = require('request');
 
-    if (cb) {
-      cb(err);
-    }
+  file.on('finish', function() {
+    file.close();
+    deferred.resolve(dest);
   });
+
+  request({
+    followAllRedirects: true,
+    method: 'get',
+    url: url
+  }).on('error', function (err) {
+    deferred.reject(err);
+  }).pipe(file);
+
+  return deferred.promise;
 };
 
 /**
@@ -368,7 +451,9 @@ Bootstrap.prototype.restartApp = function restartApp() {
 
   Q.all([
     self.stopApp(),
-    self.startApp()
+    self.startApp(),
+    self.stopRRID(),
+    self.startRFID()
   ]).then(function () {
     deferred.resolve();
   }).catch(function (err) {
@@ -390,12 +475,6 @@ Bootstrap.prototype.startApp = function startApp() {
 
   var app = fork(__dirname + '/app.js');
   debug('Started new application with pid: ' + app.pid);
-
-  // Start RFID java application.
-  if (!rfid_debug) {
-    this.rfidApp = spawn(__dirname + '/start_rfid.sh');
-    debug('Started new rfid application with pid: ' + this.rfidApp.pid);
-  }
 
   // Event handler for startup errors.
   function startupError(code) {
@@ -427,6 +506,39 @@ Bootstrap.prototype.startApp = function startApp() {
 };
 
 /**
+ * Start the RFID application as a new process.
+ *
+ * @return promise
+ *   Resolves if stated.
+ */
+Bootstrap.prototype.startRFID = function startRFID() {
+  var deferred = Q.defer();
+
+  // Event handler for startup errors.
+  function startupError(code) {
+    debug('RFID not started exit code: ' + app.exitCode);
+
+    deferred.reject(app.exitCode);
+  }
+
+  if (!rfid_debug) {
+    var env = process.env;
+    env.LD_LIBRARY_PATH = '/opt/feig';
+    var app = spawn('java', [ '-jar', __dirname + '/plugins/rfid/device/rfid.jar'], { env: env });
+    debug('Started new rfid application with pid: ' + app.pid);
+
+    app.once('close', startupError);
+  }
+  else {
+    debug('RFID not started in DEBUG mode.')
+  }
+
+  deferred.resolve();
+
+  return deferred.promise;
+};
+
+/**
  * Stop the application.
  *
  * @return promise
@@ -438,35 +550,66 @@ Bootstrap.prototype.stopApp = function stopApp() {
 
   debug('Stop BibBox');
 
-  this.bibbox.on('error', function (err) {
-    debug('Error: ' + err.message);
-    deferred.reject(err);
-  });
-
-  // Handle close event.
-  this.bibbox.on('close', function (code) {
-    debug('Stopped application with pid: ' + self.bibbox.pid + ' and exit code: ' + self.bibbox.exitCode);
-
-    deferred.resolve();
-  });
-
-  // Handle close event.
-  if (this.rfidApp) {
-    this.rfidApp.on('close', function (code) {
-      debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
+  if (this.bibbox) {
+    this.bibbox.on('error', function (err) {
+      debug('Error: ' + err.message);
+      deferred.reject(err);
     });
-  }
 
-  if (this.rfidApp) {
-    this.rfidApp.kill('SIGTERM');
-  }
+    // Handle close event.
+    this.bibbox.on('close', function (code) {
+      debug('Stopped application with pid: ' + self.bibbox.pid + ' and exit code: ' + self.bibbox.exitCode);
 
-  // Kill the application.
-  this.bibbox.kill('SIGTERM');
+      deferred.resolve();
+    });
+
+    // Kill the application.
+    this.bibbox.kill('SIGTERM');
+  }
+  else {
+    deferred.resolve('Not running.');
+  }
 
   return deferred.promise;
 };
 
+/**
+ * Stop the RFID application.
+ *
+ * @return promise
+ *   Resolves if app have been closed.
+ */
+Bootstrap.prototype.stopRRID = function stopRFID() {
+  var deferred = Q.defer();
+
+  debug('Stop RFID');
+
+  if (this.rfidApp) {
+    if (!rfid_debug) {
+      this.rfidApp.on('error', function (err) {
+        debug('Error: ' + err.message);
+        deferred.reject(err);
+      });
+
+      this.rfidApp.on('close', function (code) {
+        debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
+
+        deferred.resolve();
+      });
+
+      this.rfidApp.kill('SIGTERM');
+    }
+    else {
+      debug('RFID not stopped, as we are in DEBUG mode.');
+      deferred.resolve();
+    }
+  }
+  else {
+    deferred.resolve('Not running.')
+  }
+
+  return deferred.promise;
+};
 
 /**
  * Pull version form git-hub and restart application.
@@ -502,6 +645,7 @@ Bootstrap.prototype.updateApp = function updateApp(version) {
 // Get the show on the road.
 var bs = new Bootstrap();
 bs.startApp();
+bs.startRFID();
 
 /**
  * Handle bootstrap process exit and errors.
@@ -515,6 +659,7 @@ function exitHandler(options, err) {
   }
   if (options.exit) {
     bs.stopApp();
+    bs.stopRRID();
     process.exit();
   }
 }

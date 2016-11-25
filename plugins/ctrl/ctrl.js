@@ -106,8 +106,9 @@ CTRL.prototype.getTranslations = function getTranslations() {
       deferred.resolve(data);
     }
   });
-  this.bus.emit('translations.request', {busEvent: 'translations.request.languages'});
-
+  this.bus.emit('translations.request', {
+    busEvent: 'translations.request.languages'
+  });
 
   return deferred.promise;
 };
@@ -124,52 +125,60 @@ module.exports = function (options, imports, register) {
    * Handle front-end (UI) configuration requests.
    */
   bus.on('ctrl.config.ui', function (data) {
-    ctrl.getUiConfig().then(function (res) {
-      bus.emit(data.busEvent, res);
-    },
-    function (err) {
-      bus.emit('logger.err', 'CTRL: ' + err);
-      bus.emit(data.errorEvent, err);
-    });
+    ctrl.getUiConfig().then(
+      function (res) {
+        bus.emit(data.busEvent, res);
+      },
+      function (err) {
+        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit(data.errorEvent, err);
+      }
+    );
   });
 
   /**
    * Handle front-end (UI) translations requests.
    */
   bus.on('ctrl.config.ui.translations', function (data) {
-    ctrl.getTranslations().then(function (translations) {
-      bus.emit(data.busEvent, {translations: translations});
-    },
-    function (err) {
-      bus.emit('logger.err', 'CTRL: ' + err);
-      bus.emit(data.errorEvent, err);
-    });
+    ctrl.getTranslations().then(
+      function (translations) {
+        bus.emit(data.busEvent, {translations: translations});
+      },
+      function (err) {
+        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit(data.errorEvent, err);
+      }
+    );
   });
 
   /**
    * Handle notification config requests.
    */
   bus.on('ctrl.config.notification', function (data) {
-    ctrl.getNotificationConfig().then(function (config) {
-      bus.emit(data.busEvent, config);
-    },
-    function (err) {
-      bus.emit('logger.err', 'CTRL: ' + err);
-      bus.emit(data.errorEvent, err);
-    });
+    ctrl.getNotificationConfig().then(
+      function (config) {
+        bus.emit(data.busEvent, config);
+      },
+      function (err) {
+        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit(data.errorEvent, err);
+      }
+    );
   });
 
   /**
    * Handle notification config requests.
    */
   bus.on('ctrl.config.fbs', function (data) {
-    ctrl.getFBSConfig().then(function (config) {
-      bus.emit(data.busEvent, config);
-    },
-    function (err) {
-      bus.emit('logger.err', 'CTRL: ' + err);
-      bus.emit(data.errorEvent, err);
-    });
+    ctrl.getFBSConfig().then(
+      function (config) {
+        bus.emit(data.busEvent, config);
+      },
+      function (err) {
+        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit(data.errorEvent, err);
+      }
+    );
   });
 
   /**
@@ -185,28 +194,35 @@ module.exports = function (options, imports, register) {
         break;
 
       case 'config':
-        bus.emit('storage.save', {
-          type: 'config',
-          name: 'ui',
-          obj: data.config.ui,
-          busEvent: 'storage.config.saved'
-        });
+        if (data.config.hasOwnProperty('ui')) {
+          // Save UI configuration.
+          bus.emit('storage.save', {
+            type: 'config',
+            name: 'ui',
+            obj: data.config.ui,
+            busEvent: 'storage.config.saved'
+          });
+        }
 
-        // Save fbs config.
-        bus.emit('storage.save', {
-          type: 'config',
-          name: 'fbs',
-          obj: data.config.fbs,
-          busEvent: 'storage.config.saved'
-        });
+        if (data.config.hasOwnProperty('fbs')) {
+          // Save fbs config.
+          bus.emit('storage.save', {
+            type: 'config',
+            name: 'fbs',
+            obj: data.config.fbs,
+            busEvent: 'storage.config.saved'
+          });
+        }
 
-        // Save notification config.
-        bus.emit('storage.save', {
-          type: 'config',
-          name: 'notification',
-          obj: data.config.notification,
-          busEvent: 'storage.config.saved'
-        });
+        if (data.config.hasOwnProperty('notification')) {
+          // Save notification config.
+          bus.emit('storage.save', {
+            type: 'config',
+            name: 'notification',
+            obj: data.config.notification,
+            busEvent: 'storage.config.saved'
+          });
+        }
         break;
 
       case 'translations':
@@ -217,7 +233,7 @@ module.exports = function (options, imports, register) {
               type: 'locales',
               name: 'ui/' + key,
               obj: data.translations.ui[key],
-              busEvent: 'storage.translation.saved'
+              busEvent: 'storage.translation.ui.saved'
             });
           }
         }
@@ -229,13 +245,10 @@ module.exports = function (options, imports, register) {
               type: 'locales',
               name: 'notifications/' + key,
               obj: data.translations.notification[key],
-              busEvent: 'storage.translation.saved'
+              busEvent: 'storage.translation.notifications.saved'
             });
           }
         }
-
-        // @TODO: Emit translations to UI.
-
         break;
     }
   });

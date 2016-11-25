@@ -18,10 +18,13 @@
         restrict: 'E',
         replace: false,
         link: function (scope) {
-          scope.outOfOrder = false;
+          // Assume we are out of order.
+          scope.outOfOrder = true;
 
           if (!$rootScope.hasOwnProperty('outOfOrderLocks')) {
-            $rootScope.outOfOrderLocks = [];
+            // Assume 'nodejs' is connected.
+            // Assume we have no translations and config, and that the rfid is not running.
+            $rootScope.outOfOrderLocks = ['rfid', 'config', 'translations'];
           }
           else {
             scope.outOfOrder = $rootScope.outOfOrderLocks.length > 0;
