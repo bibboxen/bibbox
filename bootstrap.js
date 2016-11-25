@@ -212,6 +212,9 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
               // Update symlink.
               debug('Update symlink.');
 
+              // File unpacked, so clean up.
+              fs.unlinkSync(file);
+
               var target = __dirname;
               target = target.substr(0, target.lastIndexOf('/')) + '/bibbox';
 
@@ -224,26 +227,14 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
                   res.end();
                 }
                 else {
-                  self.restartApp().then(function () {
-                    self.getVersion().then(function (version) {
-                      res.write(JSON.stringify({
-                        version: version
-                      }));
-                      res.end();
-                    },
-                    function (err) {
-                      res.write(JSON.stringify({
-                        error: err.message
-                      }));
-                      res.end();
-                    });
-                  },
-                  function (err) {
-                    res.write(JSON.stringify({
-                      error: err.message
-                    }));
-                    res.end();
-                  });
+                  res.write(JSON.stringify({
+                    status: 'Restating the application'
+                  }));
+                  res.end();
+
+                  // Restart the application to allow supervisor to reboot the
+                  // application.
+                  process.exit();
                 }
               });
 
