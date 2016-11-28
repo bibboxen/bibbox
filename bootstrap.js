@@ -498,6 +498,9 @@ Bootstrap.prototype.startApp = function startApp() {
         }
       });
 
+      // Restart node app on error.
+      self.bibbox.on('close', startApp);
+
       deferred.resolve();
     }
   });
@@ -556,9 +559,15 @@ Bootstrap.prototype.stopApp = function stopApp() {
       deferred.reject(err);
     });
 
-    // Handle close event.
+    // Remove auto-start event.
+    this.bibbox.removeListener('close', startApp);
+
+    // Listen to new close event.
     this.bibbox.on('close', function (code) {
       debug('Stopped application with pid: ' + self.bibbox.pid + ' and exit code: ' + self.bibbox.exitCode);
+
+      // Free memory.
+      self.bibbox = null;
 
       deferred.resolve();
     });
