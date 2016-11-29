@@ -593,11 +593,6 @@ Bootstrap.prototype.stopRFID = function stopRFID() {
 
   if (this.rfidApp) {
     if (!rfid_debug) {
-      this.rfidApp.on('error', function (err) {
-        debug('Error: ' + err.message);
-        deferred.reject(err);
-      });
-
       // Remove auto-start event.
       this.rfidApp.removeListener('close', self.startRFID);
 
@@ -654,9 +649,9 @@ Bootstrap.prototype.updateApp = function updateApp(version) {
 };
 
 // Get the show on the road.
-var bs = new Bootstrap();
-bs.startApp();
-bs.startRFID();
+var bootstrap = new Bootstrap();
+bootstrap.startApp();
+bootstrap.startRFID();
 
 /**
  * Handle bootstrap process exit and errors.
@@ -669,8 +664,8 @@ function exitHandler(options, err) {
     console.error(err.stack);
   }
   if (options.exit) {
-    bs.stopApp();
-    bs.stopRFID();
+    bootstrap.stopApp();
+    bootstrap.stopRFID();
     process.exit();
   }
 }
