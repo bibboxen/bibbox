@@ -670,7 +670,7 @@ function exitHandler(options, err) {
   }
   if (options.exit) {
     bs.stopApp();
-    bs.stopRRID();
+    bs.stopRFID();
     process.exit();
   }
 }
