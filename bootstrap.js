@@ -560,7 +560,7 @@ Bootstrap.prototype.stopApp = function stopApp() {
     });
 
     // Remove auto-start event.
-    this.bibbox.removeListener('close', startApp);
+    this.bibbox.removeListener('close', self.startApp);
 
     // Listen to new close event.
     this.bibbox.on('close', function (code) {
