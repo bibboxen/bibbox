@@ -225,14 +225,15 @@ body {
   overflow: hidden;
 }
 
-.image-help {
+.image-help > img {
   z-index: -1;
   position: fixed;
   left: 0;
   bottom: 0;
-  width: 100%;
+  right: 0;
   margin: 0;
   padding: 0;
+  width: 100%;
 }
 
 /* The Overlay (background) */

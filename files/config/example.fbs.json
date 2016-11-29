@@ -6,6 +6,6 @@
   "location": "hb",
   "loginAttempts": {
     "max": 5,
-    "timeLimit": 60
+    "timeLimit": 900000
   }
 }
