@@ -452,7 +452,7 @@ Bootstrap.prototype.restartApp = function restartApp() {
   Q.all([
     self.stopApp(),
     self.startApp(),
-    self.stopRRID(),
+    self.startRFID(),
     self.startRFID()
   ]).then(function () {
     deferred.resolve();
@@ -531,6 +531,8 @@ Bootstrap.prototype.startRFID = function startRFID() {
     debug('Started new rfid application with pid: ' + app.pid);
 
     app.once('close', startupError);
+
+    this.rfidApp = app;
   }
   else {
     debug('RFID not started in DEBUG mode.')
@@ -588,8 +590,9 @@ Bootstrap.prototype.stopApp = function stopApp() {
  * @return promise
  *   Resolves if app have been closed.
  */
-Bootstrap.prototype.stopRRID = function stopRFID() {
+Bootstrap.prototype.stopRFID = function stopRFID() {
   var deferred = Q.defer();
+  var self = this;
 
   debug('Stop RFID');
 
@@ -614,6 +617,7 @@ Bootstrap.prototype.stopRRID = function stopRFID() {
     }
   }
   else {
+    debug("RFID was not running");
     deferred.resolve('Not running.')
   }
 
