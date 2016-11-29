@@ -517,20 +517,14 @@ Bootstrap.prototype.startApp = function startApp() {
 Bootstrap.prototype.startRFID = function startRFID() {
   var deferred = Q.defer();
 
-  // Event handler for startup errors.
-  function startupError(code) {
-    debug('RFID not started exit code: ' + app.exitCode);
-
-    deferred.reject(app.exitCode);
-  }
-
   if (!rfid_debug) {
     var env = process.env;
     env.LD_LIBRARY_PATH = '/opt/feig';
     var app = spawn('java', [ '-jar', __dirname + '/plugins/rfid/device/rfid.jar'], { env: env });
     debug('Started new rfid application with pid: ' + app.pid);
 
-    app.once('close', startupError);
+    // Restart node app on error.
+    self.bibbox.on('close', startRFID);
 
     this.rfidApp = app;
   }
@@ -602,6 +596,9 @@ Bootstrap.prototype.stopRFID = function stopRFID() {
         debug('Error: ' + err.message);
         deferred.reject(err);
       });
+
+      // Remove auto-start event.
+      this.bibbox.removeListener('close', self.startRFID);
 
       this.rfidApp.on('close', function (code) {
         debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
