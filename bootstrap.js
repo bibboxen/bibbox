@@ -560,7 +560,7 @@ Bootstrap.prototype.stopApp = function stopApp() {
     this.bibbox.removeListener('close', self.startApp);
 
     // Listen to new close event.
-    this.bibbox.on('close', function (code) {
+    this.bibbox.on('exit', function (code, signal) {
       debug('Stopped application with pid: ' + self.bibbox.pid + ' and exit code: ' + self.bibbox.exitCode);
 
       // Free memory.
@@ -596,7 +596,7 @@ Bootstrap.prototype.stopRFID = function stopRFID() {
       // Remove auto-start event.
       this.rfidApp.removeListener('close', self.startRFID);
 
-      this.rfidApp.on('close', function (code) {
+      this.rfidApp.on('exit', function (code, signal) {
         debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
 
         deferred.resolve();
@@ -664,9 +664,11 @@ function exitHandler(options, err) {
     console.error(err.stack);
   }
   if (options.exit) {
-    bootstrap.stopApp();
-    bootstrap.stopRFID();
-    process.exit();
+    bootstrap.stopApp().then(function () {
+      bootstrap.stopRFID().then(function () {
+          process.exit();
+      });
+    });
   }
 }
 
