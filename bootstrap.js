@@ -523,10 +523,11 @@ Bootstrap.prototype.startRFID = function startRFID() {
     var app = spawn('java', [ '-jar', __dirname + '/plugins/rfid/device/rfid.jar'], { env: env });
     debug('Started new rfid application with pid: ' + app.pid);
 
-    // Restart node app on error.
-    self.bibbox.on('close', startRFID);
-
+    // Store ref. to the application.
     this.rfidApp = app;
+
+    // Restart rfid app on error.
+    this.rfidApp.on('close', startRFID);
   }
   else {
     debug('RFID not started in DEBUG mode.')
@@ -598,7 +599,7 @@ Bootstrap.prototype.stopRFID = function stopRFID() {
       });
 
       // Remove auto-start event.
-      this.bibbox.removeListener('close', self.startRFID);
+      this.rfidApp.removeListener('close', self.startRFID);
 
       this.rfidApp.on('close', function (code) {
         debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
