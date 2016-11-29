@@ -452,7 +452,7 @@ Bootstrap.prototype.restartApp = function restartApp() {
   Q.all([
     self.stopApp(),
     self.startApp(),
-    self.startRFID(),
+    self.stopRFID(),
     self.startRFID()
   ]).then(function () {
     deferred.resolve();
