@@ -675,6 +675,9 @@ function exitHandler(options, err) {
 // Bootstrap app is closing.
 process.on('exit', exitHandler.bind(null, {exit: true}));
 
+// Craches supervisor stop.
+process.on('SIGTERM', exitHandler.bind(null, {exit: true}));
+
 // Catches ctrl+c event
 process.on('SIGINT', exitHandler.bind(null, {exit: true}));
 
