@@ -452,7 +452,7 @@ Bootstrap.prototype.restartApp = function restartApp() {
   Q.all([
     self.stopApp(),
     self.startApp(),
-    self.stopRRID(),
+    self.stopRFID(),
     self.startRFID()
   ]).then(function () {
     deferred.resolve();
@@ -517,20 +517,17 @@ Bootstrap.prototype.startApp = function startApp() {
 Bootstrap.prototype.startRFID = function startRFID() {
   var deferred = Q.defer();
 
-  // Event handler for startup errors.
-  function startupError(code) {
-    debug('RFID not started exit code: ' + app.exitCode);
-
-    deferred.reject(app.exitCode);
-  }
-
   if (!rfid_debug) {
     var env = process.env;
     env.LD_LIBRARY_PATH = '/opt/feig';
     var app = spawn('java', [ '-jar', __dirname + '/plugins/rfid/device/rfid.jar'], { env: env });
     debug('Started new rfid application with pid: ' + app.pid);
 
-    app.once('close', startupError);
+    // Store ref. to the application.
+    this.rfidApp = app;
+
+    // Restart rfid app on error.
+    this.rfidApp.on('close', startRFID);
   }
   else {
     debug('RFID not started in DEBUG mode.')
@@ -563,7 +560,7 @@ Bootstrap.prototype.stopApp = function stopApp() {
     this.bibbox.removeListener('close', self.startApp);
 
     // Listen to new close event.
-    this.bibbox.on('close', function (code) {
+    this.bibbox.on('exit', function (code, signal) {
       debug('Stopped application with pid: ' + self.bibbox.pid + ' and exit code: ' + self.bibbox.exitCode);
 
       // Free memory.
@@ -588,19 +585,18 @@ Bootstrap.prototype.stopApp = function stopApp() {
  * @return promise
  *   Resolves if app have been closed.
  */
-Bootstrap.prototype.stopRRID = function stopRFID() {
+Bootstrap.prototype.stopRFID = function stopRFID() {
   var deferred = Q.defer();
+  var self = this;
 
   debug('Stop RFID');
 
   if (this.rfidApp) {
     if (!rfid_debug) {
-      this.rfidApp.on('error', function (err) {
-        debug('Error: ' + err.message);
-        deferred.reject(err);
-      });
+      // Remove auto-start event.
+      this.rfidApp.removeListener('close', self.startRFID);
 
-      this.rfidApp.on('close', function (code) {
+      this.rfidApp.on('exit', function (code, signal) {
         debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
 
         deferred.resolve();
@@ -614,6 +610,7 @@ Bootstrap.prototype.stopRRID = function stopRFID() {
     }
   }
   else {
+    debug("RFID was not running");
     deferred.resolve('Not running.')
   }
 
@@ -652,9 +649,9 @@ Bootstrap.prototype.updateApp = function updateApp(version) {
 };
 
 // Get the show on the road.
-var bs = new Bootstrap();
-bs.startApp();
-bs.startRFID();
+var bootstrap = new Bootstrap();
+bootstrap.startApp();
+bootstrap.startRFID();
 
 /**
  * Handle bootstrap process exit and errors.
@@ -667,14 +664,19 @@ function exitHandler(options, err) {
     console.error(err.stack);
   }
   if (options.exit) {
-    bs.stopApp();
-    bs.stopRRID();
-    process.exit();
+    bootstrap.stopApp().then(function () {
+      bootstrap.stopRFID().then(function () {
+          process.exit();
+      });
+    });
   }
 }
 
 // Bootstrap app is closing.
 process.on('exit', exitHandler.bind(null, {exit: true}));
+
+// Craches supervisor stop.
+process.on('SIGTERM', exitHandler.bind(null, {exit: true}));
 
 // Catches ctrl+c event
 process.on('SIGINT', exitHandler.bind(null, {exit: true}));
