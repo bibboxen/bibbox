@@ -4,7 +4,7 @@ body {
   -ms-user-select: none; /* IE 10+ */
   user-select: none; /* Likely future */
 
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .logo {
@@ -24,8 +24,8 @@ body {
 
 .button-small {
   min-width: 110px;
-  font-size: 1.5em;
-  padding: .5em;
+  font-size: 1.3em;
+  padding: .6em;
   margin: 1em;
 }
 
@@ -286,11 +286,11 @@ h2 {
 }
 
 h3 {
-  font-size: 1.6em;
+  font-size: 1.8em;
 }
 
 h4 {
-  font-size: 1.2em;
+  font-size: 1.4em;
 }
 
 .btn-sm {
@@ -298,10 +298,24 @@ h4 {
 }
 
 .table {
-  font-size: 1.25em;
+  font-size: 1.4em;
 }
 
 .modal-dialog {
   width: 90%;
   margin: 5% auto;
+}
+
+.numpad-input-group > .input-group-addon {
+  font-size: 1.6em;
+  height: 60px;
+}
+
+.numpad-input-group > .form-control {
+  font-size: 1.6em;
+  height: 60px;
+}
+
+.header-headline {
+  margin-top: .6em;
 }
