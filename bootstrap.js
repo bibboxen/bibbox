@@ -19,6 +19,8 @@ var https = require('https');
 
 var rfid_debug = process.env.RFID_DEBUG || false;
 
+var shutdown = false;
+
 var Bootstrap = function Bootstrap() {
   var self = this;
   this.bibbox = null;
@@ -473,37 +475,44 @@ Bootstrap.prototype.startApp = function startApp() {
   var deferred = Q.defer();
   var self = this;
 
-  var app = fork(__dirname + '/app.js');
-  debug('Started new application with pid: ' + app.pid);
 
-  // Event handler for startup errors.
-  function startupError(code) {
-    debug('Bibbox not started exit code: ' + app.exitCode);
 
-    deferred.reject(app.exitCode);
+  if (shutdown) {
+    debug('App not started - in shutdown');
+    deferred.resolve();
   }
-  app.once('close', startupError);
+  else {
+    var app = fork(__dirname + '/app.js');
+    debug('Started new application with pid: ' + app.pid);
 
-  // Listen for "ready" events.
-  app.once('message', function (message) {
-    if (message.hasOwnProperty('ready')) {
-      app.removeListener('close', startupError);
+    // Event handler for startup errors.
+    app.once('close', function startupError(code) {
+      debug('Bibbox not started exit code: ' + app.exitCode);
 
-      debug('Bibbox is ready with pid: ' + app.pid);
-      self.bibbox = app;
-      self.bibbox.on('message', function (message) {
-        // React to ping events.
-        if (message.hasOwnProperty('ping')) {
-          self.alive = message.ping;
-        }
-      });
+      deferred.reject(app.exitCode);
+    });
 
-      // Restart node app on error.
-      self.bibbox.on('close', startApp);
+    // Listen for "ready" events.
+    app.once('message', function (message) {
+      if (message.hasOwnProperty('ready')) {
+        app.removeAllListeners('close');
 
-      deferred.resolve();
-    }
-  });
+        debug('Bibbox is ready with pid: ' + app.pid);
+        self.bibbox = app;
+        self.bibbox.on('message', function (message) {
+          // React to ping events.
+          if (message.hasOwnProperty('ping')) {
+            self.alive = message.ping;
+          }
+        });
+
+        // Restart node app on error.
+        self.bibbox.on('close', startApp);
+
+        deferred.resolve();
+      }
+    });
+  }
 
   return deferred.promise;
 };
@@ -517,7 +526,11 @@ Bootstrap.prototype.startApp = function startApp() {
 Bootstrap.prototype.startRFID = function startRFID() {
   var deferred = Q.defer();
 
-  if (!rfid_debug) {
+  if (shutdown) {
+    debug('RFID not started - in shutdown');
+    deferred.resolve();
+  }
+  else if (!rfid_debug) {
     var env = process.env;
     env.LD_LIBRARY_PATH = '/opt/feig';
     var app = spawn('java', [ '-jar', __dirname + '/plugins/rfid/device/rfid.jar'], { env: env });
@@ -660,15 +673,18 @@ bootstrap.startRFID();
  * @param err
  */
 function exitHandler(options, err) {
-  if (err) {
-    console.error(err.stack);
-  }
-  if (options.exit) {
-    bootstrap.stopApp().then(function () {
-      bootstrap.stopRFID().then(function () {
+  if (!shutdown) {
+    shutdown = true;
+    if (err) {
+      console.error(err.stack);
+    }
+    if (options.exit) {
+      bootstrap.stopApp().then(function () {
+        bootstrap.stopRFID().then(function () {
           process.exit();
+        });
       });
-    });
+    }
   }
 }
 
