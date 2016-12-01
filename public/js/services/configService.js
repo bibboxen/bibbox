@@ -81,6 +81,7 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
 angular.module('BibBox').value('config', {
   default_lang: 'da',
   initialized: false,
+  debug: false,
   translations: {},
   languages: [],
   features: [],

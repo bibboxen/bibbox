@@ -4,6 +4,7 @@
 
 * Improved allTagsInSeries check.
 * Changed styling to 1280x1024 resolution.
+* Hide mouse by default, except if config.debug is true.
 
 ### v1.0.0
 https://github.com/bibboxen/bibbox/tree/v1.0.0

@@ -49,7 +49,7 @@ angular.module('BibBox').controller('ReturnController', [
       $scope.baseResetIdleWatch();
 
       // Check if all tags in series have been added.
-      if (!material.invalid && !material.loading && (!material.success || material.status === 'error') && $scope.allTagsInSeries(material)) {
+      if (!material.invalid && !material.loading && !material.success && $scope.allTagsInSeries(material)) {
         // If a tag is missing from the device.
         if ($scope.anyTagRemoved(material.tags)) {
           material.tagRemoved = true;
