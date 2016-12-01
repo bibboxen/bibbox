@@ -20,7 +20,7 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
 
     // Pager config.
     $scope.pager = {
-      itemsPerPage: 11,
+      itemsPerPage: 14,
       currentPage: 1
     };
 

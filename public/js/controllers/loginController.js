@@ -1,18 +1,24 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('LoginController', ['$scope', '$controller', '$http', '$window', '$location', '$routeParams', 'userService', 'barcodeService',
-  function ($scope, $controller, $http, $window, $location, $routeParams, userService, barcodeService) {
+angular.module('BibBox').controller('LoginController', ['$scope', '$controller', '$http', '$window', '$location', '$routeParams', 'userService', 'barcodeService', 'config',
+  function ($scope, $controller, $http, $window, $location, $routeParams, userService, barcodeService, config) {
     'use strict';
 
     // Instantiate/extend base controller.
     $controller('BaseController', { $scope: $scope });
 
-    var usernameRegExp = /^\d+$/;
-    var passwordRegExp = /^\d+$/;
-
     $scope.display = 'start';
     $scope.loading = false;
+
+    // Logout if not initialized.
+    if (!config || !config.initialized) {
+      $scope.baseLogoutRedirect('/');
+      return;
+    }
+
+    var usernameRegExp = /^\d+$/;
+    var passwordRegExp = /^\d+$/;
 
     /**
      * Reset user scope.

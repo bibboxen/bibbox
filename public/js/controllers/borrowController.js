@@ -45,7 +45,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
     // Pager config.
     $scope.pager = {
-      itemsPerPage: 10,
+      itemsPerPage: 12,
       currentPage: 1
     };
 

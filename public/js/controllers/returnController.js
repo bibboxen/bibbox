@@ -28,7 +28,7 @@ angular.module('BibBox').controller('ReturnController', [
     for (var bin in $scope.returnBins) {
       $scope.returnBins[bin].materials = [];
       $scope.returnBins[bin].pager = {
-        itemsPerPage: 8,
+        itemsPerPage: 11,
         currentPage: 1
       };
     }

@@ -3,10 +3,12 @@ body {
   -moz-user-select: none; /* Firefox all */
   -ms-user-select: none; /* IE 10+ */
   user-select: none; /* Likely future */
+
+  font-size: 14px;
 }
 
 .logo {
-  height: 60px;
+  height: 8%;
 }
 
 .logo-container {
@@ -14,24 +16,22 @@ body {
 }
 
 .button {
-  height: 50px;
-  min-width: 160px;
-  font-size: 18px;
-  padding: .65em;
+  min-width: 200px;
+  font-size: 1.6em;
+  padding: .6em;
   margin: 1em;
 }
 
 .button-small {
-  height: 40px;
-  min-width: 100px;
-  font-size: 16px;
-  padding: .5em;
+  min-width: 110px;
+  font-size: 1.3em;
+  padding: .6em;
   margin: 1em;
 }
 
 .container {
   text-align: center;
-  max-height: 580px;
+  max-height: 750px;
   overflow: hidden;
 }
 
@@ -57,9 +57,9 @@ body {
 }
 
 .numpad-key {
-  width: 60px;
-  height: 60px;
-  font-size: 20px;
+  width: 80px;
+  height: 80px;
+  font-size: 1.8em;
   padding: .7em;
   margin: 5px;
 }
@@ -68,21 +68,21 @@ body {
   text-align: center;
   margin: 0 auto;
   padding: 1em;
-  width: 380px;
+  width: 450px;
 }
 
 .numpad-key-zero {
-  width: 210px;
-  height: 60px;
-  font-size: 20px;
+  width: 270px;
+  height: 80px;
+  font-size: 1.8em;
   padding: .7em;
   margin: 5px;
 }
 
 .numpad-enter {
   width: 120px;
-  height: 200px;
-  font-size: 20px;
+  height: 260px;
+  font-size: 1.8em;
   padding: .7em;
   padding-top: 3.8em;
   margin: 5px;
@@ -90,8 +90,8 @@ body {
 
 .numpad-back {
   width: 120px;
-  height: 60px;
-  font-size: 20px;
+  height: 80px;
+  font-size: 1.8em;
   padding: .7em;
   margin: 5px;
 }
@@ -272,7 +272,50 @@ body {
 }
 
 .processing-results {
-  font-size: 16px;
+  font-size: 1.4em;
   padding: .5em;
   right: 0;
+}
+
+h1 {
+  font-size: 3em;
+}
+
+h2 {
+  font-size: 2.4em;
+}
+
+h3 {
+  font-size: 1.8em;
+}
+
+h4 {
+  font-size: 1.4em;
+}
+
+.btn-sm {
+  font-size: .8em;
+}
+
+.table {
+  font-size: 1.4em;
+}
+
+.modal-dialog {
+  width: 90%;
+  margin: 5% auto;
+}
+
+.numpad-input-group > .input-group-addon {
+  font-size: 1.6em;
+  height: 60px;
+}
+
+.numpad-input-group > .form-control {
+  font-size: 1.6em;
+  height: 60px;
+}
+
+.header-headline {
+  margin-top: .6em;
 }
