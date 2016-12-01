@@ -475,8 +475,6 @@ Bootstrap.prototype.startApp = function startApp() {
   var deferred = Q.defer();
   var self = this;
 
-
-
   if (shutdown) {
     debug('App not started - in shutdown');
     deferred.resolve();
@@ -570,22 +568,23 @@ Bootstrap.prototype.stopApp = function stopApp() {
     });
 
     // Remove auto-start event.
-    this.bibbox.removeListener('close', self.startApp);
+    this.bibbox.removeAllListeners('close', function () {
+      // Listen to new close event.
+      self.bibbox.on('close', function (code) {
+        debug('Stopped application with pid: ' + self.bibbox.pid + ' and exit code: ' + self.bibbox.exitCode);
 
-    // Listen to new close event.
-    this.bibbox.on('exit', function (code, signal) {
-      debug('Stopped application with pid: ' + self.bibbox.pid + ' and exit code: ' + self.bibbox.exitCode);
+        // Free memory.
+        self.bibbox = null;
 
-      // Free memory.
-      self.bibbox = null;
+        deferred.resolve();
+      });
 
-      deferred.resolve();
+      // Kill the application.
+      this.bibbox.kill('SIGTERM');
     });
-
-    // Kill the application.
-    this.bibbox.kill('SIGTERM');
   }
   else {
+    debug('App not running');
     deferred.resolve('Not running.');
   }
 
@@ -607,15 +606,18 @@ Bootstrap.prototype.stopRFID = function stopRFID() {
   if (this.rfidApp) {
     if (!rfid_debug) {
       // Remove auto-start event.
-      this.rfidApp.removeListener('close', self.startRFID);
+      this.rfidApp.removeAllListeners('close', function () {
+        self.rfidApp.on('close', function (code) {
+          debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
 
-      this.rfidApp.on('exit', function (code, signal) {
-        debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
+          // Free memory.
+          self.rfidApp = null;
 
-        deferred.resolve();
+          deferred.resolve();
+        });
+
+        self.rfidApp.kill('SIGTERM');
       });
-
-      this.rfidApp.kill('SIGTERM');
     }
     else {
       debug('RFID not stopped, as we are in DEBUG mode.');
@@ -679,17 +681,15 @@ function exitHandler(options, err) {
       console.error(err.stack);
     }
     if (options.exit) {
-      bootstrap.stopApp().then(function () {
-        bootstrap.stopRFID().then(function () {
-          process.exit();
-        });
-      });
+      bootstrap.stopRFID();
+      bootstrap.stopApp();
+      process.exit();
     }
   }
 }
 
 // Bootstrap app is closing.
-process.on('exit', exitHandler.bind(null, {exit: true}));
+process.once('exit', exitHandler.bind(null, {exit: true}));
 
 // Craches supervisor stop.
 process.on('SIGTERM', exitHandler.bind(null, {exit: true}));
