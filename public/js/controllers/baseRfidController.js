@@ -145,7 +145,15 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * @param material
      */
     $scope.allTagsInSeries = function allTagsInSeries(material) {
-      return material.seriesLength > 0 && material.seriesLength === material.tags.length;
+      // This count of unique series numbers is to counter an issue with the
+      // RFID reading a tag UUID wrong, so its gets added twice.
+      var uniqueSeriesNumbers = {};
+      for (var i = 0; i < material.tags.length; i++) {
+        uniqueSeriesNumbers['tag' + material.tags[i].numberInSeries] = true;
+      }
+
+      // Series length should be greater than zero, and each tag in the series must be present.
+      return material.seriesLength > 0 && material.seriesLength === Object.keys(uniqueSeriesNumbers).length;
     };
 
     /**
