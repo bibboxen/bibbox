@@ -29,14 +29,14 @@ Network.prototype.isOnline = function isOnline(uri) {
         deferred.reject(data.message);
       }
       else {
-        debug('Tester connected successful');
+        debug('Tester connected successful (pid: ' + tester.pid + ')');
         deferred.resolve();
       }
     });
 
     // Debug helper code.
     tester.once('close', function (code) {
-      debug('Tester closed with code: ' + code);
+      debug('Tester (pid: ' + tester.pid + ') closed with code: ' + code);
     });
     debug('Tester started with pid: ', tester.pid);
   }
