@@ -12,11 +12,7 @@
     {% if item.itemProperties.author %}
       {{ item.itemProperties.author }}<br/>
     {% endif %}
-    {% if item.transactionDate %}
     {{ 'receipt.checkin.transactionDate'|translate }} {{ (item.transactionDate/1000)|date('d/m/y') }}
-    {% else %}
-    {{ 'receipt.checkin.transactionDate'|translate }} {{ now|date('d/m/y') }}
-    {% endif %}
   </p>
 </div>
 {% endfor %}
