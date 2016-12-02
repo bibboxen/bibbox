@@ -91,6 +91,15 @@ angular.module('BibBox').service('rfidService', ['$q', '$rootScope', 'proxyServi
     });
 
     /**
+     * RFID is processing.
+     */
+    proxyService.on('rfid.processing', function processing() {
+      if (currentScope && hasMethod('rfidProcessing')) {
+        currentScope.rfidProcessing();
+      }
+    });
+
+    /**
      * RFID error.
      *
      * @param err

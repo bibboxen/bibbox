@@ -261,6 +261,13 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     };
 
     /**
+     * RFID is processing.
+     */
+    $scope.rfidProcessing = function rfidProcessing() {
+      $scope.processing = true;
+    };
+
+    /**
      * RFID error handler.
      *
      * @param err
