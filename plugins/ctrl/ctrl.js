@@ -193,6 +193,10 @@ module.exports = function (options, imports, register) {
         bus.emit('frontend.reload');
         break;
 
+      case 'outOfOrder':
+        bus.emit('frontend.outOfOrder');
+        break;
+
       case 'config':
         if (data.config.hasOwnProperty('ui')) {
           // Save UI configuration.

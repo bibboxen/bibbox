@@ -141,6 +141,19 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       break;
 
     /**
+     * Send out of order.
+     */
+    case '/outoforder':
+      self.bibbox.send({
+        command: 'outOfOrder'
+      });
+      res.write(JSON.stringify({
+        status: 'Out of order sent.',
+      }));
+      res.end();
+      break;
+
+    /**
      * Update based on pull from github.
      *
      * @query version

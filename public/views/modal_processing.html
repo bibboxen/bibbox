@@ -16,8 +16,9 @@
                 data-ng-if="!material.success">
               <td class="vert-align">{{ material.title }}</td>
               <td class="vert-align">
+                <spinner data-ng-if="material.loading"></spinner>
                 <span data-ng-if="material.seriesLength > 0 && material.tags.length === material.seriesLength">{{ material.information | translate }}</span>
-                <span data-ng-if="material.seriesLength > 0 && material.tags.length !== material.seriesLength">
+                <span data-ng-if="material.seriesLength > 0 && material.tags.length < material.seriesLength">
                   {{ material.tags.length }} / {{ material.seriesLength }} {{ 'processing.materials_scanned' | translate }}
                 </span>
                 <span data-ng-if="material.invalid">{{ 'processing.invalid_material' | translate }}</span>

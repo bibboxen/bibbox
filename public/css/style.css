@@ -181,6 +181,7 @@ body {
 }
 
 .spinner-circle {
+  display: inline-block;
   box-sizing: border-box;
   width: 20px;
   height: 20px;
