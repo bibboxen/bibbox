@@ -4,7 +4,7 @@
   <div class="image-help" data-ng-if="!materials || materials.length === 0">
     <img src="img/help2.jpg" class="image-help--image" data-ng-if="!imageDisplayMoreBooks" />
     <img src="img/help3.jpg" class="image-help--image" data-ng-if="imageDisplayMoreBooks" />
-    <spinner-global class="image-help--spinner" style="display: none;"></spinner-global>
+    <h2 class="image-help--processing">{{ 'processing.reading_tags' | translate }}</h2>
   </div>
 
   <div data-ng-include="'/views/processing.html'"></div>

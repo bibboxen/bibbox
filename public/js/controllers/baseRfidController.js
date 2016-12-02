@@ -264,8 +264,9 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * RFID is processing.
      */
     $scope.rfidProcessing = function rfidProcessing() {
+      // Hack to circumvent angular's slow digest cycle.
       angular.element('.image-help--image').hide();
-      angular.element('.image-help--spinner').show();
+      angular.element('.image-help--processing').show();
     };
 
     /**
