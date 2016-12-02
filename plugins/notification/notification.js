@@ -513,7 +513,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
       }
       else {
         var data = result.reason;
-        if (data.message !== 'Unknown patron: ' + username) {
+        if (data.message !== 'Unknown patron') {
           deferred.reject(data);
           // End processing.
           return;
@@ -521,8 +521,8 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
 
         // Unknown patrons (item was not checkout before check-in etc.).
         content = {
-          name: i18n.__('fbs.offline.username'),
-          check_ins: layout.check_ins ? self.renderCheckIn(mail, items[data.username]) : ''
+          name: 'Unknown user',
+          check_ins: layout.check_ins ? self.renderCheckIn(mail, items['unknown']) : ''
         };
 
         context.patrons.push(JSON.parse(JSON.stringify(content)));
@@ -570,7 +570,7 @@ Notification.prototype.checkInOfflineReceipt = function checkInOfflineReceipt(it
     library: self.renderLibrary(false),
     footer: self.renderFooter(false),
     patrons: [{
-      name: i18n.__('fbs.offline.username'),
+      name: 'Unknown user',
       check_ins: self.renderCheckInOffline(items['unknown'])
     }]
   };
@@ -691,7 +691,7 @@ Notification.prototype.checkOutOfflineReceipt = function checkOutOfflineReceipt(
     library: self.renderLibrary(false),
     footer: self.renderFooter(false),
     patrons: [{
-      name: i18n.__('fbs.offline.username'),
+      name: 'Unknown user',
       loans_new: self.renderNewLoansOffline(items)
     }]
   };
@@ -816,7 +816,7 @@ Notification.prototype.getPatronInformation = function getPatronInformation(user
 
   this.bus.once(busEvent, function (data) {
     if (data.validPatron === 'N') {
-      deferred.reject(new Error('Unknown patron: ' + username));
+      deferred.reject(new Error('Unknown patron'));
     }
     else {
       deferred.resolve(data);
@@ -827,7 +827,6 @@ Notification.prototype.getPatronInformation = function getPatronInformation(user
   });
 
   this.bus.once(errorEvent, function (err) {
-    err.username = username;
     deferred.reject(err);
 
     // Remove the not needed event listener.
@@ -983,14 +982,42 @@ module.exports = function (options, imports, register) {
   });
 
   /**
+   * Listen check-out offline (loans) receipt events.
+   */
+  bus.on('notification.checkOutOffline', function (data) {
+    Notification.create(bus, options.paths, options.languages).then(function (notification) {
+      notification.checkOutOfflineReceipt(data.items, data.lang).then(function () {
+          bus.emit(data.busEvent, true);
+        },
+        function (err) {
+          bus.emit(data.errorEvent, err);
+        });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
+  });
+
+  /**
    * Listen check-in (returns) receipt events.
    */
   bus.on('notification.checkIn', function (data) {
     Notification.create(bus, options.paths, options.languages).then(function (notification) {
-
-
-
       notification.checkInReceipt(data.mail, data.items, data.lang).then(function () {
+        bus.emit(data.busEvent, true);
+      }, function (err) {
+        bus.emit(data.errorEvent, err);
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
+  });
+
+  /**
+   * Listen check-in offline (returns) receipt events.
+   */
+  bus.on('notification.checkInOffline', function (data) {
+    Notification.create(bus, options.paths, options.languages).then(function (notification) {
+      notification.checkInOfflineReceipt(data.items, data.lang).then(function () {
         bus.emit(data.busEvent, true);
       }, function (err) {
         bus.emit(data.errorEvent, err);
