@@ -149,6 +149,11 @@ var RFID = function (bus, port, afi) {
 
               break;
 
+            case 'rfid.processing':
+              bus.emit('rfid.processing');
+
+              break;
+
             case 'rfid.online':
               bus.emit('rfid.connected');
 
