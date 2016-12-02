@@ -264,7 +264,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * RFID is processing.
      */
     $scope.rfidProcessing = function rfidProcessing() {
-      $scope.processing = true;
+      angular.element('.image-help').hide();
     };
 
     /**
