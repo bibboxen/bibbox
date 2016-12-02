@@ -21,6 +21,7 @@
       "^rfid.tag.set_afi.[\\w]+$",
       "^rfid.closed$",
       "^rfid.connected$",
+      "^rfid.processing$",
       "^barcode.data$",
       "^frontend.[\\w]+$",
       "^fbs.login.[\\w]+$",

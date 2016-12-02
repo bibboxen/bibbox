@@ -2,8 +2,9 @@
 
 <div class="container">
   <div class="image-help" data-ng-if="!materials || materials.length === 0">
-    <img src="img/help2.jpg" data-ng-if="!imageDisplayMoreBooks" />
-    <img src="img/help3.jpg" data-ng-if="imageDisplayMoreBooks" />
+    <img src="img/help2.jpg" class="image-help--image" data-ng-if="!imageDisplayMoreBooks" />
+    <img src="img/help3.jpg" class="image-help--image" data-ng-if="imageDisplayMoreBooks" />
+    <h2 class="image-help--processing">{{ 'processing.reading_tags' | translate }}</h2>
   </div>
 
   <div data-ng-include="'/views/processing.html'"></div>

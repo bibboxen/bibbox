@@ -324,3 +324,7 @@ h4 {
 .header-headline {
   margin-top: .6em;
 }
+
+.image-help--processing {
+  display: none;
+}
