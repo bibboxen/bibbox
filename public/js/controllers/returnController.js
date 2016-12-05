@@ -53,10 +53,7 @@ angular.module('BibBox').controller('ReturnController', [
       if (material.success && material.status === 'awaiting_afi') {
         material.loading = true;
 
-        // Turn AFI off.
-        for (i = 0; i < material.tags.length; i++) {
-          $scope.setAFI(material.tags[i].uid, true);
-        }
+        $scope.setAFI(tag.uid, true);
 
         return;
       }
