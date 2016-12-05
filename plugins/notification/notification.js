@@ -901,7 +901,7 @@ Notification.prototype.printReceipt = function printReceipt(content) {
   });
 
   readableStream.on('end', function () {
-    var lp = spawn('/usr/bin/lp', [ '-o media=Custom.80x500cm', filename ]);
+    var lp = spawn('/usr/bin/lp', [ '-o', 'media=Custom.80x500cm', filename ]);
 
     lp.stderr.on('data', function (data) {
       deferred.reject(data.toString());
