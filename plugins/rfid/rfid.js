@@ -180,7 +180,7 @@ var RFID = function (bus, port, afi) {
               }
               else {
                 bus.emit('rfid.error', 'AFI not set!');
-                debug('AFI not set for uid: ' + data.tag.uid);
+                debug('AFI not set for: ' + data);
               }
               break;
 

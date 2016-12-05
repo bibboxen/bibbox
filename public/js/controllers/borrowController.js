@@ -66,7 +66,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
       // If afi is awaiting being unlocked, and is placed on the device again.
       // Retry the unlocking.
-      if (material.success && material.status === 'awaiting_afi') {
+      if (material.status === 'awaiting_afi') {
         material.loading = true;
 
         $scope.setAFI(tag.uid, false);
@@ -99,7 +99,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                     $scope.materials[i].status = 'awaiting_afi';
                     $scope.materials[i].information = 'borrow.is_awaiting_afi';
                     $scope.materials[i].dueDate = result.dueDate;
-                    $scope.materials[i].success = true;
 
                     // See if material was already added to borrowed materials.
                     var found = $scope.borrowedMaterials.find(function (item, index) {

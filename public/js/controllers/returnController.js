@@ -50,7 +50,7 @@ angular.module('BibBox').controller('ReturnController', [
 
       // If afi is awaiting being locked, and is placed on the device again.
       // Retry the locking.
-      if (material.success && material.status === 'awaiting_afi') {
+      if (material.status === 'awaiting_afi') {
         material.loading = true;
 
         $scope.setAFI(tag.uid, true);
