@@ -106,7 +106,7 @@ angular.module('BibBox').controller('ReturnController', [
 
                   // Store the raw result (it's used to send with receipts).
                   if (result.hasOwnProperty('patronIdentifier')) {
-                    if (!raw_materials.hasOwnProperty('patronIdentifier')) {
+                    if (!raw_materials.hasOwnProperty(result.patronIdentifier)) {
                       raw_materials[result.patronIdentifier] = [];
                     }
 
