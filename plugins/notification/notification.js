@@ -893,7 +893,7 @@ Notification.prototype.printReceipt = function printReceipt(content) {
     'margin-right': 0,
     'margin-top': 0,
     'margin-bottom': 10,
-    'page-height': 800,
+    'page-height': 4000,
     'page-width': 80
   });
 
