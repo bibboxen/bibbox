@@ -4,7 +4,11 @@
 <div class="row-item">
   <p>
     {{ 'receipt.checkin.id'|translate }} {{ item.itemIdentifier }}<br/>
+    {% if item.itemProperties.title == 'fbs.offline.title' %}
+    {{ item.itemProperties.title|translate }}<br/>
+    {% else %}
     {{ item.itemProperties.title }}<br/>
+    {% endif %}
     {% if item.itemProperties.author %}
       {{ item.itemProperties.author }}<br/>
     {% endif %}

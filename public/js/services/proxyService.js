@@ -99,6 +99,11 @@ angular.module('BibBox').service('proxyService', ['$rootScope', '$q', '$location
         $rootScope.$emit('out-of-order.disable', 'rfid');
       });
 
+      // Listen for out of order from backend.
+      socket.on('frontend.outOfOrder', function () {
+        $rootScope.$emit('out-of-order.enable', 'out-of-order');
+      });
+
       // Reloads the browser on the 'frontend.reload' event.
       socket.on('frontend.reload', function () {
         $location.path('/');

@@ -64,7 +64,7 @@ var Offline = function Offline(bus, host, port) {
   this.pause('checkout');
 
   // Book-keeping to track that FBS is relative stable online.
-  var threshold = 10;
+  var threshold = 3;
   var currentHold = 0;
 
   // Listen for FBS offline events.
@@ -98,7 +98,7 @@ var Offline = function Offline(bus, host, port) {
       busEvent: 'offline.fbs.check',
       errorEvent: 'offline.fbs.check.error'
     });
-  }, 5000);
+  }, 300000);
 };
 
 /**

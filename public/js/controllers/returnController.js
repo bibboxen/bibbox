@@ -28,7 +28,7 @@ angular.module('BibBox').controller('ReturnController', [
     for (var bin in $scope.returnBins) {
       $scope.returnBins[bin].materials = [];
       $scope.returnBins[bin].pager = {
-        itemsPerPage: 8,
+        itemsPerPage: 11,
         currentPage: 1
       };
     }
@@ -48,8 +48,19 @@ angular.module('BibBox').controller('ReturnController', [
       // Restart idle timeout.
       $scope.baseResetIdleWatch();
 
+      // If afi is awaiting being locked, and is placed on the device again.
+      // Retry the locking.
+      if (material.status === 'awaiting_afi') {
+        material.loading = true;
+
+        $scope.setAFI(tag.uid, true);
+
+        return;
+      }
+
+
       // Check if all tags in series have been added.
-      if (!material.invalid && !material.loading && (!material.success || material.status === 'error') && $scope.allTagsInSeries(material)) {
+      if (!material.invalid && !material.loading && !material.success && $scope.allTagsInSeries(material)) {
         // If a tag is missing from the device.
         if ($scope.anyTagRemoved(material.tags)) {
           material.tagRemoved = true;
@@ -95,7 +106,7 @@ angular.module('BibBox').controller('ReturnController', [
 
                   // Store the raw result (it's used to send with receipts).
                   if (result.hasOwnProperty('patronIdentifier')) {
-                    if (!raw_materials.hasOwnProperty('patronIdentifier')) {
+                    if (!raw_materials.hasOwnProperty(result.patronIdentifier)) {
                       raw_materials[result.patronIdentifier] = [];
                     }
 

@@ -13,7 +13,7 @@
     ]
   },
   "dependencies": {
-    "connection-tester": "^0.1.1",
+    "debug": "^2.3.3",
     "q": "^1.4.1"
   }
 }

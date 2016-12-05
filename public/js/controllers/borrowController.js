@@ -45,7 +45,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
     // Pager config.
     $scope.pager = {
-      itemsPerPage: 10,
+      itemsPerPage: 12,
       currentPage: 1
     };
 
@@ -64,8 +64,18 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       // Restart idle timeout.
       $scope.baseResetIdleWatch();
 
+      // If afi is awaiting being unlocked, and is placed on the device again.
+      // Retry the unlocking.
+      if (material.status === 'awaiting_afi') {
+        material.loading = true;
+
+        $scope.setAFI(tag.uid, false);
+
+        return;
+      }
+
       // Check if all tags in series have been added.
-      if (!material.invalid && !material.loading && (!material.success || material.status === 'error') && $scope.allTagsInSeries(material)) {
+      if (!material.invalid && !material.loading && !material.success && $scope.allTagsInSeries(material)) {
         // If a tag is missing from the device.
         if ($scope.anyTagRemoved(material.tags)) {
           material.tagRemoved = true;
@@ -89,7 +99,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                     $scope.materials[i].status = 'awaiting_afi';
                     $scope.materials[i].information = 'borrow.is_awaiting_afi';
                     $scope.materials[i].dueDate = result.dueDate;
-                    $scope.materials[i].success = true;
 
                     // See if material was already added to borrowed materials.
                     var found = $scope.borrowedMaterials.find(function (item, index) {

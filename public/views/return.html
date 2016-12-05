@@ -2,8 +2,9 @@
 
 <div class="container">
   <div class="image-help" data-ng-if="!materials || materials.length === 0">
-    <img src="img/help2.jpg" data-ng-if="!imageDisplayMoreBooks" />
-    <img src="img/help3.jpg" data-ng-if="imageDisplayMoreBooks" />
+    <img src="img/help2.jpg" class="image-help--image" data-ng-if="!imageDisplayMoreBooks" />
+    <img src="img/help3.jpg" class="image-help--image" data-ng-if="imageDisplayMoreBooks" />
+    <h2 class="image-help--processing">{{ 'processing.reading_tags' | translate }}</h2>
   </div>
 
   <div data-ng-include="'/views/processing.html'"></div>
@@ -22,12 +23,12 @@
           </tr>
           <tr data-ng-repeat="material in bin.materials track by $index"
               data-ng-if="$index >= (bin.pager.currentPage - 1) * bin.pager.itemsPerPage && $index < bin.pager.currentPage * bin.pager.itemsPerPage"
-              data-ng-class="{'bg-success': material.success, 'bg-warning': material.status === 'awaiting_afi'}">
+              data-ng-class="{'bg-success': material.success, 'bg-warning': !material.success && material.status === 'awaiting_afi'}">
             <!-- Title here is translated, as it may be offline title -->
             <td class="vert-align">{{ material.title | translate }}</td>
             <td>
               <span class="glyphicon glyphicon-ok" aria-hidden="true" data-ng-if="material.success"></span>
-              <span class="glyphicon glyphicon-lock" aria-hidden="true" data-ng-if="material.status === 'awaiting_afi'"></span>
+              <span class="glyphicon glyphicon-lock" aria-hidden="true" data-ng-if="!material.success && material.status === 'awaiting_afi'"></span>
             </td>
           </tr>
         </table>

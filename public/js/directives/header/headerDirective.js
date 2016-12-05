@@ -9,8 +9,8 @@
 (function () {
   'use strict';
 
-  angular.module('BibBox').directive('header', [
-    function () {
+  angular.module('BibBox').directive('header', ['config',
+    function (config) {
       return {
         restrict: 'E',
         replace: false,
@@ -20,6 +20,7 @@
           countdown: '='
         },
         link: function (scope) {
+          scope.debug = config.debug;
         }
       };
     }

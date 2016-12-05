@@ -5,9 +5,11 @@
 
 'use strict';
 
-var connectionTester = require('connection-tester');
 var url = require('url');
 var Q = require('q');
+var fork = require('child_process').fork;
+var debug = require('debug')('bibbox:network');
+
 
 var Network = function Network(bus) {
   this.bus = bus;
@@ -19,13 +21,24 @@ Network.prototype.isOnline = function isOnline(uri) {
   try {
     var address = url.parse(uri);
     var port = address.protocol === 'https:' ? 443 : 80;
-    var connected = connectionTester.test(address.host, port, 1000);
-    if (connected.error !== null) {
-      deferred.reject(connected.error);
-    }
-    else {
-      deferred.resolve();
-    }
+    var tester = fork(__dirname + '/network_tester.js', [address.host, port, 1000]);
+
+    tester.once('message', function (data) {
+      if (data.error) {
+        debug('Tester error: ' + data.message);
+        deferred.reject(data.message);
+      }
+      else {
+        debug('Tester connected successful (pid: ' + tester.pid + ')');
+        deferred.resolve();
+      }
+    });
+
+    // Debug helper code.
+    tester.once('close', function (code) {
+      debug('Tester (pid: ' + tester.pid + ') closed with code: ' + code);
+    });
+    debug('Tester started with pid: ', tester.pid);
   }
   catch (err) {
     deferred.reject(err);

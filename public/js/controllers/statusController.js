@@ -28,7 +28,7 @@ angular.module('BibBox').controller('StatusController', [
 
     // Pager config.
     $scope.pager = {
-      itemsPerPage: 11,
+      itemsPerPage: 14,
       currentPage: 1
     };
 
