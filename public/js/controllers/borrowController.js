@@ -64,6 +64,19 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       // Restart idle timeout.
       $scope.baseResetIdleWatch();
 
+      // If afi is awaiting being unlocked, and is placed on the device again.
+      // Retry the unlocking.
+      if (material.success && material.status === 'awaiting_afi') {
+        material.loading = true;
+
+        // Turn AFI off.
+        for (i = 0; i < material.tags.length; i++) {
+          $scope.setAFI(material.tags[i].uid, false);
+        }
+
+        return;
+      }
+
       // Check if all tags in series have been added.
       if (!material.invalid && !material.loading && !material.success && $scope.allTagsInSeries(material)) {
         // If a tag is missing from the device.
