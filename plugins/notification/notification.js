@@ -893,8 +893,8 @@ Notification.prototype.printReceipt = function printReceipt(content) {
     'margin-right': 0,
     'margin-top': 0,
     'margin-bottom': 10,
-    'page-height': 4000,
-    'page-width': 80
+    'page-width': 80,
+    'media': 'Custom.80x500cm'
   });
 
   readableStream.on('data', function (chunk) {
