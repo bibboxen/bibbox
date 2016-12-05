@@ -893,8 +893,7 @@ Notification.prototype.printReceipt = function printReceipt(content) {
     'margin-right': 0,
     'margin-top': 0,
     'margin-bottom': 10,
-    'page-width': 80,
-    'media': 'Custom.80x500cm'
+    'page-width': 80
   });
 
   readableStream.on('data', function (chunk) {
@@ -902,7 +901,7 @@ Notification.prototype.printReceipt = function printReceipt(content) {
   });
 
   readableStream.on('end', function () {
-    var lp = spawn('/usr/bin/lp', [ filename ]);
+    var lp = spawn('/usr/bin/lp', [ '-o media=Custom.80x500cm', filename ]);
 
     lp.stderr.on('data', function (data) {
       deferred.reject(data.toString());
