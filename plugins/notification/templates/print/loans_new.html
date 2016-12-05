@@ -9,7 +9,7 @@
     {{ item.itemProperties.title }}<br/>
     {% endif %}
     {{ 'receipt.loans.id'|translate }} {{ item.itemIdentifier }}<br/>
-    {% if item.author %}
+    {% if item.itemProperties.author %}
     {{ item.itemProperties.author }}<br/>
     {% endif %}
     {% if item.dueDate %}
