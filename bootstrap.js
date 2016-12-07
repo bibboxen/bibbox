@@ -14,7 +14,7 @@ var queryString = require('querystring');
 var config = require(__dirname + '/config.json');
 var Q = require('q');
 
-var fs = require('fs.extra');
+var fs = require('fs');
 var https = require('https');
 
 var rfid_debug = process.env.RFID_DEBUG || false;
@@ -201,7 +201,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
 
         self.downloadFile(query.url, dest).then(function (file) {
             // Try to detect version from the filename.
-            var regEx =  /v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?/;
+            var regEx = /v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?/;
             if (!regEx.test(path.basename(file))) {
               var msg = 'Version not found in filename: ' + path.basename(file);
               debug('Err: ' + msg);
@@ -233,6 +233,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
             });
 
             tar.on('exit', function (code) {
+              console.log('code' + code);
               // Update symlink.
               debug('Update symlink.');
 
@@ -254,29 +255,32 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
                   // Move files folder with config, translation and offline
                   // backup storage.
                   var src = __dirname + '/files/*';
-                  debug('Copy files from: ' + src + ' to: ' + target + '/files/');
+                  debug('Copy files from: ' + src + ' to: ' + dir + '/files/');
 
-                  fs.copyRecursive(src, target + '/files/', function (err) {
-                    if (err) {
-                      debug('Err copying file: ' + err);
-                      res.write(JSON.stringify({
-                        error: data.toString()
-                      }));
-                      res.end();
-                      return;
-                    }
-
-                   res.write(JSON.stringify({
-                      status: 'Restating the application'
+                  var cp = spawn('cp', ['-rp', src, dir + '/files/']);
+                  cp.stderr.on('data', function (data) {
+                    debug('Err copying file: ' + data.toString());
+                    res.write(JSON.stringify({
+                      error: data.toString()
                     }));
                     res.end();
+                    return;
+                  });
 
-                    // Restart the application to allow supervisor to reboot the
-                    // application. The timeout is to allow the "res" transmission
-                    // to be completed before restart.
-                    setTimeout(function () {
-                      process.exit();
-                    }, 500);
+                  cp.on('exit', function (code) {
+                    if (code === 0) {
+                      res.write(JSON.stringify({
+                        status: 'Restating the application'
+                      }));
+                      res.end();
+
+                      // Restart the application to allow supervisor to reboot the
+                      // application. The timeout is to allow the "res" transmission
+                      // to be completed before restart.
+                      setTimeout(function () {
+                        process.exit();
+                      }, 500);
+                    }
                   });
                 }
               });
