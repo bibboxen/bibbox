@@ -201,7 +201,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
 
         self.downloadFile(query.url, dest).then(function (file) {
             // Try to detect version from the filename.
-            var regEx =  new RegExp('v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?');
+            var regEx =  /v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?/;
             if (!regEx.test(path.basename(file))) {
               var msg = 'Version not found in filename: ' + path.basename(file);
               debug('Err: ' + msg);
@@ -255,7 +255,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
                   // backup storage.
                   var src = __dirname + '/files/*';
                   debug('Copy files from: ' + src + ' to: ' + target + '/files/');
-                  
+
                   var cp = spawn('cp', ['-rp', src, target + '/files/']);
                   cp.stderr.on('data', function (data) {
                     debug('Err copying file: ' + data.toString());
