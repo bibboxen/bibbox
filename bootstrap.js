@@ -233,7 +233,11 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
             });
 
             tar.on('exit', function (code) {
-              console.log('code' + code);
+              if (code !== 0) {
+                // Not clean exit, so handled in strerr function above.
+                return;
+              }
+
               // Update symlink.
               debug('Update symlink.');
 
