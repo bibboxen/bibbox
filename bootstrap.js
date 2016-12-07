@@ -255,9 +255,9 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
                   // Move files folder with config, translation and offline
                   // backup storage.
                   var src = __dirname + '/files';
-                  debug('Copy files from: ' + src + ' to: ' + dir + '/files');
+                  debug('Copy files from: ' + src + ' to: ' + dir);
 
-                  var cp = spawn('cp', ['-rfp', src, dir + '/files']);
+                  var cp = spawn('cp', ['-rfp', src, dir]);
                   cp.stderr.on('data', function (data) {
                     debug('Err copying file: ' + data.toString());
                     res.write(JSON.stringify({
