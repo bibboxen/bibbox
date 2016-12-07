@@ -257,7 +257,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
                   var src = __dirname + '/files';
                   debug('Copy files from: ' + src + ' to: ' + dir + '/files');
 
-                  var cp = spawn('cp', ['-rp', src, dir + '/files']);
+                  var cp = spawn('cp', ['-rfp', src, dir + '/files']);
                   cp.stderr.on('data', function (data) {
                     debug('Err copying file: ' + data.toString());
                     res.write(JSON.stringify({
