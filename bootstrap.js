@@ -124,7 +124,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
         command: 'reloadUi'
       });
       res.write(JSON.stringify({
-        status: 'Reload sent',
+        status: 'Reload sent'
       }));
       res.end();
       break;
@@ -135,7 +135,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
     case '/reboot':
       spawn('/sbin/reboot');
       res.write(JSON.stringify({
-        status: 'Reboot started',
+        status: 'Reboot started'
       }));
       res.end();
       break;
@@ -148,7 +148,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
         command: 'outOfOrder'
       });
       res.write(JSON.stringify({
-        status: 'Out of order sent.',
+        status: 'Out of order sent.'
       }));
       res.end();
       break;
@@ -200,7 +200,19 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
         var dest = __dirname + '/../' + path.basename(urlParser.parse(query.url).pathname);
 
         self.downloadFile(query.url, dest).then(function (file) {
-            var version = path.basename(file).slice(0, -7);
+            // Try to detect version from the filename.
+            var regEx =  new RegExp('v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?');
+            if (!regEx.test(path.basename(file))) {
+              var msg = 'Version not found in filename: ' + path.basename(file);
+              debug('Err: ' + msg);
+              res.write(JSON.stringify({
+                error: msg
+              }));
+              res.end();
+              return;
+            }
+
+            var version = regEx.exec(path.basename(file))[0];
             var dir = __dirname.substr(0, __dirname.lastIndexOf('/')) + '/' + version;
 
             debug('File downloaded to: ' + file);
@@ -220,7 +232,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
               return;
             });
 
-            tar.on('exit', (code) => {
+            tar.on('exit', function (code) {
               // Update symlink.
               debug('Update symlink.');
 
@@ -239,14 +251,31 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
                   res.end();
                 }
                 else {
-                  res.write(JSON.stringify({
-                    status: 'Restating the application'
-                  }));
-                  res.end();
+                  // Move files folder with config, translation and offline
+                  // backup storage.
+                  var cp = spawn('cp', ['-rp', __dirname + '/files/*', target + '/files/']);
+                  cp.stderr.on('data', function (data) {
+                    debug('Err copying file: ' + data.toString());
+                    res.write(JSON.stringify({
+                      error: data.toString()
+                    }));
+                    res.end();
+                    return;
+                  });
 
-                  // Restart the application to allow supervisor to reboot the
-                  // application.
-                  process.exit();
+                  tar.on('exit', function (code) {
+                    res.write(JSON.stringify({
+                      status: 'Restating the application'
+                    }));
+                    res.end();
+
+                    // Restart the application to allow supervisor to reboot the
+                    // application. The timeout is to allow the "res" transmission
+                    // to be completed before restart.
+                    setTimeout(function () {
+                      process.exit();
+                    }, 500);
+                  });
                 }
               });
 
@@ -268,7 +297,6 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       }
       break;
 
-
     /**
      * Send update config to bibbox.
      */
@@ -278,7 +306,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
         config: body
       });
       res.write(JSON.stringify({
-        status: 'Config sent',
+        status: 'Config sent'
       }));
       res.end();
       break;
@@ -292,7 +320,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
         translations: body
       });
       res.write(JSON.stringify({
-        status: 'Config sent',
+        status: 'Config sent'
       }));
       res.end();
       break;
@@ -435,7 +463,8 @@ Bootstrap.prototype.getRemoteIp = function getRemoteIp(req) {
  */
 Bootstrap.prototype.getVersion = function getVersion() {
   var deferred = Q.defer();
-  var git = spawn('git', ['describe', '--exact-match', '--tags']);
+  var env = process.env;
+  var git = spawn('git', ['describe', '--exact-match', '--tags'], { env: env });
 
   git.stdout.on('data', function (data) {
     var version = data.toString().replace("\n", '');
