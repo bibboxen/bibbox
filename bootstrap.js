@@ -14,7 +14,7 @@ var queryString = require('querystring');
 var config = require(__dirname + '/config.json');
 var Q = require('q');
 
-var fs = require('fs');
+var fs = require('fs.extra');
 var https = require('https');
 
 var rfid_debug = process.env.RFID_DEBUG || false;
@@ -256,18 +256,17 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
                   var src = __dirname + '/files/*';
                   debug('Copy files from: ' + src + ' to: ' + target + '/files/');
 
-                  var cp = spawn('cp', ['-rp', src, target + '/files/']);
-                  cp.stderr.on('data', function (data) {
-                    debug('Err copying file: ' + data.toString());
-                    res.write(JSON.stringify({
-                      error: data.toString()
-                    }));
-                    res.end();
-                    return;
-                  });
+                  fs.copyRecursive(src, target + '/files/', function (err) {
+                    if (err) {
+                      debug('Err copying file: ' + err);
+                      res.write(JSON.stringify({
+                        error: data.toString()
+                      }));
+                      res.end();
+                      return;
+                    }
 
-                  tar.on('exit', function (code) {
-                    res.write(JSON.stringify({
+                   res.write(JSON.stringify({
                       status: 'Restating the application'
                     }));
                     res.end();
