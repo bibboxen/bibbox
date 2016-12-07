@@ -253,7 +253,10 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
                 else {
                   // Move files folder with config, translation and offline
                   // backup storage.
-                  var cp = spawn('cp', ['-rp', __dirname + '/files/*', target + '/files/']);
+                  var src = __dirname + '/files/*';
+                  debug('Copy files from: ' + src + ' to: ' + target + '/files/');
+                  
+                  var cp = spawn('cp', ['-rp', src, target + '/files/']);
                   cp.stderr.on('data', function (data) {
                     debug('Err copying file: ' + data.toString());
                     res.write(JSON.stringify({
@@ -390,6 +393,7 @@ Bootstrap.prototype.downloadFile = function downloadFile(url, dest) {
     method: 'get',
     url: url
   }).on('error', function (err) {
+    debug('Download error: ' + err.message);
     deferred.reject(err);
   }).pipe(file);
 
@@ -740,4 +744,4 @@ process.on('SIGTERM', exitHandler.bind(null, {exit: true}));
 process.on('SIGINT', exitHandler.bind(null, {exit: true}));
 
 // Catches uncaught exceptions
-process.on('uncaughtException', exitHandler.bind(null, {exit: true}));
+//process.on('uncaughtException', exitHandler.bind(null, {exit: true}));
