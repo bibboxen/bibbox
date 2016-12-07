@@ -2,6 +2,10 @@
 
 ### In development
 
+* Fixed RFID reading of MID.
+
+### v1.1.0
+
 * Improved allTagsInSeries check.
 * Changed styling to 1280x1024 resolution.
 * Hide mouse by default, except if config.debug is true.
