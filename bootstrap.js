@@ -43,7 +43,7 @@ var Bootstrap = function Bootstrap() {
 
       // Check if this is a post request, if it is parse the request an wait for
       // the data.
-      if (req.method == 'POST') {
+      if (req.method === 'POST') {
         self.parseBody(req).then(function (body) {
           self.handleRequest(req, res, url, body);
         }, function (err) {
@@ -79,13 +79,13 @@ util.inherits(Bootstrap, eventEmitter);
  * This is used after the body have been parsed into JSON, if it was a post
  * request.
  *
- * @param req
+ * @param {object} req
  *  HTTP request object.
- * @param res
+ * @param {object} res
  *  HTTP response object.
- * @param url
+ * @param {string} url
  *   The URL the request came in on.
- * @param body
+ * @param {object} body
  *   The body pay-load as JSON, if post request else undefined.
  */
 Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) {
@@ -200,105 +200,105 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
         var dest = __dirname + '/../' + path.basename(urlParser.parse(query.url).pathname);
 
         self.downloadFile(query.url, dest).then(function (file) {
-            // Try to detect version from the filename.
-            var regEx = /v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?/;
-            if (!regEx.test(path.basename(file))) {
-              var msg = 'Version not found in filename: ' + path.basename(file);
-              debug('Err: ' + msg);
-              res.write(JSON.stringify({
-                error: msg
-              }));
-              res.end();
-              return;
-            }
-
-            var version = regEx.exec(path.basename(file))[0];
-            var dir = __dirname.substr(0, __dirname.lastIndexOf('/')) + '/' + version;
-
-            debug('File downloaded to: ' + file);
-
-            // Unpack file
-            if (!fs.existsSync(dir)){
-              fs.mkdirSync(dir);
-            }
-
-            var tar = spawn('tar', ['-zxf', file, '-C', dir]);
-            tar.stderr.on('data', function (data) {
-              debug('Err unpacking file: ' + data.toString());
-              res.write(JSON.stringify({
-                error: data.toString()
-              }));
-              res.end();
-              return;
-            });
-
-            tar.on('exit', function (code) {
-              if (code !== 0) {
-                // Not clean exit, so handled in strerr function above.
-                return;
-              }
-
-              // Update symlink.
-              debug('Update symlink.');
-
-              // File unpacked, so clean up.
-              fs.unlinkSync(file);
-
-              var target = __dirname;
-              target = target.substr(0, target.lastIndexOf('/')) + '/bibbox';
-
-              fs.unlinkSync(target);
-              fs.symlink(dir, target, function (err, data) {
-                if (err) {
-                  res.write(JSON.stringify({
-                    error: err.message
-                  }));
-                  res.end();
-                }
-                else {
-                  // Move files folder with config, translation and offline
-                  // backup storage.
-                  var src = __dirname + '/files';
-                  debug('Copy files from: ' + src + ' to: ' + dir);
-
-                  var cp = spawn('cp', ['-rfp', src, dir]);
-                  cp.stderr.on('data', function (data) {
-                    debug('Err copying file: ' + data.toString());
-                    res.write(JSON.stringify({
-                      error: data.toString()
-                    }));
-                    res.end();
-                    return;
-                  });
-
-                  cp.on('exit', function (code) {
-                    if (code === 0) {
-                      res.write(JSON.stringify({
-                        status: 'Restating the application'
-                      }));
-                      res.end();
-
-                      // Restart the application to allow supervisor to reboot the
-                      // application. The timeout is to allow the "res" transmission
-                      // to be completed before restart.
-                      setTimeout(function () {
-                        // Trigger shoutdown process with right signal, so clean up is executed.
-                        process.kill(process.pid, 'SIGTERM');
-                      }, 500);
-                    }
-                  });
-                }
-              });
-
-            });
-          },
-          function (err) {
+          // Try to detect version from the filename.
+          var regEx = /v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?/;
+          if (!regEx.test(path.basename(file))) {
+            var msg = 'Version not found in filename: ' + path.basename(file);
+            debug('Err: ' + msg);
             res.write(JSON.stringify({
-              status: 'error',
-              error: err.message
+              error: msg
             }));
             res.end();
-          })
+            return;
+          }
+
+          var version = regEx.exec(path.basename(file))[0];
+          var dir = __dirname.substr(0, __dirname.lastIndexOf('/')) + '/' + version;
+
+          debug('File downloaded to: ' + file);
+
+          // Unpack file
+          if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir);
+          }
+
+          var tar = spawn('tar', ['-zxf', file, '-C', dir]);
+          tar.stderr.on('data', function (data) {
+            debug('Err unpacking file: ' + data.toString());
+            res.write(JSON.stringify({
+              error: data.toString()
+            }));
+            res.end();
+            return;
+          });
+
+          tar.on('exit', function (code) {
+            if (code !== 0) {
+              // Not clean exit, so handled in standard error function above.
+              return;
+            }
+
+            // Update symlink.
+            debug('Update symlink.');
+
+            // File unpacked, so clean up.
+            fs.unlinkSync(file);
+
+            var target = __dirname;
+            target = target.substr(0, target.lastIndexOf('/')) + '/bibbox';
+
+            fs.unlinkSync(target);
+            fs.symlink(dir, target, function (err, data) {
+              if (err) {
+                res.write(JSON.stringify({
+                  error: err.message
+                }));
+                res.end();
+              }
+              else {
+                // Move files folder with config, translation and offline
+                // backup storage.
+                var src = __dirname + '/files';
+                debug('Copy files from: ' + src + ' to: ' + dir);
+
+                var cp = spawn('cp', ['-rfp', src, dir]);
+                cp.stderr.on('data', function (data) {
+                  debug('Err copying file: ' + data.toString());
+                  res.write(JSON.stringify({
+                    error: data.toString()
+                  }));
+                  res.end();
+                  return;
+                });
+
+                cp.on('exit', function (code) {
+                  if (code === 0) {
+                    res.write(JSON.stringify({
+                      status: 'Restating the application'
+                    }));
+                    res.end();
+
+                    // Restart the application to allow supervisor to reboot the
+                    // application. The timeout is to allow the "res" transmission
+                    // to be completed before restart.
+                    setTimeout(function () {
+                      // Trigger shoutdown process with right signal, so clean up is executed.
+                      process.kill(process.pid, 'SIGTERM');
+                    }, 500);
+                  }
+                });
+              }
+            });
+
+          });
+        },
+        function (err) {
+          res.write(JSON.stringify({
+            status: 'error',
+            error: err.message
+          }));
+          res.end();
+        });
       }
       else {
         res.write(JSON.stringify({
@@ -379,21 +379,22 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
 /**
  * Down load file over https.
  *
- * @param url
+ * @param {string} url
  *   Url to download
- * @param dest
+ * @param {string} destination
  *   Where to download the file.
  *
- * @returns {*|promise}
+ * @return {*|promise}
+ *   Resolves if file is downloaded correctly.
  */
-Bootstrap.prototype.downloadFile = function downloadFile(url, dest) {
+Bootstrap.prototype.downloadFile = function downloadFile(url, destination) {
   var deferred = Q.defer();
-  var file = fs.createWriteStream(dest);
+  var file = fs.createWriteStream(destination);
   var request = require('request');
 
-  file.on('finish', function() {
+  file.on('finish', function () {
     file.close();
-    deferred.resolve(dest);
+    deferred.resolve(destination);
   });
 
   request({
@@ -411,10 +412,10 @@ Bootstrap.prototype.downloadFile = function downloadFile(url, dest) {
 /**
  * Parse POST request body.
  *
- * @param req
+ * @param {object} req
  *   Request object.
  *
- * @returns {*|promise}
+ * @return {*|promise}
  *   Resolved if parsed else rejected.
  */
 Bootstrap.prototype.parseBody = function parseBody(req) {
@@ -450,10 +451,10 @@ Bootstrap.prototype.parseBody = function parseBody(req) {
  *
  * Get the IP of the client.
  *
- * @param req
+ * @param {object} req
  *   The http request.
  *
- * @returns {*}
+ * @return {*}
  *   The IP as an string.
  */
 Bootstrap.prototype.getRemoteIp = function getRemoteIp(req) {
@@ -470,13 +471,13 @@ Bootstrap.prototype.getRemoteIp = function getRemoteIp(req) {
 /**
  * Get the current version.
  *
- * @returns {*|promise}
+ * @return {*|promise}
  *   Resolve with version or reject with git output.
  */
 Bootstrap.prototype.getVersion = function getVersion() {
   var deferred = Q.defer();
   var env = process.env;
-  var git = spawn('git', ['describe', '--exact-match', '--tags'], { env: env });
+  var git = spawn('git', ['describe', '--exact-match', '--tags'], {env: env});
 
   git.stdout.on('data', function (data) {
     var version = data.toString().replace("\n", '');
@@ -496,7 +497,7 @@ Bootstrap.prototype.getVersion = function getVersion() {
 /**
  * Restart the application.
  *
- * @return promise
+ * @return {*|promise}
  *   Resolves if app have been re-started.
  */
 Bootstrap.prototype.restartApp = function restartApp() {
@@ -522,7 +523,7 @@ Bootstrap.prototype.restartApp = function restartApp() {
 /**
  * Start the application as a child process.
  *
- * @return promise
+ * @return {*|promise}
  *   Resolves if app have been started and the old one closed.
  */
 Bootstrap.prototype.startApp = function startApp() {
@@ -572,7 +573,7 @@ Bootstrap.prototype.startApp = function startApp() {
 /**
  * Start the RFID application as a new process.
  *
- * @return promise
+ * @return {*|promise}
  *   Resolves if stated.
  */
 Bootstrap.prototype.startRFID = function startRFID() {
@@ -585,7 +586,7 @@ Bootstrap.prototype.startRFID = function startRFID() {
   else if (!rfid_debug) {
     var env = process.env;
     env.LD_LIBRARY_PATH = '/opt/feig';
-    var app = spawn('java', [ '-jar', __dirname + '/plugins/rfid/device/rfid.jar'], { env: env });
+    var app = spawn('java', ['-jar', __dirname + '/plugins/rfid/device/rfid.jar'], {env: env});
     debug('Started new rfid application with pid: ' + app.pid);
 
     // Store ref. to the application.
@@ -595,7 +596,7 @@ Bootstrap.prototype.startRFID = function startRFID() {
     this.rfidApp.on('close', startRFID);
   }
   else {
-    debug('RFID not started in DEBUG mode.')
+    debug('RFID not started in DEBUG mode.');
   }
 
   deferred.resolve();
@@ -606,7 +607,7 @@ Bootstrap.prototype.startRFID = function startRFID() {
 /**
  * Stop the application.
  *
- * @return promise
+ * @return {*|promise}
  *   Resolves if app have been closed.
  */
 Bootstrap.prototype.stopApp = function stopApp() {
@@ -648,7 +649,7 @@ Bootstrap.prototype.stopApp = function stopApp() {
 /**
  * Stop the RFID application.
  *
- * @return promise
+ * @return {*|promise}
  *   Resolves if app have been closed.
  */
 Bootstrap.prototype.stopRFID = function stopRFID() {
@@ -679,8 +680,8 @@ Bootstrap.prototype.stopRFID = function stopRFID() {
     }
   }
   else {
-    debug("RFID was not running");
-    deferred.resolve('Not running.')
+    debug('RFID was not running');
+    deferred.resolve('Not running');
   }
 
   return deferred.promise;
@@ -689,8 +690,11 @@ Bootstrap.prototype.stopRFID = function stopRFID() {
 /**
  * Pull version form git-hub and restart application.
  *
- * @param version
+ * @param {string} version
  *   The version to update to.
+ *
+ * @return {*|promise}
+ *   Resolves it the app is updated.
  */
 Bootstrap.prototype.updateApp = function updateApp(version) {
   var self = this;
@@ -725,8 +729,10 @@ bootstrap.startRFID();
 /**
  * Handle bootstrap process exit and errors.
  *
- * @param options
- * @param err
+ * @param {object} options
+ *   Options to the exits handler.
+ * @param {error} err
+ *   Error object is error is detected.
  */
 function exitHandler(options, err) {
   if (!shutdown) {

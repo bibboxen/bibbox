@@ -294,6 +294,13 @@ FBS.prototype.block = function block(username, reason) {
 
 /**
  * Register the plugin with architect.
+ *
+ * @param {array} options
+ *   Options defined in app.js.
+ * @param {array} imports
+ *   The other plugins available.
+ * @param {function} register
+ *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
@@ -568,8 +575,5 @@ module.exports = function (options, imports, register) {
         bus.emit(request.busEvent, false);
       }
     });
-  },
-  function (err) {
-    bus.emit(request.errorEvent, err);
   });
 };

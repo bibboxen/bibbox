@@ -82,8 +82,8 @@ architect.createApp(config, function (err, app) {
 });
 
 // Ensure proper process exit when killed in term.
-process.once('SIGINT', function () { process.exit(1); });
-process.once('SIGTERM', function () { process.exit(1); });
+process.once('SIGINT', function () { process.exit(); });
+process.once('SIGTERM', function () { process.exit(); });
 
 // If process is forked from bootstrap send keep-alive events back.
 setInterval(function () {

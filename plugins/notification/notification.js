@@ -917,10 +917,16 @@ Notification.prototype.printReceipt = function printReceipt(content) {
 
 /**
  * Register the plugin with architect.
+ *
+ * @param {array} options
+ *   Options defined in app.js.
+ * @param {array} imports
+ *   The other plugins available.
+ * @param {function} register
+ *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
-  //var notification = new Notification(bus, options.paths, options.languages);
 
   // Create FBS object to use in tests.
   Notification.create(bus, options.paths, options.languages).then(function (notification) {
@@ -986,11 +992,11 @@ module.exports = function (options, imports, register) {
   bus.on('notification.checkOutOffline', function (data) {
     Notification.create(bus, options.paths, options.languages).then(function (notification) {
       notification.checkOutOfflineReceipt(data.items, data.lang).then(function () {
-          bus.emit(data.busEvent, true);
-        },
-        function (err) {
-          bus.emit(data.errorEvent, err);
-        });
+        bus.emit(data.busEvent, true);
+      },
+      function (err) {
+        bus.emit(data.errorEvent, err);
+      });
     }, function (err) {
       bus.emit(data.errorEvent, err);
     });
