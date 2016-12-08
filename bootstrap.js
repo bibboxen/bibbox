@@ -170,7 +170,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
 
           // Restart the application to allow supervisor to reboot the
           // application.
-          process.exit();
+          process.kill(process.pid, 'SIGTERM');
         }, function (err) {
           res.write(JSON.stringify({
             error: err.message
@@ -282,7 +282,8 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
                       // application. The timeout is to allow the "res" transmission
                       // to be completed before restart.
                       setTimeout(function () {
-                        process.exit();
+                        // Trigger shoutdown process with right signal, so clean up is executed.
+                        process.kill(process.pid, 'SIGTERM');
                       }, 500);
                     }
                   });
@@ -747,8 +748,8 @@ process.once('exit', exitHandler.bind(null, {exit: true}));
 // Craches supervisor stop.
 process.on('SIGTERM', exitHandler.bind(null, {exit: true}));
 
-// Catches ctrl+c event
+// Catches ctrl+c event-
 process.on('SIGINT', exitHandler.bind(null, {exit: true}));
 
-// Catches uncaught exceptions
-//process.on('uncaughtException', exitHandler.bind(null, {exit: true}));
+// Catches uncaught exceptions-
+process.on('uncaughtException', exitHandler.bind(null, {exit: true}));

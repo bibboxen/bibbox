@@ -2,7 +2,12 @@
 
 ### In development
 
+### v1.2.0
+
 * Fixed RFID reading of MID.
+* Bootstrap stability and style fixes
+* Update now copies "files" folder
+* Better process restart in bootstrap
 
 ### v1.1.0
 
