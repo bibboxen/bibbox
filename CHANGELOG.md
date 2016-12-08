@@ -2,6 +2,15 @@
 
 ### In development
 
+### v1.2.0
+
+* Fixed RFID reading of MID.
+* Bootstrap stability and style fixes
+* Update now copies "files" folder
+* Better process restart in bootstrap
+
+### v1.1.0
+
 * Improved allTagsInSeries check.
 * Changed styling to 1280x1024 resolution.
 * Hide mouse by default, except if config.debug is true.

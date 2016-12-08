@@ -124,7 +124,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
         command: 'reloadUi'
       });
       res.write(JSON.stringify({
-        status: 'Reload sent',
+        status: 'Reload sent'
       }));
       res.end();
       break;
@@ -135,7 +135,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
     case '/reboot':
       spawn('/sbin/reboot');
       res.write(JSON.stringify({
-        status: 'Reboot started',
+        status: 'Reboot started'
       }));
       res.end();
       break;
@@ -148,7 +148,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
         command: 'outOfOrder'
       });
       res.write(JSON.stringify({
-        status: 'Out of order sent.',
+        status: 'Out of order sent.'
       }));
       res.end();
       break;
@@ -170,7 +170,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
 
           // Restart the application to allow supervisor to reboot the
           // application.
-          process.exit();
+          process.kill(process.pid, 'SIGTERM');
         }, function (err) {
           res.write(JSON.stringify({
             error: err.message
@@ -200,7 +200,19 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
         var dest = __dirname + '/../' + path.basename(urlParser.parse(query.url).pathname);
 
         self.downloadFile(query.url, dest).then(function (file) {
-            var version = path.basename(file).slice(0, -7);
+            // Try to detect version from the filename.
+            var regEx = /v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?/;
+            if (!regEx.test(path.basename(file))) {
+              var msg = 'Version not found in filename: ' + path.basename(file);
+              debug('Err: ' + msg);
+              res.write(JSON.stringify({
+                error: msg
+              }));
+              res.end();
+              return;
+            }
+
+            var version = regEx.exec(path.basename(file))[0];
             var dir = __dirname.substr(0, __dirname.lastIndexOf('/')) + '/' + version;
 
             debug('File downloaded to: ' + file);
@@ -220,7 +232,12 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
               return;
             });
 
-            tar.on('exit', (code) => {
+            tar.on('exit', function (code) {
+              if (code !== 0) {
+                // Not clean exit, so handled in strerr function above.
+                return;
+              }
+
               // Update symlink.
               debug('Update symlink.');
 
@@ -239,14 +256,37 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
                   res.end();
                 }
                 else {
-                  res.write(JSON.stringify({
-                    status: 'Restating the application'
-                  }));
-                  res.end();
+                  // Move files folder with config, translation and offline
+                  // backup storage.
+                  var src = __dirname + '/files';
+                  debug('Copy files from: ' + src + ' to: ' + dir);
 
-                  // Restart the application to allow supervisor to reboot the
-                  // application.
-                  process.exit();
+                  var cp = spawn('cp', ['-rfp', src, dir]);
+                  cp.stderr.on('data', function (data) {
+                    debug('Err copying file: ' + data.toString());
+                    res.write(JSON.stringify({
+                      error: data.toString()
+                    }));
+                    res.end();
+                    return;
+                  });
+
+                  cp.on('exit', function (code) {
+                    if (code === 0) {
+                      res.write(JSON.stringify({
+                        status: 'Restating the application'
+                      }));
+                      res.end();
+
+                      // Restart the application to allow supervisor to reboot the
+                      // application. The timeout is to allow the "res" transmission
+                      // to be completed before restart.
+                      setTimeout(function () {
+                        // Trigger shoutdown process with right signal, so clean up is executed.
+                        process.kill(process.pid, 'SIGTERM');
+                      }, 500);
+                    }
+                  });
                 }
               });
 
@@ -268,7 +308,6 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       }
       break;
 
-
     /**
      * Send update config to bibbox.
      */
@@ -278,7 +317,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
         config: body
       });
       res.write(JSON.stringify({
-        status: 'Config sent',
+        status: 'Config sent'
       }));
       res.end();
       break;
@@ -292,7 +331,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
         translations: body
       });
       res.write(JSON.stringify({
-        status: 'Config sent',
+        status: 'Config sent'
       }));
       res.end();
       break;
@@ -362,6 +401,7 @@ Bootstrap.prototype.downloadFile = function downloadFile(url, dest) {
     method: 'get',
     url: url
   }).on('error', function (err) {
+    debug('Download error: ' + err.message);
     deferred.reject(err);
   }).pipe(file);
 
@@ -435,7 +475,8 @@ Bootstrap.prototype.getRemoteIp = function getRemoteIp(req) {
  */
 Bootstrap.prototype.getVersion = function getVersion() {
   var deferred = Q.defer();
-  var git = spawn('git', ['describe', '--exact-match', '--tags']);
+  var env = process.env;
+  var git = spawn('git', ['describe', '--exact-match', '--tags'], { env: env });
 
   git.stdout.on('data', function (data) {
     var version = data.toString().replace("\n", '');
@@ -707,8 +748,8 @@ process.once('exit', exitHandler.bind(null, {exit: true}));
 // Craches supervisor stop.
 process.on('SIGTERM', exitHandler.bind(null, {exit: true}));
 
-// Catches ctrl+c event
+// Catches ctrl+c event-
 process.on('SIGINT', exitHandler.bind(null, {exit: true}));
 
-// Catches uncaught exceptions
+// Catches uncaught exceptions-
 process.on('uncaughtException', exitHandler.bind(null, {exit: true}));
