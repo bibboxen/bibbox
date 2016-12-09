@@ -410,7 +410,7 @@ Response.prototype.parseVariables = function parseVariables() {
             self[keyTrans].push({
               bibliographicId: val.shift(),
               id: val.shift(),
-              pickupId: val.shift(),
+              pickupId: val.shift().replace(/(\w*\/\w*\/)/, ''),
               pickupDate: self.parseDate(val.shift()),
               pickupLocation: val.shift().match(/\w{2,3}-\d{6}\s-\s(.*)/)[1],
               title: entities.decode(val.shift()),
