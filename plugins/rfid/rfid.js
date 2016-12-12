@@ -112,6 +112,12 @@ var RFID = function (bus, port, afi) {
   else {
     // Connection set up.
     server.on('connection', function connection(ws) {
+      // Disconnect client if connecting from other address than 127.0.0.1.
+      if (ws.upgradeReq.connection.remoteAddress !== "127.0.0.1") {
+        ws.close();
+        return;
+      }
+
       currentWebSocket = ws;
 
       // Inform the UI that connection with RFID is open.
