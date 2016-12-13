@@ -2,6 +2,8 @@
 
 ### In development
 
+* Added access control to the rfid ws.
+
 ### v1.2.0
 
 * Fixed RFID reading of MID.
