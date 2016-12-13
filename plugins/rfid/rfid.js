@@ -10,13 +10,13 @@ var debug = require('debug')('bibbox:rfid');
 /**
  * This object encapsulates the connector to RFID.
  *
- * @param bus
- *   The bus.
- * @param port
- *   The port to setup the server on.
- * @param afi
- *   The values of afi.
- * @param allowed
+ * @param {object} bus
+ *   The event bus.
+ * @param {string} port
+ *   The web-socket port number to use.
+ * @param {object} afi
+ *   JSON object with the values to set for AFI.
+ * @param {array} allowed
  *   Addresses allowed to connect to the WS.
  *
  * @constructor
@@ -235,6 +235,13 @@ var RFID = function (bus, port, afi, allowed) {
 
 /**
  * Register the plugin with architect.
+ *
+ * @param {array} options
+ *   Options defined in app.js.
+ * @param {array} imports
+ *   The other plugins available.
+ * @param {function} register
+ *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
   var rfid = new RFID(imports.bus, options.port, options.afi, options.allowed);
