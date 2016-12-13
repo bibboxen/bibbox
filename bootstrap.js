@@ -741,9 +741,16 @@ function exitHandler(options, err) {
       console.error(err.stack);
     }
     if (options.exit) {
-      bootstrap.stopRFID();
-      bootstrap.stopApp();
-      process.exit();
+      Q.all([
+        self.stopApp(),
+        self.stopRFID()
+      ]).then(function () {
+        debug('All process was closed');
+        process.exit();
+      }).catch(function (err) {
+        debug('Not all process was closed');
+        process.exit();
+      });
     }
   }
 }
