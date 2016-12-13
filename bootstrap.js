@@ -761,8 +761,5 @@ process.on('SIGTERM', exitHandler);
 // Catches ctrl+c event.
 process.on('SIGINT', exitHandler);
 
-// Catches ctrl+c event.
-process.on('SIGKILL', exitHandler);
-
 // Catches uncaught exceptions.
 process.on('uncaughtException', exitHandler);
