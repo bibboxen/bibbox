@@ -617,26 +617,22 @@ Bootstrap.prototype.stopApp = function stopApp() {
   debug('Stop BibBox');
 
   if (this.bibbox) {
-    this.bibbox.on('error', function (err) {
-      debug('Error: ' + err.message);
-      deferred.reject(err);
-    });
-
     // Remove auto-start event.
-    this.bibbox.removeAllListeners('close', function () {
-      // Listen to new close event.
-      self.bibbox.on('close', function (code) {
-        debug('Stopped application with pid: ' + self.bibbox.pid + ' and exit code: ' + self.bibbox.exitCode);
+    this.bibbox.removeAllListeners('close');
 
-        // Free memory.
-        self.bibbox = null;
+    // Listen to new close event.
+    self.bibbox.on('close', function (code) {
+      debug('Stopped application with pid: ' + self.bibbox.pid + ' and exit code: ' + self.bibbox.exitCode);
 
-        deferred.resolve();
-      });
+      // Free memory.
+      self.bibbox = null;
 
-      // Kill the application.
-      self.bibbox.kill('SIGTERM');
+      deferred.resolve();
     });
+
+    // Kill the application.
+    self.bibbox.kill('SIGTERM');
+
   }
   else {
     debug('App not running');
@@ -661,18 +657,18 @@ Bootstrap.prototype.stopRFID = function stopRFID() {
   if (this.rfidApp) {
     if (!rfid_debug) {
       // Remove auto-start event.
-      this.rfidApp.removeAllListeners('close', function () {
-        self.rfidApp.on('close', function (code) {
-          debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
+      this.rfidApp.removeAllListeners('close');
 
-          // Free memory.
-          self.rfidApp = null;
+      self.rfidApp.on('close', function (code) {
+        debug('Stopped RFID application with pid: ' + self.rfidApp.pid + ' and exit code: ' + self.rfidApp.exitCode);
 
-          deferred.resolve();
-        });
+        // Free memory.
+        self.rfidApp = null;
 
-        self.rfidApp.kill('SIGTERM');
+        deferred.resolve();
       });
+
+      self.rfidApp.kill('SIGTERM');
     }
     else {
       debug('RFID not stopped, as we are in DEBUG mode.');
@@ -735,13 +731,12 @@ bootstrap.startRFID();
  *   Error object is error is detected.
  */
 function exitHandler(options, err) {
-  var self = this;
 
   if (!shutdown) {
     shutdown = true;
     Q.all([
-      self.stopApp(),
-      self.stopRFID()
+      bootstrap.stopApp(),
+      bootstrap.stopRFID()
     ]).then(function () {
       debug('All process was closed');
       process.exit();
