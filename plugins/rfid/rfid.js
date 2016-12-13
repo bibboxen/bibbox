@@ -55,7 +55,7 @@ var RFID = function (bus, port, afi, allowed) {
   };
 
   /**
-   * @TODO: Document.
+   * Handler for setAFI bus calls.
    */
   var setAFI = function setAFI(data) {
     try {
@@ -74,7 +74,7 @@ var RFID = function (bus, port, afi, allowed) {
   };
 
   /**
-   * @TODO: Document.
+   * Handler for requestTags bus calls.
    */
   var requestTags = function requestTags() {
     try {
