@@ -10,15 +10,18 @@ var debug = require('debug')('bibbox:rfid');
 /**
  * This object encapsulates the connector to RFID.
  *
- * Assumes only one connection to RFID.
- *
  * @param bus
+ *   The bus.
  * @param port
+ *   The port to setup the server on.
  * @param afi
+ *   The values of afi.
+ * @param allowed
+ *   Addresses allowed to connect to the WS.
  *
  * @constructor
  */
-var RFID = function (bus, port, afi) {
+var RFID = function (bus, port, afi, allowed) {
   var WebSocketServer = require('ws').Server;
 
   // Check if we are in RFID debug mode. Will return basic fake Id's to emulate
@@ -31,6 +34,29 @@ var RFID = function (bus, port, afi) {
   // When client connects to RFID web-socket this will be set.
   var currentWebSocket = null;
 
+  /**
+   * Is the client address allowed?
+   *
+   * @param address
+   * @return {boolean} allowed?
+   */
+  var allowedAccess = function allowedAccess(address) {
+    var allow = false;
+
+    for (var i = 0; i < allowed.length; i++) {
+      // Disconnect client if connecting from other address than allowed addresses.
+      if (allowed[i] === address) {
+        allow = true;
+        break;
+      }
+    }
+
+    return allow;
+  };
+
+  /**
+   * Handler for setAFI bus calls.
+   */
   var setAFI = function setAFI(data) {
     try {
       currentWebSocket.send(JSON.stringify({
@@ -47,6 +73,9 @@ var RFID = function (bus, port, afi) {
     }
   };
 
+  /**
+   * Handler for requestTags bus calls.
+   */
   var requestTags = function requestTags() {
     try {
       currentWebSocket.send(JSON.stringify({
@@ -112,6 +141,12 @@ var RFID = function (bus, port, afi) {
   else {
     // Connection set up.
     server.on('connection', function connection(ws) {
+      // Check if client has access to use RFID.
+      if (!allowedAccess(ws.upgradeReq.connection.remoteAddress)) {
+        ws.close();
+        return;
+      }
+
       currentWebSocket = ws;
 
       // Inform the UI that connection with RFID is open.
@@ -202,7 +237,7 @@ var RFID = function (bus, port, afi) {
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
-  var rfid = new RFID(imports.bus, options.port, options.afi);
+  var rfid = new RFID(imports.bus, options.port, options.afi, options.allowed);
 
   register(null, {
     rfid: rfid
