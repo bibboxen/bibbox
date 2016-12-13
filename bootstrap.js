@@ -635,7 +635,7 @@ Bootstrap.prototype.stopApp = function stopApp() {
       });
 
       // Kill the application.
-      this.bibbox.kill('SIGTERM');
+      self.bibbox.kill('SIGTERM');
     });
   }
   else {
@@ -735,34 +735,34 @@ bootstrap.startRFID();
  *   Error object is error is detected.
  */
 function exitHandler(options, err) {
+  var self = this;
+
   if (!shutdown) {
     shutdown = true;
-    if (err) {
-      console.error(err.stack);
-    }
-    if (options.exit) {
-      Q.all([
-        self.stopApp(),
-        self.stopRFID()
-      ]).then(function () {
-        debug('All process was closed');
-        process.exit();
-      }).catch(function (err) {
-        debug('Not all process was closed');
-        process.exit();
-      });
-    }
+    Q.all([
+      self.stopApp(),
+      self.stopRFID()
+    ]).then(function () {
+      debug('All process was closed');
+      process.exit();
+    }).catch(function (err) {
+      debug('Not all process was closed');
+      process.exit();
+    });
   }
 }
 
 // Bootstrap app is closing.
-process.once('exit', exitHandler.bind(null, {exit: true}));
+process.once('exit', exitHandler);
 
 // Craches supervisor stop.
-process.on('SIGTERM', exitHandler.bind(null, {exit: true}));
+process.on('SIGTERM', exitHandler);
 
-// Catches ctrl+c event-
-process.on('SIGINT', exitHandler.bind(null, {exit: true}));
+// Catches ctrl+c event.
+process.on('SIGINT', exitHandler);
 
-// Catches uncaught exceptions-
-process.on('uncaughtException', exitHandler.bind(null, {exit: true}));
+// Catches ctrl+c event.
+process.on('SIGKILL', exitHandler);
+
+// Catches uncaught exceptions.
+process.on('uncaughtException', exitHandler);
