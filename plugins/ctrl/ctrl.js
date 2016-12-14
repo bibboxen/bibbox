@@ -6,11 +6,8 @@
 
 var Q = require('q');
 
-var CTRL = function CTRL(bus, allowed) {
-  var self = this;
-
-  self.bus = bus;
-  self.allowed = allowed;
+var CTRL = function CTRL(bus) {
+  this.bus = bus;
 };
 
 /**
@@ -126,7 +123,7 @@ CTRL.prototype.getTranslations = function getTranslations() {
 module.exports = function (options, imports, register) {
 
   var bus = imports.bus;
-  var ctrl = new CTRL(bus, options.allowed);
+  var ctrl = new CTRL(bus);
 
   /**
    * Handle front-end (UI) configuration requests.

@@ -32,8 +32,7 @@ var plugins = [
     path: path.join(__dirname, 'public')
   },
   {
-    packagePath: './plugins/ctrl',
-    allowed: config.allowed
+    packagePath: './plugins/ctrl'
   },
   {
     packagePath: './plugins/network'
@@ -51,7 +50,8 @@ var plugins = [
   {
     packagePath: './plugins/proxy',
     whitelistedSocketEvents: config.proxy.whitelistedSocketEvents,
-    whitelistedBusEvents: config.proxy.whitelistedBusEvents
+    whitelistedBusEvents: config.proxy.whitelistedBusEvents,
+    allowed: config.allowed
   },
   {
     packagePath: './plugins/fbs'

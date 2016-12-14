@@ -8,15 +8,22 @@
 /**
  * This object encapsulates the proxy.
  *
- * @param server
- * @param bus
- * @param whitelistedBusEvents
- * @param whitelistedSocketEvents
+ * @param {object} server
+ *   The Express server.
+ * @param {object} bus
+ *   The event bus.
+ * @param {array} whitelistedBusEvents
+ *   The white listed bus events to proxy.
+ * @param {array} whitelistedSocketEvents
+ *   The white listed socket events to proxy.
+ *
+ * @param {array} allowed
+ *   The allowed origins that the socket will accetp connections.
  *
  * @constructor
  */
-var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents) {
-  var io = require('socket.io')(server);
+var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents, allowed) {
+  var io = require('socket.io')(server, { origins: allowed });
 
   // Add wildcard support for socket.
   var wildcard = require('socketio-wildcard')();
@@ -135,7 +142,7 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var proxy = new Proxy(imports.server, imports.bus, options.whitelistedBusEvents, options.whitelistedSocketEvents);
+  var proxy = new Proxy(imports.server, imports.bus, options.whitelistedBusEvents, options.whitelistedSocketEvents, options.allowed);
 
   register(null, {
     proxy: proxy
