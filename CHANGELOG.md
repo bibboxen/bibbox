@@ -3,6 +3,9 @@
 ### In development
 
 * Added access control to the rfid ws.
+* Added access check on socket connection.
+* Bootstrap shutdown (reboot) process fixes.
+* Receipt paper size (75mm)
 
 ### v1.2.0
 
