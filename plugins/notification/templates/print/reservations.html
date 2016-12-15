@@ -3,9 +3,12 @@
 {% for item in items|sortOnField('interestDate') %}
 <div class="row-item">
   <p>
-    {{ 'receipt.reservations.id'|translate }} {{ item.id }}<br />
+    {% if item.title %}
     {{ item.title }}<br />
+    {% endif %}
+    {% if item.author %}
     {{ item.author }}<br />
+    {% endif %}
     {{ 'receipt.reservations.interestDate'|translate }} {{ (item.interestDate/1000)|date('d/m/y') }}<br />
     {{ 'receipt.reservations.dk5'|translate }} {{ item.DK5 }}
   </p>

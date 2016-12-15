@@ -6,6 +6,7 @@
 * Added access check on socket connection.
 * Bootstrap shutdown (reboot) process fixes.
 * Receipt paper size (75mm)
+* Receipt reservations not ready mat. id removed. 
 
 ### v1.2.0
 

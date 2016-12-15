@@ -8,8 +8,12 @@
       <table style="border-spacing: 0;border-collapse: collapse;padding: 0;vertical-align: top;text-align: left;border-top: 1px solid #ffffff;border-bottom: 1px solid #cccccc;width: 100%;">
         <tr style="padding: 0;vertical-align: top;text-align: left;">
           <td style="word-break: break-word;-webkit-hyphens: auto;-moz-hyphens: auto;hyphens: auto;padding: 10px;vertical-align: top;text-align: left;color: #222222;font-family: Helvetica, Arial, sans-serif;font-weight: normal;margin: 0;line-height: 1.4em;font-size: 14px;border-collapse: collapse !important;">
+            {% if item.title %}
             <strong>{{ 'receipt.reservations.title'|translate }}</strong> {{ item.title }}<br/>
+            {% endif %}
+            {% if item.author %}
             <strong>{{ 'receipt.reservations.author'|translate }}</strong> {{ item.author }}<br/>
+            {% endif %}
             <strong>{{ 'receipt.reservations.interestDate'|translate }}</strong> {{ (item.interestDate/1000)|date('d/m/y') }}<br/>
             <strong>{{ 'receipt.reservations.dk5'|translate }}</strong> {{ item.DK5 }}
           </td>
