@@ -7,6 +7,8 @@
 * Bootstrap shutdown (reboot) process fixes.
 * Receipt paper size (75mm)
 * Receipt reservations not ready mat. id removed. 
+* Increased font size of pagination.
+* Only show materials as processed when AFI has been set.
 
 ### v1.2.0
 
