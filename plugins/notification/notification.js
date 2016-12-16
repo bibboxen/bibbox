@@ -168,7 +168,7 @@ Notification.create = function create(bus, paths, languages) {
     deferred.resolve(new Notification(bus, config, paths, languages));
   });
 
-  bus.on('notification.error.config', function (err) {
+  bus.on(errorEvent, function (err) {
     deferred.reject(err);
   });
 

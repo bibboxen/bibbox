@@ -566,7 +566,7 @@ module.exports = function (options, imports, register) {
         var busEvent = 'network.fbs.online' + uniqid();
 
         // Listen to online check event send below.
-        bus.once('busEvent', function (online) {
+        bus.once(busEvent, function (online) {
           bus.emit(request.busEvent, online);
         });
 
