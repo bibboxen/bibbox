@@ -10,7 +10,7 @@ var nodemailer = require('nodemailer');
 var i18n = require('i18n');
 var wkhtmltopdf = require('wkhtmltopdf');
 var spawn = require('child_process').spawn;
-
+var uniqid = require('uniqid');
 var Q = require('q');
 var fs = require('fs');
 
@@ -161,8 +161,10 @@ var Notification = function Notification(bus, config, paths, languages) {
  */
 Notification.create = function create(bus, paths, languages) {
   var deferred = Q.defer();
+  var busEvent = 'notification.loaded.config' + uniqid();
+  var errorEvent = 'notification.error.config' + uniqid();
 
-  bus.once('notification.loaded.config', function (config) {
+  bus.once(busEvent, function (config) {
     deferred.resolve(new Notification(bus, config, paths, languages));
   });
 
@@ -171,8 +173,8 @@ Notification.create = function create(bus, paths, languages) {
   });
 
   bus.emit('ctrl.config.notification', {
-    busEvent: 'notification.loaded.config',
-    errorEvent: 'notification.error.config'
+    busEvent: busEvent,
+    errorEvent: errorEvent
   });
 
   return deferred.promise;

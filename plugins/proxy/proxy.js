@@ -5,6 +5,8 @@
 
 'use strict';
 
+var uniqid = require('uniqid');
+
 /**
  * This object encapsulates the proxy.
  *
@@ -101,27 +103,31 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
     socket.on('*', socketEventHandler);
 
     // Emit configuration to client.
-    bus.once('proxy.config.ui', function (data) {
+    var busEvent = 'proxy.config.ui' + uniqid();
+    var errorEvent = 'proxy.config.ui.error' + uniqid();
+    bus.once(busEvent, function (data) {
       socket.emit('config.ui.update', data);
     });
-    bus.once('proxy.config.ui.error', function (err) {
+    bus.once(errorEvent, function (err) {
       socket.emit('config.ui.update.error', err);
     });
     bus.emit('ctrl.config.ui', {
-      busEvent: 'proxy.config.ui',
-      errorEvent: 'proxy.config.ui.error'
+      busEvent: busEvent,
+      errorEvent: errorEvent
     });
 
     // Emit translation to client.
-    bus.once('proxy.config.ui.translation', function (data) {
+    busEvent = 'proxy.config.ui.translation' + uniqid();
+    errorEvent = 'proxy.config.ui.translation.error' + uniqid();
+    bus.once(busEvent, function (data) {
       socket.emit('config.ui.translations.update', data);
     });
-    bus.once('proxy.config.ui.translation.error', function (err) {
+    bus.once(errorEvent, function (err) {
       socket.emit('config.ui.translations.error', err);
     });
     bus.emit('ctrl.config.ui.translations', {
-      busEvent: 'proxy.config.ui.translation',
-      errorEvent: 'proxy.config.ui.translation.error'
+      busEvent: busEvent,
+      errorEvent: errorEvent
     });
 
     // Handle socket error events.

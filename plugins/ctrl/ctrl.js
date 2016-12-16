@@ -5,6 +5,7 @@
 'use strict';
 
 var Q = require('q');
+var uniqid = require('uniqid');
 
 var CTRL = function CTRL(bus) {
   this.bus = bus;
@@ -17,8 +18,9 @@ var CTRL = function CTRL(bus) {
  */
 CTRL.prototype.getFBSConfig = function getFBSConfig() {
   var deferred = Q.defer();
+  var busEvent = 'ctrl.fbs.loaded.config' + uniqid();
 
-  this.bus.on('ctrl.fbs.loaded.config', function (data) {
+  this.bus.on(busEvent, function (data) {
     if (data instanceof Error) {
       deferred.reject(data);
     }
@@ -26,10 +28,11 @@ CTRL.prototype.getFBSConfig = function getFBSConfig() {
       deferred.resolve(data);
     }
   });
+
   this.bus.emit('storage.load', {
     type: 'config',
     name: 'fbs',
-    busEvent: 'ctrl.fbs.loaded.config'
+    busEvent: busEvent
   });
 
   return deferred.promise;
@@ -43,8 +46,9 @@ CTRL.prototype.getFBSConfig = function getFBSConfig() {
  */
 CTRL.prototype.getNotificationConfig = function getNotificationConfig() {
   var deferred = Q.defer();
+  var busEvent = 'ctrl.notification.loaded.config' + uniqid();
 
-  this.bus.on('ctrl.notification.loaded.config', function (data) {
+  this.bus.on(busEvent, function (data) {
     if (data instanceof Error) {
       deferred.reject(data);
     }
@@ -55,7 +59,7 @@ CTRL.prototype.getNotificationConfig = function getNotificationConfig() {
   this.bus.emit('storage.load', {
     type: 'config',
     name: 'notification',
-    busEvent: 'ctrl.notification.loaded.config'
+    busEvent: busEvent
   });
 
   return deferred.promise;
@@ -69,8 +73,9 @@ CTRL.prototype.getNotificationConfig = function getNotificationConfig() {
  */
 CTRL.prototype.getUiConfig = function getUiConfig() {
   var deferred = Q.defer();
+  var busEvent = 'ctrl.loaded.ui.config' + uniqid();
 
-  this.bus.on('ctrl.loaded.ui.config', function (data) {
+  this.bus.on(busEvent, function (data) {
     if (data instanceof Error) {
       deferred.reject(data);
     }
@@ -81,7 +86,7 @@ CTRL.prototype.getUiConfig = function getUiConfig() {
   this.bus.emit('storage.load', {
     type: 'config',
     name: 'ui',
-    busEvent: 'ctrl.loaded.ui.config'
+    busEvent: busEvent
   });
 
   return deferred.promise;
@@ -94,8 +99,9 @@ CTRL.prototype.getUiConfig = function getUiConfig() {
  */
 CTRL.prototype.getTranslations = function getTranslations() {
   var deferred = Q.defer();
+  var busEvent = 'translations.request.languages' + uniqid();
 
-  this.bus.on('translations.request.languages', function (data) {
+  this.bus.on(busEvent, function (data) {
     if (data instanceof Error) {
       deferred.reject(data);
     }
@@ -104,7 +110,7 @@ CTRL.prototype.getTranslations = function getTranslations() {
     }
   });
   this.bus.emit('translations.request', {
-    busEvent: 'translations.request.languages'
+    busEvent: busEvent
   });
 
   return deferred.promise;
@@ -121,7 +127,6 @@ CTRL.prototype.getTranslations = function getTranslations() {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-
   var bus = imports.bus;
   var ctrl = new CTRL(bus);
 
@@ -208,7 +213,7 @@ module.exports = function (options, imports, register) {
             type: 'config',
             name: 'ui',
             obj: data.config.ui,
-            busEvent: 'storage.config.saved'
+            busEvent: 'storage.config.saved' + uniqid()
           });
         }
 
@@ -218,7 +223,7 @@ module.exports = function (options, imports, register) {
             type: 'config',
             name: 'fbs',
             obj: data.config.fbs,
-            busEvent: 'storage.config.saved'
+            busEvent: 'storage.config.saved' + uniqid()
           });
         }
 
@@ -228,7 +233,7 @@ module.exports = function (options, imports, register) {
             type: 'config',
             name: 'notification',
             obj: data.config.notification,
-            busEvent: 'storage.config.saved'
+            busEvent: 'storage.config.saved' + uniqid()
           });
         }
         break;
@@ -241,7 +246,7 @@ module.exports = function (options, imports, register) {
               type: 'locales',
               name: 'ui/' + key,
               obj: data.translations.ui[key],
-              busEvent: 'storage.translation.ui.saved'
+              busEvent: 'storage.translation.ui.saved' + uniqid()
             });
           }
         }
@@ -253,7 +258,7 @@ module.exports = function (options, imports, register) {
               type: 'locales',
               name: 'notifications/' + key,
               obj: data.translations.notification[key],
-              busEvent: 'storage.translation.notifications.saved'
+              busEvent: 'storage.translation.notifications.saved' + uniqid()
             });
           }
         }

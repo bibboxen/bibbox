@@ -7,6 +7,7 @@
 
 var Queue = require('bull');
 var Q = require('q');
+var uniqid = require('uniqid');
 
 // Global self is used be queued jobs to get access to the bus.
 var self = null;
@@ -67,8 +68,11 @@ var Offline = function Offline(bus, host, port) {
   var threshold = 3;
   var currentHold = 0;
 
+  var busEvent = 'offline.fbs.check' + uniqid();
+  var errorEvent = 'offline.fbs.check.error' + uniqid();
+
   // Listen for FBS offline events.
-  bus.on('offline.fbs.check', function (online) {
+  bus.on(busEvent, function (online) {
     if (online) {
       if (currentHold >= threshold) {
         self.resume('checkin');
@@ -86,7 +90,7 @@ var Offline = function Offline(bus, host, port) {
   });
 
   // Listen to FBS check error and pause queues (FBS offline).
-  bus.on('offline.fbs.check.error', function () {
+  bus.on(errorEvent, function () {
     currentHold = 0;
     self.pause('checkin');
     self.pause('checkout');
@@ -95,8 +99,8 @@ var Offline = function Offline(bus, host, port) {
   // Send FBS online check requests.
   setInterval(function () {
     bus.emit('fbs.online', {
-      busEvent: 'offline.fbs.check',
-      errorEvent: 'offline.fbs.check.error'
+      busEvent: busEvent,
+      errorEvent: errorEvent
     });
   }, 300000);
 };
@@ -215,8 +219,8 @@ Offline.prototype.checkin = function checkin(job, done) {
         type: 'offline',
         name: data.file,
         itemIdentifier: data.itemIdentifier,
-        busEvent: 'offline.remove.item.checkin',
-        errorEvent: 'offline.remove.item.checkin.error'
+        busEvent: 'offline.remove.item.checkin' + uniqid(),
+        errorEvent: 'offline.remove.item.checkin.error' + uniqid()
       });
 
       // Success the item have been checked-in.
@@ -260,8 +264,8 @@ Offline.prototype.checkout = function checkout(job, done) {
         type: 'offline',
         name: data.file,
         itemIdentifier: data.itemIdentifier,
-        busEvent: 'offline.remove.item.checkin',
-        errorEvent: 'offline.remove.item.checkin.error'
+        busEvent: 'offline.remove.item.checkin' + uniqid(),
+        errorEvent: 'offline.remove.item.checkin.error' + uniqid()
       });
 
       // Success the item have been checked-out.
