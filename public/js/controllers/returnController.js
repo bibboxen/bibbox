@@ -83,22 +83,6 @@ angular.module('BibBox').controller('ReturnController', [
                   $scope.materials[i].information = 'return.is_awaiting_afi';
                   $scope.materials[i].sortBin = result.sortBin;
 
-                  // Place the material in the correct sorting bin.
-                  var returnBin = getSortBin(material.sortBin);
-
-                  // See if material was already added to borrowed materials.
-                  var found = returnBin.materials.find(function (item, index) {
-                    return item.id === material.id;
-                  });
-
-                  // Add to material to return bin.
-                  if (!found) {
-                    returnBin.materials.push(material);
-
-                    // Update the pager to show latest result.
-                    returnBin.pager.currentPage = Math.ceil(returnBin.materials.length / returnBin.pager.itemsPerPage);
-                  }
-
                   // Turn AFI on.
                   for (i = 0; i < material.tags.length; i++) {
                     $scope.setAFI(material.tags[i].uid, true);
@@ -177,8 +161,24 @@ angular.module('BibBox').controller('ReturnController', [
           return !tag.afi;
         });
 
-        // If all AFIs have been turned on mark the material as borrowed.
+        // If all AFIs have been turned on mark the material as returned.
         if (!found) {
+          // Place the material in the correct sorting bin.
+          var returnBin = getSortBin(material.sortBin);
+
+          // See if material was already added to borrowed materials.
+          found = returnBin.materials.find(function (item, index) {
+            return item.id === material.id;
+          });
+
+          // Add to material to return bin.
+          if (!found) {
+            returnBin.materials.push(material);
+
+            // Update the pager to show latest result.
+            returnBin.pager.currentPage = Math.ceil(returnBin.materials.length / returnBin.pager.itemsPerPage);
+          }
+
           material.status = 'success';
           material.information = 'return.was_successful';
           material.loading = false;
