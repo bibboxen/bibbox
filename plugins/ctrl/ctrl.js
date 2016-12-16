@@ -261,7 +261,6 @@ module.exports = function (options, imports, register) {
     }
   });
 
-
   register(null, {
     ctrl: ctrl
   });

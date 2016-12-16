@@ -535,7 +535,7 @@ Bootstrap.prototype.startApp = function startApp() {
     deferred.resolve();
   }
   else {
-    var app = fork(__dirname + '/app.js');
+    var app = fork(__dirname + '/app.js', [], { silent: true });
     debug('Started new application with pid: ' + app.pid);
 
     // Event handler for startup errors.
@@ -543,6 +543,14 @@ Bootstrap.prototype.startApp = function startApp() {
       debug('Bibbox not started exit code: ' + app.exitCode);
 
       deferred.reject(app.exitCode);
+    });
+
+    app.stdout.on('data', function (data) {
+      console.log(data.toString());
+    });
+
+    app.stderr.on('data', function (data) {
+      console.error(data.toString());
     });
 
     // Listen for "ready" events.
