@@ -12,6 +12,13 @@ var fs = require('fs');
 
 /**
  * This object encapsulates translation.
+ *
+ * @param {object} bus
+ *   The event bus.
+ * @param {object} paths
+ *   JSON object with information about the translations files to use.
+ * @param {array} languages
+ *   The supported languages.
  */
 var Translation = function (bus, paths, languages) {
   var self = this;
@@ -29,7 +36,7 @@ var Translation = function (bus, paths, languages) {
   // Watch for changes in the translations files and send them in next tick to
   // give n18l an change to reload..
   // @TODO: Avoid more than one push when multiple language files are changed.
-  fs.watch(directory, function(event, filename) {
+  fs.watch(directory, function (event, filename) {
     process.nextTick(function () {
       var langCode = filename.split('.json')[0];
       var translations = {};
@@ -45,7 +52,7 @@ var Translation = function (bus, paths, languages) {
 /**
  * Get all translations.
  *
- * @returns {*}
+ * @return {*}
  *   JSON object with the translations.
  */
 Translation.prototype.getTranslations = function getTranslations() {
@@ -55,10 +62,10 @@ Translation.prototype.getTranslations = function getTranslations() {
 /**
  * Get translations for a given language.
  *
- * @param lang
+ * @param {string} lang
  *   Language code.
  *
- * @returns {*}
+ * @return {*}
  *   JSON object with the translations.
  */
 Translation.prototype.getTranslationsLang = function getTranslationsLang(lang) {
@@ -67,6 +74,13 @@ Translation.prototype.getTranslationsLang = function getTranslationsLang(lang) {
 
 /**
  * Register the plugin with architect.
+ *
+ * @param {array} options
+ *   Options defined in app.js.
+ * @param {array} imports
+ *   The other plugins available.
+ * @param {function} register
+ *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;

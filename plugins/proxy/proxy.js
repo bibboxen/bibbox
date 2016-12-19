@@ -5,18 +5,27 @@
 
 'use strict';
 
+var uniqid = require('uniqid');
+
 /**
  * This object encapsulates the proxy.
  *
- * @param server
- * @param bus
- * @param whitelistedBusEvents
- * @param whitelistedSocketEvents
+ * @param {object} server
+ *   The Express server.
+ * @param {object} bus
+ *   The event bus.
+ * @param {array} whitelistedBusEvents
+ *   The white listed bus events to proxy.
+ * @param {array} whitelistedSocketEvents
+ *   The white listed socket events to proxy.
+ *
+ * @param {array} allowed
+ *   The allowed origins that the socket will accetp connections.
  *
  * @constructor
  */
-var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents) {
-  var io = require('socket.io')(server);
+var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents, allowed) {
+  var io = require('socket.io')(server, { origins: allowed });
 
   // Add wildcard support for socket.
   var wildcard = require('socketio-wildcard')();
@@ -94,27 +103,31 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
     socket.on('*', socketEventHandler);
 
     // Emit configuration to client.
-    bus.once('proxy.config.ui', function (data) {
+    var busEvent = 'proxy.config.ui' + uniqid();
+    var errorEvent = 'proxy.config.ui.error' + uniqid();
+    bus.once(busEvent, function (data) {
       socket.emit('config.ui.update', data);
     });
-    bus.once('proxy.config.ui.error', function (err) {
+    bus.once(errorEvent, function (err) {
       socket.emit('config.ui.update.error', err);
     });
     bus.emit('ctrl.config.ui', {
-      busEvent: 'proxy.config.ui',
-      errorEvent: 'proxy.config.ui.error'
+      busEvent: busEvent,
+      errorEvent: errorEvent
     });
 
     // Emit translation to client.
-    bus.once('proxy.config.ui.translation', function (data) {
+    busEvent = 'proxy.config.ui.translation' + uniqid();
+    errorEvent = 'proxy.config.ui.translation.error' + uniqid();
+    bus.once(busEvent, function (data) {
       socket.emit('config.ui.translations.update', data);
     });
-    bus.once('proxy.config.ui.translation.error', function (err) {
+    bus.once(errorEvent, function (err) {
       socket.emit('config.ui.translations.error', err);
     });
     bus.emit('ctrl.config.ui.translations', {
-      busEvent: 'proxy.config.ui.translation',
-      errorEvent: 'proxy.config.ui.translation.error'
+      busEvent: busEvent,
+      errorEvent: errorEvent
     });
 
     // Handle socket error events.
@@ -126,9 +139,16 @@ var Proxy = function (server, bus, whitelistedBusEvents, whitelistedSocketEvents
 
 /**
  * Register the plugin with architect.
+ *
+ * @param {array} options
+ *   Options defined in app.js.
+ * @param {array} imports
+ *   The other plugins available.
+ * @param {function} register
+ *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var proxy = new Proxy(imports.server, imports.bus, options.whitelistedBusEvents, options.whitelistedSocketEvents);
+  var proxy = new Proxy(imports.server, imports.bus, options.whitelistedBusEvents, options.whitelistedSocketEvents, options.allowed);
 
   register(null, {
     proxy: proxy

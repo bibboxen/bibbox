@@ -9,6 +9,16 @@ var util = require('util');
 var eventEmitter = require('events').EventEmitter;
 var usb = require('usb');
 
+/**
+ * Barcode object.
+ *
+ * @param {string} VID
+ *   USB vendor ID.
+ * @param {string} PID
+ *   USB product id.
+ *
+ * @constructor
+ */
 var Barcode = function Barcode(VID, PID) {
   this.VID = VID;
   this.PID = PID;
@@ -80,10 +90,10 @@ Barcode.prototype.connect = function connect() {
 /**
  * Parse buffer from barcode reader.
  *
- * @param data
+ * @param {buffer} data
  *   The raw buffer from the reader.
  *
- * @returns {*}
+ * @return {*}
  *   The buffers numeric value. If no value -1 and "\n" at end-of-number.
  */
 Barcode.prototype.parseBuffer = function parseBuffer(data) {
@@ -147,7 +157,8 @@ Barcode.prototype.parseBuffer = function parseBuffer(data) {
 /**
  * List devices.
  *
- * @returns {*}
+ * @return {*}
+ *   List of available USB devices.
  */
 Barcode.prototype.list = function list() {
   return usb.getDeviceList();
@@ -172,6 +183,13 @@ Barcode.prototype.stop = function stop() {
 
 /**
  * Register the plugin with architect.
+ *
+ * @param {array} options
+ *   Options defined in app.js.
+ * @param {array} imports
+ *   The other plugins available.
+ * @param {function} register
+ *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;

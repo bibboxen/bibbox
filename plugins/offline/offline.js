@@ -7,6 +7,7 @@
 
 var Queue = require('bull');
 var Q = require('q');
+var uniqid = require('uniqid');
 
 // Global self is used be queued jobs to get access to the bus.
 var self = null;
@@ -67,36 +68,39 @@ var Offline = function Offline(bus, host, port) {
   var threshold = 3;
   var currentHold = 0;
 
-  // Listen for FBS offline events.
-  bus.on('offline.fbs.check', function (online) {
-    if (online) {
-      if (currentHold >= threshold) {
-        self.resume('checkin');
-        self.resume('checkout');
+  // Send FBS online check requests.
+  setInterval(function () {
+    var busEvent = 'offline.fbs.check' + uniqid();
+    var errorEvent = 'offline.fbs.check.error' + uniqid();
+
+    // Listen for FBS offline events. This have to be "on" events not once.
+    bus.once(busEvent, function (online) {
+      if (online) {
+        if (currentHold >= threshold) {
+          self.resume('checkin');
+          self.resume('checkout');
+        }
+        else {
+          currentHold++;
+        }
       }
       else {
-        currentHold++;
+        currentHold = 0;
+        self.pause('checkin');
+        self.pause('checkout');
       }
-    }
-    else {
+    });
+
+    // Listen to FBS check error and pause queues (FBS offline).
+    bus.once(errorEvent, function () {
       currentHold = 0;
       self.pause('checkin');
       self.pause('checkout');
-    }
-  });
+    });
 
-  // Listen to FBS check error and pause queues (FBS offline).
-  bus.on('offline.fbs.check.error', function () {
-    currentHold = 0;
-    self.pause('checkin');
-    self.pause('checkout');
-  });
-
-  // Send FBS online check requests.
-  setInterval(function () {
     bus.emit('fbs.online', {
-      busEvent: 'offline.fbs.check',
-      errorEvent: 'offline.fbs.check.error'
+      busEvent: busEvent,
+      errorEvent: errorEvent
     });
   }, 300000);
 };
@@ -126,6 +130,92 @@ Offline.prototype._findQueue = function _findQueue(type) {
   }
 
   return queue;
+};
+
+/**
+ * Get the list of failed jobs.
+ *
+ * @param {string} type
+ *   The queue type to get jobs from (checkin or checkout).
+ *
+ * @returns {null|*|jQuery.promise|Function|promise|d}
+ *   Promise that will resolve with job count and the failed jobs.
+ */
+Offline.prototype.getFailedJobs = function getFailedJobs(type) {
+  var deferred = Q.defer();
+
+  var queue = this._findQueue(type);
+
+  queue.getFailed().then(function (failedJobs) {
+    var jobs = [];
+    for (var i in failedJobs) {
+      var job = failedJobs[i];
+
+      // Clean internal book keeping information from the jobs data.
+      var data = job.data;
+      delete data.busEvent;
+      delete data.errorEvent;
+      delete data.queued;
+
+      jobs.push({
+        type: job.queue.name,
+        jobId: job.jobId,
+        timestamp: job.timestamp,
+        data: data,
+        reason: job.failedReason
+      });
+    }
+    queue.getFailedCount().then(function (count) {
+        deferred.resolve({
+          count: count,
+          jobs: jobs
+        });
+    }, function (err) {
+      deferred.reject(err);
+    });
+  }, function (err) {
+    deferred.reject(err);
+  });
+
+  return deferred.promise;
+};
+
+/**
+ * Get counts (number of jobs) in the different stats.
+ *
+ * @param {string} type
+ *   The queue type to get jobs from (checkin or checkout).
+ *
+ * @returns {null|*|jQuery.promise|Function|promise|d}
+ *   Promise that will resolve with job counts.
+ */
+Offline.prototype.getQueueCounts = function getQueueCounts(type) {
+  var deferred = Q.defer();
+
+  var queue = this._findQueue(type);
+  var counts = {};
+
+  Q.all([
+    queue.getCompletedCount(),
+    queue.getPausedCount(),
+    queue.getFailedCount(),
+    queue.getDelayedCount(),
+    queue.getActiveCount(),
+    queue.getWaitingCount()
+  ]).then(function (data) {
+    deferred.resolve({
+      completed: data[0],
+      paused: data[1],
+      failed: data[2],
+      delayed: data[3],
+      active: data[4],
+      waiting: data[5]
+    });
+  }, function (err) {
+    deferred.reject(err);
+  });
+
+  return deferred.promise;
 };
 
 /**
@@ -215,8 +305,8 @@ Offline.prototype.checkin = function checkin(job, done) {
         type: 'offline',
         name: data.file,
         itemIdentifier: data.itemIdentifier,
-        busEvent: 'offline.remove.item.checkin',
-        errorEvent: 'offline.remove.item.checkin.error'
+        busEvent: 'offline.remove.item.checkin' + uniqid(),
+        errorEvent: 'offline.remove.item.checkin.error' + uniqid()
       });
 
       // Success the item have been checked-in.
@@ -260,8 +350,8 @@ Offline.prototype.checkout = function checkout(job, done) {
         type: 'offline',
         name: data.file,
         itemIdentifier: data.itemIdentifier,
-        busEvent: 'offline.remove.item.checkin',
-        errorEvent: 'offline.remove.item.checkin.error'
+        busEvent: 'offline.remove.item.checkin' + uniqid(),
+        errorEvent: 'offline.remove.item.checkin.error' + uniqid()
       });
 
       // Success the item have been checked-out.
@@ -281,6 +371,13 @@ Offline.prototype.checkout = function checkout(job, done) {
 
 /**
  * Register the plugin with architect.
+ *
+ * @param {array} options
+ *   Options defined in app.js.
+ * @param {array} imports
+ *   The other plugins available.
+ * @param {function} register
+ *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
@@ -306,6 +403,36 @@ module.exports = function (options, imports, register) {
     data.queued = true;
 
     offline.add('checkin', data);
+  });
+
+  bus.on('offline.failed.jobs', function (data) {
+    var jobs = {};
+    offline.getFailedJobs('checkout').then(function (checkoutJobs) {
+      jobs.checkout = checkoutJobs;
+      offline.getFailedJobs('checkin').then(function (checkinJobs) {
+        jobs.checkin = checkinJobs;
+        bus.emit(data.busEvent, jobs);
+      }, function (err) {
+        bus.emit(data.errorEvent, err);
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
+  });
+
+  bus.on('offline.counts', function (data) {
+    var counts = {};
+    offline.getQueueCounts('checkout').then(function (checkoutCounts) {
+      counts.checkout = checkoutCounts;
+      offline.getQueueCounts('checkin').then(function (checkinCounts) {
+        counts.checkin = checkinCounts;
+        bus.emit(data.busEvent, counts);
+      }, function (err) {
+        bus.emit(data.errorEvent, err);
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   register(null, {

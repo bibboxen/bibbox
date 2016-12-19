@@ -2,6 +2,19 @@
 
 ### In development
 
+* Added access control to the rfid ws.
+* Added access check on socket connection.
+* Bootstrap shutdown (reboot) process fixes.
+* Receipt paper size (75mm)
+* Receipt reservations not ready mat. id removed. 
+* Increased font size of pagination.
+* Only show materials as processed when AFI has been set.
+* Uniform pagination in borrow and return pages.
+* Fixed bug where mouse was visible on status page.
+* Added /offlineFailedJobs to get JSON object with failed jobs from offline queue.
+* Added /offlineJobCounts to get job queue stats by counts.
+* Fix to the event listeners memory leak issues.
+
 ### v1.2.0
 
 * Fixed RFID reading of MID.

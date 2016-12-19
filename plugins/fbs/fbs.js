@@ -8,6 +8,7 @@
 var util = require('util');
 var eventEmitter = require('events').EventEmitter;
 var Q = require('q');
+var uniqid = require('uniqid');
 
 var debug = require('debug')('bibbox:FBS:main');
 
@@ -46,18 +47,20 @@ util.inherits(FBS, eventEmitter);
  */
 FBS.create = function create(bus) {
   var deferred = Q.defer();
+  var busEvent = 'fbs.config.loaded' + uniqid();
+  var errorEvent = 'fbs.config.error' + uniqid();
 
-  bus.once('fbs.config.loaded', function (config) {
+  bus.once(busEvent, function (config) {
     deferred.resolve(new FBS(bus, config));
   });
 
-  bus.once('fbs.config.error', function (err) {
+  bus.once(errorEvent, function (err) {
     deferred.reject(err);
   });
 
   bus.emit('ctrl.config.fbs', {
-    busEvent: 'fbs.config.loaded',
-    errorEvent: 'fbs.config.error'
+    busEvent: busEvent,
+    errorEvent: errorEvent
   });
 
   return deferred.promise;
@@ -294,6 +297,13 @@ FBS.prototype.block = function block(username, reason) {
 
 /**
  * Register the plugin with architect.
+ *
+ * @param {array} options
+ *   Options defined in app.js.
+ * @param {array} imports
+ *   The other plugins available.
+ * @param {function} register
+ *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
@@ -553,23 +563,22 @@ module.exports = function (options, imports, register) {
     FBS.create(bus).then(function (fbs) {
       // Check that config exists.
       if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
+        var busEvent = 'network.fbs.online' + uniqid();
+
         // Listen to online check event send below.
-        bus.once('network.fbs.online', function (online) {
+        bus.once(busEvent, function (online) {
           bus.emit(request.busEvent, online);
         });
 
         // Send online check.
         bus.emit('network.online', {
           url: fbs.config.endpoint,
-          busEvent: 'network.fbs.online'
+          busEvent: busEvent
         });
       }
       else {
         bus.emit(request.busEvent, false);
       }
     });
-  },
-  function (err) {
-    bus.emit(request.errorEvent, err);
   });
 };

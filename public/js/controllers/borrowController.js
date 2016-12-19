@@ -100,16 +100,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                     $scope.materials[i].information = 'borrow.is_awaiting_afi';
                     $scope.materials[i].dueDate = result.dueDate;
 
-                    // See if material was already added to borrowed materials.
-                    var found = $scope.borrowedMaterials.find(function (item, index) {
-                      return item.id === material.id;
-                    });
-
-                    // Add to borrowed materials if not found.
-                    if (!found) {
-                      $scope.borrowedMaterials.push(material);
-                    }
-
                     // Turn AFI off.
                     for (i = 0; i < material.tags.length; i++) {
                       $scope.setAFI(material.tags[i].uid, false);
@@ -194,6 +184,19 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
         // If all AFIs have been turned off mark the material as borrowed.
         if (!found) {
+          // See if material was already added to borrowed materials.
+          found = $scope.borrowedMaterials.find(function (item, index) {
+            return item.id === material.id;
+          });
+
+          // Add to borrowed materials if not found.
+          if (!found) {
+            $scope.borrowedMaterials.push(material);
+
+            // Update the pager to show latest result.
+            $scope.pager.currentPage = Math.ceil($scope.borrowedMaterials.length / $scope.pager.itemsPerPage);
+          }
+
           material.status = 'success';
           material.information = 'borrow.was_successful';
           material.loading = false;

@@ -10,11 +10,27 @@ var Q = require('q');
 var fork = require('child_process').fork;
 var debug = require('debug')('bibbox:network');
 
-
+/**
+ * The network object.
+ *
+ * @param {object} bus
+ *   The event bus.
+ *
+ * @constructor
+ */
 var Network = function Network(bus) {
   this.bus = bus;
 };
 
+/**
+ * Check if a given URI address is online.
+ *
+ * @param {string} uri
+ *   The URI to check.
+ *
+ * @returns {Function|promise|*|d}
+ *   Resolves if the URI is online else rejected.
+ */
 Network.prototype.isOnline = function isOnline(uri) {
   var deferred = Q.defer();
 
@@ -38,6 +54,7 @@ Network.prototype.isOnline = function isOnline(uri) {
     tester.once('close', function (code) {
       debug('Tester (pid: ' + tester.pid + ') closed with code: ' + code);
     });
+
     debug('Tester started with pid: ', tester.pid);
   }
   catch (err) {
@@ -49,6 +66,13 @@ Network.prototype.isOnline = function isOnline(uri) {
 
 /**
  * Register the plugin with architect.
+ *
+ * @param {array} options
+ *   Options defined in app.js.
+ * @param {array} imports
+ *   The other plugins available.
+ * @param {function} register
+ *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;

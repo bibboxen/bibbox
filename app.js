@@ -32,8 +32,7 @@ var plugins = [
     path: path.join(__dirname, 'public')
   },
   {
-    packagePath: './plugins/ctrl',
-    allowed: config.allowed
+    packagePath: './plugins/ctrl'
   },
   {
     packagePath: './plugins/network'
@@ -51,7 +50,8 @@ var plugins = [
   {
     packagePath: './plugins/proxy',
     whitelistedSocketEvents: config.proxy.whitelistedSocketEvents,
-    whitelistedBusEvents: config.proxy.whitelistedBusEvents
+    whitelistedBusEvents: config.proxy.whitelistedBusEvents,
+    allowed: config.allowed
   },
   {
     packagePath: './plugins/fbs'
@@ -59,7 +59,8 @@ var plugins = [
   {
     packagePath: './plugins/rfid',
     port: config.rfid.port,
-    afi: config.rfid.afi
+    afi: config.rfid.afi,
+    allowed: config.rfid.allowed
   },
   {
     packagePath: './plugins/notification',
@@ -82,8 +83,8 @@ architect.createApp(config, function (err, app) {
 });
 
 // Ensure proper process exit when killed in term.
-process.once('SIGINT', function () { process.exit(1); });
-process.once('SIGTERM', function () { process.exit(1); });
+process.once('SIGINT', function () { process.exit(); });
+process.once('SIGTERM', function () { process.exit(); });
 
 // If process is forked from bootstrap send keep-alive events back.
 setInterval(function () {

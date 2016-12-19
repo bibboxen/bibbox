@@ -328,3 +328,7 @@ h4 {
 .image-help--processing {
   display: none;
 }
+
+.pagination {
+  font-size: 1.4em;
+}

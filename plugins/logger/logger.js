@@ -118,7 +118,7 @@ var Logger = function Logger(logs) {
 /**
  * Log error message.
  *
- * @param message
+ * @param {string} message
  *   The message to send to the logger.
  */
 Logger.prototype.error = function error(message) {
@@ -130,7 +130,7 @@ Logger.prototype.error = function error(message) {
 /**
  * Log info message.
  *
- * @param message
+ * @param {string} message
  *   The message to send to the logger.
  */
 Logger.prototype.info = function info(message) {
@@ -142,7 +142,7 @@ Logger.prototype.info = function info(message) {
 /**
  * Log debug message.
  *
- * @param message
+ * @param {string} message
  *   The message to send to the logger.
  */
 Logger.prototype.debug = function debug(message) {
@@ -154,7 +154,7 @@ Logger.prototype.debug = function debug(message) {
 /**
  * Log fbs message.
  *
- * @param message
+ * @param {string} message
  *   The message to send to the logger.
  */
 Logger.prototype.fbs = function fbs(message) {
@@ -166,7 +166,7 @@ Logger.prototype.fbs = function fbs(message) {
 /**
  * Log off-line message.
  *
- * @param message
+ * @param {string} message
  *   The message to send to the logger.
  */
 Logger.prototype.offline = function offline(message) {
@@ -177,6 +177,13 @@ Logger.prototype.offline = function offline(message) {
 
 /**
  * Register the plugin with architect.
+ *
+ * @param {array} options
+ *   Options defined in app.js.
+ * @param {array} imports
+ *   The other plugins available.
+ * @param {function} register
+ *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
   var logger = new Logger(options.logs);

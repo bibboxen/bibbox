@@ -6,7 +6,8 @@
   "private": true,
   "dependencies": {
     "bull": "^1.0.0",
-    "q": "^1.4.1"
+    "q": "^1.4.1",
+    "uniqid": "^4.1.0"
   },
   "plugin": {
     "consumes": [
