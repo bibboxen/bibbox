@@ -285,6 +285,28 @@ module.exports = function (options, imports, register) {
           errorEvent: errorEvent
         });
         break;
+
+      case 'offlineCounts':
+        var busEvent = 'offline.counts' + uniqid();
+        var errorEvent = 'offline.counts.error' + uniqid();
+
+        bus.once(busEvent, function (data) {
+          process.send({
+            offlineCounts: data
+          });
+        });
+
+        bus.once(errorEvent, function (err) {
+          process.send({
+            offlineCountsError: err.message
+          });
+        });
+
+        bus.emit('offline.counts', {
+          busEvent: busEvent,
+          errorEvent: errorEvent
+        });
+        break;
     }
   });
 

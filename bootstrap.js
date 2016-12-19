@@ -396,6 +396,33 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       });
       break;
 
+    /**
+     * Get offline job counts.
+     */
+    case '/offlineJobCounts':
+      self.bibbox.on('message', function offlineJobCounts(message) {
+        if (message.hasOwnProperty('offlineCounts')) {
+          res.write(JSON.stringify({
+            status: 'running',
+            jobs: message.offlineCounts
+          }));
+          res.end();
+          self.bibbox.removeListener('message', offlineJobCounts);
+        }
+        if (message.hasOwnProperty('offlineCountsError')) {
+          res.write(JSON.stringify({
+            status: 'error',
+            message: message.offlineCountsError
+          }));
+          res.end();
+          self.bibbox.removeListener('message', offlineJobCounts);
+        }
+      });
+      self.bibbox.send({
+        command: 'offlineCounts'
+      });
+      break;
+
     default:
       res.write('Hello World!');
       res.end();

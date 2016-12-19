@@ -180,6 +180,44 @@ Offline.prototype.getFailedJobs = function getFailedJobs(type) {
 };
 
 /**
+ * Get counts (number of jobs) in the different stats.
+ *
+ * @param {string} type
+ *   The queue type to get jobs from (checkin or checkout).
+ *
+ * @returns {null|*|jQuery.promise|Function|promise|d}
+ *   Promise that will resolve with job counts.
+ */
+Offline.prototype.getQueueCounts = function getQueueCounts(type) {
+  var deferred = Q.defer();
+
+  var queue = this._findQueue(type);
+  var counts = {};
+
+  Q.all([
+    queue.getCompletedCount(),
+    queue.getPausedCount(),
+    queue.getFailedCount(),
+    queue.getDelayedCount(),
+    queue.getActiveCount(),
+    queue.getWaitingCount()
+  ]).then(function (data) {
+    deferred.resolve({
+      completed: data[0],
+      paused: data[1],
+      failed: data[2],
+      delayed: data[3],
+      active: data[4],
+      waiting: data[5]
+    });
+  }, function (err) {
+    deferred.reject(err);
+  });
+
+  return deferred.promise;
+};
+
+/**
  * Pause a queue.
  *
  * @param type
@@ -373,6 +411,21 @@ module.exports = function (options, imports, register) {
       offline.getFailedJobs('checkin').then(function (checkinJobs) {
         jobs.checkin = checkinJobs;
         bus.emit(data.busEvent, jobs);
+      }, function (err) {
+        bus.emit(data.errorEvent, err);
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
+  });
+
+  bus.on('offline.counts', function (data) {
+    var counts = {};
+    offline.getQueueCounts('checkout').then(function (checkoutCounts) {
+      counts.checkout = checkoutCounts;
+      offline.getQueueCounts('checkin').then(function (checkinCounts) {
+        counts.checkin = checkinCounts;
+        bus.emit(data.busEvent, counts);
       }, function (err) {
         bus.emit(data.errorEvent, err);
       });

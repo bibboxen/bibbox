@@ -12,6 +12,7 @@
 * Uniform pagination in borrow and return pages.
 * Fixed bug where mouse was visible on status page.
 * Added /offlineFailedJobs to get JSON object with failed jobs from offline queue.
+* Added /offlineJobCounts to get job queue stats by counts.
 * Fix to the event listeners memory leak issues.
 
 ### v1.2.0
