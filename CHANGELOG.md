@@ -2,11 +2,15 @@
 
 ### In development
 
+* No changes yet...
+
+### v1.2.1
+
 * Added access control to the rfid ws.
 * Added access check on socket connection.
 * Bootstrap shutdown (reboot) process fixes.
 * Receipt paper size (75mm)
-* Receipt reservations not ready mat. id removed. 
+* Receipt reservations not ready mat. id removed.
 * Increased font size of pagination.
 * Only show materials as processed when AFI has been set.
 * Uniform pagination in borrow and return pages.
