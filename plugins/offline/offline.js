@@ -161,7 +161,8 @@ Offline.prototype.getFailedJobs = function getFailedJobs(type) {
         type: job.queue.name,
         jobId: job.jobId,
         timestamp: job.timestamp,
-        data: data
+        data: data,
+        reason: job.failedReason
       });
     }
     queue.getFailedCount().then(function (count) {
