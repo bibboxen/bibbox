@@ -263,6 +263,28 @@ module.exports = function (options, imports, register) {
           }
         }
         break;
+
+      case 'offlineFailedJobs':
+        var busEvent = 'offline.failed.jobs' + uniqid();
+        var errorEvent = 'offline.failed.jobs.error' + uniqid();
+
+        bus.once(busEvent, function (data) {
+          process.send({
+            offlineFailedJobs: data
+          });
+        });
+
+        bus.once(errorEvent, function (err) {
+          process.send({
+            offlineFailedJobsError: err.message
+          });
+        });
+
+        bus.emit('offline.failed.jobs', {
+          busEvent: busEvent,
+          errorEvent: errorEvent
+        });
+        break;
     }
   });
 

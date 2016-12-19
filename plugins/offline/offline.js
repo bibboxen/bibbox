@@ -133,6 +133,53 @@ Offline.prototype._findQueue = function _findQueue(type) {
 };
 
 /**
+ * Get the list of failed jobs.
+ *
+ * @param {string} type
+ *   The queue type to get jobs from (checkin or checkout).
+ *
+ * @returns {null|*|jQuery.promise|Function|promise|d}
+ *   Promise that will resolve with job count and the failed jobs.
+ */
+Offline.prototype.getFailedJobs = function getFailedJobs(type) {
+  var deferred = Q.defer();
+
+  var queue = this._findQueue(type);
+
+  queue.getFailed().then(function (failedJobs) {
+    var jobs = [];
+    for (var i in failedJobs) {
+      var job = failedJobs[i];
+
+      // Clean internal book keeping information from the jobs data.
+      var data = job.data;
+      delete data.busEvent;
+      delete data.errorEvent;
+      delete data.queued;
+
+      jobs.push({
+        type: job.queue.name,
+        jobId: job.jobId,
+        timestamp: job.timestamp,
+        data: data
+      });
+    }
+    queue.getFailedCount().then(function (count) {
+        deferred.resolve({
+          count: count,
+          jobs: jobs
+        });
+    }, function (err) {
+      deferred.reject(err);
+    });
+  }, function (err) {
+    deferred.reject(err);
+  });
+
+  return deferred.promise;
+};
+
+/**
  * Pause a queue.
  *
  * @param type
@@ -317,6 +364,21 @@ module.exports = function (options, imports, register) {
     data.queued = true;
 
     offline.add('checkin', data);
+  });
+
+  bus.on('offline.failed.jobs', function (data) {
+    var jobs = {};
+    offline.getFailedJobs('checkout').then(function (checkoutJobs) {
+      jobs.checkout = checkoutJobs;
+      offline.getFailedJobs('checkin').then(function (checkinJobs) {
+        jobs.checkin = checkinJobs;
+        bus.emit(data.busEvent, jobs);
+      }, function (err) {
+        bus.emit(data.errorEvent, err);
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   register(null, {

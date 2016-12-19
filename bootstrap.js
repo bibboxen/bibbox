@@ -369,6 +369,33 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       }
       break;
 
+    /**
+     * Get list of failed offline jobs.
+     */
+    case '/offlineFailedJobs':
+      self.bibbox.on('message', function offlineFailedJobs(message) {
+        if (message.hasOwnProperty('offlineFailedJobs')) {
+          res.write(JSON.stringify({
+            status: 'running',
+            jobs: message.offlineFailedJobs
+          }));
+          res.end();
+          self.bibbox.removeListener('message', offlineFailedJobs);
+        }
+        if (message.hasOwnProperty('offlineFailedJobsError')) {
+          res.write(JSON.stringify({
+            status: 'error',
+            message: message.offlineFailedJobsError
+          }));
+          res.end();
+          self.bibbox.removeListener('message', offlineFailedJobs);
+        }
+      });
+      self.bibbox.send({
+        command: 'offlineFailedJobs'
+      });
+      break;
+
     default:
       res.write('Hello World!');
       res.end();
