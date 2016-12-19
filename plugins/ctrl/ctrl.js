@@ -20,7 +20,7 @@ CTRL.prototype.getFBSConfig = function getFBSConfig() {
   var deferred = Q.defer();
   var busEvent = 'ctrl.fbs.loaded.config' + uniqid();
 
-  this.bus.on(busEvent, function (data) {
+  this.bus.once(busEvent, function (data) {
     if (data instanceof Error) {
       deferred.reject(data);
     }
@@ -48,7 +48,7 @@ CTRL.prototype.getNotificationConfig = function getNotificationConfig() {
   var deferred = Q.defer();
   var busEvent = 'ctrl.notification.loaded.config' + uniqid();
 
-  this.bus.on(busEvent, function (data) {
+  this.bus.once(busEvent, function (data) {
     if (data instanceof Error) {
       deferred.reject(data);
     }
@@ -75,7 +75,7 @@ CTRL.prototype.getUiConfig = function getUiConfig() {
   var deferred = Q.defer();
   var busEvent = 'ctrl.loaded.ui.config' + uniqid();
 
-  this.bus.on(busEvent, function (data) {
+  this.bus.once(busEvent, function (data) {
     if (data instanceof Error) {
       deferred.reject(data);
     }
@@ -101,7 +101,7 @@ CTRL.prototype.getTranslations = function getTranslations() {
   var deferred = Q.defer();
   var busEvent = 'translations.request.languages' + uniqid();
 
-  this.bus.on(busEvent, function (data) {
+  this.bus.once(busEvent, function (data) {
     if (data instanceof Error) {
       deferred.reject(data);
     }

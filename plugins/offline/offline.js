@@ -68,36 +68,36 @@ var Offline = function Offline(bus, host, port) {
   var threshold = 3;
   var currentHold = 0;
 
-  var busEvent = 'offline.fbs.check' + uniqid();
-  var errorEvent = 'offline.fbs.check.error' + uniqid();
+  // Send FBS online check requests.
+  setInterval(function () {
+    var busEvent = 'offline.fbs.check' + uniqid();
+    var errorEvent = 'offline.fbs.check.error' + uniqid();
 
-  // Listen for FBS offline events.
-  bus.on(busEvent, function (online) {
-    if (online) {
-      if (currentHold >= threshold) {
-        self.resume('checkin');
-        self.resume('checkout');
+    // Listen for FBS offline events. This have to be "on" events not once.
+    bus.once(busEvent, function (online) {
+      if (online) {
+        if (currentHold >= threshold) {
+          self.resume('checkin');
+          self.resume('checkout');
+        }
+        else {
+          currentHold++;
+        }
       }
       else {
-        currentHold++;
+        currentHold = 0;
+        self.pause('checkin');
+        self.pause('checkout');
       }
-    }
-    else {
+    });
+
+    // Listen to FBS check error and pause queues (FBS offline).
+    bus.once(errorEvent, function () {
       currentHold = 0;
       self.pause('checkin');
       self.pause('checkout');
-    }
-  });
+    });
 
-  // Listen to FBS check error and pause queues (FBS offline).
-  bus.on(errorEvent, function () {
-    currentHold = 0;
-    self.pause('checkin');
-    self.pause('checkout');
-  });
-
-  // Send FBS online check requests.
-  setInterval(function () {
     bus.emit('fbs.online', {
       busEvent: busEvent,
       errorEvent: errorEvent
