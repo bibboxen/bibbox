@@ -63,6 +63,9 @@ var Bus = function Bus() {
         // We use the same pattern to send events into the bus. So we do some
         // book keeping to be able to remove the unused event handler and free
         // memory.
+        // The reason we swap bus/errorEvent is that these entries are used with
+        // once listeners. When an busEvent once handler is invoked, the
+        // errorEvent once handler will need to be remove.
         events[data.busEvent] = data.errorEvent;
         events[data.errorEvent] = data.busEvent;
       }

@@ -192,6 +192,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           // Add to borrowed materials if not found.
           if (!found) {
             $scope.borrowedMaterials.push(material);
+
+            // Update the pager to show latest result.
+            $scope.pager.currentPage = Math.ceil($scope.borrowedMaterials.length / $scope.pager.itemsPerPage);
           }
 
           material.status = 'success';

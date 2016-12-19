@@ -9,6 +9,8 @@
 * Receipt reservations not ready mat. id removed. 
 * Increased font size of pagination.
 * Only show materials as processed when AFI has been set.
+* Uniform pagination in borrow and return pages.
+* Fixed bug where mouse was visible on status page.
 
 ### v1.2.0
 
