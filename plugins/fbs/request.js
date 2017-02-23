@@ -222,16 +222,18 @@ Request.prototype.patronInformation = function patronInformation(patronId, patro
  *   Pin code/password for the patron.
  * @param itemIdentifier
  *   The item to checkout.
- * @param checkedOutDate
- *   Timestamp for the time that the item was checked out.
+ * @param noBlockDueDate
+ *   Timestamp for the time the book should be returned (when noBlock is true).
+ * @param {bool} noBlock
+ *   If true the check-out cannot be rejected by FBS.
  * @param callback
  *   Function to call when completed request to FBS.
  */
-Request.prototype.checkout = function checkout(patronId, patronPassword, itemIdentifier, checkedOutDate, callback) {
+Request.prototype.checkout = function checkout(patronId, patronPassword, itemIdentifier, noBlockDueDate, noBlock, callback) {
   var self = this;
   var transactionDate = self.encodeTime();
-  var checkedOutDateEncoded = self.encodeTime(checkedOutDate);
-  var message = '11NN' + transactionDate + checkedOutDateEncoded + '|AO' + self.agency + '|AA' + patronId + '|AB' + itemIdentifier + '|AC|CH|AD' + patronPassword + '|';
+  var noBlockDueDateEncoded = self.encodeTime(noBlockDueDate);
+  var message = '11N' + (noBlock ? 'Y' : 'N') + transactionDate + noBlockDueDateEncoded + '|AO' + self.agency + '|AA' + patronId + '|AB' + itemIdentifier + '|AC|CH|AD' + patronPassword + '|';
 
   self.send(message, 'AO', callback);
 };

@@ -369,6 +369,10 @@ Offline.prototype.checkout = function checkout(job, done) {
     done(err);
   });
 
+  // Request from the offline queue need to have the noBlock set to true to
+  // ensure that the check-out is forced in the library system.
+  data.noBlock = true;
+
   // Send request to FBS.
   self.bus.emit('fbs.checkout', data);
 };
