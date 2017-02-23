@@ -5,6 +5,9 @@
   <p>
     {{ item.itemProperties.title|translate }}<br/>
     {{ 'receipt.loans.id'|translate }} {{ item.itemIdentifier }}<br/>
+    {% if item.dueDate %}
+    {{ 'receipt.loans.returnDate'|translate }} {{ (item.dueDate/1000)|date('d/m/y') }}
+    {% endif %}
   </p>
 </div>
 {% endfor %}

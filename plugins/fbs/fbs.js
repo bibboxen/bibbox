@@ -408,7 +408,8 @@ module.exports = function (options, imports, register) {
             itemProperties: {
               id: data.itemIdentifier,
               title: 'fbs.offline.title'
-            }
+            },
+            dueDate: data.noBlockDueDate
           };
 
           bus.once('fbs.checkout.offline.stored' + data.itemIdentifier, function (res) {
