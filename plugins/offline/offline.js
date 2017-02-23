@@ -320,6 +320,10 @@ Offline.prototype.checkin = function checkin(job, done) {
     done(err);
   });
 
+  // Request from the offline queue need to have the noBlock set to true to
+  // ensure that the check-in is forced in the library system.
+  data.noBlock = true;
+
   // Send request to FBS.
   self.bus.emit('fbs.checkin', data);
 };

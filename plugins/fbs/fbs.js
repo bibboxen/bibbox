@@ -192,15 +192,17 @@ FBS.prototype.checkout = function checkout(username, password, itemIdentifier, c
  *   The item to checkout.
  * @param checkedInDate
  *   Timestamp for the time that the item was returned.
+ * @param {bool} noBlock
+ *   If true the request can not be blocked by the library system.
  *
  * @return {*|promise}
  *   JSON object with information or error message on failure.
  */
-FBS.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate) {
+FBS.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate, noBlock) {
   var deferred = Q.defer();
 
   var req = new Request(this.bus, this.config);
-  req.checkIn(itemIdentifier, checkedInDate, function (err, res) {
+  req.checkIn(itemIdentifier, checkedInDate, noBlock, function (err, res) {
     if (err) {
       deferred.reject(err);
     }
@@ -451,7 +453,13 @@ module.exports = function (options, imports, register) {
 
     // Create FBS object and send check-in request.
     FBS.create(bus).then(function (fbs) {
-      fbs.checkIn(data.itemIdentifier, data.checkedInDate).then(function (res) {
+      // Ensure that the noBlock parameter to FBS is set to 'N' as default.
+      // NoBlock have been added in a later release an may not the send in all
+      // request.
+      var noBlock = data.hasOwnProperty('noBlock') ? data.noBlock : false;
+
+      // Perform the checking request.
+      fbs.checkIn(data.itemIdentifier, data.checkedInDate, noBlock).then(function (res) {
         bus.emit(data.busEvent, res);
       },
       function (err) {

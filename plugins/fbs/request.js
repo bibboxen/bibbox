@@ -243,14 +243,16 @@ Request.prototype.checkout = function checkout(patronId, patronPassword, itemIde
  *   The item to checkout.
  * @param checkedInDate
  *   Timestamp for the time that the item was returned.
+ * @param noBlock
+ *   If true the check-in cannot be rejected by FBS.
  * @param callback
  *   Function to call when completed request to FBS.
  */
-Request.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate, callback) {
+Request.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate, noBlock, callback) {
   var self = this;
   var transactionDate = self.encodeTime();
   var checkedInDateEncoded = self.encodeTime(checkedInDate);
-  var message = '09N' + transactionDate + checkedInDateEncoded + '|AP' + self.location + '|AO' + self.agency + '|AB' + itemIdentifier + '|AC|CH|';
+  var message = '09' + (noBlock ? 'Y' : 'N') + transactionDate + checkedInDateEncoded + '|AP' + self.location + '|AO' + self.agency + '|AB' + itemIdentifier + '|AC|CH|';
 
   self.send(message, 'AO', callback);
 };
