@@ -2,9 +2,11 @@
 
 ### In development
 
-* Added no block to check-in and check-out in SIP2 when executed from offline 
-  queue.
+### v1.2.2
+
+* Added no block to check-in and check-out in SIP2 when executed from offline queue.
 * Added due date to offline receipt.
+* Updated Java RFID application (detected tags clearance)
 
 ### v1.2.1
 
