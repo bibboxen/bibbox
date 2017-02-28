@@ -2,7 +2,9 @@
 
 ### In development
 
-* No changes yet...
+* Added no block to check-in and check-out in SIP2 when executed from offline 
+  queue.
+* Added due date to offline receipt.
 
 ### v1.2.1
 

@@ -163,17 +163,19 @@ FBS.prototype.patronInformation = function patronInformation(username, password)
  *   The patrons password.
  * @param itemIdentifier
  *   The item to checkout.
- * @param checkedOutDate
- *   Timestamp for the time that the item was checked out.
+ * @param noBlockDueDate
+ *   Timestamp for the time the book should be returned (when noBlock is true).
+ * @param {bool} noBlock
+ *   If true the request can not be blocked by the library system.
  *
  * @return {*|promise}
  *   JSON object with information or error message on failure.
  */
-FBS.prototype.checkout = function checkout(username, password, itemIdentifier, checkedOutDate) {
+FBS.prototype.checkout = function checkout(username, password, itemIdentifier, noBlockDueDate, noBlock) {
   var deferred = Q.defer();
 
   var req = new Request(this.bus, this.config);
-  req.checkout(username, password, itemIdentifier, checkedOutDate, function (err, res) {
+  req.checkout(username, password, itemIdentifier, noBlockDueDate, noBlock, function (err, res) {
     if (err) {
       deferred.reject(err);
     }
@@ -192,15 +194,17 @@ FBS.prototype.checkout = function checkout(username, password, itemIdentifier, c
  *   The item to checkout.
  * @param checkedInDate
  *   Timestamp for the time that the item was returned.
+ * @param {bool} noBlock
+ *   If true the request can not be blocked by the library system.
  *
  * @return {*|promise}
  *   JSON object with information or error message on failure.
  */
-FBS.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate) {
+FBS.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate, noBlock) {
   var deferred = Q.defer();
 
   var req = new Request(this.bus, this.config);
-  req.checkIn(itemIdentifier, checkedInDate, function (err, res) {
+  req.checkIn(itemIdentifier, checkedInDate, noBlock, function (err, res) {
     if (err) {
       deferred.reject(err);
     }
@@ -378,12 +382,21 @@ module.exports = function (options, imports, register) {
     // Check if this is a processing of offline queue.
     data.queued = data.queued || false;
 
-    // Set checked-out date if not set.
-    data.checkedOutDate = data.checkedOutDate || new Date().getTime();
+    // Set noBlock due date if not set. This due data is ignored if the noBlock
+    // field is false. So we set it to expire in 31 days into the future, so if
+    // this gets into the offline queue and gets noBlocked the date is set.
+    if (!data.hasOwnProperty('noBlockDueDate')) {
+      data.noBlockDueDate = new Date().getTime() + 2678400000;
+    }
+
+    // Ensure that the noBlock parameter to FBS is set to 'N' as default.
+    // NoBlock have been added in a later release an may not be in all
+    // request.
+    var noBlock = data.hasOwnProperty('noBlock') ? data.noBlock : false;
 
     // Create FBS object and send checkout request.
     FBS.create(bus).then(function (fbs) {
-      fbs.checkout(data.username, data.password, data.itemIdentifier, data.checkedOutDate).then(function (res) {
+      fbs.checkout(data.username, data.password, data.itemIdentifier, data.noBlockDueDate, noBlock).then(function (res) {
         bus.emit(data.busEvent, res);
       },
       function (err) {
@@ -395,7 +408,8 @@ module.exports = function (options, imports, register) {
             itemProperties: {
               id: data.itemIdentifier,
               title: 'fbs.offline.title'
-            }
+            },
+            dueDate: data.noBlockDueDate
           };
 
           bus.once('fbs.checkout.offline.stored' + data.itemIdentifier, function (res) {
@@ -451,7 +465,13 @@ module.exports = function (options, imports, register) {
 
     // Create FBS object and send check-in request.
     FBS.create(bus).then(function (fbs) {
-      fbs.checkIn(data.itemIdentifier, data.checkedInDate).then(function (res) {
+      // Ensure that the noBlock parameter to FBS is set to 'N' as default.
+      // NoBlock have been added in a later release an may not the be in all
+      // request.
+      var noBlock = data.hasOwnProperty('noBlock') ? data.noBlock : false;
+
+      // Perform the checking request.
+      fbs.checkIn(data.itemIdentifier, data.checkedInDate, noBlock).then(function (res) {
         bus.emit(data.busEvent, res);
       },
       function (err) {
