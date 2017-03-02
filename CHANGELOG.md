@@ -3,6 +3,7 @@
 ### In development
 
 * Changed to a new logger that required new config.json file.
+* Set out-of-order on redis connection errors.
 
 ### v1.2.2
 
