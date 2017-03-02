@@ -78,8 +78,12 @@ var plugins = [
 config = architect.resolveConfig(plugins, __dirname);
 architect.createApp(config, function (err, app) {
   if (err) {
-    throw err;
+    console.error(err.stack);
   }
+});
+
+process.on('uncaughtException', function (error) {
+  console.log(error.stack);
 });
 
 // Ensure proper process exit when killed in term.

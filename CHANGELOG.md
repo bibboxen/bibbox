@@ -2,6 +2,8 @@
 
 ### In development
 
+* Changed to a new logger that required new config.json file.
+
 ### v1.2.2
 
 * Added no block to check-in and check-out in SIP2 when executed from offline queue.
