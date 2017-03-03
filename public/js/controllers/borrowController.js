@@ -29,19 +29,14 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     // Store raw check-in responses as it's need to print receipt.
     var raw_materials = [];
 
-    /**
-     * Contains the array of materials scanned.
-     *
-     * @type {Array}
-     */
+    // Contains the array of materials scanned.
     $scope.materials = [];
 
-    /**
-     * Keep track of borrowed materials.
-     *
-     * @type {Array}
-     */
+    // Keep track of borrowed materials.
     $scope.borrowedMaterials = [];
+
+    //Materials that have been borrowed, but not been unlocked.
+    $scope.lockedMaterials = [];
 
     // Pager config.
     $scope.pager = {
@@ -58,7 +53,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      *   The tag of the material to check-out (borrow).
      */
     $scope.tagDetected = function tagDetected(tag) {
-      var i;
       var material = $scope.addTag(tag, $scope.materials);
 
       // Restart idle timeout.
@@ -76,9 +70,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
       // Check if all tags in series have been added.
       if (!material.invalid && !material.loading && !material.success && $scope.allTagsInSeries(material)) {
-        // If a tag is missing from the device.
+        // If a tag is missing from the device, do not attempt to borrow the material.
         if ($scope.anyTagRemoved(material.tags)) {
-          material.tagRemoved = true;
           return;
         }
 
@@ -90,77 +83,119 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           function success(result) {
             $scope.baseResetIdleWatch();
 
+            // Find material.
+            var material = $scope.materials.find(function (material) {
+              return material.id === result.itemIdentifier;
+            });
+
+            // If it is not found, ignore it.
+            if (!material) {
+              return;
+            }
+
+            // Check result.
             if (result) {
+              // If borrow was successful.
               if (result.ok === '1') {
-                for (i = 0; i < $scope.materials.length; i++) {
-                  if ($scope.materials[i].id === result.itemIdentifier) {
-                    $scope.materials[i].title = result.itemProperties.title;
-                    $scope.materials[i].author = result.itemProperties.author;
-                    $scope.materials[i].status = 'awaiting_afi';
-                    $scope.materials[i].information = 'borrow.is_awaiting_afi';
-                    $scope.materials[i].dueDate = result.dueDate;
+                material.title = result.itemProperties.title;
+                material.author = result.itemProperties.author;
+                material.status = 'awaiting_afi';
+                material.information = 'borrow.is_awaiting_afi';
+                material.dueDate = result.dueDate;
 
-                    // Turn AFI off.
-                    for (i = 0; i < material.tags.length; i++) {
-                      $scope.setAFI(material.tags[i].uid, false);
-                    }
+                // Add to locked materials.
+                $scope.lockedMaterials.push(material);
 
-                    // Store the raw result (it's used to send with receipts).
-                    raw_materials.push(result);
-
-                    break;
-                  }
+                // Turn AFI off.
+                for (var i = 0; i < material.tags.length; i++) {
+                  $scope.setAFI(material.tags[i].uid, false);
                 }
+
+                // If a tag is missing from the device show the locked materials pop-up.
+                if ($scope.anyTagRemoved(material.tags)) {
+                  tagMissingModal.$promise.then(tagMissingModal.show);
+
+                  // Reset time to give more time for user to react.
+                  $scope.baseResetIdleWatch();
+                }
+
+                // Store the raw result (it's used to send with receipts).
+                raw_materials.push(result);
               }
               else {
-                for (i = 0; i < $scope.materials.length; i++) {
-                  if ($scope.materials[i].id === result.itemIdentifier) {
-                    $scope.materials[i].loading = false;
-                    $scope.materials[i].information = result.screenMessage;
-                    $scope.materials[i].status = 'error';
+                material.loading = false;
+                material.information = result.screenMessage;
+                material.status = 'error';
 
-                    if (result.itemProperties) {
-                      $scope.materials[i].title = result.itemProperties.title;
-                      $scope.materials[i].author = result.itemProperties.author;
-                    }
-
-                    break;
-                  }
+                if (result.itemProperties) {
+                  material.title = result.itemProperties.title;
+                  material.author = result.itemProperties.author;
                 }
               }
             }
             else {
-              for (i = 0; i < $scope.materials.length; i++) {
-                if ($scope.materials[i].id === material.id) {
-                  $scope.materials[i].status = 'error';
-                  $scope.materials[i].information = 'borrow.was_not_successful';
-                  $scope.materials[i].loading = false;
-
-                  // @TODO: How can this be retried?
-
-                  break;
-                }
-              }
+              material.status = 'error';
+              material.information = 'borrow.was_not_successful';
+              material.loading = false;
             }
           },
           function error(err) {
+            // Find material.
+            var material = $scope.materials.find(function (material) {
+              return material.id === result.itemIdentifier;
+            });
+
+            // If it is not found, ignore the error.
+            if (!material) {
+              return;
+            }
+
             $scope.baseResetIdleWatch();
 
-            console.log('Borrow error', err);
+            console.error('Borrow error', err);
 
-            for (i = 0; i < $scope.materials.length; i++) {
-              if ($scope.materials[i].id === material.id) {
-                $scope.materials[i].status = 'error';
-                $scope.materials[i].information = 'borrow.was_not_successful';
-                $scope.materials[i].loading = false;
-
-                // @TODO: How can this be retried?
-
-                break;
-              }
-            }
+            material.status = 'error';
+            material.information = 'borrow.was_not_successful';
+            material.loading = false;
           }
         );
+      }
+    };
+
+    /**
+     * Tag was removed from RFID device.
+     *
+     * @param tag
+     */
+    $scope.tagRemoved = function itemRemoved(tag) {
+      // Restart idle timeout.
+      $scope.baseResetIdleWatch();
+
+      // Check if material has already been added to the list.
+      var material = $scope.materials.find(function (material) {
+        return material.id === tag.mid;
+      });
+
+      // If the material has not been added, ignore it.
+      if (!material) {
+        return;
+      }
+
+      // Mark tag as removed from the scanner.
+      var materialTag = material.tags.find(function (tag) {
+        return tag.uid === tag.uid;
+      });
+
+      // If the tag is found, mark it as removed.
+      if (materialTag) {
+        materialTag.removed = true;
+      }
+
+      if (material.status === 'awaiting_afi') {
+        tagMissingModal.$promise.then(tagMissingModal.show);
+
+        // Reset time to give more time for user to react.
+        $scope.baseResetIdleWatch();
       }
     };
 
@@ -177,9 +212,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
       // If the tag belongs to a material in $scope.materials.
       if (material) {
-        // Iterate all tags in material and return tag if afi true.
+        // Iterate all tags in material and return tag if afi is not false.
         var found = material.tags.find(function (tag, index) {
-          return tag.afi;
+          return tag.afi === true || tag.afi === undefined;
         });
 
         // If all AFIs have been turned off mark the material as borrowed.
@@ -197,19 +232,23 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
             $scope.pager.currentPage = Math.ceil($scope.borrowedMaterials.length / $scope.pager.itemsPerPage);
           }
 
+          // Remove material from lockedMaterials, if there.
+          var index = $scope.lockedMaterials.indexOf(material);
+          if (index !== -1) {
+            $scope.lockedMaterials.splice(index, 1);
+          }
+
+          // Remove tagMissingModal if no materials are locked.
+          if ($scope.lockedMaterials.length <= 0) {
+            tagMissingModal.$promise.then(tagMissingModal.hide);
+          }
+
           material.status = 'success';
           material.information = 'borrow.was_successful';
           material.loading = false;
           material.success = true;
         }
       }
-    };
-
-    /**
-     * Show the receipt modal.
-     */
-    $scope.showReceiptModal = function showReceiptModal() {
-      receiptModal.$promise.then(receiptModal.show);
     };
 
     /**
@@ -229,12 +268,19 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
         },
         function (err) {
           // @TODO: Report error to user.
-          console.log(err);
+          console.error(err);
         }
       );
 
       // Always return to front page.
       $scope.baseLogoutRedirect();
+    };
+
+    /**
+     * Show the receipt modal.
+     */
+    $scope.showReceiptModal = function showReceiptModal() {
+      receiptModal.$promise.then(receiptModal.show);
     };
 
     /**
@@ -260,6 +306,18 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       scope: $scope,
       templateUrl: './views/modal_processing.html',
       show: false
+    });
+
+    /**
+     * Setup tag missing modal.
+     *
+     * Has a locked backdrop, that does not disappear when clicked.
+     */
+    var tagMissingModal = $modal({
+      scope: $scope,
+      templateUrl: './views/modal_tag_missing.html',
+      show: false,
+      backdrop: 'static'
     });
 
     // Check that interface methods are implemented.
