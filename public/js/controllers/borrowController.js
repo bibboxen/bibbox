@@ -59,7 +59,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       $scope.baseResetIdleWatch();
 
       // If afi is awaiting being unlocked, and is placed on the device again.
-      // Retry the unlocking.
+      // Retry the unlocking of all tags not unlocked.
       if (material.status === 'awaiting_afi') {
         material.loading = true;
 
