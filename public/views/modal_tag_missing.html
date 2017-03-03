@@ -2,16 +2,16 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 class="modal-title" id="tagsMissingModal">{{ 'borrow.locked_materials' | translate }}</h2>
+        <h2 class="modal-title" id="tagsMissingModal">{{ 'modal_tag_missing.locked_materials' | translate }}</h2>
       </div>
       <div class="modal-body">
-        <h3>{{ 'borrow.please_return_materials_for_unlocking' | translate }}</h3>
+        <h3>{{ 'modal_tag_missing.please_return_materials_for_unlocking' | translate }}</h3>
 
         <div class="panel panel-default">
           <table class="table">
             <tr>
               <th></th>
-              <th>{{ 'status.material' | translate }}</th>
+              <th>{{ 'modal_tag_missing.material' | translate }}</th>
             </tr>
             <tr data-ng-repeat="material in lockedMaterials" class="bg-warning">
               <td class="vert-align">{{ $index + 1 }}</td>
