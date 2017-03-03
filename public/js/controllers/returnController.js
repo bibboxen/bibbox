@@ -106,7 +106,7 @@ angular.module('BibBox').controller('ReturnController', [
                 $scope.lockedMaterials.push(material);
 
                 // Turn AFI on.
-                for (i = 0; i < material.tags.length; i++) {
+                for (var i = 0; i < material.tags.length; i++) {
                   $scope.setAFI(material.tags[i].uid, true);
                 }
 
