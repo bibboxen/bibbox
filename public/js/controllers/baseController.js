@@ -3,8 +3,8 @@
  * Borrow page controller.
  */
 
-angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$q', 'userService', 'Idle',
-  function ($scope, $location, $q, userService, Idle) {
+angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$q', 'userService', 'Idle', 'config',
+  function ($scope, $location, $q, userService, Idle, config) {
     'use strict';
 
     /**
@@ -74,7 +74,9 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
     /**
      * Restart the idle service or start it if it's not running.
      */
-    $scope.baseResetIdleWatch = function baseResetIdleWatch() {
+    $scope.baseResetIdleWatch = function baseResetIdleWatch(secondsAdded = 0) {
+      Idle.setIdle(config.timeout.idleTimeout + secondsAdded);
+
       Idle.watch();
     };
 

@@ -114,8 +114,8 @@ angular.module('BibBox').controller('ReturnController', [
                 if ($scope.anyTagRemoved(material.tags)) {
                   tagMissingModal.$promise.then(tagMissingModal.show);
 
-                  // Reset time to give more time for user to react.
-                  $scope.baseResetIdleWatch();
+                  // Reset time to double time for users to has time to react.
+                  $scope.baseResetIdleWatch(config.timeout.idleTimeout);
                 }
 
                 // Store the raw result (it's used to send with receipts).
@@ -198,8 +198,8 @@ angular.module('BibBox').controller('ReturnController', [
       if (material.status === 'awaiting_afi') {
         tagMissingModal.$promise.then(tagMissingModal.show);
 
-        // Reset time to give more time for user to react.
-        $scope.baseResetIdleWatch();
+        // Reset time to double time for users to has time to react.
+        $scope.baseResetIdleWatch(config.timeout.idleTimeout);
       }
     };
 
