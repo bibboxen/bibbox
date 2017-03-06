@@ -226,14 +226,16 @@ Request.prototype.patronInformation = function patronInformation(patronId, patro
  *   Timestamp for the time the book should be returned (when noBlock is true).
  * @param {bool} noBlock
  *   If true the check-out cannot be rejected by FBS.
- * @param callback
+ * @param {number} transactionDate
+ *   Timestamp for when the user preformed the action.
+ * @param {function} callback
  *   Function to call when completed request to FBS.
  */
-Request.prototype.checkout = function checkout(patronId, patronPassword, itemIdentifier, noBlockDueDate, noBlock, callback) {
+Request.prototype.checkout = function checkout(patronId, patronPassword, itemIdentifier, noBlockDueDate, noBlock, transactionDate, callback) {
   var self = this;
-  var transactionDate = self.encodeTime();
+  var transactionDateEncoded = self.encodeTime(transactionDate);
   var noBlockDueDateEncoded = self.encodeTime(noBlockDueDate);
-  var message = '11N' + (noBlock ? 'Y' : 'N') + transactionDate + noBlockDueDateEncoded + '|AO' + self.agency + '|AA' + patronId + '|AB' + itemIdentifier + '|AC|CH|AD' + patronPassword + '|';
+  var message = '11N' + (noBlock ? 'Y' : 'N') + transactionDateEncoded + noBlockDueDateEncoded + '|AO' + self.agency + '|AA' + patronId + '|AB' + itemIdentifier + '|AC|CH|AD' + patronPassword + '|';
 
   self.send(message, 'AO', callback);
 };
@@ -252,9 +254,8 @@ Request.prototype.checkout = function checkout(patronId, patronPassword, itemIde
  */
 Request.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate, noBlock, callback) {
   var self = this;
-  var transactionDate = self.encodeTime();
   var checkedInDateEncoded = self.encodeTime(checkedInDate);
-  var message = '09' + (noBlock ? 'Y' : 'N') + transactionDate + checkedInDateEncoded + '|AP' + self.location + '|AO' + self.agency + '|AB' + itemIdentifier + '|AC|CH|';
+  var message = '09' + (noBlock ? 'Y' : 'N') + checkedInDateEncoded + checkedInDateEncoded + '|AP' + self.location + '|AO' + self.agency + '|AB' + itemIdentifier + '|AC|CH|';
 
   self.send(message, 'AO', callback);
 };

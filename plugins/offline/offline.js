@@ -24,6 +24,16 @@ var Offline = function Offline(bus, host, port) {
   this.checkinQueue = Queue('Check-in', port, host);
   this.checkoutQueue = Queue('Check-out', port, host);
 
+  // Set the front-end out-of-order on queue errors (redis errors included).
+  this.checkinQueue.on('error', function (err) {
+    self.bus.emit('logger.err', err);
+    self.bus.emit('frontend.outOfOrder');
+  });
+  this.checkoutQueue.on('error', function (err) {
+    self.bus.emit('logger.err', err);
+    self.bus.emit('frontend.outOfOrder');
+  });
+
   // Add job processing functions to the queues.
   this.checkinQueue.process(this.checkin);
   this.checkoutQueue.process(this.checkout);

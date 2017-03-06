@@ -10,7 +10,7 @@ var path = require('path');
 
 // NPM modules.
 var winston = require('winston');
-var Rotate = require('winston-logrotate').Rotate;
+require('winston-daily-rotate-file');
 
 var Logger = function Logger(logs) {
   var levels = winston.config.syslog.levels;
@@ -22,13 +22,13 @@ var Logger = function Logger(logs) {
     this.infoLog = new (winston.Logger)({
       levels: levels,
       transports: [
-        new Rotate({
-          file: path.join(__dirname, '../../' + logs.info),
+        new winston.transports.DailyRotateFile({
+          filename: logs.info,
+          dirname: path.join(__dirname, '../../' + logs.path),
           level: 'info',
           colorize: false,
           timestamp: true,
           json: false,
-          max: '100m',
           keep: 5,
           compress: false
         })
@@ -41,13 +41,13 @@ var Logger = function Logger(logs) {
     this.debugLog = new (winston.Logger)({
       levels: levels,
       transports: [
-        new Rotate({
-          file: path.join(__dirname, '../../' + logs.debug),
+        new winston.transports.DailyRotateFile({
+          filename: logs.debug,
+          dirname: path.join(__dirname, '../../' + logs.path),
           level: 'debug',
           colorize: false,
           timestamp: true,
           json: false,
-          max: '100m',
           keep: 5,
           compress: false
         })
@@ -60,13 +60,13 @@ var Logger = function Logger(logs) {
     this.errorLog = new (winston.Logger)({
       levels: levels,
       transports: [
-        new Rotate({
-          file: path.join(__dirname, '../../' + logs.error),
+        new winston.transports.DailyRotateFile({
+          filename: logs.error,
+          dirname: path.join(__dirname, '../../' + logs.path),
           level: 'error',
           colorize: false,
           timestamp: true,
           json: false,
-          max: '100m',
           keep: 5,
           compress: false
         })
@@ -79,15 +79,17 @@ var Logger = function Logger(logs) {
     this.fbsLog = new (winston.Logger)({
       levels: levels,
       transports: [
-        new (winston.transports.DailyRotateFile)({
+        new winston.transports.DailyRotateFile({
           name: 'fbs-file',
-          filename: path.join(__dirname, '../../' + logs.fbs),
+          filename: logs.fbs,
+          dirname: path.join(__dirname, '../../' + logs.path),
           level: 'fbs',
           colorize: false,
-          datePattern: '.dd-MM-yyTHH',
+          datePattern: '.dd-MM-yy',
           timestamp: true,
           json: false,
           maxFiles: 30,
+          localTime: true,
           zippedArchive: false
         })
       ],
@@ -99,13 +101,13 @@ var Logger = function Logger(logs) {
     this.offlineLog = new (winston.Logger)({
       levels: levels,
       transports: [
-        new Rotate({
-          file: path.join(__dirname, '../../' + logs.offline),
+        new winston.transports.DailyRotateFile({
+          filename: logs.offline,
+          dirname: path.join(__dirname, '../../' + logs.path),
           level: 'offline',
           colorize: false,
           timestamp: true,
           json: false,
-          max: '100m',
           keep: 5,
           compress: false
         })
@@ -192,23 +194,48 @@ module.exports = function (options, imports, register) {
   // to have a inner function to work!
   var bus = imports.bus;
   bus.on('logger.err', function (message) {
-    logger.error(message);
+    try {
+      logger.error(message);
+    }
+    catch (exception) {
+      console.error(exception.stack);
+    }
   });
 
   bus.on('logger.info', function (message) {
-    logger.info(message);
+    try {
+      logger.info(message);
+    }
+    catch (exception) {
+      console.error(exception.stack);
+    }
   });
 
   bus.on('logger.debug', function (message) {
-    logger.debug(message);
+    try {
+      logger.debug(message);
+    }
+    catch (exception) {
+      console.error(exception.stack);
+    }
   });
 
   bus.on('logger.fbs', function (message) {
-    logger.fbs(message);
+    try {
+      logger.fbs(message);
+    }
+    catch (exception) {
+      console.error(exception.stack);
+    }
   });
 
   bus.on('logger.offline', function (message) {
-    logger.offline(message);
+    try {
+      logger.offline(message);
+    }
+    catch (exception) {
+      console.error(exception.stack);
+    }
   });
 
   // Register the plugin with the system.

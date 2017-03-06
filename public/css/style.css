@@ -230,6 +230,20 @@ body {
   overflow: hidden;
 }
 
+.modal-dialog {
+  width: 90%;
+  margin: 5% auto;
+}
+
+.modal-tags-missing {
+  z-index: 1000;
+  background-color: rgba(255, 0, 0, .25);
+}
+
+.modal-tags-missing > .modal-dialog .modal-content {
+  min-height: 60%;
+}
+
 .image-help > img {
   z-index: -1;
   position: fixed;
@@ -304,11 +318,6 @@ h4 {
 
 .table {
   font-size: 1.4em;
-}
-
-.modal-dialog {
-  width: 90%;
-  margin: 5% auto;
 }
 
 .numpad-input-group > .input-group-addon {

@@ -167,15 +167,17 @@ FBS.prototype.patronInformation = function patronInformation(username, password)
  *   Timestamp for the time the book should be returned (when noBlock is true).
  * @param {bool} noBlock
  *   If true the request can not be blocked by the library system.
+ * @param {number} transactionDate
+ *   Timestamp for when the user preformed the action.
  *
  * @return {*|promise}
  *   JSON object with information or error message on failure.
  */
-FBS.prototype.checkout = function checkout(username, password, itemIdentifier, noBlockDueDate, noBlock) {
+FBS.prototype.checkout = function checkout(username, password, itemIdentifier, noBlockDueDate, noBlock, transactionDate) {
   var deferred = Q.defer();
 
   var req = new Request(this.bus, this.config);
-  req.checkout(username, password, itemIdentifier, noBlockDueDate, noBlock, function (err, res) {
+  req.checkout(username, password, itemIdentifier, noBlockDueDate, noBlock, transactionDate, function (err, res) {
     if (err) {
       deferred.reject(err);
     }
@@ -394,9 +396,13 @@ module.exports = function (options, imports, register) {
     // request.
     var noBlock = data.hasOwnProperty('noBlock') ? data.noBlock : false;
 
+    // Set transaction date if not set already (offline queued item will have
+    // the date already).
+    data.transactionDate = data.transactionDate || new Date().getTime();
+
     // Create FBS object and send checkout request.
     FBS.create(bus).then(function (fbs) {
-      fbs.checkout(data.username, data.password, data.itemIdentifier, data.noBlockDueDate, noBlock).then(function (res) {
+      fbs.checkout(data.username, data.password, data.itemIdentifier, data.noBlockDueDate, noBlock, data.transactionDate).then(function (res) {
         bus.emit(data.busEvent, res);
       },
       function (err) {

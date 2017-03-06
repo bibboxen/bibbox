@@ -1,13 +1,13 @@
 <div>
   <h3>{{ 'login.scan' | translate }}</h3>
 
-  <h3>{{ 'login.or' | translate }}</h3>
+  <h3 data-ng-if="online">{{ 'login.or' | translate }}</h3>
 </div>
 
 <div class="image-help">
   <img src="img/help1.jpg" />
 </div>
 
-<button type="button" class="btn btn-default button-small" aria-label="Left Align" data-ng-click="useManualLogin(true)">
+<button type="button" class="btn btn-default button-small" aria-label="Left Align" data-ng-click="useManualLogin(true)" data-ng-if="online">
   <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> {{ 'login.button.manual_login' | translate }}
 </button>

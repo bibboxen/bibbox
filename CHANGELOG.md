@@ -1,6 +1,11 @@
 #Bibbox Changelog
 
-### In development
+### v1.3.0
+
+* Changed to a new logger that required new config.json file.
+* Set out-of-order on redis connection errors.
+* Added missing materials popups for checkin / checkout.
+* Removed manual login when offline.
 
 ### v1.2.2
 

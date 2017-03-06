@@ -1,0 +1,25 @@
+<div class="modal text-center modal-tags-missing">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="tagsMissingModal">{{ 'modal_tag_missing.locked_materials' | translate }}</h2>
+      </div>
+      <div class="modal-body">
+        <div class="panel panel-default">
+          <table class="table">
+            <tr>
+              <th></th>
+              <th>{{ 'modal_tag_missing.id' | translate }}</th>
+              <th>{{ 'modal_tag_missing.material' | translate }}</th>
+            </tr>
+            <tr data-ng-repeat="material in lockedMaterials" class="bg-warning">
+              <td class="vert-align">{{ $index + 1 }}</td>
+              <td class="vert-align">{{ material.id }}</td>
+              <td class="vert-align">{{ material.title }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
