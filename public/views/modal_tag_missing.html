@@ -9,10 +9,12 @@
           <table class="table">
             <tr>
               <th></th>
+              <th>{{ 'modal_tag_missing.id' | translate }}</th>
               <th>{{ 'modal_tag_missing.material' | translate }}</th>
             </tr>
             <tr data-ng-repeat="material in lockedMaterials" class="bg-warning">
               <td class="vert-align">{{ $index + 1 }}</td>
+              <td class="vert-align">{{ material.id }}</td>
               <td class="vert-align">{{ material.title }}</td>
             </tr>
           </table>
