@@ -240,6 +240,10 @@ body {
   background-color: rgba(255, 0, 0, .3);
 }
 
+.modal-tags-missing > .modal-dialog .modal-content {
+  min-height: 60%;
+}
+
 .image-help > img {
   z-index: -1;
   position: fixed;
