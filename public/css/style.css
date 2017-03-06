@@ -237,7 +237,7 @@ body {
 
 .modal-tags-missing {
   z-index: 1000;
-  background-color: rgba(255, 0, 0, .15);
+  background-color: rgba(255, 0, 0, .25);
 }
 
 .modal-tags-missing > .modal-dialog .modal-content {
