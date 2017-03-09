@@ -19,14 +19,14 @@ angular.module('BibBox').controller('ReturnController', [
       return;
     }
 
+    // Used for offline storage.
+    var currentDate = new Date().getTime();
+
     // Display more than one book.
     $scope.imageDisplayMoreBooks = config.display_more_materials;
 
     // Store raw check-in responses as it's need to print receipt.
-    var raw_materials = {};
-
-    // Used for offline storage.
-    var currentDate = new Date().getTime();
+    $scope.rawMaterials = {};
 
     // Materials that have been borrowed, but not been unlocked.
     $scope.lockedMaterials = [];
@@ -120,17 +120,17 @@ angular.module('BibBox').controller('ReturnController', [
 
                 // Store the raw result (it's used to send with receipts).
                 if (result.hasOwnProperty('patronIdentifier')) {
-                  if (!raw_materials.hasOwnProperty(result.patronIdentifier)) {
-                    raw_materials[result.patronIdentifier] = [];
+                  if (!$scope.rawMaterials.hasOwnProperty(result.patronIdentifier)) {
+                    $scope.rawMaterials[result.patronIdentifier] = [];
                   }
 
-                  raw_materials[result.patronIdentifier].push(result);
+                  $scope.rawMaterials[result.patronIdentifier].push(result);
                 }
                 else {
-                  if (!raw_materials.hasOwnProperty('unknown')) {
-                    raw_materials.unknown = [];
+                  if (!$scope.rawMaterials.hasOwnProperty('unknown')) {
+                    $scope.rawMaterials.unknown = [];
                   }
-                  raw_materials.unknown.push(result);
+                  $scope.rawMaterials.unknown.push(result);
                 }
               }
               else {
@@ -245,16 +245,16 @@ angular.module('BibBox').controller('ReturnController', [
             $scope.lockedMaterials.splice(index, 1);
           }
 
-          // Remove tagMissingModal if no materials are locked.
-          if ($scope.lockedMaterials.length <= 0) {
-            tagMissingModal.$promise.then(tagMissingModal.hide);
-          }
-
           material.status = 'success';
           material.information = 'return.was_successful';
           material.loading = false;
           material.success = true;
         }
+      }
+
+      // Remove tagMissingModal if no materials are locked.
+      if ($scope.lockedMaterials.length <= 0) {
+        tagMissingModal.$promise.then(tagMissingModal.hide);
       }
     };
 
@@ -282,7 +282,7 @@ angular.module('BibBox').controller('ReturnController', [
     $scope.receipt = function receipt() {
       // Raw materials contains all loaned in the library system (also those who
       // have failed AFI sets, as they are still loaned in LMS)
-      receiptService.returnReceipt(raw_materials, 'printer').then(
+      receiptService.returnReceipt($scope.rawMaterials, 'printer').then(
         function (status) {
           // Ignore.
         },
@@ -331,8 +331,8 @@ angular.module('BibBox').controller('ReturnController', [
      * On destroy.
      */
     $scope.$on('$destroy', function () {
-      processingModal.hide();
-      tagMissingModal.hide();
+      processingModal.$promise.then(processingModal.hide);
+      tagMissingModal.$promise.then(tagMissingModal.hide);
     });
   }
 ]);

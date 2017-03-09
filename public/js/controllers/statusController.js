@@ -236,8 +236,9 @@ angular.module('BibBox').controller('StatusController', [
      * Log out of user service.
      */
     $scope.$on('$destroy', function () {
-      receiptModal.hide();
-      finesModal.hide();
+      userService.logout();
+      receiptModal.$promise.then(receiptModal.hide);
+      finesModal.$promise.then(finesModal.hide);
     });
   }
 ]);
