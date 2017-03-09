@@ -28,7 +28,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     $scope.baseGetPatron();
 
     // Store raw check-in responses as it's need to print receipt.
-    var raw_materials = [];
+    $scope.rawMaterials = [];
 
     // Contains the array of materials scanned.
     $scope.materials = [];
@@ -121,7 +121,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                 }
 
                 // Store the raw result (it's used to send with receipts).
-                raw_materials.push(result);
+                $scope.rawMaterials.push(result);
               }
               else {
                 material.loading = false;
@@ -237,16 +237,16 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
             $scope.lockedMaterials.splice(index, 1);
           }
 
-          // Remove tagMissingModal if no materials are locked.
-          if ($scope.lockedMaterials.length <= 0) {
-            tagMissingModal.$promise.then(tagMissingModal.hide);
-          }
-
           material.status = 'success';
           material.information = 'borrow.was_successful';
           material.loading = false;
           material.success = true;
         }
+      }
+
+      // Remove tagMissingModal if no materials are locked.
+      if ($scope.lockedMaterials.length <= 0) {
+        tagMissingModal.$promise.then(tagMissingModal.hide);
       }
     };
 
@@ -261,7 +261,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
       // Raw materials contains all loaned in the library system (also those who
       // have failed AFI sets, as they are still loaned in LMS)
-      receiptService.borrow(credentials.username, credentials.password, raw_materials, type).then(
+      receiptService.borrow(credentials.username, credentials.password, $scope.rawMaterials, type).then(
         function (status) {
           // Ignore.
         },
@@ -330,9 +330,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      */
     $scope.$on('$destroy', function () {
       userService.logout();
-      receiptModal.hide();
-      processingModal.hide();
-      tagMissingModal.hide();
+      receiptModal.$promise.then(receiptModal.hide);
+      processingModal.$promise.then(processingModal.hide);
+      tagMissingModal.$promise.then(tagMissingModal.hide);
     });
   }
 ]);

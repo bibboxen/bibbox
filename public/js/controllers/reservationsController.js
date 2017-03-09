@@ -80,7 +80,8 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
      * Log out of user service.
      */
     $scope.$on('$destroy', function () {
-      receiptModal.hide();
+      userService.logout();
+      receiptModal.$promise.then(receiptModal.hide);
     });
   }
 ]);
