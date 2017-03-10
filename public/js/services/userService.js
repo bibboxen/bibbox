@@ -16,9 +16,6 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     this.password = null;
     this.loggedIn = false;
 
-
-    proxyService.emit('logger.frontend', 'TEST TEST');
-
     /**
      * Is user logged in?
      *
