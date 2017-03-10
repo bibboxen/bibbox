@@ -20,8 +20,8 @@ RFIDBaseInterface = new Interface( 'RFIDBaseInterface', [
   'tagAFISet'
 ]);
 
-angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controller', 'rfidService',
-  function ($scope, $controller, rfidService) {
+angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controller', 'rfidService', 'loggerService',
+  function ($scope, $controller, rfidService, loggerService) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -275,7 +275,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * @param err
      */
     $scope.rfidError = function rfidError(err) {
-      console.log(err);
+      loggerService.error(err);
     };
 
     /**

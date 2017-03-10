@@ -11,7 +11,8 @@
     "error": "error.log",
     "debug": "debug.log",
     "fbs": "fbs.log",
-    "offline": "offline.log"
+    "offline": "offline.log",
+    "frontend": "frontend.log"
   },
   "proxy": {
     "whitelistedBusEvents": [
@@ -59,7 +60,8 @@
       "^notification.checkIn$",
       "^notification.checkInOffline$",
       "^notification.checkOut$",
-      "^notification.checkOutOffline$"
+      "^notification.checkOutOffline$",
+      "^logger.frontend$"
     ]
   },
   "ctrl": {

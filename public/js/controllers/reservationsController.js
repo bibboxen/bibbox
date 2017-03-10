@@ -1,8 +1,8 @@
 /**
  * Reservations page controller.
  */
-angular.module('BibBox').controller('ReservationsController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal',
-  function ($scope, $controller, $location, $timeout, userService, Idle, receiptService, $modal) {
+angular.module('BibBox').controller('ReservationsController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'Idle', 'receiptService', '$modal', 'loggerService',
+  function ($scope, $controller, $location, $timeout, userService, Idle, receiptService, $modal, loggerService) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -38,8 +38,7 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
         }
       }
     }, function (err) {
-      // @TODO: what to do...
-      console.log(err);
+      loggerService.error(err);
     });
 
     /**
@@ -65,8 +64,7 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
           // Ignore.
         },
         function (err) {
-          // @TODO: what to do...
-          console.log(err);
+          loggerService.error(err);
         }
       );
 

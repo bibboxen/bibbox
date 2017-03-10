@@ -6,8 +6,8 @@
  * @implements RFIDBaseInterface
  */
 
-angular.module('BibBox').controller('BorrowController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', '$modal', 'config',
-  function ($scope, $controller, $location, $timeout, userService, receiptService, $modal, config) {
+angular.module('BibBox').controller('BorrowController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', '$modal', 'config', 'loggerService',
+  function ($scope, $controller, $location, $timeout, userService, receiptService, $modal, config, loggerService) {
     'use strict';
 
     // Extend controller scope from the base controller.
@@ -143,9 +143,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           function error(err) {
             $scope.baseResetIdleWatch();
 
-            console.error('Borrow error', err);
+            loggerService.error('Borrow error', err);
 
-            for (i = 0; i < $scope.materials.length; i++) {
+            for (var i = 0; i < $scope.materials.length; i++) {
               if ($scope.materials[i].id === material.id) {
                 material = $scope.materials[i];
 
@@ -266,8 +266,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           // Ignore.
         },
         function (err) {
-          // @TODO: Report error to user.
-          console.error(err);
+          loggerService.error(err);
         }
       );
 
