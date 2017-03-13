@@ -3,8 +3,8 @@
  * Borrow page controller.
  */
 
-angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$q', 'userService', 'Idle', 'config',
-  function ($scope, $location, $q, userService, Idle, config) {
+angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$q', 'userService', 'Idle', 'config', 'loggerService',
+  function ($scope, $location, $q, userService, Idle, config, loggerService) {
     'use strict';
 
     /**
@@ -30,8 +30,7 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
         },
         function (err) {
           $scope.loading = false;
-          // @TODO: Report error.
-          console.error(err);
+          loggerService.error(err);
         }
       );
 

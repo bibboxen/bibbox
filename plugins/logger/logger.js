@@ -16,6 +16,7 @@ var Logger = function Logger(logs) {
   var levels = winston.config.syslog.levels;
   levels.fbs = 8;
   levels.offline = 9;
+  levels.frontend = 10;
   winston.setLevels(levels);
 
   if (logs.hasOwnProperty('info')) {
@@ -29,7 +30,7 @@ var Logger = function Logger(logs) {
           colorize: false,
           timestamp: true,
           json: false,
-          keep: 5,
+          keep: 30,
           compress: false
         })
       ],
@@ -48,7 +49,7 @@ var Logger = function Logger(logs) {
           colorize: false,
           timestamp: true,
           json: false,
-          keep: 5,
+          keep: 30,
           compress: false
         })
       ],
@@ -67,7 +68,7 @@ var Logger = function Logger(logs) {
           colorize: false,
           timestamp: true,
           json: false,
-          keep: 5,
+          keep: 30,
           compress: false
         })
       ],
@@ -108,7 +109,26 @@ var Logger = function Logger(logs) {
           colorize: false,
           timestamp: true,
           json: false,
-          keep: 5,
+          keep: 30,
+          compress: false
+        })
+      ],
+      exitOnError: false
+    });
+  }
+
+  if (logs.hasOwnProperty('frontend')) {
+    this.frontendLog = new (winston.Logger)({
+      levels: levels,
+      transports: [
+        new winston.transports.DailyRotateFile({
+          filename: logs.frontend,
+          dirname: path.join(__dirname, '../../' + logs.path),
+          level: 'frontend',
+          colorize: false,
+          timestamp: true,
+          json: false,
+          keep: 30,
           compress: false
         })
       ],
@@ -178,6 +198,18 @@ Logger.prototype.offline = function offline(message) {
 };
 
 /**
+ * Log front end message.
+ *
+ * @param {string} message
+ *   The message to send to the logger.
+ */
+Logger.prototype.frontend = function frontend(message) {
+  if (this.frontendLog !== undefined) {
+    this.frontendLog.frontend(message);
+  }
+};
+
+/**
  * Register the plugin with architect.
  *
  * @param {array} options
@@ -232,6 +264,15 @@ module.exports = function (options, imports, register) {
   bus.on('logger.offline', function (message) {
     try {
       logger.offline(message);
+    }
+    catch (exception) {
+      console.error(exception.stack);
+    }
+  });
+
+  bus.on('logger.frontend', function (message) {
+    try {
+      logger.frontend(message);
     }
     catch (exception) {
       console.error(exception.stack);
