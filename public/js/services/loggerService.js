@@ -4,8 +4,8 @@
  *
  * @TODO: If in debug mode also log to console.
  */
-angular.module('BibBox').service('loggerService', ['$q', 'proxyService',
-  function ($q, proxyService) {
+angular.module('BibBox').service('loggerService', ['$q', 'proxyService', 'config',
+  function ($q, proxyService, config) {
     'use strict';
 
     var self = this;
@@ -26,6 +26,10 @@ angular.module('BibBox').service('loggerService', ['$q', 'proxyService',
     this.error = function error(message) {
       message = 'ERR: ' + message;
       proxyService.emit('logger.frontend', message);
+
+      if (config.hasOwnProperty('debug') && config.debug) {
+        console.error(message);
+      }
     };
 
     /**
@@ -37,6 +41,10 @@ angular.module('BibBox').service('loggerService', ['$q', 'proxyService',
     this.info = function info(message) {
       message = 'INFO: ' + message;
       proxyService.emit('logger.frontend', message);
+
+      if (config.hasOwnProperty('debug') && config.debug) {
+        console.log(message);
+      }
     };
 
     /**
@@ -48,6 +56,10 @@ angular.module('BibBox').service('loggerService', ['$q', 'proxyService',
     this.debug = function debug(message) {
       message = 'DEBUG: ' + message;
       proxyService.emit('logger.frontend', message);
+
+      if (config.hasOwnProperty('debug') && config.debug) {
+        console.debug(message);
+      }
     };
   }
 ]);
