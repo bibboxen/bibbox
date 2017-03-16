@@ -2,6 +2,8 @@
 
 ### In development
 
+### v1.3.1
+
 * Changed how modals are hidden.
 * Added user logout for reservations and status.
 * Changed receipt buttons for borrow/return, so they are only available when material has been accepted by FBS.
