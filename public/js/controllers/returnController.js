@@ -277,6 +277,26 @@ angular.module('BibBox').controller('ReturnController', [
     }
 
     /**
+     * Has the user borrowed a material?
+     *
+     * @return {boolean}
+     */
+    $scope.hasBorrowedMaterial = function hasBorrowedMaterial() {
+      if (!$scope.rawMaterials) {
+        return false;
+      }
+      
+      for (var index in $scope.rawMaterials) {
+        if ($scope.rawMaterials.hasOwnProperty(index)) {
+          if ($scope.rawMaterials[index].length > 0) {
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+
+    /**
      * Print receipt.
      */
     $scope.receipt = function receipt() {
