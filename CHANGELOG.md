@@ -1,6 +1,6 @@
 #Bibbox Changelog
 
-### v1.3.0
+### v1.3.1
 
 * Changed how modals are hidden.
 * Added user logout for reservations and status.
