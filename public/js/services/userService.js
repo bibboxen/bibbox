@@ -8,8 +8,8 @@
  */
 
 
-angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 'config', 'proxyService', 'userTrackerService',
-  function ($q, $timeout, $location, config, proxyService, userTrackerService) {
+angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 'config', 'proxyService', 'userTrackerService', 'loggerService',
+  function ($q, $timeout, $location, config, proxyService, userTrackerService, loggerService) {
     'use strict';
 
     this.username = null;
@@ -92,8 +92,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
               deferred.reject(err);
             },
             function () {
-              // @TODO: What to do...
-              console.log(err);
+              loggerService.error(err);
             });
           }
           else {

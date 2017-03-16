@@ -4,8 +4,8 @@
  */
 
 angular.module('BibBox').controller('StatusController', [
-  '$scope', '$controller', '$location', '$translate', '$timeout', 'userService', 'receiptService', '$modal', 'config',
-  function ($scope, $controller, $location, $translate, $timeout, userService, receiptService, $modal, config) {
+  '$scope', '$controller', '$location', '$translate', '$timeout', 'userService', 'receiptService', '$modal', 'config', 'loggerService',
+  function ($scope, $controller, $location, $translate, $timeout, userService, receiptService, $modal, config, loggerService) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -65,8 +65,7 @@ angular.module('BibBox').controller('StatusController', [
         }
       }
     }, function (err) {
-      // @TODO: what to do...
-      console.log(err);
+      loggerService.error(err);
     });
 
     /**
@@ -104,8 +103,7 @@ angular.module('BibBox').controller('StatusController', [
           material.information = 'status.renew.failed';
           material.renewed = false;
 
-          // @TODO: what to do...
-          console.log(err);
+          loggerService.error(err);
 
           // Restart idle service if not running.
           $scope.baseResetIdleWatch();
@@ -173,8 +171,7 @@ angular.module('BibBox').controller('StatusController', [
           }
         },
         function error(err) {
-          // @TODO: what to do...
-          console.log(err);
+          loggerService.error(err);
 
           // Restart idle service if not running.
           $scope.baseResetIdleWatch();
@@ -221,8 +218,7 @@ angular.module('BibBox').controller('StatusController', [
           // Ignore.
         },
         function (err) {
-          // @TODO: what to do...
-          console.log(err);
+          loggerService.error(err);
         }
       );
 
@@ -236,8 +232,9 @@ angular.module('BibBox').controller('StatusController', [
      * Log out of user service.
      */
     $scope.$on('$destroy', function () {
-      receiptModal.hide();
-      finesModal.hide();
+      userService.logout();
+      receiptModal.$promise.then(receiptModal.hide);
+      finesModal.$promise.then(finesModal.hide);
     });
   }
 ]);

@@ -2,6 +2,13 @@
 
 ### v1.3.0
 
+* Changed how modals are hidden.
+* Added user logout for reservations and status.
+* Changed receipt buttons for borrow/return, so they are only available when material has been accepted by FBS.
+* Added logger service to send front-end message to the backend.
+
+### v1.3.0
+
 * Changed to a new logger that required new config.json file.
 * Set out-of-order on redis connection errors.
 * Added missing materials popups for checkin / checkout.
