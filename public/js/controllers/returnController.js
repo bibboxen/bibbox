@@ -282,15 +282,9 @@ angular.module('BibBox').controller('ReturnController', [
      * @return {boolean}
      */
     $scope.hasBorrowedMaterial = function hasBorrowedMaterial() {
-      if (!$scope.rawMaterials) {
-        return false;
-      }
-      
-      for (var index in $scope.rawMaterials) {
-        if ($scope.rawMaterials.hasOwnProperty(index)) {
-          if ($scope.rawMaterials[index].length > 0) {
-            return true;
-          }
+      for (var entry in $scope.rawMaterials) {
+        if (entry.length > 0) {
+          return true;
         }
       }
       return false;
