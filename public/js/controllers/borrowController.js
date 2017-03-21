@@ -251,6 +251,24 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     };
 
     /**
+     * RFID Error handler.
+     *
+     * If there was an error unlocking the AFI, retry.
+     *
+     * Interface method implementation.
+     *
+     * @param err
+     */
+    $scope.rfidError = function rfidError(err) {
+      loggerService.error('RFID error', err);
+
+      if (err.hasOwnProperty('type') && err.type === 'tag.set') {
+        // Retry unlocking AFI.
+        $scope.setAFI(err.tag.uid, false);
+      }
+    };
+
+    /**
      * Print receipt.
      *
      * @param type
