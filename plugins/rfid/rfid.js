@@ -214,7 +214,11 @@ var RFID = function (bus, port, afi, allowed) {
                 });
               }
               else {
-                bus.emit('rfid.error', 'AFI not set!');
+                bus.emit('rfid.error', {
+                  type: 'afi.set',
+                  msg: 'AFI not set!',
+                  tag: data.tag
+                });
                 debug('AFI not set for: ' + data);
               }
               break;

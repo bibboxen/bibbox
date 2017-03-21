@@ -259,6 +259,24 @@ angular.module('BibBox').controller('ReturnController', [
     };
 
     /**
+     * RFID Error handler.
+     *
+     * If there was an error locking the AFI, retry.
+     *
+     * Interface method implementation.
+     *
+     * @param err
+     */
+    $scope.rfidError = function rfidError(err) {
+      console.error(err);
+
+      if (err.hasOwnProperty('type') && err.type === 'tag.set') {
+        // Retry locking AFI.
+        $scope.setAFI(err.tag.uid, true);
+      }
+    };
+
+    /**
      * Get sort bin.
      *
      * @param {string} bin
