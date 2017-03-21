@@ -260,7 +260,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      * @param err
      */
     $scope.rfidError = function rfidError(err) {
-      console.error(err);
+      loggerService.error('RFID error', err);
 
       if (err.hasOwnProperty('type') && err.type === 'tag.set') {
         // Retry unlocking AFI.
