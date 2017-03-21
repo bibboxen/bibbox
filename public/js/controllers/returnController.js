@@ -7,8 +7,8 @@
  */
 
 angular.module('BibBox').controller('ReturnController', [
-  '$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', 'config', '$modal',
-  function ($scope, $controller, $location, $timeout, userService, receiptService, config, $modal) {
+  '$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', 'config', '$modal', 'loggerService',
+  function ($scope, $controller, $location, $timeout, userService, receiptService, config, $modal, loggerService) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -148,9 +148,9 @@ angular.module('BibBox').controller('ReturnController', [
           function error(err) {
             $scope.baseResetIdleWatch();
 
-            console.error('Return error', err);
+            loggerService.error('Check-in: ' + err);
 
-            for (i = 0; i < $scope.materials.length; i++) {
+            for (var i = 0; i < $scope.materials.length; i++) {
               if ($scope.materials[i].id === material.id) {
                 material = $scope.materials[i];
 
@@ -295,6 +295,20 @@ angular.module('BibBox').controller('ReturnController', [
     }
 
     /**
+     * Has the user borrowed a material?
+     *
+     * @return {boolean}
+     */
+    $scope.hasBorrowedMaterial = function hasBorrowedMaterial() {
+      for (var entry in $scope.rawMaterials) {
+        if (entry.length > 0) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    /**
      * Print receipt.
      */
     $scope.receipt = function receipt() {
@@ -305,8 +319,7 @@ angular.module('BibBox').controller('ReturnController', [
           // Ignore.
         },
         function (err) {
-          // @TODO: Report error to user.
-          console.log(err);
+          loggerService.error(err);
         }
       );
 

@@ -1,8 +1,8 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('LoginController', ['$scope', '$controller', '$http', '$window', '$location', '$routeParams', 'userService', 'barcodeService', 'config',
-  function ($scope, $controller, $http, $window, $location, $routeParams, userService, barcodeService, config) {
+angular.module('BibBox').controller('LoginController', ['$scope', '$controller', '$http', '$window', '$location', '$routeParams', 'userService', 'barcodeService', 'config', 'loggerService',
+  function ($scope, $controller, $http, $window, $location, $routeParams, userService, barcodeService, config, loggerService) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -167,7 +167,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
      */
     $scope.barcodeError = function barcodeError(err) {
       // @TODO: inform user that barcode as failed and switch to manual.
-      console.log('barcodeError', err);
+      loggerService.error('Barcode: ' + err);
     };
 
     // Start listen to barcode events.
