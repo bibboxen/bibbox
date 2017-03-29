@@ -181,24 +181,23 @@ var RFID = function (bus, port, afi, allowed) {
           switch (data.event) {
             case 'rfid.offline':
               bus.emit('rfid.closed');
-
               break;
 
             case 'rfid.processing':
               bus.emit('rfid.processing');
-
               break;
 
             case 'rfid.online':
               bus.emit('rfid.connected');
-
               break;
 
             case 'rfid.tags.detected':
+              console.log(data);
               bus.emit('rfid.tags.detected', data.tags);
               break;
 
             case 'rfid.tag.detected':
+              console.log(data);
               bus.emit('rfid.tag.detected', data.tag);
               break;
 
