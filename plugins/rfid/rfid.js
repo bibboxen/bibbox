@@ -18,10 +18,12 @@ var debug = require('debug')('bibbox:rfid');
  *   JSON object with the values to set for AFI.
  * @param {array} allowed
  *   Addresses allowed to connect to the WS.
+ * @param {int} eventTimeout
+ *   Milliseconds that an event should be old.
  *
  * @constructor
  */
-var RFID = function (bus, port, afi, allowed) {
+var RFID = function (bus, port, afi, allowed, eventTimeout) {
   var WebSocketServer = require('ws').Server;
 
   // Check if we are in RFID debug mode. Will return basic fake Id's to emulate
@@ -33,6 +35,24 @@ var RFID = function (bus, port, afi, allowed) {
 
   // When client connects to RFID web-socket this will be set.
   var currentWebSocket = null;
+
+  /**
+   * Check if a given event message has expired.
+   *
+   * @param {object} message
+   *   Web-socket JSON message.
+   *
+   * @returns {boolean}
+   *   If expire true else false.
+   */
+  var isEventExpired = function isEventExpired(message) {
+    if (message.timestamp + eventTimeout < new Date().getTime()) {
+      return false;
+    }
+
+    debug('Web-socket message is expired.');
+    return true;
+  };
 
   /**
    * Is the client address allowed?
@@ -192,13 +212,15 @@ var RFID = function (bus, port, afi, allowed) {
               break;
 
             case 'rfid.tags.detected':
-              console.log(data);
-              bus.emit('rfid.tags.detected', data.tags);
+              if (!isEventExpired(data)) {
+                bus.emit('rfid.tags.detected', data.tags);
+              }
               break;
 
             case 'rfid.tag.detected':
-              console.log(data);
-              bus.emit('rfid.tag.detected', data.tag);
+              if (!isEventExpired(data)) {
+                bus.emit('rfid.tag.detected', data.tag);
+              }
               break;
 
             case 'rfid.tag.removed':
@@ -247,7 +269,7 @@ var RFID = function (bus, port, afi, allowed) {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var rfid = new RFID(imports.bus, options.port, options.afi, options.allowed);
+  var rfid = new RFID(imports.bus, options.port, options.afi, options.allowed, options.eventTimeout);
 
   register(null, {
     rfid: rfid

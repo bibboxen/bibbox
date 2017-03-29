@@ -17,60 +17,73 @@ var config = require(__dirname + '/config.json');
 var plugins = [
   {
     packagePath: './plugins/logger',
-    logs: config.logs
+    logs: config.logs,
+    eventTimeout: config.eventTimeout
   },
   {
-    packagePath: './plugins/bus'
+    packagePath: './plugins/bus',
+    eventTimeout: config.eventTimeout
   },
   {
     packagePath: './plugins/storage',
-    paths: config.paths
+    paths: config.paths,
+    eventTimeout: config.eventTimeout
   },
   {
     packagePath: './plugins/server',
     port: config.port,
-    path: path.join(__dirname, 'public')
+    path: path.join(__dirname, 'public'),
+    eventTimeout: config.eventTimeout
   },
   {
-    packagePath: './plugins/ctrl'
+    packagePath: './plugins/ctrl',
+    eventTimeout: config.eventTimeout
   },
   {
-    packagePath: './plugins/network'
+    packagePath: './plugins/network',
+    eventTimeout: config.eventTimeout
   },
   {
     packagePath: './plugins/barcode',
     pid: config.barcode.pid,
-    vid: config.barcode.vid
+    vid: config.barcode.vid,
+    eventTimeout: config.eventTimeout
   },
   {
     packagePath: './plugins/translation',
     paths: config.paths,
-    languages: config.languages
+    languages: config.languages,
+    eventTimeout: config.eventTimeout
   },
   {
     packagePath: './plugins/proxy',
     whitelistedSocketEvents: config.proxy.whitelistedSocketEvents,
     whitelistedBusEvents: config.proxy.whitelistedBusEvents,
-    allowed: config.allowed
+    allowed: config.allowed,
+    eventTimeout: config.eventTimeout
   },
   {
-    packagePath: './plugins/fbs'
+    packagePath: './plugins/fbs',
+    eventTimeout: config.eventTimeout
   },
   {
     packagePath: './plugins/rfid',
     port: config.rfid.port,
     afi: config.rfid.afi,
-    allowed: config.rfid.allowed
+    allowed: config.rfid.allowed,
+    eventTimeout: config.eventTimeout
   },
   {
     packagePath: './plugins/notification',
     paths: config.paths,
-    languages: config.languages
+    languages: config.languages,
+    eventTimeout: config.eventTimeout
   },
   {
     packagePath: './plugins/offline',
     host: config.offline.host,
-    port: config.offline.port
+    port: config.offline.port,
+    eventTimeout: config.eventTimeout
   }
 ];
 
