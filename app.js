@@ -111,8 +111,8 @@ var plugins = [
 ];
 
 // User the configuration to start the application.
-config = architect.resolveConfig(plugins, __dirname);
-architect.createApp(config, function (err, app) {
+var appConfig = architect.resolveConfig(plugins, __dirname);
+architect.createApp(appConfig, function (err, app) {
   if (err) {
     console.error(err.stack);
   }
