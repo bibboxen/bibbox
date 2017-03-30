@@ -2,6 +2,11 @@
 
 ### In development
 
+* Changed events between the systems to use an timeout to filter out old events.
+* Fixed missing event remove function call in bus plugin.
+* Config.json changes with eventTimeout.
+* Upgraded RFID java application to handle event timestamps.
+
 ### v1.3.1
 
 * Changed how modals are hidden.

@@ -14,6 +14,8 @@ var uniqid = require('uniqid');
 var Q = require('q');
 var fs = require('fs');
 
+var debug = require('debug')('bibbox:notification');
+
 var Notification = function Notification(bus, config, paths, languages) {
   var self = this;
   this.bus = bus;
@@ -946,91 +948,103 @@ module.exports = function (options, imports, register) {
    * Listen status receipt events.
    */
   bus.on('notification.status', function (data) {
-    Notification.create(bus, options.paths, options.languages).then(function (notification) {
-      notification.patronReceipt('status', data.mail, data.username, data.password, data.lang).then(function () {
-        bus.emit(data.busEvent, true);
+    if (!options.isEventExpired(data.timestamp, debug)) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.patronReceipt('status', data.mail, data.username, data.password, data.lang).then(function () {
+          bus.emit(data.busEvent, true);
+        }, function (err) {
+          bus.emit(data.errorEvent, err);
+        });
       }, function (err) {
         bus.emit(data.errorEvent, err);
       });
-    }, function (err) {
-      bus.emit(data.errorEvent, err);
-    });
+    }
   });
 
   /**
    * Listen status receipt events.
    */
   bus.on('notification.reservations', function (data) {
-    Notification.create(bus, options.paths, options.languages).then(function (notification) {
-      notification.patronReceipt('reservations', data.mail, data.username, data.password, data.lang).then(function () {
-        bus.emit(data.busEvent, true);
+    if (!options.isEventExpired(data.timestamp, debug)) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.patronReceipt('reservations', data.mail, data.username, data.password, data.lang).then(function () {
+          bus.emit(data.busEvent, true);
+        }, function (err) {
+          bus.emit(data.errorEvent, err);
+        });
       }, function (err) {
         bus.emit(data.errorEvent, err);
       });
-    }, function (err) {
-      bus.emit(data.errorEvent, err);
-    });
+    }
   });
 
   /**
    * Listen check-out (loans) receipt events.
    */
   bus.on('notification.checkOut', function (data) {
-    Notification.create(bus, options.paths, options.languages).then(function (notification) {
-      notification.checkOutReceipt(data.mail, data.items, data.username, data.password, data.lang).then(function () {
-        bus.emit(data.busEvent, true);
-      },
-      function (err) {
+    if (!options.isEventExpired(data.timestamp, debug)) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.checkOutReceipt(data.mail, data.items, data.username, data.password, data.lang).then(function () {
+            bus.emit(data.busEvent, true);
+          },
+          function (err) {
+            bus.emit(data.errorEvent, err);
+          });
+      }, function (err) {
         bus.emit(data.errorEvent, err);
       });
-    }, function (err) {
-      bus.emit(data.errorEvent, err);
-    });
+    }
   });
 
   /**
    * Listen check-out offline (loans) receipt events.
    */
   bus.on('notification.checkOutOffline', function (data) {
-    Notification.create(bus, options.paths, options.languages).then(function (notification) {
-      notification.checkOutOfflineReceipt(data.items, data.lang).then(function () {
-        bus.emit(data.busEvent, true);
-      },
-      function (err) {
+    if (!options.isEventExpired(data.timestamp, debug)) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.checkOutOfflineReceipt(data.items, data.lang).then(function () {
+            bus.emit(data.busEvent, true);
+          },
+          function (err) {
+            bus.emit(data.errorEvent, err);
+          });
+      }, function (err) {
         bus.emit(data.errorEvent, err);
       });
-    }, function (err) {
-      bus.emit(data.errorEvent, err);
-    });
+    }
   });
 
   /**
    * Listen check-in (returns) receipt events.
    */
   bus.on('notification.checkIn', function (data) {
-    Notification.create(bus, options.paths, options.languages).then(function (notification) {
-      notification.checkInReceipt(data.mail, data.items, data.lang).then(function () {
-        bus.emit(data.busEvent, true);
+    if (!options.isEventExpired(data.timestamp, debug)) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.checkInReceipt(data.mail, data.items, data.lang).then(function () {
+          bus.emit(data.busEvent, true);
+        }, function (err) {
+          bus.emit(data.errorEvent, err);
+        });
       }, function (err) {
         bus.emit(data.errorEvent, err);
       });
-    }, function (err) {
-      bus.emit(data.errorEvent, err);
-    });
+    }
   });
 
   /**
    * Listen check-in offline (returns) receipt events.
    */
   bus.on('notification.checkInOffline', function (data) {
-    Notification.create(bus, options.paths, options.languages).then(function (notification) {
-      notification.checkInOfflineReceipt(data.items, data.lang).then(function () {
-        bus.emit(data.busEvent, true);
+    if (!options.isEventExpired(data.timestamp, debug)) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.checkInOfflineReceipt(data.items, data.lang).then(function () {
+          bus.emit(data.busEvent, true);
+        }, function (err) {
+          bus.emit(data.errorEvent, err);
+        });
       }, function (err) {
         bus.emit(data.errorEvent, err);
       });
-    }, function (err) {
-      bus.emit(data.errorEvent, err);
-    });
+    }
   });
 };
