@@ -50,7 +50,7 @@ var RFID = function (bus, port, afi, allowed, eventTimeout) {
       return false;
     }
 
-    debug('Web-socket message is expired.');
+    debug('Web-socket message is expired ('+ (message.timestamp + eventTimeout) - new Date().getTime() +').');
     return true;
   };
 
