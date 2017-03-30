@@ -586,7 +586,7 @@ module.exports = function (options, imports, register) {
    * Listen for fbs.online events.
    */
   bus.on('fbs.online', function (request) {
-    if (!options.isEventExpired(request, debug)) {
+    if (!options.isEventExpired(request.timestamp, debug)) {
       FBS.create(bus).then(function (fbs) {
         // Check that config exists.
         if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
