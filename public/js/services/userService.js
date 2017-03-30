@@ -107,6 +107,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
 
       // Send the login request.
       proxyService.emit('fbs.login', {
+        timestamp: new Date().getTime(),
         username: username,
         password: password,
         busEvent: 'fbs.login.success' + uniqueId,
@@ -144,6 +145,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
       });
 
       proxyService.emit('fbs.checkout', {
+        timestamp: new Date().getTime(),
         busEvent: 'fbs.checkout.success' + itemIdentifier,
         errorEvent: 'fbs.checkout.error' + itemIdentifier,
         username: this.username,
@@ -159,11 +161,11 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      *
      * @param itemIdentifier
      *   The id of the item to check in.
-     * @param timestamp
-     *   The current date that the check ins should be groupped under if in
+     * @param transaction
+     *   The current date that the check ins should be grouped under if in
      *   offline mode.
      */
-    this.checkIn = function checkIn(itemIdentifier, timestamp) {
+    this.checkIn = function checkIn(itemIdentifier, transaction) {
       var deferred = $q.defer();
 
       proxyService.once('fbs.checkin.success' + itemIdentifier, function (result) {
@@ -175,9 +177,10 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
       });
 
       proxyService.emit('fbs.checkin', {
+        timestamp: new Date().getTime(),
         busEvent: 'fbs.checkin.success' + itemIdentifier,
         errorEvent: 'fbs.checkin.error' + itemIdentifier,
-        timestamp: timestamp,
+        transaction: transaction,
         itemIdentifier: itemIdentifier
       });
 
@@ -202,6 +205,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
       });
 
       proxyService.emit('fbs.renew', {
+        timestamp: new Date().getTime(),
         busEvent: 'fbs.renew.success' + itemIdentifier,
         errorEvent: 'fbs.renew.error' + itemIdentifier,
         username: this.username,
@@ -230,6 +234,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
       });
 
       proxyService.emit('fbs.renew.all', {
+        timestamp: new Date().getTime(),
         busEvent: 'fbs.renew.all.success' + uniqueId,
         errorEvent: 'fbs.renew.all.error' + uniqueId,
         username: this.username,
@@ -257,6 +262,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
       });
 
       proxyService.emit('fbs.block', {
+        timestamp: new Date().getTime(),
         busEvent: 'fbs.block.success' + uniqueId,
         errorEvent: 'fbs.block.error' + uniqueId,
         username: username,
@@ -286,6 +292,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
       });
 
       proxyService.emit('fbs.patron', {
+        timestamp: new Date().getTime(),
         busEvent: 'fbs.patron.success' + uniqueId,
         errorEvent: 'fbs.patron.error' + uniqueId,
         username: this.username,

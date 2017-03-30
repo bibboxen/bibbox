@@ -335,6 +335,9 @@ Offline.prototype.checkin = function checkin(job, done) {
   // ensure that the check-in is forced in the library system.
   data.noBlock = true;
 
+  // Set updated timestamp to get past event timeout check in FBS plugin.
+  data.timestamp = new Date().getTime();
+
   // Send request to FBS.
   self.bus.emit('fbs.checkin', data);
 };
@@ -383,6 +386,9 @@ Offline.prototype.checkout = function checkout(job, done) {
   // Request from the offline queue need to have the noBlock set to true to
   // ensure that the check-out is forced in the library system.
   data.noBlock = true;
+
+  // Set updated timestamp to get past event timeout check in FBS plugin.
+  data.timestamp = new Date().getTime();
 
   // Send request to FBS.
   self.bus.emit('fbs.checkout', data);
