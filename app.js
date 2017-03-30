@@ -28,11 +28,11 @@ var isEventExpired = function isEventExpired(timestamp, debug) {
   var current = new Date().getTime();
 
   if (Number(timestamp) + config.eventTimeout < current) {
-    debug('Web-socket message is expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
+    debug('Event is expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
     return true;
   }
 
-  debug('Web-socket message not expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
+  debug('Event message not expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
   return false;
 };
 
