@@ -13,6 +13,29 @@ var architect = require('architect');
 // Load config file.
 var config = require(__dirname + '/config.json');
 
+/**
+ * Check if a given event message has expired.
+ *
+ * @param {int} timestamp
+ *   Unit timestamp to compare.
+ * @param {function} debug
+ *   Debug function used to display debug messages.
+ *
+ * @returns {boolean}
+ *   If expire true else false.
+ */
+var isEventExpired = function isEventExpired(timestamp, debug) {
+  var current = new Date().getTime();
+
+  if (Number(timestamp) + config.eventTimeout < current) {
+    debug('Web-socket message is expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
+    return true;
+  }
+
+  debug('Web-socket message not expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
+  return false;
+};
+
 // Configure the plugins.
 var plugins = [
   {
@@ -71,7 +94,7 @@ var plugins = [
     port: config.rfid.port,
     afi: config.rfid.afi,
     allowed: config.rfid.allowed,
-    eventTimeout: config.eventTimeout
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/notification',

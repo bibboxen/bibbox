@@ -18,12 +18,12 @@ var debug = require('debug')('bibbox:rfid');
  *   JSON object with the values to set for AFI.
  * @param {array} allowed
  *   Addresses allowed to connect to the WS.
- * @param {int} eventTimeout
- *   Milliseconds that an event should be old.
+ * @param {function} isEventExpired
+ *   Used to test if an event message has expired.
  *
  * @constructor
  */
-var RFID = function (bus, port, afi, allowed, eventTimeout) {
+var RFID = function (bus, port, afi, allowed, isEventExpired) {
   var WebSocketServer = require('ws').Server;
 
   // Check if we are in RFID debug mode. Will return basic fake Id's to emulate
@@ -35,24 +35,6 @@ var RFID = function (bus, port, afi, allowed, eventTimeout) {
 
   // When client connects to RFID web-socket this will be set.
   var currentWebSocket = null;
-
-  /**
-   * Check if a given event message has expired.
-   *
-   * @param {object} message
-   *   Web-socket JSON message.
-   *
-   * @returns {boolean}
-   *   If expire true else false.
-   */
-  var isEventExpired = function isEventExpired(message) {
-    if (message.timestamp + eventTimeout < new Date().getTime()) {
-      return false;
-    }
-
-    debug('Web-socket message is expired ('+ (message.timestamp + eventTimeout) - new Date().getTime() +').');
-    return true;
-  };
 
   /**
    * Is the client address allowed?
@@ -212,13 +194,13 @@ var RFID = function (bus, port, afi, allowed, eventTimeout) {
               break;
 
             case 'rfid.tags.detected':
-              if (!isEventExpired(data)) {
+              if (!isEventExpired(data.timestamp, debug)) {
                 bus.emit('rfid.tags.detected', data.tags);
               }
               break;
 
             case 'rfid.tag.detected':
-              if (!isEventExpired(data)) {
+              if (!isEventExpired(data.timestamp, debug)) {
                 bus.emit('rfid.tag.detected', data.tag);
               }
               break;
@@ -269,7 +251,7 @@ var RFID = function (bus, port, afi, allowed, eventTimeout) {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var rfid = new RFID(imports.bus, options.port, options.afi, options.allowed, options.eventTimeout);
+  var rfid = new RFID(imports.bus, options.port, options.afi, options.allowed, options.isEventExpired);
 
   register(null, {
     rfid: rfid
