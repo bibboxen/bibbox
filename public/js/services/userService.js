@@ -315,6 +315,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
       });
 
       proxyService.emit('fbs.online', {
+        timestamp: new Date().getTime(),
         busEvent: 'fbs.online.response' + uniqueId,
         errorEvent: 'fbs.online.error' + uniqueId
       });

@@ -586,25 +586,27 @@ module.exports = function (options, imports, register) {
    * Listen for fbs.online events.
    */
   bus.on('fbs.online', function (request) {
-    FBS.create(bus).then(function (fbs) {
-      // Check that config exists.
-      if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
-        var busEvent = 'network.fbs.online' + uniqid();
+    if (!options.isEventExpired(request, debug)) {
+      FBS.create(bus).then(function (fbs) {
+        // Check that config exists.
+        if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
+          var busEvent = 'network.fbs.online' + uniqid();
 
-        // Listen to online check event send below.
-        bus.once(busEvent, function (online) {
-          bus.emit(request.busEvent, online);
-        });
+          // Listen to online check event send below.
+          bus.once(busEvent, function (online) {
+            bus.emit(request.busEvent, online);
+          });
 
-        // Send online check.
-        bus.emit('network.online', {
-          url: fbs.config.endpoint,
-          busEvent: busEvent
-        });
-      }
-      else {
-        bus.emit(request.busEvent, false);
-      }
-    });
+          // Send online check.
+          bus.emit('network.online', {
+            url: fbs.config.endpoint,
+            busEvent: busEvent
+          });
+        }
+        else {
+          bus.emit(request.busEvent, false);
+        }
+      });
+    }
   });
 };

@@ -109,6 +109,7 @@ var Offline = function Offline(bus, host, port) {
     });
 
     bus.emit('fbs.online', {
+      timestamp: new Date().getTime(),
       busEvent: busEvent,
       errorEvent: errorEvent
     });

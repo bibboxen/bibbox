@@ -41,53 +41,53 @@ var plugins = [
   {
     packagePath: './plugins/logger',
     logs: config.logs,
-    eventTimeout: config.eventTimeout
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/bus',
-    eventTimeout: config.eventTimeout
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/storage',
     paths: config.paths,
-    eventTimeout: config.eventTimeout
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/server',
     port: config.port,
     path: path.join(__dirname, 'public'),
-    eventTimeout: config.eventTimeout
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/ctrl',
-    eventTimeout: config.eventTimeout
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/network',
-    eventTimeout: config.eventTimeout
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/barcode',
     pid: config.barcode.pid,
     vid: config.barcode.vid,
-    eventTimeout: config.eventTimeout
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/translation',
     paths: config.paths,
     languages: config.languages,
-    eventTimeout: config.eventTimeout
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/proxy',
     whitelistedSocketEvents: config.proxy.whitelistedSocketEvents,
     whitelistedBusEvents: config.proxy.whitelistedBusEvents,
     allowed: config.allowed,
-    eventTimeout: config.eventTimeout
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/fbs',
-    eventTimeout: config.eventTimeout
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/rfid',
@@ -100,13 +100,13 @@ var plugins = [
     packagePath: './plugins/notification',
     paths: config.paths,
     languages: config.languages,
-    eventTimeout: config.eventTimeout
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/offline',
     host: config.offline.host,
     port: config.offline.port,
-    eventTimeout: config.eventTimeout
+    isEventExpired: isEventExpired
   }
 ];
 
