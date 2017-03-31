@@ -13,70 +13,106 @@ var architect = require('architect');
 // Load config file.
 var config = require(__dirname + '/config.json');
 
+/**
+ * Check if a given event message has expired.
+ *
+ * @param {int} timestamp
+ *   Unit timestamp to compare.
+ * @param {function} debug
+ *   Debug function used to display debug messages.
+ *
+ * @returns {boolean}
+ *   If expire true else false.
+ */
+var isEventExpired = function isEventExpired(timestamp, debug) {
+  var current = new Date().getTime();
+
+  if (Number(timestamp) + config.eventTimeout < current) {
+    debug('Event is expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
+    return true;
+  }
+
+  debug('Event message not expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
+  return false;
+};
+
 // Configure the plugins.
 var plugins = [
   {
     packagePath: './plugins/logger',
-    logs: config.logs
+    logs: config.logs,
+    isEventExpired: isEventExpired
   },
   {
-    packagePath: './plugins/bus'
+    packagePath: './plugins/bus',
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/storage',
-    paths: config.paths
+    paths: config.paths,
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/server',
     port: config.port,
-    path: path.join(__dirname, 'public')
+    path: path.join(__dirname, 'public'),
+    isEventExpired: isEventExpired
   },
   {
-    packagePath: './plugins/ctrl'
+    packagePath: './plugins/ctrl',
+    isEventExpired: isEventExpired
   },
   {
-    packagePath: './plugins/network'
+    packagePath: './plugins/network',
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/barcode',
     pid: config.barcode.pid,
-    vid: config.barcode.vid
+    vid: config.barcode.vid,
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/translation',
     paths: config.paths,
-    languages: config.languages
+    languages: config.languages,
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/proxy',
     whitelistedSocketEvents: config.proxy.whitelistedSocketEvents,
     whitelistedBusEvents: config.proxy.whitelistedBusEvents,
-    allowed: config.allowed
+    allowed: config.allowed,
+    isEventExpired: isEventExpired
   },
   {
-    packagePath: './plugins/fbs'
+    packagePath: './plugins/fbs',
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/rfid',
     port: config.rfid.port,
     afi: config.rfid.afi,
-    allowed: config.rfid.allowed
+    allowed: config.rfid.allowed,
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/notification',
     paths: config.paths,
-    languages: config.languages
+    languages: config.languages,
+    isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/offline',
     host: config.offline.host,
-    port: config.offline.port
+    port: config.offline.port,
+    isEventExpired: isEventExpired
   }
 ];
 
 // User the configuration to start the application.
-config = architect.resolveConfig(plugins, __dirname);
-architect.createApp(config, function (err, app) {
+var appConfig = architect.resolveConfig(plugins, __dirname);
+architect.createApp(appConfig, function (err, app) {
   if (err) {
     console.error(err.stack);
   }

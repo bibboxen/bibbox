@@ -18,10 +18,12 @@ var debug = require('debug')('bibbox:rfid');
  *   JSON object with the values to set for AFI.
  * @param {array} allowed
  *   Addresses allowed to connect to the WS.
+ * @param {function} isEventExpired
+ *   Used to test if an event message has expired.
  *
  * @constructor
  */
-var RFID = function (bus, port, afi, allowed) {
+var RFID = function (bus, port, afi, allowed, isEventExpired) {
   var WebSocketServer = require('ws').Server;
 
   // Check if we are in RFID debug mode. Will return basic fake Id's to emulate
@@ -181,25 +183,26 @@ var RFID = function (bus, port, afi, allowed) {
           switch (data.event) {
             case 'rfid.offline':
               bus.emit('rfid.closed');
-
               break;
 
             case 'rfid.processing':
               bus.emit('rfid.processing');
-
               break;
 
             case 'rfid.online':
               bus.emit('rfid.connected');
-
               break;
 
             case 'rfid.tags.detected':
-              bus.emit('rfid.tags.detected', data.tags);
+              if (!isEventExpired(data.timestamp, debug)) {
+                bus.emit('rfid.tags.detected', data.tags);
+              }
               break;
 
             case 'rfid.tag.detected':
-              bus.emit('rfid.tag.detected', data.tag);
+              if (!isEventExpired(data.timestamp, debug)) {
+                bus.emit('rfid.tag.detected', data.tag);
+              }
               break;
 
             case 'rfid.tag.removed':
@@ -248,7 +251,7 @@ var RFID = function (bus, port, afi, allowed) {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var rfid = new RFID(imports.bus, options.port, options.afi, options.allowed);
+  var rfid = new RFID(imports.bus, options.port, options.afi, options.allowed, options.isEventExpired);
 
   register(null, {
     rfid: rfid

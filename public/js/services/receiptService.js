@@ -63,6 +63,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
       });
 
       proxyService.emit('notification.status', {
+        timestamp: new Date().getTime(),
         username: username,
         password: password,
         mail: type === 'mail',
@@ -98,6 +99,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
       });
 
       proxyService.emit('notification.reservations', {
+        timestamp: new Date().getTime(),
         username: username,
         password: password,
         mail: type === 'mail',
@@ -136,6 +138,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
 
       if (_isOffline(items)) {
         proxyService.emit('notification.checkOutOffline', {
+          timestamp: new Date().getTime(),
           items: items,
           lang: tmhDynamicLocale.get(),
           busEvent: 'notification.response',
@@ -144,6 +147,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
       }
       else {
         proxyService.emit('notification.checkOut', {
+          timestamp: new Date().getTime(),
           username: username,
           password: password,
           items: items,
@@ -180,6 +184,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
 
       if (_isOffline(items)) {
         proxyService.emit('notification.checkInOffline', {
+          timestamp: new Date().getTime(),
           lang: tmhDynamicLocale.get(),
           items: items,
           busEvent: 'notification.response',
@@ -188,6 +193,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
       }
       else {
         proxyService.emit('notification.checkIn', {
+          timestamp: new Date().getTime(),
           mail: type === 'mail',
           lang: tmhDynamicLocale.get(),
           items: items,
