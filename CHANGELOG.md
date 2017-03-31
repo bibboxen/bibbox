@@ -6,6 +6,7 @@
 * Fixed missing event remove function call in bus plugin.
 * Config.json changes with eventTimeout.
 * Upgraded RFID java application to handle event timestamps.
+* Added AFI value to reads from RFID.
 
 ### v1.3.1
 
