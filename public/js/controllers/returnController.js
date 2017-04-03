@@ -309,9 +309,32 @@ angular.module('BibBox').controller('ReturnController', [
     };
 
     /**
+     * Check-in completed.
+     *
+     * Used to get user mail addresses based on the material returned.
+     */
+    $scope.checkinCompleted = function checkinCompleted() {
+      var patronIdentifiers = Object.getOwnPropertyNames($scope.rawMaterials);
+
+      console.log(patronIdentifiers);
+
+      receiptService.getMailAddresses(patronIdentifiers).then(
+        function (mails) {
+          console.log(mails);
+        },
+        function (err) {
+          loggerService.error(err);
+        }
+      );
+    };
+
+    /**
      * Print receipt.
      */
     $scope.receipt = function receipt() {
+
+      // $scope.checkinCompleted();
+
       // Raw materials contains all loaned in the library system (also those who
       // have failed AFI sets, as they are still loaned in LMS)
       receiptService.returnReceipt($scope.rawMaterials, 'printer').then(

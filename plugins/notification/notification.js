@@ -920,6 +920,48 @@ Notification.prototype.printReceipt = function printReceipt(content) {
 };
 
 /**
+ * Get mail addresses for patrons.
+ *
+ * @param {array} patronIdentifiers
+ *   The patrons identifications numbers.
+ */
+Notification.prototype.getMailAddresses = function getMailAddresses(patronIdentifiers) {
+  var deferred = Q.defer();
+
+  // Build promise with patron information.
+  var patrons = [];
+  for (var index in patronIdentifiers) {
+    var promise = this.getPatronInformation(patronIdentifiers[index]);
+    patrons.push(promise);
+  }
+
+  Q.allSettled(patrons).then(function (results) {
+    var mailAddresses = {};
+    results.forEach(function (result) {
+      if (result.state === 'fulfilled') {
+        var patron = result.value;
+
+        // Check if patron has an mail address and it's set. If not set the mail
+        // to false. This will indicates that the user exists but don't have an
+        // mail.
+        mailAddresses[patron.patronIdentifier] = false;
+        if (patron.hasOwnProperty('emailAddress') && patron.emailAddress !== undefined) {
+          mailAddresses[patron.patronIdentifier] = patron.emailAddress;
+        }
+      }
+      else {
+        // User lookup failed.
+        mailAddresses['unknown'] = false;
+      }
+    });
+
+    deferred.resolve(mailAddresses);
+  });
+
+  return deferred.promise;
+};
+
+/**
  * Register the plugin with architect.
  *
  * @param {array} options
@@ -1039,6 +1081,23 @@ module.exports = function (options, imports, register) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.checkInOfflineReceipt(data.items, data.lang).then(function () {
           bus.emit(data.busEvent, true);
+        }, function (err) {
+          bus.emit(data.errorEvent, err);
+        });
+      }, function (err) {
+        bus.emit(data.errorEvent, err);
+      });
+    }
+  });
+
+  /**
+   * Listen getMailAddresses receipt events.
+   */
+  bus.on('notification.getMailAddresses', function (data) {
+    if (!options.isEventExpired(data.timestamp, debug)) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.getMailAddresses(data.patronIdentifiers).then(function (addresses) {
+          bus.emit(data.busEvent, addresses);
         }, function (err) {
           bus.emit(data.errorEvent, err);
         });

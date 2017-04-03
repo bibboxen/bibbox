@@ -62,6 +62,7 @@
       "^notification.checkInOffline$",
       "^notification.checkOut$",
       "^notification.checkOutOffline$",
+      "^notification.getMailAddresses$",
       "^logger.frontend$"
     ]
   },
