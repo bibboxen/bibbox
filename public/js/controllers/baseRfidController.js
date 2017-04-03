@@ -166,13 +166,11 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      *   The material that contains the tag.
      */
     $scope.updateMaterialAFI = function updateMaterialAFI(tag) {
-      var i;
-      var j;
       var material;
 
       // Locate tag.
-      for (i = 0; i < $scope.materials.length; i++) {
-        for (j = 0; j < $scope.materials[i].tags.length; j++) {
+      for (var i = 0; i < $scope.materials.length; i++) {
+        for (var j = 0; j < $scope.materials[i].tags.length; j++) {
           // If the tag is located.
           if ($scope.materials[i].tags[j].uid === tag.uid) {
             // Set material for later evaluation.

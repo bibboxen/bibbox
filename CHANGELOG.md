@@ -7,6 +7,9 @@
 * Config.json changes with eventTimeout.
 * Upgraded RFID java application to handle event timestamps.
 * Added AFI value to reads from RFID.
+* Added table clear between write/reads of AFI in RFID code
+* Added afi conversion to boolean for rfid.tag.removed event
+* Only change afi values when they are not already set correctly
 
 ### v1.3.1
 
