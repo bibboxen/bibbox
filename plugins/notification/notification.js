@@ -480,7 +480,6 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
   var deferred = Q.defer();
   var layout = self.layouts.checkIn;
 
-
   // Set current language.
   i18n.setLocale(lang ? lang : self.config.default_lang);
 
@@ -492,49 +491,64 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
     patrons: []
   };
 
-  // Build promise with patron information.
-  var patrons = [];
-  for (var username in items) {
-    var promise = this.getPatronInformation(username);
-    patrons.push(promise);
+  console.log('HEHE1');
+
+  var patronsInformation = JSON.parse(JSON.stringify(items.patronsInformation));
+  delete items.patronsInformation;
+
+  var content;
+  for (var patronIdentifier in patronsInformation) {
+    var patronInformation = patronsInformation[patronIdentifier];
+    if (patronInformation) {
+      content = {
+        patronIdentifier: patronIdentifier,
+        name: patronInformation.hasOwnProperty('personalName') ? patronInformation.personalName : 'Unknown',
+        fines: layout.fines ? self.renderFines(mail, patronInformation.fineItems) : '',
+        loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patronInformation.chargedItems, patronInformation.overdueItems) : '',
+        reservations: layout.reservations ? self.renderReservations(mail, patronInformation.unavailableHoldItems) : '',
+        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, patronInformation.holdItems) : '',
+        check_ins: layout.check_ins ? self.renderCheckIn(mail, items[patronInformation.patronIdentifier]) : ''
+      };
+
+      context.patrons.push(JSON.parse(JSON.stringify(content)));
+    }
+    else {
+      // Unknown patrons (item was not checkout before check-in etc.).
+      content = {
+        name: 'Unknown user',
+        check_ins: layout.check_ins ? self.renderCheckIn(mail, items['unknown']) : ''
+      };
+
+      context.patrons.push(JSON.parse(JSON.stringify(content)));
+    }
   }
 
-  Q.allSettled(patrons).then(function (results) {
-    var content;
-    results.forEach(function (result) {
-      if (result.state === 'fulfilled') {
-        var patron = result.value;
-        content = {
-          name: patron.hasOwnProperty('personalName') ? patron.personalName : 'Unknown',
-          fines: layout.fines ? self.renderFines(mail, patron.fineItems) : '',
-          loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patron.chargedItems, patron.overdueItems) : '',
-          reservations: layout.reservations ? self.renderReservations(mail, patron.unavailableHoldItems) : '',
-          reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, patron.holdItems) : '',
-          check_ins: layout.check_ins ? self.renderCheckIn(mail, items[patron.patronIdentifier]) : ''
-        };
+  // Render receipt.
+  var result = '';
+  if (mail) {
+    // The context is optimized for print receipt, so we need to change it to
+    // send a mail to each patron and not one big to one mail patron.
+    var patrons = JSON.parse(JSON.stringify(context.patrons));
+    context.patrons = [];
 
-        context.patrons.push(JSON.parse(JSON.stringify(content)));
-      }
-      else {
-        var data = result.reason;
-        if (data.message !== 'Unknown patron') {
-          deferred.reject(data);
-          // End processing.
-          return;
-        }
+    for (var patron in patrons) {
+      var data = JSON.parse(JSON.stringify(context));
+      data.patrons.push(patron);
 
-        // Unknown patrons (item was not checkout before check-in etc.).
-        content = {
-          name: 'Unknown user',
-          check_ins: layout.check_ins ? self.renderCheckIn(mail, items['unknown']) : ''
-        };
+      result = self.mailTemplate.render(data);
 
-        context.patrons.push(JSON.parse(JSON.stringify(content)));
-      }
-    });
+      // Remove empty lines (from template engine if statements).
+      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
-    // Render receipt.
-    var result = self.printTemplate.render(context);
+      self.sendMail(patronsInformation[patron.patronIdentifier].emailAddress, result).then(function () {
+        deferred.resolve();
+      }, function (err) {
+        deferred.reject(err);
+      });
+    }
+  }
+  else {
+    result = self.printTemplate.render(context);
 
     // Remove empty lines (from template engine if statements).
     result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
@@ -545,7 +559,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
     }, function (err) {
       deferred.reject(err);
     });
-  });
+  }
 
   return deferred.promise;
 };
@@ -925,7 +939,7 @@ Notification.prototype.printReceipt = function printReceipt(content) {
  * @param {array} patronIdentifiers
  *   The patrons identifications numbers.
  */
-Notification.prototype.getMailAddresses = function getMailAddresses(patronIdentifiers) {
+Notification.prototype.getPatronsInformation = function getPatronsInformation(patronIdentifiers) {
   var deferred = Q.defer();
 
   // Build promise with patron information.
@@ -936,7 +950,7 @@ Notification.prototype.getMailAddresses = function getMailAddresses(patronIdenti
   }
 
   Q.allSettled(patrons).then(function (results) {
-    var mailAddresses = {};
+    var patronsInformation = {};
     results.forEach(function (result) {
       if (result.state === 'fulfilled') {
         var patron = result.value;
@@ -944,18 +958,18 @@ Notification.prototype.getMailAddresses = function getMailAddresses(patronIdenti
         // Check if patron has an mail address and it's set. If not set the mail
         // to false. This will indicates that the user exists but don't have an
         // mail.
-        mailAddresses[patron.patronIdentifier] = false;
-        if (patron.hasOwnProperty('emailAddress') && patron.emailAddress !== undefined) {
-          mailAddresses[patron.patronIdentifier] = patron.emailAddress;
+        patronsInformation[patron.patronIdentifier] = patron;
+        if (!patron.hasOwnProperty('emailAddress') || patron.emailAddress === undefined) {
+          patronsInformation[patron.patronIdentifier]['emailAddress'] = false;
         }
       }
       else {
         // User lookup failed.
-        mailAddresses['unknown'] = false;
+        patronsInformation['unknown'] = false;
       }
     });
 
-    deferred.resolve(mailAddresses);
+    deferred.resolve(patronsInformation);
   });
 
   return deferred.promise;
@@ -1093,10 +1107,10 @@ module.exports = function (options, imports, register) {
   /**
    * Listen getMailAddresses receipt events.
    */
-  bus.on('notification.getMailAddresses', function (data) {
+  bus.on('notification.getPatronsInformation', function (data) {
     if (!options.isEventExpired(data.timestamp, debug)) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
-        notification.getMailAddresses(data.patronIdentifiers).then(function (addresses) {
+        notification.getPatronsInformation(data.patronIdentifiers).then(function (addresses) {
           bus.emit(data.busEvent, addresses);
         }, function (err) {
           bus.emit(data.errorEvent, err);

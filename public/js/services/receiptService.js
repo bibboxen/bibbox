@@ -47,7 +47,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
      *
      * @returns {Function}
      */
-    this.getMailAddresses = function getMailAddresses(patronIdentifiers) {
+    this.getPatronsInformation = function getPatronsInformation(patronIdentifiers) {
       var deferred = $q.defer();
 
       proxyService.once('notification.response', function (mailAddresses) {
@@ -58,7 +58,7 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
         deferred.reject(err);
       });
 
-      proxyService.emit('notification.getMailAddresses', {
+      proxyService.emit('notification.getPatronsInformation', {
         timestamp: new Date().getTime(),
         patronIdentifiers: patronIdentifiers,
         busEvent: 'notification.response',

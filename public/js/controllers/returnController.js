@@ -318,20 +318,21 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      */
     $scope.showReceiptModal = function showReceiptModal() {
       var patronIdentifiers = Object.getOwnPropertyNames($scope.rawMaterials);
-      receiptService.getMailAddresses(patronIdentifiers).then(
-        function (mailAddresses) {
+      receiptService.getPatronsInformation(patronIdentifiers).then(
+        function (patronsInformation) {
+
+          // Enrich the raw materials with the patron information.
+          $scope.rawMaterials.patronsInformation = patronsInformation;
+
           // Check if all mail addresses exists; if not print the receipt and
           // exit.
-          for (var address in mailAddresses) {
-            if (!mailAddresses[address]) {
+          for (var patronIdentifier in patronsInformation) {
+            if (!patronsInformation[patronIdentifier].emailAddress) {
               $scope.receipt('printer');
               return;
             }
           }
 
-          // Enrich the raw materials with the mail addresses and give the user
-          // a modal to select receipt type.
-          $scope.rawMaterials.mailAddresses = mailAddresses;
           $modal({
             scope: $scope,
             templateUrl: './views/modal_receipt.html',
