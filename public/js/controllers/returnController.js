@@ -61,7 +61,13 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       if (material.status === 'awaiting_afi') {
         material.loading = true;
 
-        $scope.setAFI(tag.uid, true);
+        // Retry setting tag afi if not set to true.
+        if (tag.afi !== true) {
+          $scope.setAFI(tag.uid, true);
+        }
+        else {
+          $scope.tagAFISet(tag);
+        }
 
         return;
       }
@@ -104,19 +110,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
                 // Add to locked materials.
                 $scope.lockedMaterials.push(material);
 
-                // Turn AFI on.
-                for (var i = 0; i < material.tags.length; i++) {
-                  $scope.setAFI(material.tags[i].uid, true);
-                }
-
-                // If a tag is missing from the device show the unlocked materials pop-up.
-                if ($scope.anyTagRemoved(material.tags)) {
-                  tagMissingModal.$promise.then(tagMissingModal.show);
-
-                  // Reset time to double time for users to has time to react.
-                  $scope.baseResetIdleWatch(config.timeout.idleTimeout);
-                }
-
                 // Store the raw result (it's used to send with receipts).
                 if (result.hasOwnProperty('patronIdentifier')) {
                   if (!$scope.rawMaterials.hasOwnProperty(result.patronIdentifier)) {
@@ -130,6 +123,24 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
                     $scope.rawMaterials.unknown = [];
                   }
                   $scope.rawMaterials.unknown.push(result);
+                }
+
+                // If a tag is missing from the device show the unlocked materials pop-up.
+                if ($scope.anyTagRemoved(material.tags)) {
+                  // Reset time to double time for users to has time to react.
+                  $scope.baseResetIdleWatch(config.timeout.idleTimeout);
+
+                  tagMissingModal.$promise.then(tagMissingModal.show);
+                }
+
+                // Turn AFI on for materials that have not been set correctly yet.
+                for (var i = 0; i < material.tags.length; i++) {
+                  if (material.tags[i].afi !== true) {
+                    $scope.setAFI(material.tags[i].uid, true);
+                  }
+                  else {
+                    $scope.tagAFISet(material.tags[i]);
+                  }
                 }
               }
               else {

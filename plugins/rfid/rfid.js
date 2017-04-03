@@ -214,6 +214,8 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
               break;
 
             case 'rfid.tag.removed':
+              data.tag.afi = data.tag.afi === afi.on;
+
               bus.emit('rfid.tag.removed', data.tag);
               break;
 

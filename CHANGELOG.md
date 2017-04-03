@@ -9,6 +9,9 @@
 * Added AFI value to reads from RFID.
 * Ensured that modal boxes is always closed.
 * Added option to send mails on check-ins, if all users have an email address.
+* Added table clear between write/reads of AFI in RFID code
+* Added afi conversion to boolean for rfid.tag.removed event
+* Only change afi values when they are not already set correctly
 
 ### v1.3.1
 
