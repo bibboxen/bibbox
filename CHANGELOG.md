@@ -12,7 +12,7 @@
 * Added table clear between write/reads of AFI in RFID code
 * Added afi conversion to boolean for rfid.tag.removed event
 * Only change afi values when they are not already set correctly
-
+* New receipt event on config.json - "^notification.getPatronsInformation$".
 ### v1.3.1
 
 * Changed how modals are hidden.
