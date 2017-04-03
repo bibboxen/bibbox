@@ -64,7 +64,13 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       if (material.status === 'awaiting_afi') {
         material.loading = true;
 
-        $scope.setAFI(tag.uid, false);
+        // Retry setting tag afi if not set to false.
+        if (tag.afi !== false) {
+          $scope.setAFI(tag.uid, false);
+        }
+        else {
+          $scope.tagAFISet(tag);
+        }
 
         return;
       }
@@ -107,21 +113,26 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                 // Add to locked materials.
                 $scope.lockedMaterials.push(material);
 
-                // Turn AFI off.
-                for (var i = 0; i < material.tags.length; i++) {
-                  $scope.setAFI(material.tags[i].uid, false);
-                }
+                // Store the raw result (it's used to send with receipts).
+                $scope.rawMaterials.push(result);
 
                 // If a tag is missing from the device show the locked materials pop-up.
                 if ($scope.anyTagRemoved(material.tags)) {
-                  tagMissingModal.$promise.then(tagMissingModal.show);
-
                   // Reset time to double time for users to has time to react.
                   $scope.baseResetIdleWatch(config.timeout.idleTimeout);
+
+                  tagMissingModal.$promise.then(tagMissingModal.show);
                 }
 
-                // Store the raw result (it's used to send with receipts).
-                $scope.rawMaterials.push(result);
+                // Turn AFI off for materials that have not been set correctly yet.
+                for (var i = 0; i < material.tags.length; i++) {
+                  if (material.tags[i].afi !== false) {
+                    $scope.setAFI(material.tags[i].uid, false);
+                  }
+                  else {
+                    $scope.tagAFISet(material.tags[i]);
+                  }
+                }
               }
               else {
                 material.loading = false;
