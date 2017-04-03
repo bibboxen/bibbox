@@ -491,9 +491,9 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
     patrons: []
   };
 
-  console.log('HEHE1');
-
-  var patronsInformation = JSON.parse(JSON.stringify(items.patronsInformation));
+  // Make an copy of the object and remove it from the data structure as the
+  // receipt builder loops over the items.
+  var patronsInformation = items.patronsInformation;
   delete items.patronsInformation;
 
   var content;
@@ -510,6 +510,8 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
         check_ins: layout.check_ins ? self.renderCheckIn(mail, items[patronInformation.patronIdentifier]) : ''
       };
 
+      // Needs to make a copy to ensure that the content is not changed in the
+      // next loop (object ref.).
       context.patrons.push(JSON.parse(JSON.stringify(content)));
     }
     else {
@@ -519,6 +521,8 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
         check_ins: layout.check_ins ? self.renderCheckIn(mail, items['unknown']) : ''
       };
 
+      // Needs to make a copy to ensure that the content is not changed in the
+      // next loop (object ref.).
       context.patrons.push(JSON.parse(JSON.stringify(content)));
     }
   }
@@ -532,6 +536,8 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
     context.patrons = [];
 
     for (var patron in patrons) {
+      // Copy made as to ensure that the reader process don't change the context
+      // object as it's used for every mail sent.
       var data = JSON.parse(JSON.stringify(context));
       data.patrons.push(patron);
 
@@ -540,9 +546,9 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
       // Remove empty lines (from template engine if statements).
       result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
-      self.sendMail(patronsInformation[patron.patronIdentifier].emailAddress, result).then(function () {
+      self.sendMail(patronsInformation[patron.patronIdentifier].emailAddress, result).then(function success() {
         deferred.resolve();
-      }, function (err) {
+      }, function error(err) {
         deferred.reject(err);
       });
     }
@@ -658,9 +664,9 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
         // Remove empty lines (from template engine if statements).
         result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
-        self.sendMail(data.emailAddress, result).then(function () {
+        self.sendMail(data.emailAddress, result).then(function success() {
           deferred.resolve();
-        }, function (err) {
+        }, function error(err) {
           deferred.reject(err);
         });
       }
@@ -776,9 +782,9 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       if (data.hasOwnProperty('emailAddress') && data.emailAddress !== undefined) {
         result = self.mailTemplate.render(context);
 
-        self.sendMail(data.emailAddress, result).then(function () {
+        self.sendMail(data.emailAddress, result).then(function success() {
           deferred.resolve();
-        }, function (err) {
+        }, function error(err) {
           deferred.reject(err);
         });
       }
