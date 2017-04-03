@@ -307,33 +307,29 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      * Show the receipt modal.
      */
     $scope.showReceiptModal = function showReceiptModal() {
-      receiptModal.$promise.then(receiptModal.show);
+      $modal({
+        scope: $scope,
+        templateUrl: './views/modal_receipt.html',
+        show: true,
+        onHide: function (modal) {
+          modal.destroy();
+        }
+      });
     };
-
-    /**
-     * Setup receipt modal.
-     */
-    var receiptModal = $modal({
-      scope: $scope,
-      templateUrl: './views/modal_receipt.html',
-      show: false
-    });
 
     /**
      * Show the processing modal.
      */
     $scope.showProcessingModal = function showProcessingModal() {
-      processingModal.$promise.then(processingModal.show);
+      $modal({
+        scope: $scope,
+        templateUrl: './views/modal_processing.html',
+        show: true,
+        onHide: function (modal) {
+          modal.destroy();
+        }
+      });
     };
-
-    /**
-     * Setup processing modal.
-     */
-    var processingModal = $modal({
-      scope: $scope,
-      templateUrl: './views/modal_processing.html',
-      show: false
-    });
 
     /**
      * Setup tag missing modal.
@@ -358,9 +354,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      */
     $scope.$on('$destroy', function () {
       userService.logout();
-      receiptModal.$promise.then(receiptModal.hide);
-      processingModal.$promise.then(processingModal.hide);
-      tagMissingModal.$promise.then(tagMissingModal.hide);
     });
   }
 ]);

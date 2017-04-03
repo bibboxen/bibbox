@@ -40,7 +40,36 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
     }
 
     /**
-     * States receipt.
+     * Get mails address for a list of patrons.
+     *
+     * @param {array} patronIdentifiers
+     *   The identifiers for the patrons.
+     *
+     * @returns {Function}
+     */
+    this.getPatronsInformation = function getPatronsInformation(patronIdentifiers) {
+      var deferred = $q.defer();
+
+      proxyService.once('notification.response', function (mailAddresses) {
+        deferred.resolve(mailAddresses);
+      });
+
+      proxyService.once('notification.error', function (err) {
+        deferred.reject(err);
+      });
+
+      proxyService.emit('notification.getPatronsInformation', {
+        timestamp: new Date().getTime(),
+        patronIdentifiers: patronIdentifiers,
+        busEvent: 'notification.response',
+        errorEvent: 'notification.error'
+      });
+
+      return deferred.promise;
+    };
+
+    /**
+     * Status receipt.
      *
      * @param username
      *   Username to get receipt data for.
