@@ -7,6 +7,8 @@
 * Config.json changes with eventTimeout.
 * Upgraded RFID java application to handle event timestamps.
 * Added AFI value to reads from RFID.
+* Ensured that modal boxes is always closed.
+* Added option to send mails on check-ins, if all users have an email address.
 
 ### v1.3.1
 
