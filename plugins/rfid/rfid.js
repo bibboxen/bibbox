@@ -195,12 +195,20 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
 
             case 'rfid.tags.detected':
               if (!isEventExpired(data.timestamp, debug)) {
+                // Change from actual afi value to boolean.
+                for (var i = 0; i < data.tags.length; i++) {
+                  data.tags[i].afi = data.tags[i].afi === afi.on;
+                }
+
                 bus.emit('rfid.tags.detected', data.tags);
               }
               break;
 
             case 'rfid.tag.detected':
               if (!isEventExpired(data.timestamp, debug)) {
+                // Change from actual afi value to boolean.
+                data.tag.afi = data.tag.afi === afi.on;
+
                 bus.emit('rfid.tag.detected', data.tag);
               }
               break;

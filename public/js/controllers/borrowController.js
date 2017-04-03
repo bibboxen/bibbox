@@ -180,7 +180,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
         return;
       }
 
-      // Mark tag as removed from the scanner.
+      // Find tag.
       var materialTag = material.tags.find(function (tag) {
         return tag.uid === tag.uid;
       });
