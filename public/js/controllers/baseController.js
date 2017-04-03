@@ -3,8 +3,8 @@
  * Borrow page controller.
  */
 
-angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$q', 'userService', 'Idle', 'config', 'loggerService',
-  function ($scope, $location, $q, userService, Idle, config, loggerService) {
+angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$q', '$window', 'userService', 'Idle', 'config', 'loggerService',
+  function ($scope, $location, $q, $window, userService, Idle, config, loggerService) {
     'use strict';
 
     /**
@@ -73,7 +73,9 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
     /**
      * Restart the idle service or start it if it's not running.
      */
-    $scope.baseResetIdleWatch = function baseResetIdleWatch(secondsAdded = 0) {
+    $scope.baseResetIdleWatch = function baseResetIdleWatch(secondsAdded) {
+      secondsAdded = secondsAdded || 0;
+
       Idle.setIdle(config.timeout.idleTimeout + secondsAdded);
 
       Idle.watch();
@@ -86,7 +88,14 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
      * On destroy.
      */
     $scope.$on('$destroy', function () {
+      // Remove all modal windows and it's backdrop.
+      angular.element(document.querySelectorAll('.modal')).remove();
+      angular.element(document.querySelectorAll('.modal-backdrop')).remove();
 
+      // Remove body classes used by modal windows.
+      var bodyElement = angular.element($window.document.body);
+      bodyElement.removeClass('modal-open');
+      bodyElement.removeClass('modal-with-am-fade');
     });
   }
 ]);

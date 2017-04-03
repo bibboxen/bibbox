@@ -6,8 +6,7 @@
  * @implements RFIDBaseInterface
  */
 
-angular.module('BibBox').controller('ReturnController', [
-  '$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', 'config', '$modal', 'loggerService',
+angular.module('BibBox').controller('ReturnController', ['$scope', '$controller', '$location', '$timeout', 'userService', 'receiptService', 'config', '$modal', 'loggerService',
   function ($scope, $controller, $location, $timeout, userService, receiptService, config, $modal, loggerService) {
     'use strict';
 
@@ -309,18 +308,38 @@ angular.module('BibBox').controller('ReturnController', [
     };
 
     /**
-     * Check-in completed.
+     * Handle receipt.
      *
-     * Used to get user mail addresses based on the material returned.
+     * Check if the material returned users has an mail address if all users has
+     * a mail address display send mail as well as print receipt button.
+     *
+     * If one or more user is unknown or don't have a mail address only print
+     * the receipt.
      */
-    $scope.checkinCompleted = function checkinCompleted() {
+    $scope.showReceiptModal = function showReceiptModal() {
       var patronIdentifiers = Object.getOwnPropertyNames($scope.rawMaterials);
-
-      console.log(patronIdentifiers);
-
       receiptService.getMailAddresses(patronIdentifiers).then(
-        function (mails) {
-          console.log(mails);
+        function (mailAddresses) {
+          // Check if all mail addresses exists; if not print the receipt and
+          // exit.
+          for (var address in mailAddresses) {
+            if (!mailAddresses[address]) {
+              $scope.receipt('printer');
+              return;
+            }
+          }
+
+          // Enrich the raw materials with the mail addresses and give the user
+          // a modal to select receipt type.
+          $scope.rawMaterials.mailAddresses = mailAddresses;
+          $modal({
+            scope: $scope,
+            templateUrl: './views/modal_receipt.html',
+            show: true,
+            onHide: function (modal) {
+              modal.destroy();
+            }
+          });
         },
         function (err) {
           loggerService.error(err);
@@ -329,15 +348,15 @@ angular.module('BibBox').controller('ReturnController', [
     };
 
     /**
-     * Print receipt.
+     * Print/send receipt.
+     *
+     * @param type
+     *   'mail' or 'printer'
      */
-    $scope.receipt = function receipt() {
-
-      // $scope.checkinCompleted();
-
+    $scope.receipt = function receipt(type) {
       // Raw materials contains all loaned in the library system (also those who
       // have failed AFI sets, as they are still loaned in LMS)
-      receiptService.returnReceipt($scope.rawMaterials, 'printer').then(
+      receiptService.returnReceipt($scope.rawMaterials, type).then(
         function (status) {
           // Ignore.
         },
@@ -354,17 +373,15 @@ angular.module('BibBox').controller('ReturnController', [
      * Show the processing modal.
      */
     $scope.showProcessingModal = function showProcessingModal() {
-      processingModal.$promise.then(processingModal.show);
+      $modal({
+        scope: $scope,
+        templateUrl: './views/modal_processing.html',
+        show: true,
+        onHide: function (modal) {
+          modal.destroy();
+        }
+      });
     };
-
-    /**
-     * Setup processing modal.
-     */
-    var processingModal = $modal({
-      scope: $scope,
-      templateUrl: './views/modal_processing.html',
-      show: false
-    });
 
     /**
      * Setup tag missing modal.
@@ -380,13 +397,5 @@ angular.module('BibBox').controller('ReturnController', [
 
     // Check that interface methods are implemented.
     Interface.ensureImplements($scope, RFIDBaseInterface);
-
-    /**
-     * On destroy.
-     */
-    $scope.$on('$destroy', function () {
-      processingModal.$promise.then(processingModal.hide);
-      tagMissingModal.$promise.then(tagMissingModal.hide);
-    });
   }
 ]);
