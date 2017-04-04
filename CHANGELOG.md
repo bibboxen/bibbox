@@ -13,6 +13,8 @@
 * Added afi conversion to boolean for rfid.tag.removed event
 * Only change afi values when they are not already set correctly
 * New receipt event on config.json - "^notification.getPatronsInformation$".
+* Changed RFID jar to be based on HashMaps.
+
 ### v1.3.1
 
 * Changed how modals are hidden.
