@@ -226,18 +226,15 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
 
       // If the tag belongs to a material in $scope.materials.
       if (material) {
-        // Iterate all tags in material and return tag if afi is not true.
-        var found = material.tags.find(function (tag) {
-          return !tag.afi;
-        });
+        var allAccepted = $scope.allTagsInSeriesSetCorrect(material.tags, true, material.seriesLength);
 
         // If all AFIs have been turned on mark the material as returned.
-        if (!found) {
+        if (allAccepted) {
           // Place the material in the correct sorting bin.
           var returnBin = getSortBin(material.sortBin);
 
           // See if material was already added to borrowed materials.
-          found = returnBin.materials.find(function (item) {
+          var found = returnBin.materials.find(function (item) {
             return item.id === material.id;
           });
 
