@@ -140,6 +140,33 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     };
 
     /**
+     * Have all number in series at least one tag that has the correct AFI value?
+     *
+     * @param {Array} tags
+     *   Array of tags to investigate.
+     * @param {boolean} afi
+     *   The AFI value that should be set.
+     * @param {number} seriesLength
+     *   The number of elements in the series.
+     *
+     * @return {boolean}
+     *   Returns true if all tags in the series have been set correctly, else returns false.
+     */
+    $scope.allTagsInSeriesSetCorrect = function allTagsInSeriesSetCorrect(tags, afi, seriesLength) {
+      // This count of unique series numbers is to counter an issue with the
+      // RFID reading a tag UUID wrong, so its gets added twice.
+      var uniqueSeriesNumbers = {};
+      for (var i = 0; i < tags.length; i++) {
+        if (tags[i].afi === afi) {
+          uniqueSeriesNumbers['tag' + tags[i].numberInSeries] = true;
+        }
+      }
+
+      // Series length should be greater than zero, and each tag in the series must be present.
+      return seriesLength === Object.keys(uniqueSeriesNumbers).length;
+    };
+
+    /**
      * Are all the tags in the material.tags series present on the scanner.
      *
      * @param material

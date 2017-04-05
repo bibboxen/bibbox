@@ -222,15 +222,12 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
       // If the tag belongs to a material in $scope.materials.
       if (material) {
-        // Iterate all tags in material and return tag if afi is not false.
-        var found = material.tags.find(function (tag) {
-          return tag.afi === true || tag.afi === undefined;
-        });
+        var allAccepted = $scope.allTagsInSeriesSetCorrect(material.tags, false, material.seriesLength);
 
-        // If all AFIs have been turned off mark the material as borrowed.
-        if (!found) {
+        // If all AFIs have been turned on mark the material as returned.
+        if (allAccepted) {
           // See if material was already added to borrowed materials.
-          found = $scope.borrowedMaterials.find(function (item) {
+          var found = $scope.borrowedMaterials.find(function (item) {
             return item.id === material.id;
           });
 

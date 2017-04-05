@@ -14,6 +14,9 @@
 * Only change afi values when they are not already set correctly
 * New receipt event on config.json - "^notification.getPatronsInformation$".
 * Changed RFID jar to be based on HashMaps.
+* Added CRC check in RFID.
+* Changed check for AFI set correctly to accept when at least one tag with the given UID has the correct AFI value.
+  This is add because UIDs can be read incorrectly by the RFID.
 
 ### v1.3.1
 
