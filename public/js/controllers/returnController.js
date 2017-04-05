@@ -21,6 +21,9 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     // Used for offline storage.
     var currentDate = new Date().getTime();
 
+    // Used to disable multi clicks on receipt button.
+    $scope.disabledReceiptBtn = false;
+
     // Display more than one book.
     $scope.imageDisplayMoreBooks = config.display_more_materials;
 
@@ -325,6 +328,10 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      * the receipt.
      */
     $scope.showReceiptModal = function showReceiptModal() {
+      // Disable the receipt button until requests to the backend has completed
+      // or modal is closed.
+      $scope.disabledReceiptBtn = true;
+
       var patronIdentifiers = Object.getOwnPropertyNames($scope.rawMaterials);
       receiptService.getPatronsInformation(patronIdentifiers).then(
         function (patronsInformation) {
@@ -346,11 +353,15 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
             templateUrl: './views/modal_receipt.html',
             show: true,
             onHide: function (modal) {
+              // Re-enable receipt button.
+              $scope.disabledReceiptBtn = false;
               modal.destroy();
             }
           });
         },
         function (err) {
+          // Re-enable receipt button.
+          $scope.disabledReceiptBtn = false;
           loggerService.error(err);
         }
       );
