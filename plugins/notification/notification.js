@@ -535,7 +535,9 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
     var patrons = JSON.parse(JSON.stringify(context.patrons));
     context.patrons = [];
 
-    for (var patron in patrons) {
+    for (var i in patrons) {
+      var patron = patrons[i];
+
       // Copy made as to ensure that the reader process don't change the context
       // object as it's used for every mail sent.
       var data = JSON.parse(JSON.stringify(context));
