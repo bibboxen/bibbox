@@ -142,10 +142,15 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     /**
      * Have all number in series at least one tag that has the correct AFI value?
      *
-     * @param tags
-     * @param afi
-     * @param seriesLength
+     * @param {Array} tags
+     *   Array of tags to investigate.
+     * @param {boolean} afi
+     *   The AFI value that should be set.
+     * @param {number} seriesLength
+     *   The number of elements in the series.
+     *
      * @return {boolean}
+     *   Returns true if all tags in the series have been set correctly, else returns false.
      */
     $scope.allTagsInSeriesSetCorrect = function allTagsInSeriesSetCorrect(tags, afi, seriesLength) {
       // This count of unique series numbers is to counter an issue with the
