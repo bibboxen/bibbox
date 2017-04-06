@@ -54,6 +54,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      *   The tag of the material to check-out (borrow).
      */
     $scope.tagDetected = function tagDetected(tag) {
+      var tag = JSON.parse(JSON.stringify(tag));
       var material = $scope.addTag(tag, $scope.materials);
 
       // Restart idle timeout.
@@ -64,7 +65,13 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       if (material.status === 'awaiting_afi') {
         material.loading = true;
 
-        $scope.setAFI(tag.uid, false);
+        // Retry setting tag afi if not set to false.
+        if (tag.afi !== false) {
+          $scope.setAFI(tag.uid, false);
+        }
+        else {
+          $scope.tagAFISet(tag);
+        }
 
         return;
       }
@@ -107,21 +114,26 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                 // Add to locked materials.
                 $scope.lockedMaterials.push(material);
 
-                // Turn AFI off.
-                for (var i = 0; i < material.tags.length; i++) {
-                  $scope.setAFI(material.tags[i].uid, false);
-                }
+                // Store the raw result (it's used to send with receipts).
+                $scope.rawMaterials.push(result);
 
                 // If a tag is missing from the device show the locked materials pop-up.
                 if ($scope.anyTagRemoved(material.tags)) {
-                  tagMissingModal.$promise.then(tagMissingModal.show);
-
                   // Reset time to double time for users to has time to react.
                   $scope.baseResetIdleWatch(config.timeout.idleTimeout);
+
+                  tagMissingModal.$promise.then(tagMissingModal.show);
                 }
 
-                // Store the raw result (it's used to send with receipts).
-                $scope.rawMaterials.push(result);
+                // Turn AFI off for materials that have not been set correctly yet.
+                for (var i = 0; i < material.tags.length; i++) {
+                  if (material.tags[i].afi !== false) {
+                    $scope.setAFI(material.tags[i].uid, false);
+                  }
+                  else {
+                    $scope.tagAFISet(material.tags[i]);
+                  }
+                }
               }
               else {
                 material.loading = false;
@@ -180,9 +192,9 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
         return;
       }
 
-      // Mark tag as removed from the scanner.
-      var materialTag = material.tags.find(function (tag) {
-        return tag.uid === tag.uid;
+      // Find tag.
+      var materialTag = material.tags.find(function (findTag) {
+        return findTag.uid === tag.uid;
       });
 
       // If the tag is found, mark it as removed.
@@ -207,19 +219,20 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      *   The tag returned from the device.
      */
     $scope.tagAFISet = function itemAFISet(tag) {
+      if (!$scope.tagValid(tag)) {
+        return;
+      }
+
       var material = $scope.updateMaterialAFI(tag);
 
       // If the tag belongs to a material in $scope.materials.
       if (material) {
-        // Iterate all tags in material and return tag if afi is not false.
-        var found = material.tags.find(function (tag) {
-          return tag.afi === true || tag.afi === undefined;
-        });
+        var allAccepted = $scope.allTagsInSeriesSetCorrect(material.tags, false, material.seriesLength);
 
-        // If all AFIs have been turned off mark the material as borrowed.
-        if (!found) {
+        // If all AFIs have been turned on mark the material as returned.
+        if (allAccepted) {
           // See if material was already added to borrowed materials.
-          found = $scope.borrowedMaterials.find(function (item) {
+          var found = $scope.borrowedMaterials.find(function (item) {
             return item.id === material.id;
           });
 
@@ -251,6 +264,24 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     };
 
     /**
+     * RFID Error handler.
+     *
+     * If there was an error unlocking the AFI, retry.
+     *
+     * Interface method implementation.
+     *
+     * @param err
+     */
+    $scope.rfidError = function rfidError(err) {
+      loggerService.error('RFID error', err);
+
+      if (err.hasOwnProperty('type') && err.type === 'tag.set') {
+        // Retry unlocking AFI.
+        $scope.setAFI(err.tag.uid, false);
+      }
+    };
+
+    /**
      * Print receipt.
      *
      * @param type
@@ -278,33 +309,29 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      * Show the receipt modal.
      */
     $scope.showReceiptModal = function showReceiptModal() {
-      receiptModal.$promise.then(receiptModal.show);
+      $modal({
+        scope: $scope,
+        templateUrl: './views/modal_receipt.html',
+        show: true,
+        onHide: function (modal) {
+          modal.destroy();
+        }
+      });
     };
-
-    /**
-     * Setup receipt modal.
-     */
-    var receiptModal = $modal({
-      scope: $scope,
-      templateUrl: './views/modal_receipt.html',
-      show: false
-    });
 
     /**
      * Show the processing modal.
      */
     $scope.showProcessingModal = function showProcessingModal() {
-      processingModal.$promise.then(processingModal.show);
+      $modal({
+        scope: $scope,
+        templateUrl: './views/modal_processing.html',
+        show: true,
+        onHide: function (modal) {
+          modal.destroy();
+        }
+      });
     };
-
-    /**
-     * Setup processing modal.
-     */
-    var processingModal = $modal({
-      scope: $scope,
-      templateUrl: './views/modal_processing.html',
-      show: false
-    });
 
     /**
      * Setup tag missing modal.
@@ -329,9 +356,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      */
     $scope.$on('$destroy', function () {
       userService.logout();
-      receiptModal.$promise.then(receiptModal.hide);
-      processingModal.$promise.then(processingModal.hide);
-      tagMissingModal.$promise.then(tagMissingModal.hide);
     });
   }
 ]);

@@ -18,10 +18,12 @@ var debug = require('debug')('bibbox:rfid');
  *   JSON object with the values to set for AFI.
  * @param {array} allowed
  *   Addresses allowed to connect to the WS.
+ * @param {function} isEventExpired
+ *   Used to test if an event message has expired.
  *
  * @constructor
  */
-var RFID = function (bus, port, afi, allowed) {
+var RFID = function (bus, port, afi, allowed, isEventExpired) {
   var WebSocketServer = require('ws').Server;
 
   // Check if we are in RFID debug mode. Will return basic fake Id's to emulate
@@ -181,40 +183,54 @@ var RFID = function (bus, port, afi, allowed) {
           switch (data.event) {
             case 'rfid.offline':
               bus.emit('rfid.closed');
-
               break;
 
             case 'rfid.processing':
               bus.emit('rfid.processing');
-
               break;
 
             case 'rfid.online':
               bus.emit('rfid.connected');
-
               break;
 
             case 'rfid.tags.detected':
-              bus.emit('rfid.tags.detected', data.tags);
+              if (!isEventExpired(data.timestamp, debug)) {
+                // Change from actual afi value to boolean.
+                for (var i = 0; i < data.tags.length; i++) {
+                  data.tags[i].afi = data.tags[i].afi === afi.on;
+                }
+
+                bus.emit('rfid.tags.detected', data.tags);
+              }
               break;
 
             case 'rfid.tag.detected':
-              bus.emit('rfid.tag.detected', data.tag);
+              if (!isEventExpired(data.timestamp, debug)) {
+                // Change from actual afi value to boolean.
+                data.tag.afi = data.tag.afi === afi.on;
+
+                bus.emit('rfid.tag.detected', data.tag);
+              }
               break;
 
             case 'rfid.tag.removed':
+              data.tag.afi = data.tag.afi === afi.on;
+
               bus.emit('rfid.tag.removed', data.tag);
               break;
 
             case 'rfid.afi.set':
               if (data.success) {
-                bus.emit('rfid.tag.afi.set', {
-                  uid: data.tag.uid,
-                  afi: data.tag.afi === afi.on
-                });
+                data.tag.afi = data.tag.afi === afi.on;
+
+                bus.emit('rfid.tag.afi.set', data.tag);
               }
               else {
-                bus.emit('rfid.error', 'AFI not set!');
+                bus.emit('rfid.error', {
+                  type: 'afi.set',
+                  msg: 'AFI not set!',
+                  tag: data.tag
+                });
                 debug('AFI not set for: ' + data);
               }
               break;
@@ -244,7 +260,7 @@ var RFID = function (bus, port, afi, allowed) {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var rfid = new RFID(imports.bus, options.port, options.afi, options.allowed);
+  var rfid = new RFID(imports.bus, options.port, options.afi, options.allowed, options.isEventExpired);
 
   register(null, {
     rfid: rfid

@@ -28,6 +28,8 @@ var Bus = function Bus() {
    */
   var events = {};
 
+  var self = this;
+
   /**
    * Remove events from book keeping.
    *
@@ -82,7 +84,7 @@ var Bus = function Bus() {
    *   The event type/name.
    */
   emitter.removeListenerBibboxWrapper = function(type) {
-    removeEvent(type);
+    self.removeEvent(type);
 
     // Send the event on the the normal handler.
     emitter.removeListener.apply(this, arguments);
@@ -95,7 +97,7 @@ var Bus = function Bus() {
    *   The event type/name.
    */
   emitter.removeAllListenersBibboxWrapper = function(type) {
-    removeEvent(type);
+    self.removeEvent(type);
 
     // Send the event on the the normal handler.
     emitter.removeAllListeners.apply(this, arguments);

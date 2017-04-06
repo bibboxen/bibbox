@@ -2,6 +2,25 @@
 
 ### v1.3.1
 
+* Changed events between the systems to use an timeout to filter out old events.
+* Fixed missing event remove function call in bus plugin.
+* Config.json changes with eventTimeout.
+* Upgraded RFID java application to handle event timestamps.
+* Added AFI value to reads from RFID.
+* Ensured that modal boxes is always closed.
+* Added option to send mails on check-ins, if all users have an email address.
+* Added table clear between write/reads of AFI in RFID code
+* Added afi conversion to boolean for rfid.tag.removed event
+* Only change afi values when they are not already set correctly
+* New receipt event on config.json - "^notification.getPatronsInformation$".
+* Changed RFID jar to be based on HashMaps.
+* Added CRC check in RFID.
+* Changed check for AFI set correctly to accept when at least one tag with the given UID has the correct AFI value.
+  This is add because UIDs can be read incorrectly by the RFID.
+* Added "^rfid.error$" to example.config.json. NB! update config.json.
+
+### v1.3.1
+
 * Changed how modals are hidden.
 * Added user logout for reservations and status.
 * Changed receipt buttons for borrow/return, so they are only available when material has been accepted by FBS.

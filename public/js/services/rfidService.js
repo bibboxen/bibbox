@@ -122,6 +122,7 @@ angular.module('BibBox').service('rfidService', ['$q', '$rootScope', 'proxyServi
      */
     this.setAFI = function setAFI(uid, afi) {
       proxyService.emit('rfid.tag.set_afi', {
+        timestamp: new Date().getTime(),
         uid: uid,
         afi: afi
       });

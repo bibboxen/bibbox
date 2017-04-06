@@ -42,15 +42,17 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
     });
 
     /**
-     * Setup receipt modal.
+     * Show receipt modal.
      */
-    var receiptModal = $modal({
-      scope: $scope,
-      templateUrl: './views/modal_receipt.html',
-      show: false
-    });
     $scope.showReceiptModal = function showReceiptModal() {
-      receiptModal.$promise.then(receiptModal.show);
+      $modal({
+        scope: $scope,
+        templateUrl: './views/modal_receipt.html',
+        show: true,
+        onHide: function (modal) {
+          modal.destroy();
+        }
+      });
     };
 
     /**
@@ -79,7 +81,6 @@ angular.module('BibBox').controller('ReservationsController', ['$scope', '$contr
      */
     $scope.$on('$destroy', function () {
       userService.logout();
-      receiptModal.$promise.then(receiptModal.hide);
     });
   }
 ]);

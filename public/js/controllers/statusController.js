@@ -180,27 +180,31 @@ angular.module('BibBox').controller('StatusController', [
     };
 
     /**
-     * Setup fines modal.
+     * Show fines modal.
      */
-    var finesModal = $modal({
-      scope: $scope,
-      templateUrl: './views/modal_fines.html',
-      show: false
-    });
     $scope.showFinesModal = function showFinesModal() {
-      finesModal.$promise.then(finesModal.show);
+      $modal({
+        scope: $scope,
+        templateUrl: './views/modal_fines.html',
+        show: true,
+        onHide: function (modal) {
+          modal.destroy();
+        }
+      });
     };
 
     /**
-     * Setup receipt modal.
+     * Show receipt modal.
      */
-    var receiptModal = $modal({
-      scope: $scope,
-      templateUrl: './views/modal_receipt.html',
-      show: false
-    });
     $scope.showReceiptModal = function showReceiptModal() {
-      receiptModal.$promise.then(receiptModal.show);
+      $modal({
+        scope: $scope,
+        templateUrl: './views/modal_receipt.html',
+        show: true,
+        onHide: function (modal) {
+          modal.destroy();
+        }
+      });
     };
 
     /**
@@ -233,8 +237,6 @@ angular.module('BibBox').controller('StatusController', [
      */
     $scope.$on('$destroy', function () {
       userService.logout();
-      receiptModal.$promise.then(receiptModal.hide);
-      finesModal.$promise.then(finesModal.hide);
     });
   }
 ]);

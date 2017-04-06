@@ -5,6 +5,7 @@
     "vid": 1529,
     "pid": 8710
   },
+  "eventTimeout": 500,
   "logs": {
     "path": "logs",
     "info": "info.log",
@@ -24,6 +25,7 @@
       "^rfid.closed$",
       "^rfid.connected$",
       "^rfid.processing$",
+      "^rfid.error$",
       "^barcode.data$",
       "^frontend.[\\w]+$",
       "^fbs.login.[\\w]+$",
@@ -61,6 +63,7 @@
       "^notification.checkInOffline$",
       "^notification.checkOut$",
       "^notification.checkOutOffline$",
+      "^notification.getPatronsInformation$",
       "^logger.frontend$"
     ]
   },

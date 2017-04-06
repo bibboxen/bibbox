@@ -14,6 +14,8 @@ var uniqid = require('uniqid');
 var Q = require('q');
 var fs = require('fs');
 
+var debug = require('debug')('bibbox:notification');
+
 var Notification = function Notification(bus, config, paths, languages) {
   var self = this;
   this.bus = bus;
@@ -478,7 +480,6 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
   var deferred = Q.defer();
   var layout = self.layouts.checkIn;
 
-
   // Set current language.
   i18n.setLocale(lang ? lang : self.config.default_lang);
 
@@ -490,49 +491,72 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
     patrons: []
   };
 
-  // Build promise with patron information.
-  var patrons = [];
-  for (var username in items) {
-    var promise = this.getPatronInformation(username);
-    patrons.push(promise);
+  // Make an copy of the object and remove it from the data structure as the
+  // receipt builder loops over the items.
+  var patronsInformation = items.patronsInformation;
+  delete items.patronsInformation;
+
+  var content;
+  for (var patronIdentifier in patronsInformation) {
+    var patronInformation = patronsInformation[patronIdentifier];
+    if (patronInformation) {
+      content = {
+        patronIdentifier: patronIdentifier,
+        name: patronInformation.hasOwnProperty('personalName') ? patronInformation.personalName : 'Unknown',
+        fines: layout.fines ? self.renderFines(mail, patronInformation.fineItems) : '',
+        loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patronInformation.chargedItems, patronInformation.overdueItems) : '',
+        reservations: layout.reservations ? self.renderReservations(mail, patronInformation.unavailableHoldItems) : '',
+        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, patronInformation.holdItems) : '',
+        check_ins: layout.check_ins ? self.renderCheckIn(mail, items[patronInformation.patronIdentifier]) : ''
+      };
+
+      // Needs to make a copy to ensure that the content is not changed in the
+      // next loop (object ref.).
+      context.patrons.push(JSON.parse(JSON.stringify(content)));
+    }
+    else {
+      // Unknown patrons (item was not checkout before check-in etc.).
+      content = {
+        name: 'Unknown user',
+        check_ins: layout.check_ins ? self.renderCheckIn(mail, items['unknown']) : ''
+      };
+
+      // Needs to make a copy to ensure that the content is not changed in the
+      // next loop (object ref.).
+      context.patrons.push(JSON.parse(JSON.stringify(content)));
+    }
   }
 
-  Q.allSettled(patrons).then(function (results) {
-    var content;
-    results.forEach(function (result) {
-      if (result.state === 'fulfilled') {
-        var patron = result.value;
-        content = {
-          name: patron.hasOwnProperty('personalName') ? patron.personalName : 'Unknown',
-          fines: layout.fines ? self.renderFines(mail, patron.fineItems) : '',
-          loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patron.chargedItems, patron.overdueItems) : '',
-          reservations: layout.reservations ? self.renderReservations(mail, patron.unavailableHoldItems) : '',
-          reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, patron.holdItems) : '',
-          check_ins: layout.check_ins ? self.renderCheckIn(mail, items[patron.patronIdentifier]) : ''
-        };
+  // Render receipt.
+  var result = '';
+  if (mail) {
+    // The context is optimized for print receipt, so we need to change it to
+    // send a mail to each patron and not one big to one mail patron.
+    var patrons = JSON.parse(JSON.stringify(context.patrons));
+    context.patrons = [];
 
-        context.patrons.push(JSON.parse(JSON.stringify(content)));
-      }
-      else {
-        var data = result.reason;
-        if (data.message !== 'Unknown patron') {
-          deferred.reject(data);
-          // End processing.
-          return;
-        }
+    for (var i in patrons) {
+      var patron = patrons[i];
 
-        // Unknown patrons (item was not checkout before check-in etc.).
-        content = {
-          name: 'Unknown user',
-          check_ins: layout.check_ins ? self.renderCheckIn(mail, items['unknown']) : ''
-        };
+      // Copy made as to ensure that the reader process don't change the context
+      // object as it's used for every mail sent.
+      var data = JSON.parse(JSON.stringify(context));
+      data.patrons.push(patron);
 
-        context.patrons.push(JSON.parse(JSON.stringify(content)));
-      }
-    });
+      result = self.mailTemplate.render(data);
 
-    // Render receipt.
-    var result = self.printTemplate.render(context);
+      // Remove empty lines (from template engine if statements).
+      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+
+      self.sendMail(patronsInformation[patron.patronIdentifier].emailAddress, result).then(function success() {
+        deferred.resolve();
+      }, function error(err) {
+        deferred.reject(err);
+      });
+    }
+  }
+  else {
+    result = self.printTemplate.render(context);
 
     // Remove empty lines (from template engine if statements).
     result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
@@ -543,7 +567,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
     }, function (err) {
       deferred.reject(err);
     });
-  });
+  }
 
   return deferred.promise;
 };
@@ -642,9 +666,9 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
         // Remove empty lines (from template engine if statements).
         result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
-        self.sendMail(data.emailAddress, result).then(function () {
+        self.sendMail(data.emailAddress, result).then(function success() {
           deferred.resolve();
-        }, function (err) {
+        }, function error(err) {
           deferred.reject(err);
         });
       }
@@ -760,9 +784,9 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       if (data.hasOwnProperty('emailAddress') && data.emailAddress !== undefined) {
         result = self.mailTemplate.render(context);
 
-        self.sendMail(data.emailAddress, result).then(function () {
+        self.sendMail(data.emailAddress, result).then(function success() {
           deferred.resolve();
-        }, function (err) {
+        }, function error(err) {
           deferred.reject(err);
         });
       }
@@ -804,8 +828,8 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
 Notification.prototype.getPatronInformation = function getPatronInformation(username, password) {
   var deferred = Q.defer();
   var self = this;
-  var busEvent = 'notification.checkInReceipt' + username;
-  var errorEvent = 'notification.checkInReceipt.error' + username;
+  var busEvent = 'notification.getPatronInformation' + username;
+  var errorEvent = 'notification.getPatronInformation.error' + username;
 
   // Check if password was given (defaults to empty string as this still will
   // give use the users information).
@@ -837,6 +861,7 @@ Notification.prototype.getPatronInformation = function getPatronInformation(user
 
   // Request the data to use in the notification.
   this.bus.emit('fbs.patron', {
+    timestamp: new Date().getTime(),
     username: username,
     password: password,
     busEvent: busEvent,
@@ -918,6 +943,48 @@ Notification.prototype.printReceipt = function printReceipt(content) {
 };
 
 /**
+ * Get mail addresses for patrons.
+ *
+ * @param {array} patronIdentifiers
+ *   The patrons identifications numbers.
+ */
+Notification.prototype.getPatronsInformation = function getPatronsInformation(patronIdentifiers) {
+  var deferred = Q.defer();
+
+  // Build promise with patron information.
+  var patrons = [];
+  for (var index in patronIdentifiers) {
+    var promise = this.getPatronInformation(patronIdentifiers[index]);
+    patrons.push(promise);
+  }
+
+  Q.allSettled(patrons).then(function (results) {
+    var patronsInformation = {};
+    results.forEach(function (result) {
+      if (result.state === 'fulfilled') {
+        var patron = result.value;
+
+        // Check if patron has an mail address and it's set. If not set the mail
+        // to false. This will indicates that the user exists but don't have an
+        // mail.
+        patronsInformation[patron.patronIdentifier] = patron;
+        if (!patron.hasOwnProperty('emailAddress') || patron.emailAddress === undefined) {
+          patronsInformation[patron.patronIdentifier]['emailAddress'] = false;
+        }
+      }
+      else {
+        // User lookup failed.
+        patronsInformation['unknown'] = false;
+      }
+    });
+
+    deferred.resolve(patronsInformation);
+  });
+
+  return deferred.promise;
+};
+
+/**
  * Register the plugin with architect.
  *
  * @param {array} options
@@ -946,91 +1013,120 @@ module.exports = function (options, imports, register) {
    * Listen status receipt events.
    */
   bus.on('notification.status', function (data) {
-    Notification.create(bus, options.paths, options.languages).then(function (notification) {
-      notification.patronReceipt('status', data.mail, data.username, data.password, data.lang).then(function () {
-        bus.emit(data.busEvent, true);
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.status')) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.patronReceipt('status', data.mail, data.username, data.password, data.lang).then(function () {
+          bus.emit(data.busEvent, true);
+        }, function (err) {
+          bus.emit(data.errorEvent, err);
+        });
       }, function (err) {
         bus.emit(data.errorEvent, err);
       });
-    }, function (err) {
-      bus.emit(data.errorEvent, err);
-    });
+    }
   });
 
   /**
    * Listen status receipt events.
    */
   bus.on('notification.reservations', function (data) {
-    Notification.create(bus, options.paths, options.languages).then(function (notification) {
-      notification.patronReceipt('reservations', data.mail, data.username, data.password, data.lang).then(function () {
-        bus.emit(data.busEvent, true);
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.reservations')) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.patronReceipt('reservations', data.mail, data.username, data.password, data.lang).then(function () {
+          bus.emit(data.busEvent, true);
+        }, function (err) {
+          bus.emit(data.errorEvent, err);
+        });
       }, function (err) {
         bus.emit(data.errorEvent, err);
       });
-    }, function (err) {
-      bus.emit(data.errorEvent, err);
-    });
+    }
   });
 
   /**
    * Listen check-out (loans) receipt events.
    */
   bus.on('notification.checkOut', function (data) {
-    Notification.create(bus, options.paths, options.languages).then(function (notification) {
-      notification.checkOutReceipt(data.mail, data.items, data.username, data.password, data.lang).then(function () {
-        bus.emit(data.busEvent, true);
-      },
-      function (err) {
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.checkOut')) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.checkOutReceipt(data.mail, data.items, data.username, data.password, data.lang).then(function () {
+            bus.emit(data.busEvent, true);
+          },
+          function (err) {
+            bus.emit(data.errorEvent, err);
+          });
+      }, function (err) {
         bus.emit(data.errorEvent, err);
       });
-    }, function (err) {
-      bus.emit(data.errorEvent, err);
-    });
+    }
   });
 
   /**
    * Listen check-out offline (loans) receipt events.
    */
   bus.on('notification.checkOutOffline', function (data) {
-    Notification.create(bus, options.paths, options.languages).then(function (notification) {
-      notification.checkOutOfflineReceipt(data.items, data.lang).then(function () {
-        bus.emit(data.busEvent, true);
-      },
-      function (err) {
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.checkOutOffline')) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.checkOutOfflineReceipt(data.items, data.lang).then(function () {
+            bus.emit(data.busEvent, true);
+          },
+          function (err) {
+            bus.emit(data.errorEvent, err);
+          });
+      }, function (err) {
         bus.emit(data.errorEvent, err);
       });
-    }, function (err) {
-      bus.emit(data.errorEvent, err);
-    });
+    }
   });
 
   /**
    * Listen check-in (returns) receipt events.
    */
   bus.on('notification.checkIn', function (data) {
-    Notification.create(bus, options.paths, options.languages).then(function (notification) {
-      notification.checkInReceipt(data.mail, data.items, data.lang).then(function () {
-        bus.emit(data.busEvent, true);
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.checkIn')) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.checkInReceipt(data.mail, data.items, data.lang).then(function () {
+          bus.emit(data.busEvent, true);
+        }, function (err) {
+          bus.emit(data.errorEvent, err);
+        });
       }, function (err) {
         bus.emit(data.errorEvent, err);
       });
-    }, function (err) {
-      bus.emit(data.errorEvent, err);
-    });
+    }
   });
 
   /**
    * Listen check-in offline (returns) receipt events.
    */
   bus.on('notification.checkInOffline', function (data) {
-    Notification.create(bus, options.paths, options.languages).then(function (notification) {
-      notification.checkInOfflineReceipt(data.items, data.lang).then(function () {
-        bus.emit(data.busEvent, true);
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.checkInOffline')) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.checkInOfflineReceipt(data.items, data.lang).then(function () {
+          bus.emit(data.busEvent, true);
+        }, function (err) {
+          bus.emit(data.errorEvent, err);
+        });
       }, function (err) {
         bus.emit(data.errorEvent, err);
       });
-    }, function (err) {
-      bus.emit(data.errorEvent, err);
-    });
+    }
+  });
+
+  /**
+   * Listen getMailAddresses receipt events.
+   */
+  bus.on('notification.getPatronsInformation', function (data) {
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.getPatronsInformation')) {
+      Notification.create(bus, options.paths, options.languages).then(function (notification) {
+        notification.getPatronsInformation(data.patronIdentifiers).then(function (patrons) {
+          bus.emit(data.busEvent, patrons);
+        }, function (err) {
+          bus.emit(data.errorEvent, err);
+        });
+      }, function (err) {
+        bus.emit(data.errorEvent, err);
+      });
+    }
   });
 };

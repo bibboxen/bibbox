@@ -108,7 +108,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       // Add tag to material if not already added.
       var alreadyAdded = false;
       for (i = 0; i < material.tags.length; i++) {
-        if (material.tags[i].uid === tag.uid) {
+        if (material.tags[i].uid === tag.uid && material.tags[i].mid === tag.mid) {
           // Mark the tag as not-removed from device.
           material.tags[i].removed = false;
 
@@ -140,6 +140,33 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     };
 
     /**
+     * Have all number in series at least one tag that has the correct AFI value?
+     *
+     * @param {Array} tags
+     *   Array of tags to investigate.
+     * @param {boolean} afi
+     *   The AFI value that should be set.
+     * @param {number} seriesLength
+     *   The number of elements in the series.
+     *
+     * @return {boolean}
+     *   Returns true if all tags in the series have been set correctly, else returns false.
+     */
+    $scope.allTagsInSeriesSetCorrect = function allTagsInSeriesSetCorrect(tags, afi, seriesLength) {
+      // This count of unique series numbers is to counter an issue with the
+      // RFID reading a tag UUID wrong, so its gets added twice.
+      var uniqueSeriesNumbers = {};
+      for (var i = 0; i < tags.length; i++) {
+        if (tags[i].afi === afi) {
+          uniqueSeriesNumbers['tag' + tags[i].numberInSeries] = true;
+        }
+      }
+
+      // Series length should be greater than zero, and each tag in the series must be present.
+      return seriesLength === Object.keys(uniqueSeriesNumbers).length;
+    };
+
+    /**
      * Are all the tags in the material.tags series present on the scanner.
      *
      * @param material
@@ -166,17 +193,16 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      *   The material that contains the tag.
      */
     $scope.updateMaterialAFI = function updateMaterialAFI(tag) {
-      var i;
-      var j;
       var material;
+      var materials = $scope.materials;
 
       // Locate tag.
-      for (i = 0; i < $scope.materials.length; i++) {
-        for (j = 0; j < $scope.materials[i].tags.length; j++) {
+      for (var i = 0; i < materials.length; i++) {
+        for (var j = 0; j < materials[i].tags.length; j++) {
           // If the tag is located.
-          if ($scope.materials[i].tags[j].uid === tag.uid) {
+          if (materials[i].tags[j].uid === tag.uid && materials[i].tags[j].mid === tag.mid) {
             // Set material for later evaluation.
-            material = $scope.materials[i];
+            material = materials[i];
 
             // Set AFI of tag.
             material.tags[j].afi = tag.afi;
@@ -192,6 +218,18 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       }
 
       return material;
+    };
+
+    /**
+     * Validate that the tag has valid data.
+     *
+     * @param {Object} tag
+     *   The tag.
+     * @return {boolean}
+     *   True if the tag is valid, else false.
+     */
+    $scope.tagValid = function tagValid(tag) {
+      return tag && tag.afi !== undefined && tag.mid !== undefined && tag.uid !== undefined && tag.numberInSeries !== undefined && tag.seriesLength !== undefined;
     };
 
     /**
