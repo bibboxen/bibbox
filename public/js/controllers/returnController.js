@@ -21,6 +21,9 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     // Used for offline storage.
     var currentDate = new Date().getTime();
 
+    // Used to disable multi clicks on receipt button.
+    $scope.disabledReceiptBtn = false;
+
     // Display more than one book.
     $scope.imageDisplayMoreBooks = config.display_more_materials;
 
@@ -325,12 +328,16 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      * the receipt.
      */
     $scope.showReceiptModal = function showReceiptModal() {
+      // Disable the receipt button until requests to the backend has completed
+      // or modal is closed.
+      $scope.disabledReceiptBtn = true;
+
       var patronIdentifiers = Object.getOwnPropertyNames($scope.rawMaterials);
       receiptService.getPatronsInformation(patronIdentifiers).then(
         function (patronsInformation) {
 
           // Enrich the raw materials with the patron information.
-          $scope.rawMaterials.patronsInformation = patronsInformation;
+          $scope.patronsInformation = patronsInformation;
 
           // Check if all mail addresses exists; if not print the receipt and
           // exit.
@@ -346,11 +353,15 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
             templateUrl: './views/modal_receipt.html',
             show: true,
             onHide: function (modal) {
+              // Re-enable receipt button.
+              $scope.disabledReceiptBtn = false;
               modal.destroy();
             }
           });
         },
         function (err) {
+          // Re-enable receipt button.
+          $scope.disabledReceiptBtn = false;
           loggerService.error(err);
         }
       );
@@ -363,9 +374,12 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      *   'mail' or 'printer'
      */
     $scope.receipt = function receipt(type) {
+      var items = angular.copy($scope.rawMaterials);
+      items.patronsInformation = $scope.patronsInformation;
+
       // Raw materials contains all loaned in the library system (also those who
       // have failed AFI sets, as they are still loaned in LMS)
-      receiptService.returnReceipt($scope.rawMaterials, type).then(
+      receiptService.returnReceipt(items, type).then(
         function (status) {
           // Ignore.
         },

@@ -20,19 +20,22 @@ var config = require(__dirname + '/config.json');
  *   Unit timestamp to compare.
  * @param {function} debug
  *   Debug function used to display debug messages.
+ * @param {string} eventName
+ *   The name of the event (used for debugging).
  *
  * @returns {boolean}
  *   If expire true else false.
  */
-var isEventExpired = function isEventExpired(timestamp, debug) {
+var isEventExpired = function isEventExpired(timestamp, debug, eventName) {
   var current = new Date().getTime();
+  eventName = eventName || 'Unknown';
 
   if (Number(timestamp) + config.eventTimeout < current) {
-    debug('Event is expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
+    debug('EVENT ' + eventName + ' is expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
     return true;
   }
 
-  debug('Event message not expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
+  debug('EVENT ' + eventName + ' message not expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
   return false;
 };
 

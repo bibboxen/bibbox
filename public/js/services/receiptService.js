@@ -50,8 +50,8 @@ angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'p
     this.getPatronsInformation = function getPatronsInformation(patronIdentifiers) {
       var deferred = $q.defer();
 
-      proxyService.once('notification.response', function (mailAddresses) {
-        deferred.resolve(mailAddresses);
+      proxyService.once('notification.response', function (patrons) {
+        deferred.resolve(patrons);
       });
 
       proxyService.once('notification.error', function (err) {
