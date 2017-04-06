@@ -108,7 +108,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       // Add tag to material if not already added.
       var alreadyAdded = false;
       for (i = 0; i < material.tags.length; i++) {
-        if (material.tags[i].uid === tag.uid) {
+        if (material.tags[i].uid === tag.uid && material.tags[i].mid === tag.mid) {
           // Mark the tag as not-removed from device.
           material.tags[i].removed = false;
 
@@ -194,14 +194,15 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      */
     $scope.updateMaterialAFI = function updateMaterialAFI(tag) {
       var material;
+      var materials = $scope.materials;
 
       // Locate tag.
-      for (var i = 0; i < $scope.materials.length; i++) {
-        for (var j = 0; j < $scope.materials[i].tags.length; j++) {
+      for (var i = 0; i < materials.length; i++) {
+        for (var j = 0; j < materials[i].tags.length; j++) {
           // If the tag is located.
-          if ($scope.materials[i].tags[j].uid === tag.uid) {
+          if (materials[i].tags[j].uid === tag.uid && materials[i].tags[j].mid === tag.mid) {
             // Set material for later evaluation.
-            material = $scope.materials[i];
+            material = materials[i];
 
             // Set AFI of tag.
             material.tags[j].afi = tag.afi;
@@ -217,6 +218,18 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       }
 
       return material;
+    };
+
+    /**
+     * Validate that the tag has valid data.
+     *
+     * @param {Object} tag
+     *   The tag.
+     * @return {boolean}
+     *   True if the tag is valid, else false.
+     */
+    $scope.tagValid = function tagValid(tag) {
+      return tag && tag.afi !== undefined && tag.mid !== undefined && tag.uid !== undefined && tag.numberInSeries !== undefined && tag.seriesLength !== undefined;
     };
 
     /**

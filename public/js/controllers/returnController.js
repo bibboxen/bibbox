@@ -54,6 +54,8 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      *   The tag of material to check-in (return).
      */
     $scope.tagDetected = function tagDetected(tag) {
+      var tag = JSON.parse(JSON.stringify(tag));
+
       var material = $scope.addTag(tag, $scope.materials);
 
       // Restart idle timeout.
@@ -224,7 +226,11 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      * @param tag
      *   The tag returned from the device.
      */
-    $scope.tagAFISet = function itemAFISet(tag) {
+    $scope.tagAFISet = function tagAFISet(tag) {
+      if (!$scope.tagValid(tag)) {
+        return;
+      }
+
       var material = $scope.updateMaterialAFI(tag);
 
       // If the tag belongs to a material in $scope.materials.
