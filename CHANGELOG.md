@@ -1,6 +1,6 @@
 #Bibbox Changelog
 
-### v1.3.1
+### v1.4.0
 
 * Changed events between the systems to use an timeout to filter out old events.
 * Fixed missing event remove function call in bus plugin.
@@ -15,8 +15,9 @@
 * New receipt event on config.json - "^notification.getPatronsInformation$".
 * Changed RFID jar to be based on HashMaps.
 * Added CRC check in RFID.
-* Changed check for AFI set correctly to accept when at least one tag with the given UID has the correct AFI value.
-  This is add because UIDs can be read incorrectly by the RFID.
+* Changed check for AFI set correctly to accept when at least one tag with the given
+  UID has the correct AFI value. This is add because UIDs can be read incorrectly
+  by the RFID.
 * Added "^rfid.error$" to example.config.json. NB! update config.json.
 
 ### v1.3.1
