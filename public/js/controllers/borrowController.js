@@ -54,6 +54,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      *   The tag of the material to check-out (borrow).
      */
     $scope.tagDetected = function tagDetected(tag) {
+      var tag = JSON.parse(JSON.stringify(tag));
       var material = $scope.addTag(tag, $scope.materials);
 
       // Restart idle timeout.
@@ -218,6 +219,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      *   The tag returned from the device.
      */
     $scope.tagAFISet = function itemAFISet(tag) {
+      if (!$scope.tagValid(tag)) {
+        return;
+      }
+
       var material = $scope.updateMaterialAFI(tag);
 
       // If the tag belongs to a material in $scope.materials.

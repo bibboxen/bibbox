@@ -221,10 +221,9 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
 
             case 'rfid.afi.set':
               if (data.success) {
-                bus.emit('rfid.tag.afi.set', {
-                  uid: data.tag.uid,
-                  afi: data.tag.afi === afi.on
-                });
+                data.tag.afi = data.tag.afi === afi.on;
+
+                bus.emit('rfid.tag.afi.set', data.tag);
               }
               else {
                 bus.emit('rfid.error', {
