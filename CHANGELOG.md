@@ -17,6 +17,7 @@
 * Added CRC check in RFID.
 * Changed check for AFI set correctly to accept when at least one tag with the given UID has the correct AFI value.
   This is add because UIDs can be read incorrectly by the RFID.
+* Added "^rfid.error$" to example.config.json. NB! update config.json.
 
 ### v1.3.1
 
