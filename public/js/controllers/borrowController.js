@@ -192,8 +192,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       }
 
       // Find tag.
-      var materialTag = material.tags.find(function (tag) {
-        return tag.uid === tag.uid;
+      var materialTag = material.tags.find(function (findTag) {
+        return findTag.uid === tag.uid;
       });
 
       // If the tag is found, mark it as removed.
