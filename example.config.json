@@ -25,6 +25,7 @@
       "^rfid.closed$",
       "^rfid.connected$",
       "^rfid.processing$",
+      "^rfid.error$",
       "^barcode.data$",
       "^frontend.[\\w]+$",
       "^fbs.login.[\\w]+$",
