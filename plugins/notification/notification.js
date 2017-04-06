@@ -828,8 +828,8 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
 Notification.prototype.getPatronInformation = function getPatronInformation(username, password) {
   var deferred = Q.defer();
   var self = this;
-  var busEvent = 'notification.checkInReceipt' + username;
-  var errorEvent = 'notification.checkInReceipt.error' + username;
+  var busEvent = 'notification.getPatronInformation' + username;
+  var errorEvent = 'notification.getPatronInformation.error' + username;
 
   // Check if password was given (defaults to empty string as this still will
   // give use the users information).
@@ -861,6 +861,7 @@ Notification.prototype.getPatronInformation = function getPatronInformation(user
 
   // Request the data to use in the notification.
   this.bus.emit('fbs.patron', {
+    timestamp: new Date().getTime(),
     username: username,
     password: password,
     busEvent: busEvent,
@@ -1012,7 +1013,7 @@ module.exports = function (options, imports, register) {
    * Listen status receipt events.
    */
   bus.on('notification.status', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.status')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.patronReceipt('status', data.mail, data.username, data.password, data.lang).then(function () {
           bus.emit(data.busEvent, true);
@@ -1029,7 +1030,7 @@ module.exports = function (options, imports, register) {
    * Listen status receipt events.
    */
   bus.on('notification.reservations', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.reservations')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.patronReceipt('reservations', data.mail, data.username, data.password, data.lang).then(function () {
           bus.emit(data.busEvent, true);
@@ -1046,7 +1047,7 @@ module.exports = function (options, imports, register) {
    * Listen check-out (loans) receipt events.
    */
   bus.on('notification.checkOut', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.checkOut')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.checkOutReceipt(data.mail, data.items, data.username, data.password, data.lang).then(function () {
             bus.emit(data.busEvent, true);
@@ -1064,7 +1065,7 @@ module.exports = function (options, imports, register) {
    * Listen check-out offline (loans) receipt events.
    */
   bus.on('notification.checkOutOffline', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.checkOutOffline')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.checkOutOfflineReceipt(data.items, data.lang).then(function () {
             bus.emit(data.busEvent, true);
@@ -1082,7 +1083,7 @@ module.exports = function (options, imports, register) {
    * Listen check-in (returns) receipt events.
    */
   bus.on('notification.checkIn', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.checkIn')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.checkInReceipt(data.mail, data.items, data.lang).then(function () {
           bus.emit(data.busEvent, true);
@@ -1099,7 +1100,7 @@ module.exports = function (options, imports, register) {
    * Listen check-in offline (returns) receipt events.
    */
   bus.on('notification.checkInOffline', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.checkInOffline')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.checkInOfflineReceipt(data.items, data.lang).then(function () {
           bus.emit(data.busEvent, true);
@@ -1116,10 +1117,10 @@ module.exports = function (options, imports, register) {
    * Listen getMailAddresses receipt events.
    */
   bus.on('notification.getPatronsInformation', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'notification.getPatronsInformation')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
-        notification.getPatronsInformation(data.patronIdentifiers).then(function (addresses) {
-          bus.emit(data.busEvent, addresses);
+        notification.getPatronsInformation(data.patronIdentifiers).then(function (patrons) {
+          bus.emit(data.busEvent, patrons);
         }, function (err) {
           bus.emit(data.errorEvent, err);
         });

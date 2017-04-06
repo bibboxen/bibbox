@@ -337,7 +337,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
         function (patronsInformation) {
 
           // Enrich the raw materials with the patron information.
-          $scope.rawMaterials.patronsInformation = patronsInformation;
+          $scope.patronsInformation = patronsInformation;
 
           // Check if all mail addresses exists; if not print the receipt and
           // exit.
@@ -374,9 +374,12 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      *   'mail' or 'printer'
      */
     $scope.receipt = function receipt(type) {
+      var items = angular.copy($scope.rawMaterials);
+      items.patronsInformation = $scope.patronsInformation;
+
       // Raw materials contains all loaned in the library system (also those who
       // have failed AFI sets, as they are still loaned in LMS)
-      receiptService.returnReceipt($scope.rawMaterials, type).then(
+      receiptService.returnReceipt(items, type).then(
         function (status) {
           // Ignore.
         },

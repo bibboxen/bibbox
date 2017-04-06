@@ -330,7 +330,7 @@ module.exports = function (options, imports, register) {
    * Listen to login requests.
    */
   bus.on('fbs.login', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'fbs.login')) {
       FBS.create(bus).then(function (fbs) {
         fbs.login(data.username, data.password).then(function () {
             bus.emit(data.busEvent, {});
@@ -349,7 +349,7 @@ module.exports = function (options, imports, register) {
    * Listen to library status requests.
    */
   bus.on('fbs.library.status', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'fbs.library.status')) {
       FBS.create(bus).then(function (fbs) {
         fbs.libraryStatus().then(function (res) {
             bus.emit(data.busEvent, res);
@@ -368,7 +368,7 @@ module.exports = function (options, imports, register) {
    * Listen to patron status requests.
    */
   bus.on('fbs.patron', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'fbs.patron')) {
       FBS.create(bus).then(function (fbs) {
         fbs.patronInformation(data.username, data.password).then(function (status) {
             bus.emit(data.busEvent, status);
@@ -387,7 +387,7 @@ module.exports = function (options, imports, register) {
    * Listen to checkout requests.
    */
   bus.on('fbs.checkout', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'fbs.checkout')) {
       // Check if this is a processing of offline queue.
       data.queued = data.queued || false;
 
@@ -471,7 +471,7 @@ module.exports = function (options, imports, register) {
    * Listen to checkIn requests.
    */
   bus.on('fbs.checkin', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'fbs.checkin')) {
       // Check if this is a processing of offline queue.
       data.queued = data.queued || false;
 
@@ -545,7 +545,7 @@ module.exports = function (options, imports, register) {
    * Listen to renew requests.
    */
   bus.on('fbs.renew', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'fbs.renew')) {
       FBS.create(bus).then(function (fbs) {
       fbs.renew(data.username, data.password, data.itemIdentifier).then(function (res) {
           bus.emit(data.busEvent, res);
@@ -564,7 +564,7 @@ module.exports = function (options, imports, register) {
    * Listen to renew all requests.
    */
   bus.on('fbs.renew.all', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'fbs.renew.all')) {
       FBS.create(bus).then(function (fbs) {
         fbs.renewAll(data.username, data.password).then(function (res) {
             bus.emit(data.busEvent, res);
@@ -583,7 +583,7 @@ module.exports = function (options, imports, register) {
    * Listen to block patron requests.
    */
   bus.on('fbs.block', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug)) {
+    if (!options.isEventExpired(data.timestamp, debug, 'fbs.block')) {
       FBS.create(bus).then(function (fbs) {
         fbs.block(data.username, data.reason).then(function (res) {
             bus.emit(data.busEvent, res);
@@ -602,7 +602,7 @@ module.exports = function (options, imports, register) {
    * Listen for fbs.online events.
    */
   bus.on('fbs.online', function (request) {
-    if (!options.isEventExpired(request.timestamp, debug)) {
+    if (!options.isEventExpired(request.timestamp, debug, 'fbs.online')) {
       FBS.create(bus).then(function (fbs) {
         // Check that config exists.
         if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
