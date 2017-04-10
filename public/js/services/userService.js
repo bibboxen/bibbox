@@ -8,21 +8,25 @@
  */
 
 
-angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 'config', 'proxyService', 'userTrackerService', 'loggerService',
-  function ($q, $timeout, $location, config, proxyService, userTrackerService, loggerService) {
+angular.module('BibBox').factory('userService', ['$q', '$timeout', '$location', 'config', 'basicService', 'proxyService', 'userTrackerService', 'loggerService',
+  function ($q, $timeout, $location, config, basicService, proxyService, userTrackerService, loggerService) {
     'use strict';
 
-    this.username = null;
-    this.password = null;
-    this.loggedIn = false;
+    // Extend this service with the basicService. It's copy to ensure that it is
+    // not overridden, if not copy the extend will return an reference.
+    var service = angular.extend(angular.copy(basicService), {});
+
+    service.username = null;
+    service.password = null;
+    service.loggedIn = false;
 
     /**
      * Is user logged in?
      *
      * @returns {*}
      */
-    this.userLoggedIn = function userLoggedIn() {
-      return this.loggedIn;
+    service.userLoggedIn = function userLoggedIn() {
+      return service.loggedIn;
     };
 
     /**
@@ -30,10 +34,10 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      *
      * @returns {{username: *, password: *}}
      */
-    this.getCredentials = function getCredentials() {
+    service.getCredentials = function getCredentials() {
       return {
-        username: this.username,
-        password: this.password
+        username: service.username,
+        password: service.password
       };
     };
 
@@ -51,22 +55,27 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      * @returns {*|promise}
      *
      */
-    this.login = function login(username, password) {
+    service.login = function login(username, password) {
       var deferred = $q.defer();
-      var self = this;
+      var self = service;
 
       var uniqueId = CryptoJS.MD5('userServiceLogin' + Date.now());
 
       // Handel response when login request is completed.
-      proxyService.once('fbs.login.success' + uniqueId, function () {
-        self.username = username;
-        self.password = password;
-        self.loggedIn = true;
+      proxyService.once('fbs.login.success' + uniqueId, function (data) {
+        if (!service.isEventExpired(data.timestamp, 'fbs.login.success', data)) {
+          self.username = username;
+          self.password = password;
+          self.loggedIn = true;
 
-        // User logged in, so clear tracker service.
-        userTrackerService.clear(username);
+          // User logged in, so clear tracker service.
+          userTrackerService.clear(username);
 
-        deferred.resolve();
+          deferred.resolve();
+        }
+        else {
+          deferred.reject(new Error('Event fbs.login.success timed out'));
+        }
       });
 
       // Handel errors and the off-line case, which should allow the user to
@@ -122,10 +131,10 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      *
      * Deletes user data, thereby logging it out.
      */
-    this.logout = function () {
-      this.username = null;
-      this.password = null;
-      this.loggedIn = false;
+    service.logout = function () {
+      service.username = null;
+      service.password = null;
+      service.loggedIn = false;
     };
 
     /**
@@ -133,11 +142,16 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      *
      * @param itemIdentifier
      */
-    this.borrow = function borrow(itemIdentifier) {
+    service.borrow = function borrow(itemIdentifier) {
       var deferred = $q.defer();
 
-      proxyService.once('fbs.checkout.success' + itemIdentifier, function (result) {
-        deferred.resolve(result);
+      proxyService.once('fbs.checkout.success' + itemIdentifier, function (data) {
+        if (!service.isEventExpired(data.timestamp, 'fbs.checkout.success', data)) {
+          deferred.resolve(data.result);
+        }
+        else {
+          deferred.reject(new Error('Event fbs.checkout.success timed out'));
+        }
       });
 
       proxyService.once('fbs.checkout.error' + itemIdentifier, function (err) {
@@ -148,8 +162,8 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
         timestamp: new Date().getTime(),
         busEvent: 'fbs.checkout.success' + itemIdentifier,
         errorEvent: 'fbs.checkout.error' + itemIdentifier,
-        username: this.username,
-        password: this.password,
+        username: service.username,
+        password: service.password,
         itemIdentifier: itemIdentifier
       });
 
@@ -165,11 +179,16 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      *   The current date that the check ins should be grouped under if in
      *   offline mode.
      */
-    this.checkIn = function checkIn(itemIdentifier, transaction) {
+    service.checkIn = function checkIn(itemIdentifier, transaction) {
       var deferred = $q.defer();
 
-      proxyService.once('fbs.checkin.success' + itemIdentifier, function (result) {
-        deferred.resolve(result);
+      proxyService.once('fbs.checkin.success' + itemIdentifier, function (data) {
+        if (!service.isEventExpired(data.timestamp, 'fbs.checkin.success', data)) {
+          deferred.resolve(data.result);
+        }
+        else {
+          deferred.reject(new Error('Event fbs.checkin.success timed out'));
+        }
       });
 
       proxyService.once('fbs.checkin.error' + itemIdentifier, function (err) {
@@ -193,11 +212,16 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      * @param itemIdentifier
      * @returns {Function}
      */
-    this.renew = function renew(itemIdentifier) {
+    service.renew = function renew(itemIdentifier) {
       var deferred = $q.defer();
 
-      proxyService.once('fbs.renew.success' + itemIdentifier, function (result) {
-        deferred.resolve(result);
+      proxyService.once('fbs.renew.success' + itemIdentifier, function (data) {
+        if (!service.isEventExpired(data.timestamp, 'fbs.renew.success', data)) {
+          deferred.resolve(data.result);
+        }
+        else {
+          deferred.reject(new Error('Event fbs.renew.success timed out'));
+        }
       });
 
       proxyService.once('fbs.renew.error' + itemIdentifier, function (err) {
@@ -208,8 +232,8 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
         timestamp: new Date().getTime(),
         busEvent: 'fbs.renew.success' + itemIdentifier,
         errorEvent: 'fbs.renew.error' + itemIdentifier,
-        username: this.username,
-        password: this.password,
+        username: service.username,
+        password: service.password,
         itemIdentifier: itemIdentifier
       });
 
@@ -221,12 +245,17 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      *
      * @returns {Function}
      */
-    this.renewAll = function renewAll() {
+    service.renewAll = function renewAll() {
       var deferred = $q.defer();
       var uniqueId = CryptoJS.MD5('userServiceRenewAll' + Date.now());
 
-      proxyService.once('fbs.renew.all.success' + uniqueId, function (result) {
-        deferred.resolve(result);
+      proxyService.once('fbs.renew.all.success' + uniqueId, function (data) {
+        if (!service.isEventExpired(data.timestamp, 'fbs.renew.all.success', data)) {
+          deferred.resolve(data.result);
+        }
+        else {
+          deferred.reject(new Error('Event fbs.renew.all.success timed out'));
+        }
       });
 
       proxyService.once('fbs.renew.all.error' + uniqueId, function (err) {
@@ -237,8 +266,8 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
         timestamp: new Date().getTime(),
         busEvent: 'fbs.renew.all.success' + uniqueId,
         errorEvent: 'fbs.renew.all.error' + uniqueId,
-        username: this.username,
-        password: this.password
+        username: service.username,
+        password: service.password
       });
 
       return deferred.promise;
@@ -249,12 +278,17 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      *
      * @returns {Function}
      */
-    this.block = function block(username, reason) {
+    service.block = function block(username, reason) {
       var deferred = $q.defer();
       var uniqueId = CryptoJS.MD5('userServiceBlock' + Date.now());
 
-      proxyService.once('fbs.block.success' + uniqueId, function (result) {
-        deferred.resolve(result);
+      proxyService.once('fbs.block.success' + uniqueId, function (data) {
+        if (!service.isEventExpired(data.timestamp, 'fbs.block.success', data)) {
+          deferred.resolve(data.result);
+        }
+        else {
+          deferred.reject(new Error('Event fbs.block.success timed out'));
+        }
       });
 
       proxyService.once('fbs.block.error' + uniqueId, function (err) {
@@ -279,12 +313,17 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      *
      * @returns {*|promise}
      */
-    this.patron = function patron() {
+    service.patron = function patron() {
       var deferred = $q.defer();
       var uniqueId = CryptoJS.MD5('userServicePatron' + Date.now());
 
-      proxyService.once('fbs.patron.success' + uniqueId, function (result) {
-        deferred.resolve(result);
+      proxyService.once('fbs.patron.success' + uniqueId, function (data) {
+        if (!service.isEventExpired(data.timestamp, 'fbs.patron.success', data)) {
+          deferred.resolve(data.patron);
+        }
+        else {
+          deferred.reject(new Error('Event fbs.patron.success timed out'));
+        }
       });
 
       proxyService.once('fbs.patron.error' + uniqueId, function (err) {
@@ -295,8 +334,8 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
         timestamp: new Date().getTime(),
         busEvent: 'fbs.patron.success' + uniqueId,
         errorEvent: 'fbs.patron.error' + uniqueId,
-        username: this.username,
-        password: this.password
+        username: service.username,
+        password: service.password
       });
 
       return deferred.promise;
@@ -309,12 +348,17 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      *
      * @returns {Function}
      */
-    this.isOnline = function isOnline() {
+    service.isOnline = function isOnline() {
       var deferred = $q.defer();
       var uniqueId = CryptoJS.MD5('userServiceOnline' + Date.now());
 
-      proxyService.once('fbs.online.response' + uniqueId, function (status) {
-        deferred.resolve(status);
+      proxyService.once('fbs.online.response' + uniqueId, function (data) {
+        if (!service.isEventExpired(data.timestamp, 'fbs.online.success', data)) {
+          deferred.resolve(data.online);
+        }
+        else {
+          deferred.reject(new Error('Event fbs.online.success timed out'));
+        }
       });
 
       proxyService.once('fbs.online.error' + uniqueId, function (err) {
@@ -329,5 +373,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
 
       return deferred.promise;
     };
+
+    return service;
   }
 ]);

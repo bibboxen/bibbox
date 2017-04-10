@@ -111,7 +111,10 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
      * Tag request fake response.
      */
     bus.on('rfid.tags.request', function () {
-      bus.emit('rfid.tags.detected', fakeTags);
+      bus.emit('rfid.tags.detected', {
+        timestamp: new Date().getTime(),
+        rawTags: fakeTags
+      });
     });
 
     /**
@@ -131,11 +134,14 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
       // Tag found so return fakeTags afi for that tag.
       if (index !== -1) {
         bus.emit('rfid.tag.afi.set', {
-          uid: fakeTags[index].uid,
-          mid: fakeTags[index].mid,
-          numberInSeries: fakeTags[index].numberInSeries,
-          seriesLength: fakeTags[index].seriesLength,
-          afi: fakeTags[index].afi === afi.on
+          timestamp: new Date().getTime(),
+          rawTag: {
+            uid: fakeTags[index].uid,
+            mid: fakeTags[index].mid,
+            numberInSeries: fakeTags[index].numberInSeries,
+            seriesLength: fakeTags[index].seriesLength,
+            afi: fakeTags[index].afi === afi.on
+          }
         });
       }
       else {
@@ -203,7 +209,10 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
                   data.tags[i].afi = data.tags[i].afi === afi.on;
                 }
 
-                bus.emit('rfid.tags.detected', data.tags);
+                bus.emit('rfid.tags.detected', {
+                  timestamp: new Date().getTime(),
+                  rawTags: data.tags
+                });
               }
               break;
 
@@ -212,24 +221,34 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
                 // Change from actual afi value to boolean.
                 data.tag.afi = data.tag.afi === afi.on;
 
-                bus.emit('rfid.tag.detected', data.tag);
+                bus.emit('rfid.tag.detected', {
+                  timestamp: new Date().getTime(),
+                  rawTag: data.tag
+                });
               }
               break;
 
             case 'rfid.tag.removed':
               data.tag.afi = data.tag.afi === afi.on;
 
-              bus.emit('rfid.tag.removed', data.tag);
+              bus.emit('rfid.tag.removed', {
+                timestamp: new Date().getTime(),
+                rawTag: data.tag
+              });
               break;
 
             case 'rfid.afi.set':
               if (data.success) {
                 data.tag.afi = data.tag.afi === afi.on;
 
-                bus.emit('rfid.tag.afi.set', data.tag);
+                bus.emit('rfid.tag.afi.set', {
+                  timestamp: new Date().getTime(),
+                  rawTag: data.tag
+                });
               }
               else {
                 bus.emit('rfid.error', {
+                  timestamp: new Date().getTime(),
                   type: 'afi.set',
                   msg: 'AFI not set!',
                   tag: data.tag

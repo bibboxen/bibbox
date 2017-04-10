@@ -228,7 +228,10 @@ module.exports = function (options, imports, register) {
    */
   barcode.on('code', function (code) {
     bus.emit('logger.debug', 'Barcode: scanned - ' + code);
-    bus.emit('barcode.data', code);
+    bus.emit('barcode.data', {
+      timestamp: new Date().getTime(),
+      code: code
+    });
   });
 
   /**
@@ -239,6 +242,7 @@ module.exports = function (options, imports, register) {
   barcode.on('err', function (err) {
     bus.emit('logger.err', 'Barcode: ' + err);
     bus.emit('barcode.err', {
+      timestamp: new Date().getTime(),
       msg: err.message
     });
   });

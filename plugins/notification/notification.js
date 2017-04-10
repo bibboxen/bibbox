@@ -1016,7 +1016,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.status')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.patronReceipt('status', data.mail, data.username, data.password, data.lang).then(function () {
-          bus.emit(data.busEvent, true);
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            status: true
+          });
         }, function (err) {
           bus.emit(data.errorEvent, err);
         });
@@ -1033,7 +1036,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.reservations')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.patronReceipt('reservations', data.mail, data.username, data.password, data.lang).then(function () {
-          bus.emit(data.busEvent, true);
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            status: true
+          });
         }, function (err) {
           bus.emit(data.errorEvent, err);
         });
@@ -1050,7 +1056,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.checkOut')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.checkOutReceipt(data.mail, data.items, data.username, data.password, data.lang).then(function () {
-            bus.emit(data.busEvent, true);
+            bus.emit(data.busEvent, {
+              timestamp: new Date().getTime(),
+              status: true
+            });
           },
           function (err) {
             bus.emit(data.errorEvent, err);
@@ -1068,7 +1077,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.checkOutOffline')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.checkOutOfflineReceipt(data.items, data.lang).then(function () {
-            bus.emit(data.busEvent, true);
+            bus.emit(data.busEvent, {
+              timestamp: new Date().getTime(),
+              status: true
+            });
           },
           function (err) {
             bus.emit(data.errorEvent, err);
@@ -1086,7 +1098,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.checkIn')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.checkInReceipt(data.mail, data.items, data.lang).then(function () {
-          bus.emit(data.busEvent, true);
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            status: true
+          });
         }, function (err) {
           bus.emit(data.errorEvent, err);
         });
@@ -1103,7 +1118,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.checkInOffline')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.checkInOfflineReceipt(data.items, data.lang).then(function () {
-          bus.emit(data.busEvent, true);
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            status: true
+          });
         }, function (err) {
           bus.emit(data.errorEvent, err);
         });
@@ -1120,7 +1138,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.getPatronsInformation')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.getPatronsInformation(data.patronIdentifiers).then(function (patrons) {
-          bus.emit(data.busEvent, patrons);
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            patrons: patrons
+          });
         }, function (err) {
           bus.emit(data.errorEvent, err);
         });
