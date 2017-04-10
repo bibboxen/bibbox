@@ -134,7 +134,7 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
           uid: fakeTags[index].uid,
           mid: fakeTags[index].mid,
           numberInSeries: fakeTags[index].numberInSeries,
-          seriesLength : fakeTags[index].seriesLength,
+          seriesLength: fakeTags[index].seriesLength,
           afi: fakeTags[index].afi === afi.on
         });
       }
