@@ -56,6 +56,10 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     $scope.tagDetected = function tagDetected(tag) {
       var tag = JSON.parse(JSON.stringify(tag));
 
+      if (!$scope.tagValid(tag)) {
+        return;
+      }
+
       var material = $scope.addTag(tag, $scope.materials);
 
       // Restart idle timeout.
@@ -187,6 +191,10 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      * @param tag
      */
     $scope.tagRemoved = function itemRemoved(tag) {
+      if (!$scope.tagValid(tag)) {
+        return;
+      }
+
       // Restart idle timeout.
       $scope.baseResetIdleWatch();
 
