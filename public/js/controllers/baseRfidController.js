@@ -20,8 +20,8 @@ RFIDBaseInterface = new Interface( 'RFIDBaseInterface', [
   'tagAFISet'
 ]);
 
-angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controller', 'rfidService', 'loggerService',
-  function ($scope, $controller, rfidService, loggerService) {
+angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controller', 'rfidService', 'loggerService', 'config',
+  function ($scope, $controller, rfidService, loggerService, config) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -229,7 +229,20 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      *   True if the tag is valid, else false.
      */
     $scope.tagValid = function tagValid(tag) {
-      return tag && tag.afi !== undefined && tag.mid !== undefined && tag.uid !== undefined && tag.numberInSeries !== undefined && tag.seriesLength !== undefined;
+      var eventTimeout = config.hasOwnProperty(eventTimeout) ? config.eventTimeout :  1000;
+
+      var expired = false;
+      if (Number(tag.timestamp) + eventTimeout < new Date().getTime()) {
+        // This logging is temporary, until #BIB-255 is resolved.
+        loggerService.debug('Event tag valid timed out (' + ((Number(tag.timestamp) + eventTimeout) - new Date().getTime()) + '): ' + JSON.stringify(tag));
+
+        expired = true;
+      }
+
+      return tag && tag.afi !== undefined
+        && tag.mid !== undefined && tag.uid !== undefined
+        && tag.numberInSeries !== undefined && tag.seriesLength !== undefined
+        && !expired;
     };
 
     /**

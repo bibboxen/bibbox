@@ -150,6 +150,10 @@ angular.module('BibBox').factory('userService', ['$q', '$timeout', '$location', 
           deferred.resolve(data.result);
         }
         else {
+          // This logging is temporary, until #BIB-255 is resolved.
+          var eventTimeout = config.hasOwnProperty(eventTimeout) ? config.eventTimeout :  500;
+          loggerService.debug('Event fbs.checkout.success timed out (' + ((Number(data.timestamp) + eventTimeout) - new Date().getTime()) + '): ' + JSON.stringify(data));
+
           deferred.reject(new Error('Event fbs.checkout.success timed out'));
         }
       });
