@@ -132,6 +132,9 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
       if (index !== -1) {
         bus.emit('rfid.tag.afi.set', {
           uid: fakeTags[index].uid,
+          mid: fakeTags[index].mid,
+          numberInSeries: fakeTags[index].numberInSeries,
+          seriesLength: fakeTags[index].seriesLength,
           afi: fakeTags[index].afi === afi.on
         });
       }
