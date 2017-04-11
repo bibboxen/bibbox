@@ -1,6 +1,10 @@
 #Bibbox Changelog
 
-### In development
+### Development
+
+* Added event timeouts to event from backend to front-end.
+
+### 1.4.0
 
 * Changed events between the systems to use an timeout to filter out old events.
 * Fixed missing event remove function call in bus plugin.

@@ -50,20 +50,20 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      *
      * Attempts to check-in the material if all part are available and on device.
      *
-     * @param tag
+     * @param {object} rawTag
      *   The tag of material to check-in (return).
      */
-    $scope.tagDetected = function tagDetected(tag) {
-      var tag = JSON.parse(JSON.stringify(tag));
+    $scope.tagDetected = function tagDetected(rawTag) {
+      var tag = JSON.parse(JSON.stringify(rawTag));
 
-      if (!$scope.tagValid(tag)) {
+      // Restart idle timeout.
+      $scope.baseResetIdleWatch();
+
+      if (!$scope.tagValid(tag, 'return.tagDetected')) {
         return;
       }
 
       var material = $scope.addTag(tag, $scope.materials);
-
-      // Restart idle timeout.
-      $scope.baseResetIdleWatch();
 
       // If afi is awaiting being locked, and is placed on the device again.
       // Retry the locking.
@@ -191,12 +191,12 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      * @param tag
      */
     $scope.tagRemoved = function itemRemoved(tag) {
-      if (!$scope.tagValid(tag)) {
-        return;
-      }
-
       // Restart idle timeout.
       $scope.baseResetIdleWatch();
+
+      if (!$scope.tagValid(tag, 'return.tagRemoved')) {
+        return;
+      }
 
       // Check if material has already been added to the list.
       var material = $scope.materials.find(function (material) {
@@ -235,7 +235,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      *   The tag returned from the device.
      */
     $scope.tagAFISet = function tagAFISet(tag) {
-      if (!$scope.tagValid(tag)) {
+      if (!$scope.tagValid(tag, 'return.tagAFISet')) {
         return;
       }
 

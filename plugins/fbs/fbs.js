@@ -333,7 +333,9 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'fbs.login')) {
       FBS.create(bus).then(function (fbs) {
         fbs.login(data.username, data.password).then(function () {
-            bus.emit(data.busEvent, {});
+            bus.emit(data.busEvent, {
+              timestamp: new Date().getTime()
+            });
           },
           function (err) {
             bus.emit(data.errorEvent, err);
@@ -352,7 +354,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'fbs.library.status')) {
       FBS.create(bus).then(function (fbs) {
         fbs.libraryStatus().then(function (res) {
-            bus.emit(data.busEvent, res);
+            bus.emit(data.busEvent, {
+              timestamp: new Date().getTime(),
+              results: res
+            });
           },
           function (err) {
             bus.emit(data.errorEvent, err);
@@ -371,7 +376,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'fbs.patron')) {
       FBS.create(bus).then(function (fbs) {
         fbs.patronInformation(data.username, data.password).then(function (status) {
-            bus.emit(data.busEvent, status);
+            bus.emit(data.busEvent, {
+              timestamp: new Date().getTime(),
+              patron: status
+            });
           },
           function (err) {
             bus.emit(data.errorEvent, err);
@@ -410,7 +418,10 @@ module.exports = function (options, imports, register) {
       // Create FBS object and send checkout request.
       FBS.create(bus).then(function (fbs) {
         fbs.checkout(data.username, data.password, data.itemIdentifier, data.noBlockDueDate, noBlock, data.transactionDate).then(function (res) {
-            bus.emit(data.busEvent, res);
+            bus.emit(data.busEvent, {
+              timestamp: new Date().getTime(),
+              result: res
+            });
           },
           function (err) {
             if (err.message === 'FBS is offline' && data.queued === false) {
@@ -487,7 +498,10 @@ module.exports = function (options, imports, register) {
 
         // Perform the checking request.
         fbs.checkIn(data.itemIdentifier, data.checkedInDate, noBlock).then(function (res) {
-            bus.emit(data.busEvent, res);
+            bus.emit(data.busEvent, {
+              timestamp: new Date().getTime(),
+              result: res
+            });
           },
           function (err) {
             if (err.message === 'FBS is offline' && data.queued === false) {
@@ -548,7 +562,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'fbs.renew')) {
       FBS.create(bus).then(function (fbs) {
       fbs.renew(data.username, data.password, data.itemIdentifier).then(function (res) {
-          bus.emit(data.busEvent, res);
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            result: res
+          });
         },
         function (err) {
           bus.emit(data.errorEvent, err);
@@ -567,7 +584,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'fbs.renew.all')) {
       FBS.create(bus).then(function (fbs) {
         fbs.renewAll(data.username, data.password).then(function (res) {
-            bus.emit(data.busEvent, res);
+            bus.emit(data.busEvent, {
+              timestamp: new Date().getTime(),
+              result: res
+            });
           },
           function (err) {
             bus.emit(data.errorEvent, err);
@@ -586,7 +606,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'fbs.block')) {
       FBS.create(bus).then(function (fbs) {
         fbs.block(data.username, data.reason).then(function (res) {
-            bus.emit(data.busEvent, res);
+            bus.emit(data.busEvent, {
+              timestamp: new Date().getTime(),
+              result: res
+            });
           },
           function (err) {
             bus.emit(data.errorEvent, err);
@@ -610,7 +633,10 @@ module.exports = function (options, imports, register) {
 
           // Listen to online check event send below.
           bus.once(busEvent, function (online) {
-            bus.emit(request.busEvent, online);
+            bus.emit(request.busEvent, {
+              timestamp: new Date().getTime(),
+              online: online
+            });
           });
 
           // Send online check.

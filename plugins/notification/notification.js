@@ -642,31 +642,31 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
   // Set current language.
   i18n.setLocale(lang ? lang : self.config.default_lang);
 
-  this.getPatronInformation(username, password).then(function (data) {
-    // Build outer context.
+  self.getPatronInformation(username, password).then(function (data) {
+    var patron = data.patron;
     var context = {
       header: self.headerConfig,
       library: self.renderLibrary(mail),
       footer: self.renderFooter(mail),
       patrons: [{
-        name: data.hasOwnProperty('personalName') ? data.personalName : 'Unknown',
-        fines: layout.fines ? self.renderFines(mail, data.fineItems, data.feeAmount) : '',
+        name: patron.hasOwnProperty('personalName') ? patron.personalName : 'Unknown',
+        fines: layout.fines ? self.renderFines(mail, patron.fineItems, patron.feeAmount) : '',
         loans_new: layout.loans_new ? self.renderNewLoans(mail, 'receipt.loans.new.headline', items) : '',
-        loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
-        reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
-        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : ''
+        loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patron.chargedItems, patron.overdueItems) : '',
+        reservations: layout.reservations ? self.renderReservations(mail, patron.unavailableHoldItems) : '',
+        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, patron.holdItems) : ''
       }]
     };
 
     var result = '';
     if (mail) {
-      if (data.hasOwnProperty('emailAddress') && data.emailAddress !== undefined) {
+      if (patron.hasOwnProperty('emailAddress') && patron.emailAddress !== undefined) {
         result = self.mailTemplate.render(context);
 
         // Remove empty lines (from template engine if statements).
         result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
 
-        self.sendMail(data.emailAddress, result).then(function success() {
+        self.sendMail(patron.emailAddress, result).then(function success() {
           deferred.resolve();
         }, function error(err) {
           deferred.reject(err);
@@ -761,30 +761,31 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
 
   // Listen for status notification message.
   this.getPatronInformation(username, password).then(function (data) {
+    var patron = data.patron;
     var context = {
       header: self.headerConfig,
       library: self.renderLibrary(mail),
       footer: self.renderFooter(mail),
       patrons: [{
-        name: data.hasOwnProperty('personalName') ? data.personalName : 'Unknown',
-        fines: layout.fines ? self.renderFines(mail, data.fineItems, data.feeAmount) : '',
-        loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', data.chargedItems, data.overdueItems) : '',
-        reservations: layout.reservations ? self.renderReservations(mail, data.unavailableHoldItems) : '',
-        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, data.holdItems) : ''
+        name: patron.hasOwnProperty('personalName') ? patron.personalName : 'Unknown',
+        fines: layout.fines ? self.renderFines(mail, patron.fineItems, patron.feeAmount) : '',
+        loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patron.chargedItems, patron.overdueItems) : '',
+        reservations: layout.reservations ? self.renderReservations(mail, patron.unavailableHoldItems) : '',
+        reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, patron.holdItems) : ''
       }]
     };
 
     // Add username to receipt.
-    if (data.hasOwnProperty('personalName') && data.personalName !== '') {
-      context.username = data.personalName;
+    if (patron.hasOwnProperty('personalName') && patron.personalName !== '') {
+      context.username = patron.personalName;
     }
 
     var result = '';
     if (mail) {
-      if (data.hasOwnProperty('emailAddress') && data.emailAddress !== undefined) {
+      if (patron.hasOwnProperty('emailAddress') && patron.emailAddress !== undefined) {
         result = self.mailTemplate.render(context);
 
-        self.sendMail(data.emailAddress, result).then(function success() {
+        self.sendMail(patron.emailAddress, result).then(function success() {
           deferred.resolve();
         }, function error(err) {
           deferred.reject(err);
@@ -841,7 +842,7 @@ Notification.prototype.getPatronInformation = function getPatronInformation(user
   }
 
   this.bus.once(busEvent, function (data) {
-    if (data.validPatron === 'N') {
+    if (data.patron.validPatron === 'N') {
       deferred.reject(new Error('Unknown patron'));
     }
     else {
@@ -962,7 +963,7 @@ Notification.prototype.getPatronsInformation = function getPatronsInformation(pa
     var patronsInformation = {};
     results.forEach(function (result) {
       if (result.state === 'fulfilled') {
-        var patron = result.value;
+        var patron = result.value.patron;
 
         // Check if patron has an mail address and it's set. If not set the mail
         // to false. This will indicates that the user exists but don't have an
@@ -1016,7 +1017,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.status')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.patronReceipt('status', data.mail, data.username, data.password, data.lang).then(function () {
-          bus.emit(data.busEvent, true);
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            status: true
+          });
         }, function (err) {
           bus.emit(data.errorEvent, err);
         });
@@ -1033,7 +1037,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.reservations')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.patronReceipt('reservations', data.mail, data.username, data.password, data.lang).then(function () {
-          bus.emit(data.busEvent, true);
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            status: true
+          });
         }, function (err) {
           bus.emit(data.errorEvent, err);
         });
@@ -1050,7 +1057,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.checkOut')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.checkOutReceipt(data.mail, data.items, data.username, data.password, data.lang).then(function () {
-            bus.emit(data.busEvent, true);
+            bus.emit(data.busEvent, {
+              timestamp: new Date().getTime(),
+              status: true
+            });
           },
           function (err) {
             bus.emit(data.errorEvent, err);
@@ -1068,7 +1078,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.checkOutOffline')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.checkOutOfflineReceipt(data.items, data.lang).then(function () {
-            bus.emit(data.busEvent, true);
+            bus.emit(data.busEvent, {
+              timestamp: new Date().getTime(),
+              status: true
+            });
           },
           function (err) {
             bus.emit(data.errorEvent, err);
@@ -1086,7 +1099,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.checkIn')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.checkInReceipt(data.mail, data.items, data.lang).then(function () {
-          bus.emit(data.busEvent, true);
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            status: true
+          });
         }, function (err) {
           bus.emit(data.errorEvent, err);
         });
@@ -1103,7 +1119,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.checkInOffline')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.checkInOfflineReceipt(data.items, data.lang).then(function () {
-          bus.emit(data.busEvent, true);
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            status: true
+          });
         }, function (err) {
           bus.emit(data.errorEvent, err);
         });
@@ -1120,7 +1139,10 @@ module.exports = function (options, imports, register) {
     if (!options.isEventExpired(data.timestamp, debug, 'notification.getPatronsInformation')) {
       Notification.create(bus, options.paths, options.languages).then(function (notification) {
         notification.getPatronsInformation(data.patronIdentifiers).then(function (patrons) {
-          bus.emit(data.busEvent, patrons);
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            patrons: patrons
+          });
         }, function (err) {
           bus.emit(data.errorEvent, err);
         });

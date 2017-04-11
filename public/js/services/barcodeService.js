@@ -3,9 +3,13 @@
  * Handel barcode events.
  */
 
-angular.module('BibBox').service('barcodeService', ['$q', 'proxyService',
-  function ($q, proxyService) {
+angular.module('BibBox').factory('barcodeService', ['$q', 'basicService', 'proxyService',
+  function ($q, basicService, proxyService) {
     'use strict';
+
+    // Extend this service with the basicService. It's copy to ensure that it is
+    // not overridden, if not copy the extend will return an reference.
+    var service = angular.extend(angular.copy(basicService), {});
 
     var currentScope = null;
 
@@ -18,8 +22,8 @@ angular.module('BibBox').service('barcodeService', ['$q', 'proxyService',
      *   The data processed by the barcode scanner.
      */
     function scanned(data) {
-      if (currentScope) {
-        currentScope.barcodeScanned(data);
+      if (currentScope && !service.isEventExpired(data.timestamp, 'barcode.data', data)) {
+        currentScope.barcodeScanned(data.code);
       }
     }
 
@@ -32,7 +36,7 @@ angular.module('BibBox').service('barcodeService', ['$q', 'proxyService',
      *   The error
      */
     function error(err) {
-      if (currentScope) {
+      if (currentScope && !service.isEventExpired(err.timestamp, 'barcode.err', data)) {
         currentScope.barcodeError(err);
       }
     }
@@ -43,7 +47,7 @@ angular.module('BibBox').service('barcodeService', ['$q', 'proxyService',
      * @param scope
      *   The scope to emit events into when data is received.
      */
-    this.start = function start(scope) {
+    service.start = function start(scope) {
       currentScope = scope;
 
       proxyService.emit('barcode.start');
@@ -52,7 +56,7 @@ angular.module('BibBox').service('barcodeService', ['$q', 'proxyService',
     /**
      * Stop listing for barcode events.
      */
-    this.stop = function stop() {
+    service.stop = function stop() {
       currentScope = null;
 
       proxyService.emit('barcode.stop');
@@ -61,5 +65,7 @@ angular.module('BibBox').service('barcodeService', ['$q', 'proxyService',
     // Register listeners.
     proxyService.on('barcode.data', scanned);
     proxyService.on('barcode.err', error);
+
+    return service;
   }
 ]);
