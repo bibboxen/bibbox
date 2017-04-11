@@ -50,11 +50,11 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      *
      * Interface method implementation.
      *
-     * @param tag
+     * @param {object} rawTag
      *   The tag of the material to check-out (borrow).
      */
-    $scope.tagDetected = function tagDetected(tag) {
-      var tag = JSON.parse(JSON.stringify(tag));
+    $scope.tagDetected = function tagDetected(rawTag) {
+      var tag = JSON.parse(JSON.stringify(rawTag));
 
       if (!$scope.tagValid(tag)) {
         return;

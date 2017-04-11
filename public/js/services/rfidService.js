@@ -29,6 +29,7 @@ angular.module('BibBox').factory('rfidService', ['$q', '$rootScope', 'basicServi
       this.numberInSeries = rawTag.numberInSeries;
       this.seriesLength = rawTag.seriesLength;
       this.afi = rawTag.afi;
+      this.timestamp = rawTag.timestamp;
     };
 
     /**
@@ -51,7 +52,7 @@ angular.module('BibBox').factory('rfidService', ['$q', '$rootScope', 'basicServi
      *   The tags that were detected by the RFID.
      */
     proxyService.on('rfid.tags.detected', function tagsDetected(data) {
-      if (currentScope && hasMethod('tagDetected') && !service.isEventExpired(data.timestamp, 'fbs.login.success', data)) {
+      if (currentScope && hasMethod('tagDetected') && !service.isEventExpired(data.timestamp, 'rfid.tags.detected', data)) {
         for (var i = 0; i < data.rawTags.length; i++) {
           currentScope.tagDetected(new Tag(data.rawTags[i]));
         }
@@ -65,7 +66,7 @@ angular.module('BibBox').factory('rfidService', ['$q', '$rootScope', 'basicServi
      *   The tag that was detected by the RFID.
      */
     proxyService.on('rfid.tag.detected', function tagDetected(data) {
-      if (currentScope && hasMethod('tagDetected') && !service.isEventExpired(data.timestamp, 'fbs.login.success', data)) {
+      if (currentScope && hasMethod('tagDetected') && !service.isEventExpired(data.timestamp, 'rfid.tag.detected', data)) {
         currentScope.tagDetected(new Tag(data.rawTag));
       }
     });
@@ -77,7 +78,7 @@ angular.module('BibBox').factory('rfidService', ['$q', '$rootScope', 'basicServi
      *   The tag that was removed from the RFID.
      */
     proxyService.on('rfid.tag.removed', function tagRemoved(data) {
-      if (currentScope && hasMethod('tagRemoved') && !service.isEventExpired(data.timestamp, 'fbs.login.success', data)) {
+      if (currentScope && hasMethod('tagRemoved') && !service.isEventExpired(data.timestamp, 'rfid.tag.removed', data)) {
         currentScope.tagRemoved(new Tag(data.rawTag));
       }
     });
@@ -89,7 +90,7 @@ angular.module('BibBox').factory('rfidService', ['$q', '$rootScope', 'basicServi
      *   The tag where the AFI have been set.
      */
     proxyService.on('rfid.tag.afi.set', function tagAFISet(data) {
-      if (currentScope && hasMethod('tagAFISet') && !service.isEventExpired(data.timestamp, 'fbs.login.success', data)) {
+      if (currentScope && hasMethod('tagAFISet') && !service.isEventExpired(data.timestamp, 'rfid.tag.afi.set', data)) {
         currentScope.tagAFISet(new Tag(data.rawTag));
       }
     });
@@ -110,7 +111,7 @@ angular.module('BibBox').factory('rfidService', ['$q', '$rootScope', 'basicServi
      *   The error.
      */
     proxyService.on('rfid.error', function rfidError(err) {
-      if (currentScope && hasMethod('rfidError') && !service.isEventExpired(err.timestamp, 'fbs.login.success', err)) {
+      if (currentScope && hasMethod('rfidError') && !service.isEventExpired(err.timestamp, 'rfid.error', err)) {
         currentScope.rfidError(err);
       }
     });

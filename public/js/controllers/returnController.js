@@ -50,11 +50,11 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      *
      * Attempts to check-in the material if all part are available and on device.
      *
-     * @param tag
+     * @param {object} rawTag
      *   The tag of material to check-in (return).
      */
-    $scope.tagDetected = function tagDetected(tag) {
-      var tag = JSON.parse(JSON.stringify(tag));
+    $scope.tagDetected = function tagDetected(rawTag) {
+      var tag = JSON.parse(JSON.stringify(rawTag));
 
       if (!$scope.tagValid(tag)) {
         return;

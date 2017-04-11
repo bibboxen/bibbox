@@ -32,7 +32,7 @@ angular.module('BibBox').service('basicService', ['config',
       }
 
       if (config.hasOwnProperty('debug') && config.debug) {
-        console.error('Event not expired (' + ((Number(timestamp) + eventTimeout) - current) + '): ' + eventName, data);
+        console.info('Event not expired (' + ((Number(timestamp) + eventTimeout) - current) + '): ' + eventName, data);
       }
       return false;
     };

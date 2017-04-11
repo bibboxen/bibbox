@@ -111,6 +111,11 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
      * Tag request fake response.
      */
     bus.on('rfid.tags.request', function () {
+      // Enrich tags with timestamps.
+      for (var i in fakeTags) {
+        fakeTags[i].timestamp = new Date().getTime() - i;
+      }
+
       bus.emit('rfid.tags.detected', {
         timestamp: new Date().getTime(),
         rawTags: fakeTags
@@ -136,6 +141,7 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
         bus.emit('rfid.tag.afi.set', {
           timestamp: new Date().getTime(),
           rawTag: {
+            timestamp: new Date().getTime(),
             uid: fakeTags[index].uid,
             mid: fakeTags[index].mid,
             numberInSeries: fakeTags[index].numberInSeries,
