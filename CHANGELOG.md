@@ -1,8 +1,9 @@
 #Bibbox Changelog
 
-### Development
+### In development
 
 * Added event timeouts to event from backend to front-end.
+* Added debug information about tags to logs to find bug about "ghost tags".
 
 ### 1.4.0
 
