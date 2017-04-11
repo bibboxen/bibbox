@@ -56,7 +56,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     $scope.tagDetected = function tagDetected(rawTag) {
       var tag = JSON.parse(JSON.stringify(rawTag));
 
-      if (!$scope.tagValid(tag)) {
+      if (!$scope.tagValid(tag, 'return.tagDetected')) {
         return;
       }
 
@@ -191,7 +191,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      * @param tag
      */
     $scope.tagRemoved = function itemRemoved(tag) {
-      if (!$scope.tagValid(tag)) {
+      if (!$scope.tagValid(tag, 'return.tagRemoved')) {
         return;
       }
 
@@ -235,7 +235,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      *   The tag returned from the device.
      */
     $scope.tagAFISet = function tagAFISet(tag) {
-      if (!$scope.tagValid(tag)) {
+      if (!$scope.tagValid(tag, 'return.tagAFISet')) {
         return;
       }
 

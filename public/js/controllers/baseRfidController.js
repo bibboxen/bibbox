@@ -225,16 +225,20 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      *
      * @param {Object} tag
      *   The tag.
+     * @param {string} name
+     *   Used in debugging as should be the name off the calling function.
+     *
      * @return {boolean}
      *   True if the tag is valid, else false.
      */
-    $scope.tagValid = function tagValid(tag) {
+    $scope.tagValid = function tagValid(tag, name) {
       var eventTimeout = config.hasOwnProperty(eventTimeout) ? config.eventTimeout :  1000;
+      name = name || 'Unknown';
 
       var expired = false;
       if (Number(tag.timestamp) + eventTimeout < new Date().getTime()) {
         // This logging is temporary, until #BIB-255 is resolved.
-        loggerService.debug('Event tag valid timed out (' + ((Number(tag.timestamp) + eventTimeout) - new Date().getTime()) + '): ' + JSON.stringify(tag));
+        loggerService.debug('Event (' + name + ') tag valid timed out (' + ((Number(tag.timestamp) + eventTimeout) - new Date().getTime()) + '): ' + JSON.stringify(tag));
 
         expired = true;
       }

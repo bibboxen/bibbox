@@ -56,7 +56,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     $scope.tagDetected = function tagDetected(rawTag) {
       var tag = JSON.parse(JSON.stringify(rawTag));
 
-      if (!$scope.tagValid(tag)) {
+      if (!$scope.tagValid(tag, 'borrow.tagDetected')) {
         return;
       }
 
@@ -184,7 +184,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      * @param tag
      */
     $scope.tagRemoved = function itemRemoved(tag) {
-      if (!$scope.tagValid(tag)) {
+      if (!$scope.tagValid(tag, 'borrow.tagRemove')) {
         return;
       }
 
@@ -228,7 +228,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      *   The tag returned from the device.
      */
     $scope.tagAFISet = function itemAFISet(tag) {
-      if (!$scope.tagValid(tag)) {
+      if (!$scope.tagValid(tag, 'borrow.tagAFISet')) {
         return;
       }
 
