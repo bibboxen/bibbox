@@ -1,6 +1,6 @@
-#Bibbox Changelog
+# Bibbox Changelog
 
-### v1.4.0
+### v1.4.1
 
 * Added event timeouts to event from backend to front-end.
 * Added debug information about tags to logs to find bug about "ghost tags".
