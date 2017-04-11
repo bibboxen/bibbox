@@ -56,14 +56,14 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     $scope.tagDetected = function tagDetected(rawTag) {
       var tag = JSON.parse(JSON.stringify(rawTag));
 
+      // Restart idle timeout.
+      $scope.baseResetIdleWatch();
+
       if (!$scope.tagValid(tag, 'borrow.tagDetected')) {
         return;
       }
 
       var material = $scope.addTag(tag, $scope.materials);
-
-      // Restart idle timeout.
-      $scope.baseResetIdleWatch();
 
       // If afi is awaiting being unlocked, and is placed on the device again.
       // Retry the unlocking.
@@ -184,12 +184,12 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      * @param tag
      */
     $scope.tagRemoved = function itemRemoved(tag) {
+      // Restart idle timeout.
+      $scope.baseResetIdleWatch();
+
       if (!$scope.tagValid(tag, 'borrow.tagRemove')) {
         return;
       }
-
-      // Restart idle timeout.
-      $scope.baseResetIdleWatch();
 
       // Check if material has already been added to the list.
       var material = $scope.materials.find(function (material) {

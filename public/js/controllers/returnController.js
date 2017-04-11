@@ -56,14 +56,14 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     $scope.tagDetected = function tagDetected(rawTag) {
       var tag = JSON.parse(JSON.stringify(rawTag));
 
+      // Restart idle timeout.
+      $scope.baseResetIdleWatch();
+
       if (!$scope.tagValid(tag, 'return.tagDetected')) {
         return;
       }
 
       var material = $scope.addTag(tag, $scope.materials);
-
-      // Restart idle timeout.
-      $scope.baseResetIdleWatch();
 
       // If afi is awaiting being locked, and is placed on the device again.
       // Retry the locking.
@@ -191,12 +191,12 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      * @param tag
      */
     $scope.tagRemoved = function itemRemoved(tag) {
+      // Restart idle timeout.
+      $scope.baseResetIdleWatch();
+
       if (!$scope.tagValid(tag, 'return.tagRemoved')) {
         return;
       }
-
-      // Restart idle timeout.
-      $scope.baseResetIdleWatch();
 
       // Check if material has already been added to the list.
       var material = $scope.materials.find(function (material) {

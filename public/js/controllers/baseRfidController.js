@@ -232,7 +232,7 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      *   True if the tag is valid, else false.
      */
     $scope.tagValid = function tagValid(tag, name) {
-      var eventTimeout = config.hasOwnProperty(eventTimeout) ? config.eventTimeout :  1000;
+      var eventTimeout = config.hasOwnProperty(eventTimeout) ? config.eventTimeout :  2000;
       name = name || 'Unknown';
 
       var expired = false;
