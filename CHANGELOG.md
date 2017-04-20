@@ -2,10 +2,15 @@
 
 ### In development
 
+* Fixed issue with tags that were read in correctly and tags that moved to the next user.
+* Fixed issue where tags with more than one leading zero in the crc value were rejected.
+
+### v1.4.1
+
 * Added event timeouts to event from backend to front-end.
 * Added debug information about tags to logs to find bug about "ghost tags".
 
-### 1.4.0
+### v1.4.0
 
 * Changed events between the systems to use an timeout to filter out old events.
 * Fixed missing event remove function call in bus plugin.
