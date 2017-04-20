@@ -22,7 +22,7 @@ angular.module('BibBox').service('basicService', ['config',
      */
     this.isEventExpired = function isEventExpired(timestamp, eventName, data) {
       var current = new Date().getTime();
-      var eventTimeout = config.hasOwnProperty(eventTimeout) ? config.eventTimeout :  500;
+      var eventTimeout = config.hasOwnProperty('eventTimeout') ? config.eventTimeout :  500;
 
       if (Number(timestamp) + eventTimeout < current) {
         if (config.hasOwnProperty('debug') && config.debug) {
