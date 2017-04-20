@@ -2,6 +2,10 @@
 
 ### In development
 
+* Added object inspection to frontend error logging to get whole message and not "[Object object]".
+
+### v1.4.2
+
 * Fixed issue with tags that were read in correctly and tags that moved to the next user.
 * Fixed issue where tags with more than one leading zero in the crc value were rejected.
 
