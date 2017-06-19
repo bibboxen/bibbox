@@ -4,6 +4,8 @@
 
 * Added object inspection to frontend error logging to get whole message and not "[Object object]".
 * Added run scripts to bootstrap.
+* Added "fixtures" for nodejs tests.
+* Fixed missing timestamp in offline check-in/out.
 
 ### v1.4.2
 

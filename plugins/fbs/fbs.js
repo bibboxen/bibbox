@@ -437,7 +437,10 @@ module.exports = function (options, imports, register) {
               };
 
               bus.once('fbs.checkout.offline.stored' + data.itemIdentifier, function (res) {
-                bus.emit(data.busEvent, material);
+                bus.emit(data.busEvent, {
+                  timestamp: new Date().getTime(),
+                  result: material
+                });
               });
 
               bus.once('fbs.checkout.offline.error' + data.itemIdentifier, function (err) {
@@ -516,7 +519,10 @@ module.exports = function (options, imports, register) {
               };
 
               bus.once('fbs.checkin.offline.stored' + data.itemIdentifier, function (res) {
-                bus.emit(data.busEvent, material);
+                bus.emit(data.busEvent, {
+                  timestamp: new Date().getTime(),
+                  result: material
+                });
               });
 
               bus.once('fbs.checkin.offline.error' + data.itemIdentifier, function (err) {
