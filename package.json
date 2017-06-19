@@ -23,6 +23,7 @@
     "karma-sinon-chai": "^1.2.4",
     "mocha": "^2.4.5",
     "newrelic": "^1.35.1",
+    "nock": "^9.0.13",
     "q": "^1.4.1",
     "should": "^8.2.2",
     "sinon": "^1.17.5",
@@ -33,6 +34,7 @@
   "scripts": {
     "live": "sudo node bootstrap.js",
     "fake": "sudo RFID_DEBUG=true DEBUG=bibbox:* node bootstrap.js",
-    "debug": "sudo DEBUG=bibbox:* node bootstrap.js"
+    "debug": "sudo DEBUG=bibbox:* node bootstrap.js",
+    "test": "./node_modules/.bin/mocha -R spec"
   }
 }

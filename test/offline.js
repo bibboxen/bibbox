@@ -53,15 +53,15 @@ var setup = function setup() {
 it('should add job to offline checkout queue', function (done) {
   setup().then(function (app) {
     app.services.offline.add('checkout', {
-      username: '3210519768',
+      username: '3210519748',
       password: '12345',
-      itemIdentifier: '0000007889',
-      busEvent: 'offline.fbs.checkout.success0000007889',
-      errorEvent: 'offline.fbs.checkout.error0000007889',
+      itemIdentifier: '3274626533',
+      busEvent: 'offline.fbs.checkout.success3274626533',
+      errorEvent: 'offline.fbs.checkout.error3274626533',
       queued: true
     }).then(function (jobId) {
       try {
-        jobId.should.be.a.Number();
+        jobId.should.be.a.String();
         done();
       }
       catch (err) {
@@ -74,13 +74,13 @@ it('should add job to offline checkout queue', function (done) {
 it('should add job to offline check-in queue', function (done) {
   setup().then(function (app) {
     app.services.offline.add('checkin', {
-      itemIdentifier: '0000007889',
-      busEvent: 'offline.fbs.checkin.success0000007889',
-      errorEvent: 'offline.fbs.checkin.error0000007889',
+      itemIdentifier: '3274626533',
+      busEvent: 'offline.fbs.checkin.success3274626533',
+      errorEvent: 'offline.fbs.checkin.error3274626533',
       queued: true
     }).then(function (jobId) {
       try {
-        jobId.should.be.a.Number();
+        jobId.should.be.a.String();
         done();
       }
       catch (err) {
