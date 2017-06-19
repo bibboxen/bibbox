@@ -46,6 +46,34 @@ global.setupArchitect = function setupArchitect(plugins, config) {
 };
 
 /**
+ * Check if a given event message has expired.
+ *
+ * @param {int} timestamp
+ *   Unit timestamp to compare.
+ * @param {function} debug
+ *   Debug function used to display debug messages.
+ * @param {string} eventName
+ *   The name of the event (used for debugging).
+ *
+ * @returns {boolean}
+ *   If expire true else false.
+ */
+global.isEventExpired = function isEventExpired(timestamp, debug, eventName) {
+  var current = new Date().getTime();
+  eventName = eventName || 'Unknown';
+
+  var config = require(__dirname + '/config.json');
+
+  if (Number(timestamp) + config.eventTimeout < current) {
+    debug('EVENT ' + eventName + ' is expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
+    return true;
+  }
+
+  debug('EVENT ' + eventName + ' message not expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
+  return false;
+};
+
+/**
  * Wrapper to load test files.
  *
  * @param name

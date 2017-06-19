@@ -1,11 +1,20 @@
 {
-  "username": 1234567890,
-  "pin": 1234,
-  "fbs_username": "xxxx",
-  "fbs_password": "xxxx",
+  "username": xxx,
+  "pin": xxx,
+  "eventTimeout": 500,
+  "fbs": {
+    "username": "xxxx",
+    "password": "xxx",
+    "endpoint": "https://cicero-fbs.com/rest/sip2/DK-775100",
+    "agency": "DK-675100",
+    "location": "hb"
+  },
   "paths": {
     "base": "files",
-    "translations": "locales",
-    "config": "config"
+    "translations": "locales"
+  },
+  "languages": {
+    "locales": ["en", "da"],
+    "defaultLocale": "da"
   }
 }
