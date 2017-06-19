@@ -7,6 +7,8 @@
 
 'use strict';
 
+var record = require('./record');
+
 global.supertest = require('supertest');
 global.should = require('should');
 global.assert = require('assert');
@@ -81,9 +83,19 @@ global.isEventExpired = function isEventExpired(timestamp, debug, eventName) {
  * @param file
  *   The file to require.
  */
-function importTest(name, file) {
+function importTest(name, file, recoreName) {
   describe(name, function () {
+    var recorder = record(recoreName);
+
+    if (recoreName !== undefined) {
+      before(recorder.before);
+    }
+
     require(file);
+
+    if (recoreName !== undefined) {
+      after(recorder.after);
+    }
   });
 }
 
@@ -93,8 +105,8 @@ importTest('Storage', './storage.js');
 importTest('Logger', './logger.js');
 importTest('Network', './network.js');
 importTest('BarCode', './barcode.js');
-importTest('FBS', './fbs.js');
-importTest('Notification', './notification.js');
+importTest('FBS', './fbs.js', 'fbs');
+importTest('Notification', './notification.js', 'notification');
 importTest('Proxy', './proxy.js');
 importTest('Translation', './translation.js');
 importTest('RFID', './rfid.js');

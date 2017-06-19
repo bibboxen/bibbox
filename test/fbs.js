@@ -1,8 +1,6 @@
 /**
  * @file
  * Unit test setup of FBS plugin.
- *
- * @TODO: mock FSB?
  */
 
 'use strict';
