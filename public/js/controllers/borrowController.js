@@ -59,7 +59,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       // Restart idle timeout.
       $scope.baseResetIdleWatch();
 
-      if (!$scope.tagValid(tag, 'borrow.tagDetected')) {
+      if (!$scope.tagValid(tag)) {
         return;
       }
 
@@ -187,7 +187,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       // Restart idle timeout.
       $scope.baseResetIdleWatch();
 
-      if (!$scope.tagValid(tag, 'borrow.tagRemove')) {
+      if (!$scope.tagValid(tag)) {
         return;
       }
 
@@ -228,7 +228,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      *   The tag returned from the device.
      */
     $scope.tagAFISet = function itemAFISet(tag) {
-      if (!$scope.tagValid(tag, 'borrow.tagAFISet')) {
+      if (!$scope.tagValid(tag)) {
         return;
       }
 
