@@ -52,7 +52,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      */
     this.login = function login(username, password) {
       var deferred = $q.defer();
-      var self = service;
+      var self = this;
 
       var uniqueId = CryptoJS.MD5('userServiceLogin' + Date.now());
 
