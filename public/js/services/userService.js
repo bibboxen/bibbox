@@ -348,35 +348,22 @@ angular.module('BibBox').factory('userService', ['$q', '$timeout', '$location', 
     /**
      * Check FBS is online.
      *
-     * It's plased on user service as FBS has to due with users.
+     * It's placed on user service as FBS has to due with users.
      *
      * @returns {Function}
      */
+    var onlineState = true;
     service.isOnline = function isOnline() {
-      var deferred = $q.defer();
-      var uniqueId = CryptoJS.MD5('userServiceOnline' + Date.now());
-
-      proxyService.once('fbs.online.response' + uniqueId, function (data) {
-        if (!service.isEventExpired(data.timestamp, 'fbs.online.success', data)) {
-          deferred.resolve(data.online);
-        }
-        else {
-          deferred.reject(new Error('Event fbs.online.success timed out'));
-        }
-      });
-
-      proxyService.once('fbs.online.error' + uniqueId, function (err) {
-        deferred.reject(err);
-      });
-
-      proxyService.emit('fbs.online', {
-        timestamp: new Date().getTime(),
-        busEvent: 'fbs.online.response' + uniqueId,
-        errorEvent: 'fbs.online.error' + uniqueId
-      });
-
-      return deferred.promise;
+      return onlineState;
     };
+
+    proxyService.on('fbs.online', function online() {
+      onlineState = true;
+    });
+
+    proxyService.on('fbs.offline', function online() {
+      onlineState = false;
+    });
 
     return service;
   }

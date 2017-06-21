@@ -92,6 +92,5 @@ angular.module('BibBox').value('config', {
   loginAttempts: {
     max: 5,
     timeLimit: 15 * 60 * 1000
-  },
-  testFbsConnectionInterval: 30000
+  }
 });
