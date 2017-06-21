@@ -16,28 +16,35 @@ var setup = function setup() {
     var plugins = [
       {
         packagePath: './../plugins/logger',
-        logs: config.logs
+        logs: config.logs,
+        isEventExpired: isEventExpired
       },
       {
-        packagePath: './../plugins/bus'
+        packagePath: './../plugins/bus',
+        isEventExpired: isEventExpired
       },
       {
         packagePath: './../plugins/storage',
-        paths: config.paths
+        paths: config.paths,
+        isEventExpired: isEventExpired
       },
       {
-        packagePath: './../plugins/ctrl'
+        packagePath: './../plugins/ctrl',
+        isEventExpired: isEventExpired
       },
       {
         packagePath: './../plugins/notification',
         paths: config.paths,
-        languages: config.languages
+        languages: config.languages,
+        isEventExpired: isEventExpired
       },
       {
-        packagePath: './../plugins/network'
+        packagePath: './../plugins/network',
+        isEventExpired: isEventExpired
       },
       {
-        packagePath: './../plugins/fbs'
+        packagePath: './../plugins/fbs',
+        isEventExpired: isEventExpired
       }
     ];
 
@@ -97,7 +104,7 @@ it('Should render HTML status mail in english', function (done) {
 
     // Allow notification configuration to be loaded from storage.
     setTimeout(function () {
-      app.services.notification.patronReceipt('status', true, config.username, config.pin, 'en').then(function () {
+      app.services.notification.patronReceipt('status', true, config.username.toString(), config.pin, 'en').then(function () {
         // Don't do anything as the tests are in the mail callback.
         done();
       }, done);
@@ -128,7 +135,7 @@ it('Should render HTML status mail in danish', function (done) {
 
     // Allow notification configuration to be loaded from storage.
     setTimeout(function () {
-      app.services.notification.patronReceipt('status', true, config.username, config.pin, 'da').then(function () {
+      app.services.notification.patronReceipt('status', true, config.username.toString(), config.pin, 'da').then(function () {
         // Don't do anything as the tests are in the mail callback.
         done();
       }, done);

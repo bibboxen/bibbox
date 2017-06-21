@@ -7,6 +7,8 @@
 
 'use strict';
 
+var record = require('./record');
+
 global.supertest = require('supertest');
 global.should = require('should');
 global.assert = require('assert');
@@ -46,6 +48,34 @@ global.setupArchitect = function setupArchitect(plugins, config) {
 };
 
 /**
+ * Check if a given event message has expired.
+ *
+ * @param {int} timestamp
+ *   Unit timestamp to compare.
+ * @param {function} debug
+ *   Debug function used to display debug messages.
+ * @param {string} eventName
+ *   The name of the event (used for debugging).
+ *
+ * @returns {boolean}
+ *   If expire true else false.
+ */
+global.isEventExpired = function isEventExpired(timestamp, debug, eventName) {
+  var current = new Date().getTime();
+  eventName = eventName || 'Unknown';
+
+  var config = require(__dirname + '/config.json');
+
+  if (Number(timestamp) + config.eventTimeout < current) {
+    debug('EVENT ' + eventName + ' is expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
+    return true;
+  }
+
+  debug('EVENT ' + eventName + ' message not expired (' + ((Number(timestamp) + config.eventTimeout) - current) + ').');
+  return false;
+};
+
+/**
  * Wrapper to load test files.
  *
  * @param name
@@ -53,9 +83,19 @@ global.setupArchitect = function setupArchitect(plugins, config) {
  * @param file
  *   The file to require.
  */
-function importTest(name, file) {
+function importTest(name, file, recoreName) {
   describe(name, function () {
+    var recorder = record(recoreName);
+
+    if (recoreName !== undefined) {
+      before(recorder.before);
+    }
+
     require(file);
+
+    if (recoreName !== undefined) {
+      after(recorder.after);
+    }
   });
 }
 
@@ -65,8 +105,8 @@ importTest('Storage', './storage.js');
 importTest('Logger', './logger.js');
 importTest('Network', './network.js');
 importTest('BarCode', './barcode.js');
-importTest('FBS', './fbs.js');
-importTest('Notification', './notification.js');
+importTest('FBS', './fbs.js', 'fbs');
+importTest('Notification', './notification.js', 'notification');
 importTest('Proxy', './proxy.js');
 importTest('Translation', './translation.js');
 importTest('RFID', './rfid.js');
