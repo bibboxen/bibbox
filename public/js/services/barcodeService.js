@@ -1,17 +1,26 @@
 /**
  * @file
- * Handel barcode events.
+ * Service for barcode events.
  */
 
-angular.module('BibBox').factory('barcodeService', ['$q', 'basicService', 'proxyService',
-  function ($q, basicService, proxyService) {
+angular.module('BibBox').service('barcodeService', ['$q', 'proxyService',
+  function ($q, proxyService) {
     'use strict';
 
-    // Extend this service with the basicService. It's copy to ensure that it is
-    // not overridden, if not copy the extend will return an reference.
-    var service = angular.extend(angular.copy(basicService), {});
-
     var currentScope = null;
+
+    /**
+     * Helper function to check current scope for a give method.
+     *
+     * @param method
+     *   Method to lookup
+     *
+     * @returns {*|boolean}
+     *   True if it exists else false.
+     */
+    function currentScopeHasMethod(method) {
+      return currentScope[method] && typeof currentScope[method] === 'function';
+    }
 
     /**
      * Scanned event handler.
@@ -22,7 +31,7 @@ angular.module('BibBox').factory('barcodeService', ['$q', 'basicService', 'proxy
      *   The data processed by the barcode scanner.
      */
     function scanned(data) {
-      if (currentScope && !service.isEventExpired(data.timestamp, 'barcode.data', data)) {
+      if (currentScope && currentScopeHasMethod('barcodeScanned')) {
         currentScope.barcodeScanned(data.code);
       }
     }
@@ -36,7 +45,7 @@ angular.module('BibBox').factory('barcodeService', ['$q', 'basicService', 'proxy
      *   The error
      */
     function error(err) {
-      if (currentScope && !service.isEventExpired(err.timestamp, 'barcode.err', data)) {
+      if (currentScope && currentScopeHasMethod('barcodeError')) {
         currentScope.barcodeError(err);
       }
     }
@@ -47,7 +56,7 @@ angular.module('BibBox').factory('barcodeService', ['$q', 'basicService', 'proxy
      * @param scope
      *   The scope to emit events into when data is received.
      */
-    service.start = function start(scope) {
+    this.start = function start(scope) {
       currentScope = scope;
 
       proxyService.emit('barcode.start');
@@ -56,7 +65,7 @@ angular.module('BibBox').factory('barcodeService', ['$q', 'basicService', 'proxy
     /**
      * Stop listing for barcode events.
      */
-    service.stop = function stop() {
+    this.stop = function stop() {
       currentScope = null;
 
       proxyService.emit('barcode.stop');
@@ -65,7 +74,5 @@ angular.module('BibBox').factory('barcodeService', ['$q', 'basicService', 'proxy
     // Register listeners.
     proxyService.on('barcode.data', scanned);
     proxyService.on('barcode.err', error);
-
-    return service;
   }
 ]);

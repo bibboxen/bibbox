@@ -3,13 +3,9 @@
  * Handles request for receipt(s) (printed) and notifications (mailed).
  */
 
-angular.module('BibBox').factory('receiptService', ['$q', 'basicService', 'tmhDynamicLocale', 'proxyService',
-  function ($q, basicService, tmhDynamicLocale, proxyService) {
+angular.module('BibBox').service('receiptService', ['$q', 'tmhDynamicLocale', 'proxyService',
+  function ($q, tmhDynamicLocale, proxyService) {
     'use strict';
-
-    // Extend this service with the basicService. It's copy to ensure that it is
-    // not overridden, if not copy the extend will return an reference.
-    var service = angular.extend(angular.copy(basicService), {});
 
     /**
      * Check if we are in offline mode.
@@ -51,16 +47,11 @@ angular.module('BibBox').factory('receiptService', ['$q', 'basicService', 'tmhDy
      *
      * @returns {Function}
      */
-    service.getPatronsInformation = function getPatronsInformation(patronIdentifiers) {
+    this.getPatronsInformation = function getPatronsInformation(patronIdentifiers) {
       var deferred = $q.defer();
 
       proxyService.once('notification.response', function (data) {
-        if (!service.isEventExpired(data.timestamp, 'notification.response', data)) {
-          deferred.resolve(data.patrons);
-        }
-        else {
-          deferred.reject(new Error('Event notification.response timed out in getPatronsInformation'));
-        }
+        deferred.resolve(data.patrons);
       });
 
       proxyService.once('notification.error', function (err) {
@@ -89,16 +80,11 @@ angular.module('BibBox').factory('receiptService', ['$q', 'basicService', 'tmhDy
      *
      * @returns {Function}
      */
-    service.status = function status(username, password, type) {
+    this.status = function status(username, password, type) {
       var deferred = $q.defer();
 
       proxyService.once('notification.response', function (status) {
-        if (!service.isEventExpired(status.timestamp, 'notification.response', status)) {
-          deferred.resolve(status);
-        }
-        else {
-          deferred.reject(new Error('Event notification.response timed out in status'));
-        }
+        deferred.resolve(status);
       });
 
       proxyService.once('notification.error', function (err) {
@@ -130,16 +116,11 @@ angular.module('BibBox').factory('receiptService', ['$q', 'basicService', 'tmhDy
      *
      * @returns {Function}
      */
-    service.reservations = function reservations(username, password, type) {
+    this.reservations = function reservations(username, password, type) {
       var deferred = $q.defer();
 
       proxyService.once('notification.response', function (status) {
-        if (!service.isEventExpired(status.timestamp, 'notification.response', status)) {
-          deferred.resolve(status);
-        }
-        else {
-          deferred.reject(new Error('Event notification.response timed out in reservations'));
-        }
+        deferred.resolve(status);
       });
 
       proxyService.once('notification.error', function (err) {
@@ -173,16 +154,11 @@ angular.module('BibBox').factory('receiptService', ['$q', 'basicService', 'tmhDy
      *
      * @returns {Function}
      */
-    service.borrow = function borrow(username, password, items, type) {
+    this.borrow = function borrow(username, password, items, type) {
       var deferred = $q.defer();
 
       proxyService.once('notification.response', function (status) {
-        if (!service.isEventExpired(status.timestamp, 'notification.response', status)) {
-          deferred.resolve(status);
-        }
-        else {
-          deferred.reject(new Error('Event notification.response timed out in borrow'));
-        }
+        deferred.resolve(status);
       });
 
       proxyService.once('notification.error', function (err) {
@@ -224,16 +200,11 @@ angular.module('BibBox').factory('receiptService', ['$q', 'basicService', 'tmhDy
      *
      * @returns {Function}
      */
-    service.returnReceipt = function returnReceipt(items, type) {
+    this.returnReceipt = function returnReceipt(items, type) {
       var deferred = $q.defer();
 
       proxyService.once('notification.response', function (status) {
-        if (!service.isEventExpired(status.timestamp, 'notification.response', status)) {
-          deferred.resolve(status);
-        }
-        else {
-          deferred.reject(new Error('Event notification.response timed out in returnReceipt'));
-        }
+        deferred.resolve(status);
       });
 
       proxyService.once('notification.error', function (err) {
@@ -262,7 +233,5 @@ angular.module('BibBox').factory('receiptService', ['$q', 'basicService', 'tmhDy
 
       return deferred.promise;
     };
-
-    return service
   }
 ]);
