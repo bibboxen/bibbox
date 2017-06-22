@@ -79,18 +79,19 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
  * default value before configuration is loaded.
  */
 angular.module('BibBox').value('config', {
-  default_lang: 'da',
-  initialized: false,
-  debug: false,
-  translations: {},
-  languages: [],
-  features: [],
-  timeout: {
-    idleTimeout: 15,
-    IdleWarn: 5
+  "default_lang": 'da',
+  "initialized": false,
+  "debug": false,
+  "translations": {},
+  "languages": [],
+  "features": [],
+  "timeout": {
+    "idleTimeout": 15,
+    "IdleWarn": 5
   },
-  loginAttempts: {
-    max: 5,
-    timeLimit: 15 * 60 * 1000
-  }
+  "loginAttempts": {
+    "max": 5,
+    "timeLimit": 15 * 60 * 1000
+  },
+  "testFbsConnectionInterval": 2000
 });

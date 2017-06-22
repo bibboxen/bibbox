@@ -350,19 +350,32 @@ angular.module('BibBox').factory('userService', ['$q', '$timeout', '$location', 
      *
      * It's placed on user service as FBS has to due with users.
      *
-     * @returns {Function}
+     * @returns {boolean}
+     *   TRUE if online else FALSE.
      */
-    var onlineState = true;
+    var onlineState = false;
     service.isOnline = function isOnline() {
       return onlineState;
     };
 
+    /**
+     * Listen for online events and change state.
+     */
     proxyService.on('fbs.online', function online() {
       onlineState = true;
+      if (config.hasOwnProperty('debug') && config.debug) {
+        console.log('ONLINE beat received');
+      }
     });
 
+    /**
+     * Listen for offline events and change state.
+     */
     proxyService.on('fbs.offline', function online() {
       onlineState = false;
+      if (config.hasOwnProperty('debug') && config.debug) {
+        console.error('OFFLINE beat received');
+      }
     });
 
     return service;
