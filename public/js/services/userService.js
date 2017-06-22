@@ -304,7 +304,8 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     /**
      * Check FBS is online.
      *
-     * It's placed on user service as FBS has to due with users.
+     * This function is placed on user service as all FBS calls have to do with
+     * users.
      *
      * @returns {boolean}
      *   TRUE if online else FALSE.

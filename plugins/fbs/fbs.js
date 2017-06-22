@@ -316,11 +316,11 @@ module.exports = function (options, imports, register) {
 
   // Defines the configuration for the online checker below.
   var onlineState = {
-    'online': true,
-    'threshold': 5,
-    'currentHold': 5,
-    'onlineTimeout': 5000,
-    'offlineTimeout': 30000
+    online: true,
+    threshold: 5,
+    successfulOnlineChecks: 5,
+    onlineTimeout: 5000,
+    offlineTimeout: 30000
   };
 
   /**
@@ -337,21 +337,21 @@ module.exports = function (options, imports, register) {
           function (res) {
             // Listen to online check event send below.
             if (res.onlineStatus) {
-              if (onlineState.currentHold >= onlineState.threshold) {
+              if (onlineState.successfulOnlineChecks >= onlineState.threshold) {
                 // FBS is online and threshold has been reached, so state online.
                 setTimeout(checkOnlineState, onlineState.onlineTimeout);
                 onlineState.online = true;
               }
               else {
                 // FBS online but threshold _not_ reached, so state offline.
-                onlineState.currentHold++;
+                onlineState.successfulOnlineChecks++;
                 onlineState.online = false;
                 setTimeout(checkOnlineState, onlineState.offlineTimeout);
               }
             }
             else {
               // FBS is offline, so it the state.
-              onlineState.currentHold = 0;
+              onlineState.successfulOnlineChecks = 0;
               onlineState.online = false;
               setTimeout(checkOnlineState, onlineState.offlineTimeout);
             }
@@ -362,27 +362,23 @@ module.exports = function (options, imports, register) {
               timestamp: new Date().getTime(),
               online: onlineState
             });
-
-            console.log('', onlineState);
           },
           function (err) {
             // Error connecting to FBS.
             onlineState.online = false;
-            onlineState.currentHold = 0;
+            onlineState.successfulOnlineChecks = 0;
             setTimeout(checkOnlineState, onlineState.offlineTimeout);
             bus.emit(fbs.offline, {
               timestamp: new Date().getTime(),
               online: onlineState
             });
-
-            console.log('', onlineState);
           }
         );
       }
       else {
         // FBS not configured, so state offline.
         onlineState.online = false;
-        onlineState.currentHold = 0;
+        onlineState.successfulOnlineChecks = 0;
         setTimeout(checkOnlineState, onlineState.offlineTimeout);
         bus.emit(fbs.offline, {
           timestamp: new Date().getTime(),
