@@ -331,6 +331,12 @@ module.exports = function (options, imports, register) {
   function checkOnlineState() {
     // Start online checker for FBS servers.
     FBS.create(bus).then(function (fbs) {
+      // Update configuration - It's done here to ensure it reflects updated
+      // configuration from the admin UI.
+      onlineState.threshold = config.hasOwnProperty('onlineState') ? config.onlineState.threshold : onlineState.threshold;
+      onlineState.onlineTimeout = config.hasOwnProperty('onlineState') ? config.onlineState.onlineTimeout : onlineState.onlineTimeout;
+      onlineState.offlineTimeout = config.hasOwnProperty('onlineState') ? config.onlineState.offlineTimeout : onlineState.offlineTimeout;
+
       // Check that config exists.
       if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
         fbs.libraryStatus().then(
