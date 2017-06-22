@@ -30,9 +30,6 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     // Used to hold materials.
     $scope.materials = [];
 
-    // Start listening for rfid events.
-    rfidService.start($scope);
-
     /**
      * Tag was removed from RFID device.
      *
@@ -225,28 +222,14 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      *
      * @param {Object} tag
      *   The tag.
-     * @param {string} name
-     *   Used in debugging as should be the name off the calling function.
      *
      * @return {boolean}
      *   True if the tag is valid, else false.
      */
-    $scope.tagValid = function tagValid(tag, name) {
-      var eventTimeout = config.hasOwnProperty('eventTimeout') ? config.eventTimeout :  2000;
-      name = name || 'Unknown';
-
-      var expired = false;
-      if (Number(tag.timestamp) + eventTimeout < new Date().getTime()) {
-        // This logging is temporary, until #BIB-255 is resolved.
-        loggerService.debug('Event (' + name + ') tag valid timed out (' + ((Number(tag.timestamp) + eventTimeout) - new Date().getTime()) + '): ' + JSON.stringify(tag));
-
-        expired = true;
-      }
-
+    $scope.tagValid = function tagValid(tag) {
       return tag && tag.afi !== undefined
         && tag.mid !== undefined && tag.uid !== undefined
-        && tag.numberInSeries !== undefined && tag.seriesLength !== undefined
-        && !expired;
+        && tag.numberInSeries !== undefined && tag.seriesLength !== undefined;
     };
 
     /**
@@ -333,10 +316,14 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       loggerService.error(err);
     };
 
+    // Start listening for rfid events.
+    rfidService.start($scope);
+
     /**
      * On destroy.
      */
     $scope.$on('$destroy', function () {
+      // Stop listening for RFID events.
       rfidService.stop();
     });
   }

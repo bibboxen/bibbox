@@ -59,7 +59,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       // Restart idle timeout.
       $scope.baseResetIdleWatch();
 
-      if (!$scope.tagValid(tag, 'return.tagDetected')) {
+      if (!$scope.tagValid(tag)) {
         return;
       }
 
@@ -194,7 +194,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       // Restart idle timeout.
       $scope.baseResetIdleWatch();
 
-      if (!$scope.tagValid(tag, 'return.tagRemoved')) {
+      if (!$scope.tagValid(tag)) {
         return;
       }
 
@@ -235,7 +235,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      *   The tag returned from the device.
      */
     $scope.tagAFISet = function tagAFISet(tag) {
-      if (!$scope.tagValid(tag, 'return.tagAFISet')) {
+      if (!$scope.tagValid(tag)) {
         return;
       }
 

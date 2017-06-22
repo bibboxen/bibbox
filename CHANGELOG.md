@@ -6,6 +6,7 @@
 * Added run scripts to bootstrap.
 * Added "fixtures" for nodejs tests.
 * Fixed missing timestamp in offline check-in/out.
+* Removed event expired checks from front end.
 
 ### v1.4.2
 
