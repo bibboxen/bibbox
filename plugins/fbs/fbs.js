@@ -314,7 +314,90 @@ FBS.prototype.block = function block(username, reason) {
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
 
-  // Create FBS object to use in tests.
+  // Defines the configuration for the online checker below.
+  var onlineState = {
+    online: true,
+    threshold: 5,
+    successfulOnlineChecks: 5,
+    onlineTimeout: 5000,
+    offlineTimeout: 30000
+  };
+
+  /**
+   * Online checker.
+   *
+   * State machine that handles the FBS online/offline state.
+   */
+  function checkOnlineState() {
+    // Start online checker for FBS servers.
+    FBS.create(bus).then(function (fbs) {
+      // Update configuration - It's done here to ensure it reflects updated
+      // configuration from the admin UI.
+      onlineState.threshold = config.hasOwnProperty('onlineState') ? config.onlineState.threshold : onlineState.threshold;
+      onlineState.onlineTimeout = config.hasOwnProperty('onlineState') ? config.onlineState.onlineTimeout : onlineState.onlineTimeout;
+      onlineState.offlineTimeout = config.hasOwnProperty('onlineState') ? config.onlineState.offlineTimeout : onlineState.offlineTimeout;
+
+      // Check that config exists.
+      if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
+        fbs.libraryStatus().then(
+          function (res) {
+            // Listen to online check event send below.
+            if (res.onlineStatus) {
+              if (onlineState.successfulOnlineChecks >= onlineState.threshold) {
+                // FBS is online and threshold has been reached, so state online.
+                setTimeout(checkOnlineState, onlineState.onlineTimeout);
+                onlineState.online = true;
+              }
+              else {
+                // FBS online but threshold _not_ reached, so state offline.
+                onlineState.successfulOnlineChecks++;
+                onlineState.online = false;
+                setTimeout(checkOnlineState, onlineState.offlineTimeout);
+              }
+            }
+            else {
+              // FBS is offline, so it the state.
+              onlineState.successfulOnlineChecks = 0;
+              onlineState.online = false;
+              setTimeout(checkOnlineState, onlineState.offlineTimeout);
+            }
+
+            // Send state event into the bus.
+            var eventName = onlineState.online ? 'fbs.online' : 'fbs.offline';
+            bus.emit(eventName, {
+              timestamp: new Date().getTime(),
+              online: onlineState
+            });
+          },
+          function (err) {
+            // Error connecting to FBS.
+            onlineState.online = false;
+            onlineState.successfulOnlineChecks = 0;
+            setTimeout(checkOnlineState, onlineState.offlineTimeout);
+            bus.emit(fbs.offline, {
+              timestamp: new Date().getTime(),
+              online: onlineState
+            });
+          }
+        );
+      }
+      else {
+        // FBS not configured, so state offline.
+        onlineState.online = false;
+        onlineState.successfulOnlineChecks = 0;
+        setTimeout(checkOnlineState, onlineState.offlineTimeout);
+        bus.emit(fbs.offline, {
+          timestamp: new Date().getTime(),
+          online: onlineState
+        });
+      }
+    });
+  }
+
+  // Start the online checker.
+  checkOnlineState();
+
+    // Create FBS object to use in tests.
   FBS.create(bus).then(function (fbs) {
     register(null, {
       fbs: fbs
@@ -339,7 +422,8 @@ module.exports = function (options, imports, register) {
           },
           function (err) {
             bus.emit(data.errorEvent, err);
-          });
+          }
+        );
       },
       function (err) {
         bus.emit(data.errorEvent, err);
@@ -361,7 +445,8 @@ module.exports = function (options, imports, register) {
           },
           function (err) {
             bus.emit(data.errorEvent, err);
-          });
+          }
+        );
       },
       function (err) {
         bus.emit(data.errorEvent, err);
@@ -383,7 +468,8 @@ module.exports = function (options, imports, register) {
           },
           function (err) {
             bus.emit(data.errorEvent, err);
-          });
+          }
+        );
       },
       function (err) {
         bus.emit(data.errorEvent, err);
@@ -472,7 +558,8 @@ module.exports = function (options, imports, register) {
               debug(err);
               bus.emit(data.errorEvent, err);
             }
-          });
+          }
+        );
       },
       function (err) {
         debug(err);
@@ -552,7 +639,8 @@ module.exports = function (options, imports, register) {
               debug(err);
               bus.emit(data.errorEvent, err);
             }
-          });
+          }
+        );
       },
       function (err) {
         debug(err);
@@ -567,19 +655,20 @@ module.exports = function (options, imports, register) {
   bus.on('fbs.renew', function (data) {
     if (!options.isEventExpired(data.timestamp, debug, 'fbs.renew')) {
       FBS.create(bus).then(function (fbs) {
-      fbs.renew(data.username, data.password, data.itemIdentifier).then(function (res) {
-          bus.emit(data.busEvent, {
-            timestamp: new Date().getTime(),
-            result: res
+        fbs.renew(data.username, data.password, data.itemIdentifier).then(function (res) {
+            bus.emit(data.busEvent, {
+              timestamp: new Date().getTime(),
+              result: res
+            });
+          },
+          function (err) {
+            bus.emit(data.errorEvent, err);
           });
         },
         function (err) {
           bus.emit(data.errorEvent, err);
-        });
-      },
-      function (err) {
-        bus.emit(data.errorEvent, err);
-      });
+        }
+      );
     }
   });
 
@@ -601,7 +690,8 @@ module.exports = function (options, imports, register) {
         },
         function (err) {
           bus.emit(data.errorEvent, err);
-        });
+        }
+      );
     }
   });
 
@@ -623,38 +713,8 @@ module.exports = function (options, imports, register) {
         },
         function (err) {
           bus.emit(data.errorEvent, err);
-        });
-    }
-  });
-
-  /**
-   * Listen for fbs.online events.
-   */
-  bus.on('fbs.online', function (request) {
-    if (!options.isEventExpired(request.timestamp, debug, 'fbs.online')) {
-      FBS.create(bus).then(function (fbs) {
-        // Check that config exists.
-        if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
-          var busEvent = 'network.fbs.online' + uniqid();
-
-          // Listen to online check event send below.
-          bus.once(busEvent, function (online) {
-            bus.emit(request.busEvent, {
-              timestamp: new Date().getTime(),
-              online: online
-            });
-          });
-
-          // Send online check.
-          bus.emit('network.online', {
-            url: fbs.config.endpoint,
-            busEvent: busEvent
-          });
         }
-        else {
-          bus.emit(request.busEvent, false);
-        }
-      });
+      );
     }
   });
 };

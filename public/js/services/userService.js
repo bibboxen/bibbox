@@ -304,29 +304,35 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
     /**
      * Check FBS is online.
      *
-     * It's plased on user service as FBS has to due with users.
+     * This function is placed on user service as all FBS calls have to do with
+     * users.
      *
-     * @returns {Function}
+     * @returns {boolean}
+     *   TRUE if online else FALSE.
      */
-    this.isOnline = function isOnline() {
-      var deferred = $q.defer();
-      var uniqueId = CryptoJS.MD5('userServiceOnline' + Date.now());
-
-      proxyService.once('fbs.online.response' + uniqueId, function (data) {
-        deferred.resolve(data.online);
-      });
-
-      proxyService.once('fbs.online.error' + uniqueId, function (err) {
-        deferred.reject(err);
-      });
-
-      proxyService.emit('fbs.online', {
-        timestamp: new Date().getTime(),
-        busEvent: 'fbs.online.response' + uniqueId,
-        errorEvent: 'fbs.online.error' + uniqueId
-      });
-
-      return deferred.promise;
+    var onlineState = false;
+    service.isOnline = function isOnline() {
+      return onlineState;
     };
+
+    /**
+     * Listen for online events and change state.
+     */
+    proxyService.on('fbs.online', function online() {
+      onlineState = true;
+      if (config.hasOwnProperty('debug') && config.debug) {
+        console.log('ONLINE beat received');
+      }
+    });
+
+    /**
+     * Listen for offline events and change state.
+     */
+    proxyService.on('fbs.offline', function online() {
+      onlineState = false;
+      if (config.hasOwnProperty('debug') && config.debug) {
+        console.error('OFFLINE beat received');
+      }
+    });
   }
 ]);
