@@ -7,6 +7,8 @@
 * Added "fixtures" for nodejs tests.
 * Fixed missing timestamp in offline check-in/out.
 * Removed event expired checks from front end.
+* Added FBS online/offline push notifications.
+* Change front-end and offline queues to use push notifications (NOTE: changes required in config.json)
 
 ### v1.4.2
 
