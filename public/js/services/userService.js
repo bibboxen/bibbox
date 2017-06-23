@@ -311,7 +311,7 @@ angular.module('BibBox').service('userService', ['$q', '$timeout', '$location', 
      *   TRUE if online else FALSE.
      */
     var onlineState = false;
-    service.isOnline = function isOnline() {
+    this.isOnline = function isOnline() {
       return onlineState;
     };
 
