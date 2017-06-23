@@ -333,9 +333,9 @@ module.exports = function (options, imports, register) {
     FBS.create(bus).then(function (fbs) {
       // Update configuration - It's done here to ensure it reflects updated
       // configuration from the admin UI.
-      onlineState.threshold = config.hasOwnProperty('onlineState') ? config.onlineState.threshold : onlineState.threshold;
-      onlineState.onlineTimeout = config.hasOwnProperty('onlineState') ? config.onlineState.onlineTimeout : onlineState.onlineTimeout;
-      onlineState.offlineTimeout = config.hasOwnProperty('onlineState') ? config.onlineState.offlineTimeout : onlineState.offlineTimeout;
+      onlineState.threshold = fbs.config.hasOwnProperty('onlineState') ? fbs.config.onlineState.threshold : onlineState.threshold;
+      onlineState.onlineTimeout = fbs.config.hasOwnProperty('onlineState') ? fbs.config.onlineState.onlineTimeout : onlineState.onlineTimeout;
+      onlineState.offlineTimeout = fbs.config.hasOwnProperty('onlineState') ? fbs.config.onlineState.offlineTimeout : onlineState.offlineTimeout;
 
       // Check that config exists.
       if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
