@@ -37,48 +37,11 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
     // Keep track of borrowed materials.
     $scope.borrowedMaterials = [];
 
-    // Materials that have been borrowed, but not been unlocked.
-    $scope.lockedMaterials = [];
-
     // Pager config.
     $scope.pager = {
       itemsPerPage: 12,
       currentPage: 1
     };
-
-    /**
-     * Setup tag missing modal.
-     *
-     * Has a locked backdrop, that does not disappear when clicked.
-     */
-    var tagMissingModal = $modal({
-      scope: {
-        lockedMaterials: $scope.lockedMaterials
-      },
-      templateUrl: './views/modal_tag_missing.html',
-      show: false,
-      backdrop: 'static'
-    });
-
-    /**
-     * Check if the modal should be shown.
-     */
-    function checkShowTagMissingModal() {
-      if (tagMissingModal) {
-        tagMissingModal.$promise.then(function() {
-          // If a tag is missing from the device show the locked materials pop-up.
-          if ($scope.lockedMaterials.length > 0) {
-            // Reset time to double time for users to has time to react.
-            $scope.baseResetIdleWatch(config.timeout.idleTimeout);
-
-            tagMissingModal.show();
-          }
-          else {
-            tagMissingModal.hide();
-          }
-        });
-      }
-    }
 
     /**
      * Handle tag detected.
@@ -201,7 +164,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           }
         ).then(function () {
           $scope.baseResetIdleWatch();
-          checkShowTagMissingModal();
+          $scope.checkMissingTags();
         });
       }
     };
@@ -219,7 +182,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
         return;
       }
 
-      checkShowTagMissingModal();
+      $scope.checkMissingTags();
 
       // Check if material has already been added to the list.
       var material = $scope.materials.find(function (material) {
@@ -289,7 +252,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
         }
       }
 
-      checkShowTagMissingModal();
+      $scope.checkMissingTags();
     };
 
     /**
@@ -373,9 +336,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
      */
     $scope.$on('$destroy', function () {
       userService.logout();
-
-      // Make sure tag missing modal is removed.
-      tagMissingModal.$promise.then(tagMissingModal.hide).then(tagMissingModal.destroy);
     });
   }
 ]);
