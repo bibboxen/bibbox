@@ -172,7 +172,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
           }
         ).then(function () {
           $scope.baseResetIdleWatch();
-          $scope.checkMissingTags();
         });
       }
     };

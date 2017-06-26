@@ -164,7 +164,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           }
         ).then(function () {
           $scope.baseResetIdleWatch();
-          $scope.checkMissingTags();
         });
       }
     };
