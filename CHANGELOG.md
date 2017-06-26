@@ -9,6 +9,7 @@
 * Removed event expired checks from front end.
 * Added FBS online/offline push notifications.
 * Change front-end and offline queues to use push notifications (NOTE: changes required in config.json)
+* Removed timeouts in fbs plugin.
 
 ### v1.4.2
 
