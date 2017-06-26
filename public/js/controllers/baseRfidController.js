@@ -51,7 +51,6 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     $scope.checkMissingTags = function checkMissingTags() {
       if ($scope.tagMissingModal) {
         $scope.tagMissingModal.$promise.then(function() {
-          // If a tag is missing from the device show the locked materials pop-up.
           if ($scope.lockedMaterials.length > 0) {
             // Reset time to double time for users to has time to react.
             $scope.baseResetIdleWatch(config.timeout.idleTimeout);

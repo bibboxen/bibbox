@@ -116,6 +116,11 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
                 // Add to locked materials.
                 $scope.lockedMaterials.push(material);
 
+                // If a tag is missing from the device check missing tags.
+                if ($scope.anyTagRemoved(material.tags)) {
+                  $scope.checkMissingTags();
+                }
+
                 // Store the raw result (it's used to send with receipts).
                 if (result.hasOwnProperty('patronIdentifier')) {
                   if (!$scope.rawMaterials.hasOwnProperty(result.patronIdentifier)) {
