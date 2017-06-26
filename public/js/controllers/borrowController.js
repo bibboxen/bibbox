@@ -19,7 +19,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       return;
     }
 
-
     // Display more than one book.
     $scope.imageDisplayMoreBooks = config.display_more_materials;
 
@@ -186,8 +185,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
         return;
       }
 
-      $scope.checkMissingTags();
-
       // Check if material has already been added to the list.
       var material = $scope.materials.find(function (material) {
         return material.id === tag.mid;
@@ -207,6 +204,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
       if (materialTag) {
         materialTag.removed = true;
       }
+
+      $scope.checkMissingTags();
     };
 
     /**

@@ -194,8 +194,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
         return;
       }
 
-      $scope.checkMissingTags();
-
       // Check if material has already been added to the list.
       var material = $scope.materials.find(function (material) {
         return material.id === tag.mid;
@@ -215,6 +213,8 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       if (materialTag) {
         materialTag.removed = true;
       }
+
+      $scope.checkMissingTags();
     };
 
     /**

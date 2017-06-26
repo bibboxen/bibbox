@@ -358,7 +358,10 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      */
     $scope.$on('$destroy', function () {
       // Make sure tag missing modal is removed.
-      $scope.tagMissingModal.$promise.then($scope.tagMissingModal.hide).then($scope.tagMissingModal.destroy);
+      $scope.tagMissingModal.$promise.then(function() {
+        $scope.tagMissingModal.hide();
+        $scope.tagMissingModal.destroy();
+      });
 
       // Stop listening for RFID events.
       rfidService.stop();
