@@ -20,8 +20,8 @@ RFIDBaseInterface = new Interface( 'RFIDBaseInterface', [
   'tagAFISet'
 ]);
 
-angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controller', 'rfidService', 'loggerService', 'config',
-  function ($scope, $controller, rfidService, loggerService, config) {
+angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controller', 'rfidService', 'loggerService', 'config', '$modal',
+  function ($scope, $controller, rfidService, loggerService, config, $modal) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -29,6 +29,40 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
 
     // Used to hold materials.
     $scope.materials = [];
+
+    // Materials that have been borrowed, but not been unlocked.
+    $scope.lockedMaterials = [];
+
+    /**
+     * Setup tag missing modal.
+     *
+     * Has a locked backdrop, that does not disappear when clicked.
+     */
+    $scope.tagMissingModal = $modal({
+      scope: $scope,
+      templateUrl: './views/modal_tag_missing.html',
+      show: false,
+      backdrop: 'static'
+    });
+
+    /**
+     * Check if the modal should be shown.
+     */
+    $scope.checkMissingTags = function checkMissingTags() {
+      if ($scope.tagMissingModal) {
+        $scope.tagMissingModal.$promise.then(function() {
+          if ($scope.lockedMaterials.length > 0) {
+            // Reset time to double time for users to has time to react.
+            $scope.baseResetIdleWatch(config.timeout.idleTimeout);
+
+            $scope.tagMissingModal.show();
+          }
+          else {
+            $scope.tagMissingModal.hide();
+          }
+        });
+      }
+    };
 
     /**
      * Tag was removed from RFID device.
@@ -323,6 +357,12 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      * On destroy.
      */
     $scope.$on('$destroy', function () {
+      // Make sure tag missing modal is removed.
+      $scope.tagMissingModal.$promise.then(function() {
+        $scope.tagMissingModal.hide();
+        $scope.tagMissingModal.destroy();
+      });
+
       // Stop listening for RFID events.
       rfidService.stop();
     });
