@@ -77,7 +77,7 @@ var Offline = function Offline(bus, host, port) {
   /**
    * Listen for online events and change state.
    */
-  bus.on('fbs.online', function online() {
+  this.bus.on('fbs.online', function online() {
     self.resume('checkin');
     self.resume('checkout');
   });
@@ -85,7 +85,7 @@ var Offline = function Offline(bus, host, port) {
   /**
    * Listen for offline events and change state.
    */
-  bus.on('fbs.offline', function online() {
+  this.bus.on('fbs.offline', function online() {
     self.pause('checkin');
     self.pause('checkout');
   });
@@ -277,6 +277,7 @@ Offline.prototype.add = function add(type, data) {
  */
 Offline.prototype.checkin = function checkin(job, done) {
   var data = job.data;
+  var self = this;
 
   self.bus.once(data.busEvent, function (res) {
     if (res.ok === '0') {
@@ -327,6 +328,7 @@ Offline.prototype.checkin = function checkin(job, done) {
  */
 Offline.prototype.checkout = function checkout(job, done) {
   var data = job.data;
+  var self = this;
 
   self.bus.once(data.busEvent, function (res) {
     if (res.ok === '0') {

@@ -12,6 +12,7 @@
 * Removed timeouts in fbs plugin.
 * Rewritten missing modal tags.
 * Fixed issue with "amp;" in title.
+* Fixed missing self varaible in offline queue processing.
 
 ### v1.4.2
 
