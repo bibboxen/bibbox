@@ -23,8 +23,7 @@
           data-ng-class="{'bg-success': material.success, 'bg-warning': !material.success && material.status === 'awaiting_afi'}">
         <td class="vert-align">{{ material.id }}</td>
         <td class="vert-align">{{ material.author }}</td>
-        <!-- Title here is translated, as it may be offline title -->
-        <td class="vert-align">{{ material.title | translate }}</td>
+        <td class="vert-align">{{ material.offline ? ('fbs.offline.title' | translate) : material.title }}</td>
         <td class="vert-align">{{ material.dueDate | date }}</td>
         <td>
           <span class="glyphicon glyphicon-ok" aria-hidden="true" data-ng-if="material.success"></span>
