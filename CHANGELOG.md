@@ -11,6 +11,7 @@
 * Change front-end and offline queues to use push notifications (NOTE: changes required in config.json)
 * Removed timeouts in fbs plugin.
 * Rewritten missing modal tags.
+* Fixed issue with "amp;" in title.
 
 ### v1.4.2
 
