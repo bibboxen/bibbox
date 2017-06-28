@@ -374,7 +374,7 @@ module.exports = function (options, imports, register) {
             onlineState.online = false;
             onlineState.successfulOnlineChecks = 0;
             setTimeout(checkOnlineState, onlineState.offlineTimeout);
-            bus.emit(fbs.offline, {
+            bus.emit('fbs.offline', {
               timestamp: new Date().getTime(),
               online: onlineState
             });
@@ -386,7 +386,7 @@ module.exports = function (options, imports, register) {
         onlineState.online = false;
         onlineState.successfulOnlineChecks = 0;
         setTimeout(checkOnlineState, onlineState.offlineTimeout);
-        bus.emit(fbs.offline, {
+        bus.emit('fbs.offline', {
           timestamp: new Date().getTime(),
           online: onlineState
         });
