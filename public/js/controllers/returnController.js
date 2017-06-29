@@ -112,6 +112,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
                 material.status = 'awaiting_afi';
                 material.information = 'return.is_awaiting_afi';
                 material.sortBin = result.sortBin;
+                material.offline = result.offline;
 
                 // Add to locked materials.
                 $scope.lockedMaterials.push(material);

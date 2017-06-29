@@ -110,6 +110,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                 material.status = 'awaiting_afi';
                 material.information = 'borrow.is_awaiting_afi';
                 material.dueDate = result.dueDate;
+                material.offline = result.offline;
 
                 // Add to locked materials.
                 $scope.lockedMaterials.push(material);
