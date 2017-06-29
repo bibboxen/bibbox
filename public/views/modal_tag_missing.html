@@ -15,7 +15,8 @@
             <tr data-ng-repeat="material in lockedMaterials" class="bg-warning">
               <td class="vert-align">{{ $index + 1 }}</td>
               <td class="vert-align">{{ material.id }}</td>
-              <td class="vert-align">{{ material.offline ? ('fbs.offline.title' | translate) : material.title }}</td>
+              <td class="vert-align" ng-if="material.offline">{{ 'fbs.offline.title' | translate }}</td>
+              <td class="vert-align" ng-if="!material.offline">{{ material.title }}</td>
             </tr>
           </table>
         </div>

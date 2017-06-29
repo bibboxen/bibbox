@@ -14,7 +14,8 @@
             <tr data-ng-repeat="material in materials"
                 data-ng-class="{'bg-danger': materials.invalid || material.status === 'error'}"
                 data-ng-if="!material.success">
-              <td class="vert-align">{{ material.offline ? ('fbs.offline.title' | translate) : material.title }}</td>
+              <td class="vert-align" ng-if="material.offline">{{ 'fbs.offline.title' | translate }}</td>
+              <td class="vert-align" ng-if="!material.offline">{{ material.title }}</td>
               <td class="vert-align">
                 <spinner data-ng-if="material.loading"></spinner>
                 <span data-ng-if="material.seriesLength > 0 && material.tags.length === material.seriesLength">{{ material.information | translate }}</span>
