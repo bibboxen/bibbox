@@ -18,7 +18,9 @@ var self = null;
  */
 var Offline = function Offline(bus, host, port) {
   this.bus = bus;
-  var self = this;
+
+  // Set the modules global self.
+  self = this;
 
   // Create the queues, if they exists in redis they will just reconnect.
   this.checkinQueue = Queue('Check-in', port, host);
@@ -211,7 +213,6 @@ Offline.prototype.getQueueCounts = function getQueueCounts(type) {
  *  The type of queue (checkin or checkout).
  */
 Offline.prototype.pause = function pause(type) {
-  var self = this;
   var queue = this._findQueue(type);
 
   queue.pause().then(function () {
@@ -226,7 +227,6 @@ Offline.prototype.pause = function pause(type) {
  *  The type of queue (checkin or checkout).
  */
 Offline.prototype.resume = function resume(type) {
-  var self = this;
   var queue = this._findQueue(type);
 
   queue.resume().then(function () {
@@ -277,7 +277,6 @@ Offline.prototype.add = function add(type, data) {
  */
 Offline.prototype.checkin = function checkin(job, done) {
   var data = job.data;
-  var self = this;
 
   self.bus.once(data.busEvent, function (res) {
     if (res.ok === '0') {
@@ -328,7 +327,6 @@ Offline.prototype.checkin = function checkin(job, done) {
  */
 Offline.prototype.checkout = function checkout(job, done) {
   var data = job.data;
-  var self = this;
 
   self.bus.once(data.busEvent, function (res) {
     if (res.ok === '0') {
