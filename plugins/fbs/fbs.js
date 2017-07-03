@@ -314,7 +314,90 @@ FBS.prototype.block = function block(username, reason) {
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
 
-  // Create FBS object to use in tests.
+  // Defines the configuration for the online checker below.
+  var onlineState = {
+    online: true,
+    threshold: 5,
+    successfulOnlineChecks: 5,
+    onlineTimeout: 5000,
+    offlineTimeout: 30000
+  };
+
+  /**
+   * Online checker.
+   *
+   * State machine that handles the FBS online/offline state.
+   */
+  function checkOnlineState() {
+    // Start online checker for FBS servers.
+    FBS.create(bus).then(function (fbs) {
+      // Update configuration - It's done here to ensure it reflects updated
+      // configuration from the admin UI.
+      onlineState.threshold = fbs.config.hasOwnProperty('onlineState') ? fbs.config.onlineState.threshold : onlineState.threshold;
+      onlineState.onlineTimeout = fbs.config.hasOwnProperty('onlineState') ? fbs.config.onlineState.onlineTimeout : onlineState.onlineTimeout;
+      onlineState.offlineTimeout = fbs.config.hasOwnProperty('onlineState') ? fbs.config.onlineState.offlineTimeout : onlineState.offlineTimeout;
+
+      // Check that config exists.
+      if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
+        fbs.libraryStatus().then(
+          function (res) {
+            // Listen to online check event send below.
+            if (res.onlineStatus) {
+              if (onlineState.successfulOnlineChecks >= onlineState.threshold) {
+                // FBS is online and threshold has been reached, so state online.
+                setTimeout(checkOnlineState, onlineState.onlineTimeout);
+                onlineState.online = true;
+              }
+              else {
+                // FBS online but threshold _not_ reached, so state offline.
+                onlineState.successfulOnlineChecks++;
+                onlineState.online = false;
+                setTimeout(checkOnlineState, onlineState.offlineTimeout);
+              }
+            }
+            else {
+              // FBS is offline, so it the state.
+              onlineState.successfulOnlineChecks = 0;
+              onlineState.online = false;
+              setTimeout(checkOnlineState, onlineState.offlineTimeout);
+            }
+
+            // Send state event into the bus.
+            var eventName = onlineState.online ? 'fbs.online' : 'fbs.offline';
+            bus.emit(eventName, {
+              timestamp: new Date().getTime(),
+              online: onlineState
+            });
+          },
+          function (err) {
+            // Error connecting to FBS.
+            onlineState.online = false;
+            onlineState.successfulOnlineChecks = 0;
+            setTimeout(checkOnlineState, onlineState.offlineTimeout);
+            bus.emit('fbs.offline', {
+              timestamp: new Date().getTime(),
+              online: onlineState
+            });
+          }
+        );
+      }
+      else {
+        // FBS not configured, so state offline.
+        onlineState.online = false;
+        onlineState.successfulOnlineChecks = 0;
+        setTimeout(checkOnlineState, onlineState.offlineTimeout);
+        bus.emit('fbs.offline', {
+          timestamp: new Date().getTime(),
+          online: onlineState
+        });
+      }
+    });
+  }
+
+  // Start the online checker.
+  checkOnlineState();
+
+    // Create FBS object to use in tests.
   FBS.create(bus).then(function (fbs) {
     register(null, {
       fbs: fbs
@@ -330,237 +413,237 @@ module.exports = function (options, imports, register) {
    * Listen to login requests.
    */
   bus.on('fbs.login', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug, 'fbs.login')) {
-      FBS.create(bus).then(function (fbs) {
-        fbs.login(data.username, data.password).then(function () {
-            bus.emit(data.busEvent, {
-              timestamp: new Date().getTime()
-            });
-          },
-          function (err) {
-            bus.emit(data.errorEvent, err);
+    FBS.create(bus).then(function (fbs) {
+      fbs.login(data.username, data.password).then(function () {
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime()
           });
-      },
-      function (err) {
-        bus.emit(data.errorEvent, err);
-      });
-    }
+        },
+        function (err) {
+          bus.emit(data.errorEvent, err);
+        }
+      );
+    },
+    function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   /**
    * Listen to library status requests.
    */
   bus.on('fbs.library.status', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug, 'fbs.library.status')) {
-      FBS.create(bus).then(function (fbs) {
-        fbs.libraryStatus().then(function (res) {
-            bus.emit(data.busEvent, {
-              timestamp: new Date().getTime(),
-              results: res
-            });
-          },
-          function (err) {
-            bus.emit(data.errorEvent, err);
+    FBS.create(bus).then(function (fbs) {
+      fbs.libraryStatus().then(function (res) {
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            results: res
           });
-      },
-      function (err) {
-        bus.emit(data.errorEvent, err);
-      });
-    }
+        },
+        function (err) {
+          bus.emit(data.errorEvent, err);
+        }
+      );
+    },
+    function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   /**
    * Listen to patron status requests.
    */
   bus.on('fbs.patron', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug, 'fbs.patron')) {
-      FBS.create(bus).then(function (fbs) {
-        fbs.patronInformation(data.username, data.password).then(function (status) {
-            bus.emit(data.busEvent, {
-              timestamp: new Date().getTime(),
-              patron: status
-            });
-          },
-          function (err) {
-            bus.emit(data.errorEvent, err);
+    FBS.create(bus).then(function (fbs) {
+      fbs.patronInformation(data.username, data.password).then(function (status) {
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            patron: status
           });
-      },
-      function (err) {
-        bus.emit(data.errorEvent, err);
-      });
-    }
+        },
+        function (err) {
+          bus.emit(data.errorEvent, err);
+        }
+      );
+    },
+    function (err) {
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   /**
    * Listen to checkout requests.
    */
   bus.on('fbs.checkout', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug, 'fbs.checkout')) {
-      // Check if this is a processing of offline queue.
-      data.queued = data.queued || false;
+    // Check if this is a processing of offline queue.
+    data.queued = data.queued || false;
 
-      // Set noBlock due date if not set. This due data is ignored if the noBlock
-      // field is false. So we set it to expire in 31 days into the future, so if
-      // this gets into the offline queue and gets noBlocked the date is set.
-      if (!data.hasOwnProperty('noBlockDueDate')) {
-        data.noBlockDueDate = new Date().getTime() + 2678400000;
-      }
-
-      // Ensure that the noBlock parameter to FBS is set to 'N' as default.
-      // NoBlock have been added in a later release an may not be in all
-      // request.
-      var noBlock = data.hasOwnProperty('noBlock') ? data.noBlock : false;
-
-      // Set transaction date if not set already (offline queued item will have
-      // the date already).
-      data.transactionDate = data.transactionDate || new Date().getTime();
-
-      // Create FBS object and send checkout request.
-      FBS.create(bus).then(function (fbs) {
-        fbs.checkout(data.username, data.password, data.itemIdentifier, data.noBlockDueDate, noBlock, data.transactionDate).then(function (res) {
-            bus.emit(data.busEvent, {
-              timestamp: new Date().getTime(),
-              result: res
-            });
-          },
-          function (err) {
-            if (err.message === 'FBS is offline' && data.queued === false) {
-              var material = {
-                itemIdentifier: data.itemIdentifier,
-                offline: true,
-                ok: '1',
-                itemProperties: {
-                  id: data.itemIdentifier,
-                  title: 'fbs.offline.title'
-                },
-                dueDate: data.noBlockDueDate
-              };
-
-              bus.once('fbs.checkout.offline.stored' + data.itemIdentifier, function (res) {
-                bus.emit(data.busEvent, material);
-              });
-
-              bus.once('fbs.checkout.offline.error' + data.itemIdentifier, function (err) {
-                bus.emit(data.errorEvent, err);
-              });
-
-              // Store for later processing.
-              var file = data.username;
-              bus.emit('storage.append', {
-                type: 'offline',
-                name: file,
-                obj: {
-                  date: data.checkedInDate,
-                  action: 'checkout',
-                  username: data.username,
-                  password: data.password,
-                  itemIdentifier: data.itemIdentifier
-                },
-                lockFile: true,
-                busEvent: 'fbs.checkout.offline.stored' + data.itemIdentifier,
-                errorEvent: 'fbs.checkout.offline.error' + data.itemIdentifier
-              });
-
-              // Add to job queue.
-              data.file = file;
-              bus.emit('offline.add.checkout', data);
-            }
-            else {
-              debug(err);
-              bus.emit(data.errorEvent, err);
-            }
-          });
-      },
-      function (err) {
-        debug(err);
-        bus.emit(data.errorEvent, err);
-      });
+    // Set noBlock due date if not set. This due data is ignored if the noBlock
+    // field is false. So we set it to expire in 31 days into the future, so if
+    // this gets into the offline queue and gets noBlocked the date is set.
+    if (!data.hasOwnProperty('noBlockDueDate')) {
+      data.noBlockDueDate = new Date().getTime() + 2678400000;
     }
+
+    // Ensure that the noBlock parameter to FBS is set to 'N' as default.
+    // NoBlock have been added in a later release an may not be in all
+    // request.
+    var noBlock = data.hasOwnProperty('noBlock') ? data.noBlock : false;
+
+    // Set transaction date if not set already (offline queued item will have
+    // the date already).
+    data.transactionDate = data.transactionDate || new Date().getTime();
+
+    // Create FBS object and send checkout request.
+    FBS.create(bus).then(function (fbs) {
+      fbs.checkout(data.username, data.password, data.itemIdentifier, data.noBlockDueDate, noBlock, data.transactionDate).then(function (res) {
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            result: res
+          });
+        },
+        function (err) {
+          if (err.message === 'FBS is offline' && data.queued === false) {
+            var material = {
+              itemIdentifier: data.itemIdentifier,
+              offline: true,
+              ok: '1',
+              itemProperties: {
+                id: data.itemIdentifier,
+                title: 'fbs.offline.title'
+              },
+              dueDate: data.noBlockDueDate
+            };
+
+            bus.once('fbs.checkout.offline.stored' + data.itemIdentifier, function (res) {
+              bus.emit(data.busEvent, {
+                timestamp: new Date().getTime(),
+                result: material
+              });
+            });
+
+            bus.once('fbs.checkout.offline.error' + data.itemIdentifier, function (err) {
+              bus.emit(data.errorEvent, err);
+            });
+
+            // Store for later processing.
+            var file = data.username;
+            bus.emit('storage.append', {
+              type: 'offline',
+              name: file,
+              obj: {
+                date: data.checkedInDate,
+                action: 'checkout',
+                username: data.username,
+                password: data.password,
+                itemIdentifier: data.itemIdentifier
+              },
+              lockFile: true,
+              busEvent: 'fbs.checkout.offline.stored' + data.itemIdentifier,
+              errorEvent: 'fbs.checkout.offline.error' + data.itemIdentifier
+            });
+
+            // Add to job queue.
+            data.file = file;
+            bus.emit('offline.add.checkout', data);
+          }
+          else {
+            debug(err);
+            bus.emit(data.errorEvent, err);
+          }
+        }
+      );
+    },
+    function (err) {
+      debug(err);
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   /**
    * Listen to checkIn requests.
    */
   bus.on('fbs.checkin', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug, 'fbs.checkin')) {
-      // Check if this is a processing of offline queue.
-      data.queued = data.queued || false;
+    // Check if this is a processing of offline queue.
+    data.queued = data.queued || false;
 
-      // Set checked-in date if not set.
-      data.checkedInDate = data.checkedInDate || new Date().getTime();
+    // Set checked-in date if not set.
+    data.checkedInDate = data.checkedInDate || new Date().getTime();
 
-      // Create FBS object and send check-in request.
-      FBS.create(bus).then(function (fbs) {
-        // Ensure that the noBlock parameter to FBS is set to 'N' as default.
-        // NoBlock have been added in a later release an may not the be in all
-        // request.
-        var noBlock = data.hasOwnProperty('noBlock') ? data.noBlock : false;
+    // Create FBS object and send check-in request.
+    FBS.create(bus).then(function (fbs) {
+      // Ensure that the noBlock parameter to FBS is set to 'N' as default.
+      // NoBlock have been added in a later release an may not the be in all
+      // request.
+      var noBlock = data.hasOwnProperty('noBlock') ? data.noBlock : false;
 
-        // Perform the checking request.
-        fbs.checkIn(data.itemIdentifier, data.checkedInDate, noBlock).then(function (res) {
-            bus.emit(data.busEvent, {
-              timestamp: new Date().getTime(),
-              result: res
-            });
-          },
-          function (err) {
-            if (err.message === 'FBS is offline' && data.queued === false) {
-              var material = {
-                itemIdentifier: data.itemIdentifier,
-                offline: true,
-                ok: '1',
-                itemProperties: {
-                  id: data.itemIdentifier,
-                  title: 'fbs.offline.title'
-                }
-              };
-
-              bus.once('fbs.checkin.offline.stored' + data.itemIdentifier, function (res) {
-                bus.emit(data.busEvent, material);
-              });
-
-              bus.once('fbs.checkin.offline.error' + data.itemIdentifier, function (err) {
-                bus.emit(data.errorEvent, err);
-              });
-
-              // Store for later processing.
-              var file = data.transaction;
-              bus.emit('storage.append', {
-                type: 'offline',
-                name: file,
-                obj: {
-                  action: 'checkin',
-                  date: data.checkedInDate,
-                  itemIdentifier: data.itemIdentifier
-                },
-                lockFile: true,
-                busEvent: 'fbs.checkin.offline.stored' + data.itemIdentifier,
-                errorEvent: 'fbs.checkin.offline.error' + data.itemIdentifier
-              });
-
-              // Add to job queue.
-              data.file = file;
-              bus.emit('offline.add.checkin', data);
-            }
-            else {
-              debug(err);
-              bus.emit(data.errorEvent, err);
-            }
+      // Perform the checking request.
+      fbs.checkIn(data.itemIdentifier, data.checkedInDate, noBlock).then(function (res) {
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            result: res
           });
-      },
-      function (err) {
-        debug(err);
-        bus.emit(data.errorEvent, err);
-      });
-    }
+        },
+        function (err) {
+          if (err.message === 'FBS is offline' && data.queued === false) {
+            var material = {
+              itemIdentifier: data.itemIdentifier,
+              offline: true,
+              ok: '1',
+              itemProperties: {
+                id: data.itemIdentifier,
+                title: 'fbs.offline.title'
+              }
+            };
+
+            bus.once('fbs.checkin.offline.stored' + data.itemIdentifier, function (res) {
+              bus.emit(data.busEvent, {
+                timestamp: new Date().getTime(),
+                result: material
+              });
+            });
+
+            bus.once('fbs.checkin.offline.error' + data.itemIdentifier, function (err) {
+              bus.emit(data.errorEvent, err);
+            });
+
+            // Store for later processing.
+            var file = data.transaction;
+            bus.emit('storage.append', {
+              type: 'offline',
+              name: file,
+              obj: {
+                action: 'checkin',
+                date: data.checkedInDate,
+                itemIdentifier: data.itemIdentifier
+              },
+              lockFile: true,
+              busEvent: 'fbs.checkin.offline.stored' + data.itemIdentifier,
+              errorEvent: 'fbs.checkin.offline.error' + data.itemIdentifier
+            });
+
+            // Add to job queue.
+            data.file = file;
+            bus.emit('offline.add.checkin', data);
+          }
+          else {
+            debug(err);
+            bus.emit(data.errorEvent, err);
+          }
+        }
+      );
+    },
+    function (err) {
+      debug(err);
+      bus.emit(data.errorEvent, err);
+    });
   });
 
   /**
    * Listen to renew requests.
    */
   bus.on('fbs.renew', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug, 'fbs.renew')) {
-      FBS.create(bus).then(function (fbs) {
+    FBS.create(bus).then(function (fbs) {
       fbs.renew(data.username, data.password, data.itemIdentifier).then(function (res) {
           bus.emit(data.busEvent, {
             timestamp: new Date().getTime(),
@@ -573,82 +656,49 @@ module.exports = function (options, imports, register) {
       },
       function (err) {
         bus.emit(data.errorEvent, err);
-      });
-    }
+      }
+    );
   });
 
   /**
    * Listen to renew all requests.
    */
   bus.on('fbs.renew.all', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug, 'fbs.renew.all')) {
-      FBS.create(bus).then(function (fbs) {
-        fbs.renewAll(data.username, data.password).then(function (res) {
-            bus.emit(data.busEvent, {
-              timestamp: new Date().getTime(),
-              result: res
-            });
-          },
-          function (err) {
-            bus.emit(data.errorEvent, err);
+    FBS.create(bus).then(function (fbs) {
+      fbs.renewAll(data.username, data.password).then(function (res) {
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            result: res
           });
         },
         function (err) {
           bus.emit(data.errorEvent, err);
         });
-    }
+      },
+      function (err) {
+        bus.emit(data.errorEvent, err);
+      }
+    );
   });
 
   /**
    * Listen to block patron requests.
    */
   bus.on('fbs.block', function (data) {
-    if (!options.isEventExpired(data.timestamp, debug, 'fbs.block')) {
-      FBS.create(bus).then(function (fbs) {
-        fbs.block(data.username, data.reason).then(function (res) {
-            bus.emit(data.busEvent, {
-              timestamp: new Date().getTime(),
-              result: res
-            });
-          },
-          function (err) {
-            bus.emit(data.errorEvent, err);
+    FBS.create(bus).then(function (fbs) {
+      fbs.block(data.username, data.reason).then(function (res) {
+          bus.emit(data.busEvent, {
+            timestamp: new Date().getTime(),
+            result: res
           });
         },
         function (err) {
           bus.emit(data.errorEvent, err);
         });
-    }
-  });
-
-  /**
-   * Listen for fbs.online events.
-   */
-  bus.on('fbs.online', function (request) {
-    if (!options.isEventExpired(request.timestamp, debug, 'fbs.online')) {
-      FBS.create(bus).then(function (fbs) {
-        // Check that config exists.
-        if (fbs.config && fbs.config.hasOwnProperty('endpoint')) {
-          var busEvent = 'network.fbs.online' + uniqid();
-
-          // Listen to online check event send below.
-          bus.once(busEvent, function (online) {
-            bus.emit(request.busEvent, {
-              timestamp: new Date().getTime(),
-              online: online
-            });
-          });
-
-          // Send online check.
-          bus.emit('network.online', {
-            url: fbs.config.endpoint,
-            busEvent: busEvent
-          });
-        }
-        else {
-          bus.emit(request.busEvent, false);
-        }
-      });
-    }
+      },
+      function (err) {
+        bus.emit(data.errorEvent, err);
+      }
+    );
   });
 };

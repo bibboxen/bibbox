@@ -30,9 +30,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
     // Store raw check-in responses as it's need to print receipt.
     $scope.rawMaterials = {};
 
-    // Materials that have been borrowed, but not been unlocked.
-    $scope.lockedMaterials = [];
-
     // Get the return bins.
     $scope.returnBins = config.binSorting.destinations;
 
@@ -59,7 +56,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       // Restart idle timeout.
       $scope.baseResetIdleWatch();
 
-      if (!$scope.tagValid(tag, 'return.tagDetected')) {
+      if (!$scope.tagValid(tag)) {
         return;
       }
 
@@ -115,9 +112,15 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
                 material.status = 'awaiting_afi';
                 material.information = 'return.is_awaiting_afi';
                 material.sortBin = result.sortBin;
+                material.offline = result.offline;
 
                 // Add to locked materials.
                 $scope.lockedMaterials.push(material);
+
+                // If a tag is missing from the device check missing tags.
+                if ($scope.anyTagRemoved(material.tags)) {
+                  $scope.checkMissingTags();
+                }
 
                 // Store the raw result (it's used to send with receipts).
                 if (result.hasOwnProperty('patronIdentifier')) {
@@ -132,14 +135,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
                     $scope.rawMaterials.unknown = [];
                   }
                   $scope.rawMaterials.unknown.push(result);
-                }
-
-                // If a tag is missing from the device show the unlocked materials pop-up.
-                if ($scope.anyTagRemoved(material.tags)) {
-                  // Reset time to double time for users to has time to react.
-                  $scope.baseResetIdleWatch(config.timeout.idleTimeout);
-
-                  tagMissingModal.$promise.then(tagMissingModal.show);
                 }
 
                 // Turn AFI on for materials that have not been set correctly yet.
@@ -181,7 +176,9 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
               }
             }
           }
-        );
+        ).then(function () {
+          $scope.baseResetIdleWatch();
+        });
       }
     };
 
@@ -194,7 +191,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
       // Restart idle timeout.
       $scope.baseResetIdleWatch();
 
-      if (!$scope.tagValid(tag, 'return.tagRemoved')) {
+      if (!$scope.tagValid(tag)) {
         return;
       }
 
@@ -218,12 +215,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
         materialTag.removed = true;
       }
 
-      if (material.status === 'awaiting_afi') {
-        tagMissingModal.$promise.then(tagMissingModal.show);
-
-        // Reset time to double time for users to has time to react.
-        $scope.baseResetIdleWatch(config.timeout.idleTimeout);
-      }
+      $scope.checkMissingTags();
     };
 
     /**
@@ -235,7 +227,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
      *   The tag returned from the device.
      */
     $scope.tagAFISet = function tagAFISet(tag) {
-      if (!$scope.tagValid(tag, 'return.tagAFISet')) {
+      if (!$scope.tagValid(tag)) {
         return;
       }
 
@@ -276,10 +268,7 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
         }
       }
 
-      // Remove tagMissingModal if no materials are locked.
-      if ($scope.lockedMaterials.length <= 0) {
-        tagMissingModal.$promise.then(tagMissingModal.hide);
-      }
+      $scope.checkMissingTags();
     };
 
     /**
@@ -419,18 +408,6 @@ angular.module('BibBox').controller('ReturnController', ['$scope', '$controller'
         }
       });
     };
-
-    /**
-     * Setup tag missing modal.
-     *
-     * Has a locked backdrop, that does not disappear when clicked.
-     */
-    var tagMissingModal = $modal({
-      scope: $scope,
-      templateUrl: './views/modal_tag_missing.html',
-      show: false,
-      backdrop: 'static'
-    });
 
     // Check that interface methods are implemented.
     Interface.ensureImplements($scope, RFIDBaseInterface);

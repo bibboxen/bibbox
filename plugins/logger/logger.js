@@ -7,6 +7,7 @@
 
 // Node core modules.
 var path = require('path');
+var util = require('util');
 
 // NPM modules.
 var winston = require('winston');
@@ -272,7 +273,12 @@ module.exports = function (options, imports, register) {
 
   bus.on('logger.frontend', function (message) {
     try {
-      logger.frontend(message);
+      if (typeof message === 'object') {
+        logger.frontend('Error: ' + util.inspect(message, false, 10, false));
+      }
+      else {
+        logger.frontend(message);
+      }
     }
     catch (exception) {
       console.error(exception.stack);

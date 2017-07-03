@@ -2,6 +2,20 @@
 
 ### v1.4.2
 
+* Added object inspection to frontend error logging to get whole message and not "[Object object]".
+* Added run scripts to bootstrap.
+* Added "fixtures" for nodejs tests.
+* Fixed missing timestamp in offline check-in/out.
+* Removed event expired checks from front end.
+* Added FBS online/offline push notifications.
+* Change front-end and offline queues to use push notifications (NOTE: changes required in config.json)
+* Removed timeouts in fbs plugin.
+* Rewritten missing modal tags.
+* Fixed issue with "amp;" in title.
+* Fixed missing self variable in offline queue processing.
+
+### v1.4.2
+
 * Fixed issue with tags that were read in correctly and tags that moved to the next user.
 * Fixed issue where tags with more than one leading zero in the crc value were rejected.
 

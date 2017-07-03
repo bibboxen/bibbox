@@ -1,7 +1,7 @@
 {
   "name": "Bibbox",
   "description": "Library box - automatic borrower",
-  "version": "0.0.1",
+  "version": "1.4.2",
   "private": true,
   "dependencies": {
     "architect": "0.1.11",
@@ -23,11 +23,20 @@
     "karma-sinon-chai": "^1.2.4",
     "mocha": "^2.4.5",
     "newrelic": "^1.35.1",
+    "nock": "^9.0.13",
     "q": "^1.4.1",
     "should": "^8.2.2",
     "sinon": "^1.17.5",
     "sinon-chai": "^2.8.0",
     "socket.io-client": "^1.4.8",
     "supertest": "^1.2.0"
+  },
+  "scripts": {
+    "live": "sudo node bootstrap.js",
+    "fake": "sudo RFID_DEBUG=true DEBUG=bibbox:* node bootstrap.js",
+    "debug": "sudo DEBUG=bibbox:* node bootstrap.js",
+    "rfid": "sudo ./start_rfid.sh",
+    "test": "cd test; ../node_modules/.bin/mocha",
+    "test-live": "cd test; LIVE=1 ../node_modules/.bin/mocha"
   }
 }

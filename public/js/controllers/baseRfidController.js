@@ -20,8 +20,8 @@ RFIDBaseInterface = new Interface( 'RFIDBaseInterface', [
   'tagAFISet'
 ]);
 
-angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controller', 'rfidService', 'loggerService', 'config',
-  function ($scope, $controller, rfidService, loggerService, config) {
+angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controller', 'rfidService', 'loggerService', 'config', '$modal',
+  function ($scope, $controller, rfidService, loggerService, config, $modal) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -30,8 +30,39 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
     // Used to hold materials.
     $scope.materials = [];
 
-    // Start listening for rfid events.
-    rfidService.start($scope);
+    // Materials that have been borrowed, but not been unlocked.
+    $scope.lockedMaterials = [];
+
+    /**
+     * Setup tag missing modal.
+     *
+     * Has a locked backdrop, that does not disappear when clicked.
+     */
+    $scope.tagMissingModal = $modal({
+      scope: $scope,
+      templateUrl: './views/modal_tag_missing.html',
+      show: false,
+      backdrop: 'static'
+    });
+
+    /**
+     * Check if the modal should be shown.
+     */
+    $scope.checkMissingTags = function checkMissingTags() {
+      if ($scope.tagMissingModal) {
+        $scope.tagMissingModal.$promise.then(function() {
+          if ($scope.lockedMaterials.length > 0) {
+            // Reset time to double time for users to has time to react.
+            $scope.baseResetIdleWatch(config.timeout.idleTimeout);
+
+            $scope.tagMissingModal.show();
+          }
+          else {
+            $scope.tagMissingModal.hide();
+          }
+        });
+      }
+    };
 
     /**
      * Tag was removed from RFID device.
@@ -225,28 +256,14 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
      *
      * @param {Object} tag
      *   The tag.
-     * @param {string} name
-     *   Used in debugging as should be the name off the calling function.
      *
      * @return {boolean}
      *   True if the tag is valid, else false.
      */
-    $scope.tagValid = function tagValid(tag, name) {
-      var eventTimeout = config.hasOwnProperty('eventTimeout') ? config.eventTimeout :  2000;
-      name = name || 'Unknown';
-
-      var expired = false;
-      if (Number(tag.timestamp) + eventTimeout < new Date().getTime()) {
-        // This logging is temporary, until #BIB-255 is resolved.
-        loggerService.debug('Event (' + name + ') tag valid timed out (' + ((Number(tag.timestamp) + eventTimeout) - new Date().getTime()) + '): ' + JSON.stringify(tag));
-
-        expired = true;
-      }
-
+    $scope.tagValid = function tagValid(tag) {
       return tag && tag.afi !== undefined
         && tag.mid !== undefined && tag.uid !== undefined
-        && tag.numberInSeries !== undefined && tag.seriesLength !== undefined
-        && !expired;
+        && tag.numberInSeries !== undefined && tag.seriesLength !== undefined;
     };
 
     /**
@@ -333,10 +350,20 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
       loggerService.error(err);
     };
 
+    // Start listening for rfid events.
+    rfidService.start($scope);
+
     /**
      * On destroy.
      */
     $scope.$on('$destroy', function () {
+      // Make sure tag missing modal is removed.
+      $scope.tagMissingModal.$promise.then(function() {
+        $scope.tagMissingModal.hide();
+        $scope.tagMissingModal.destroy();
+      });
+
+      // Stop listening for RFID events.
       rfidService.stop();
     });
   }

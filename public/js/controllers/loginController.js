@@ -21,14 +21,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
     var passwordRegExp = /^\d+$/;
 
     // Check if FBS is online.
-    userService.isOnline().then(
-      function success(status) {
-        $scope.online = status;
-      },
-      function error() {
-        $scope.online = false;
-      }
-    );
+    $scope.online = userService.isOnline();
 
     /**
      * Reset user scope.

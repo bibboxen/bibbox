@@ -18,6 +18,8 @@ var self = null;
  */
 var Offline = function Offline(bus, host, port) {
   this.bus = bus;
+
+  // Set the modules global self.
   self = this;
 
   // Create the queues, if they exists in redis they will just reconnect.
@@ -74,46 +76,21 @@ var Offline = function Offline(bus, host, port) {
   this.pause('checkin');
   this.pause('checkout');
 
-  // Book-keeping to track that FBS is relative stable online.
-  var threshold = 3;
-  var currentHold = 0;
+  /**
+   * Listen for online events and change state.
+   */
+  this.bus.on('fbs.online', function online() {
+    self.resume('checkin');
+    self.resume('checkout');
+  });
 
-  // Send FBS online check requests.
-  setInterval(function () {
-    var busEvent = 'offline.fbs.check' + uniqid();
-    var errorEvent = 'offline.fbs.check.error' + uniqid();
-
-    // Listen for FBS offline events. This have to be "on" events not once.
-    bus.once(busEvent, function (online) {
-      if (online) {
-        if (currentHold >= threshold) {
-          self.resume('checkin');
-          self.resume('checkout');
-        }
-        else {
-          currentHold++;
-        }
-      }
-      else {
-        currentHold = 0;
-        self.pause('checkin');
-        self.pause('checkout');
-      }
-    });
-
-    // Listen to FBS check error and pause queues (FBS offline).
-    bus.once(errorEvent, function () {
-      currentHold = 0;
-      self.pause('checkin');
-      self.pause('checkout');
-    });
-
-    bus.emit('fbs.online', {
-      timestamp: new Date().getTime(),
-      busEvent: busEvent,
-      errorEvent: errorEvent
-    });
-  }, 300000);
+  /**
+   * Listen for offline events and change state.
+   */
+  this.bus.on('fbs.offline', function online() {
+    self.pause('checkin');
+    self.pause('checkout');
+  });
 };
 
 /**
@@ -236,7 +213,6 @@ Offline.prototype.getQueueCounts = function getQueueCounts(type) {
  *  The type of queue (checkin or checkout).
  */
 Offline.prototype.pause = function pause(type) {
-  var self = this;
   var queue = this._findQueue(type);
 
   queue.pause().then(function () {
@@ -251,7 +227,6 @@ Offline.prototype.pause = function pause(type) {
  *  The type of queue (checkin or checkout).
  */
 Offline.prototype.resume = function resume(type) {
-  var self = this;
   var queue = this._findQueue(type);
 
   queue.resume().then(function () {
