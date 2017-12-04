@@ -33,7 +33,7 @@
   },
   "scripts": {
     "live": "sudo node bootstrap.js",
-    "fake": "sudo RFID_DEBUG=true DEBUG=bibbox:* node bootstrap.js",
+    "fake": "sudo NODE_TLS_REJECT_UNAUTHORIZED=0 RFID_DEBUG=true DEBUG=bibbox:* node bootstrap.js",
     "debug": "sudo DEBUG=bibbox:* node bootstrap.js",
     "rfid": "sudo ./start_rfid.sh",
     "test": "cd test; ../node_modules/.bin/mocha",
