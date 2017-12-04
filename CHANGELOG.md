@@ -3,6 +3,7 @@
 ### In development
 
 * Added "alt" text and style to mail notifications.
+* Calculate total fine amount based on fine items.
 
 ### v1.4.3
 
