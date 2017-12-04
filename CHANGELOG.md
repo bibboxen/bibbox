@@ -2,6 +2,10 @@
 
 ### In development
 
+* Added "alt" text and style to mail notifications.
+
+### v1.4.3
+
 * Added object inspection to frontend error logging to get whole message and not "[Object object]".
 * Added run scripts to bootstrap.
 * Added "fixtures" for nodejs tests.
