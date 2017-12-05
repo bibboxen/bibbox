@@ -5,6 +5,7 @@
 * Added "alt" text and style to mail notifications.
 * Calculate total fine amount based on fine items.
 * Added extra "delayed" network connection test on failure.
+* Changed header configuration for notifications - images
 
 ### v1.4.3
 
