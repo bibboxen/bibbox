@@ -41,6 +41,7 @@ nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
 
 
 nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
+  .persist()
   .post('/rest/sip2/DK-775100', /^.+<request>990xxx2.00<\/request>.+$/)
   .reply(200, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:sip xmlns:ns2=\"http://axiell.com/Schema/sip.xsd\"><response>98YYYYYY60099920170619    1307082.00AODK-775100|AMAarhus Kommunes Biblioteker. Borgerservice og Biblioteker|BXYYYYYYYYYYYNNYYY|</response></ns2:sip>", [ 'Connection',
   'close',
@@ -141,7 +142,7 @@ nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
 
 
 nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
-  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APDK-775100\|AODK-775100\|AB3274626533\|AC\|CH\|<\/request>.+$/)
+  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APhb\|AODK-775100\|AB3274626533\|AC\|CH\|<\/request>.+$/)
   .reply(200, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:sip xmlns:ns2=\"http://axiell.com/Schema/sip.xsd\"><response>101YUN20170619    125154AODK-775100|AB3274626533|AQHovedbiblioteket%Voksen%%|AJ06850537|AALN:C0016351730|CHHelbred dit liv%Hay, Louise L.%a%xx%61.36|</response></ns2:sip>", [ 'Connection',
   'close',
   'Server',
@@ -259,7 +260,7 @@ nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
   'f5avrbbbbbbbbbbbbbbbb=PIOIFIIKMHNNGPBBEFHBFECCHELPNLGNNMPIGNMOIHIPJCKCFNMFHLPMCBMFANCBMBGDLGMHFADKFHDPAKKALHHDBLHMHCCACDOIAKHIBPIKBCCMHDKOPKLBMHHMFKLO; HttpOnly; secure' ]);
 
 nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
-  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APDK-775100\|AODK-775100\|AB5052159786\|AC\|CH\|<\/request>.+$/)
+  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APhb\|AODK-775100\|AB5052159786\|AC\|CH\|<\/request>.+$/)
   .reply(200, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:sip xmlns:ns2=\"http://axiell.com/Schema/sip.xsd\"><response>101YUN20170619    125156AODK-775100|AB5052159786|AQHovedbiblioteket%Voksen%Krimi%|AJ51320352|AALN:C0016351730|CHKvinden de meldte savnet: krimi%Blædel, Sara%a%xx%sk|</response></ns2:sip>", [ 'Connection',
   'close',
   'Server',
@@ -279,7 +280,7 @@ nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
 
 
 nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
-  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APDK-775100\|AODK-775100\|AB3849870423\|AC\|CH\|<\/request>.+$/)
+  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APhb\|AODK-775100\|AB3849870423\|AC\|CH\|<\/request>.+$/)
   .reply(200, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:sip xmlns:ns2=\"http://axiell.com/Schema/sip.xsd\"><response>101YUN20170619    125156AODK-775100|AB3849870423|AQHovedbiblioteket%Voksen%Bestsellers%Marked|AJ52735696|AALN:C0016351730|CHKemikeren%Meyer, Stephenie%a%xx%sk|</response></ns2:sip>", [ 'Connection',
   'close',
   'Server',
@@ -299,7 +300,7 @@ nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
 
 
 nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
-  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APDK-775100\|AODK-775100\|AB5135661602\|AC\|CH\|<\/request>.+$/)
+  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APhb\|AODK-775100\|AB5135661602\|AC\|CH\|<\/request>.+$/)
   .reply(200, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:sip xmlns:ns2=\"http://axiell.com/Schema/sip.xsd\"><response>101YUN20170619    125156AODK-775100|AB5135661602|AQHovedbiblioteket%Voksen%Bestsellers%Marked|AJ53045650|AALN:C0016351730|CHTørst%Nesbø, Jo%a%xx%sk|</response></ns2:sip>", [ 'Connection',
   'close',
   'Server',
@@ -319,7 +320,7 @@ nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
 
 
 nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
-  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APDK-775100\|AODK-775100\|AB5118794313\|AC\|CH\|<\/request>.+$/)
+  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APhb\|AODK-775100\|AB5118794313\|AC\|CH\|<\/request>.+$/)
   .reply(200, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:sip xmlns:ns2=\"http://axiell.com/Schema/sip.xsd\"><response>101YUN20170619    125156AODK-775100|AB5118794313|AQHovedbiblioteket%Børn%Bestsellers%|AJ22254901|AALN:C0016351730|CHFlunkerne er over os%Cera, Joaquín%a%xx%bi sk|</response></ns2:sip>", [ 'Connection',
   'close',
   'Server',
@@ -339,7 +340,7 @@ nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
 
 
 nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
-  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APDK-775100\|AODK-775100\|AB4879770462\|AC\|CH\|<\/request>.+$/)
+  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APhb\|AODK-775100\|AB4879770462\|AC\|CH\|<\/request>.+$/)
   .reply(200, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:sip xmlns:ns2=\"http://axiell.com/Schema/sip.xsd\"><response>101YUN20170619    125156AODK-775100|AB4879770462|AQHovedbiblioteket%Børn%%|AJ29017638|AALN:C0016351730|CHDen store bog om LEGO Star Wars%Beecroft, Simon%a%xx%79.31|</response></ns2:sip>", [ 'Connection',
   'close',
   'Server',
@@ -377,7 +378,7 @@ nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
     'f5avrbbbbbbbbbbbbbbbb=IAMDMKMNEKADJKFMEALFOFFKAGEPDLKDKPICKGLLONEBGKJLDAOLBJLEEPOLJLLDKLIDDJMICAMFOBPIHBEACAJCBLFPBHKIPADKGOFEMKFCEOHEMNIOGDDLDBGNNBNG; HttpOnly; secure' ]);
 
 nock('https://cicero-fbs.com:443', {"encodedQueryParams":true})
-  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APDK-775100\|AODK-775100\|AB3274626533\|AC\|CH\|<\/request>.+$/)
+  .post('/rest/sip2/DK-775100', /^.+<request>09N\d{8}\s{4}\d{6}\d{8}\s{4}\d{6}\|APhb\|AODK-775100\|AB3274626533\|AC\|CH\|<\/request>.+$/)
   .reply(200, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:sip xmlns:ns2=\"http://axiell.com/Schema/sip.xsd\"><response>101YUN20170619    125154AODK-775100|AB3274626533|AQHovedbiblioteket%Voksen%%|AJ06850537|AALN:C0016351730|CHHelbred dit liv%Hay, Louise L.%a%xx%61.36|</response></ns2:sip>", [ 'Connection',
     'close',
     'Server',
