@@ -109,6 +109,6 @@ importTest('FBS', './fbs.js', 'fbs');
 importTest('Notification', './notification.js', 'notification');
 importTest('Proxy', './proxy.js');
 importTest('Translation', './translation.js');
-importTest('RFID', './rfid.js');
 importTest('Controller', './ctrl.js');
 importTest('Offline', './offline.js');
+importTest('RFID', './rfid.js');
