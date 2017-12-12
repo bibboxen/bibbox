@@ -1,11 +1,10 @@
 # Bibbox Changelog
 
-### v1.4.3
+### v1.4.4
 
-* Added "alt" text and style to mail notifications.
 * Calculate total fine amount based on fine items.
 * Added extra "delayed" network connection test on failure.
-* Changed header configuration for notifications - images
+* Changed header configuration for notifications - to use text only.
 
 ### v1.4.3
 
