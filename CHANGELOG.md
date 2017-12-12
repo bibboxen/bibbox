@@ -2,6 +2,13 @@
 
 ### v1.4.3
 
+* Added "alt" text and style to mail notifications.
+* Calculate total fine amount based on fine items.
+* Added extra "delayed" network connection test on failure.
+* Changed header configuration for notifications - images
+
+### v1.4.3
+
 * Added object inspection to frontend error logging to get whole message and not "[Object object]".
 * Added run scripts to bootstrap.
 * Added "fixtures" for nodejs tests.
