@@ -11,12 +11,14 @@ angular.module('BibBox', [
   'ngIdle',
   'mgcrea.ngStrap.modal',
   'ngAnimate',
-  'ui.bootstrap'
+  'ui.bootstrap',
+  'angulartics',
+  'angulartics.piwik'
 ]);
 
 // Set path for dynamic translation loading and set default idle configuration.
-angular.module('BibBox').config(['tmhDynamicLocaleProvider', 'IdleProvider',
-  function (tmhDynamicLocaleProvider, IdleProvider) {
+angular.module('BibBox').config(['tmhDynamicLocaleProvider', 'IdleProvider', '$analyticsProvider',
+  function (tmhDynamicLocaleProvider, IdleProvider, $analyticsProvider) {
     'use strict';
 
     tmhDynamicLocaleProvider.localeLocationPattern('/js/lib/locales/angular-locale_{{locale}}.js');

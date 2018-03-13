@@ -47,13 +47,13 @@
   </ul>
 
   <div class="buttons-bottom">
-    <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()">
+    <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()" analytics-on analytics-on analytics-category="Borrow" analytics-label="Button">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
     </button>
-    <button type="button" class="btn btn-success button align-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress && rawMaterials && rawMaterials.length > 0">
+    <button type="button" class="btn btn-success button align-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress && rawMaterials && rawMaterials.length > 0" analytics-on analytics-category="Borrow" analytics-label="Button" analytics-event="Receipt - Choose">
       <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'borrow.button.receipt' | translate }}
     </button>
-    <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="(!currentPatron || !currentPatron.emailAddress) && rawMaterials && rawMaterials.length > 0" >
+    <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="(!currentPatron || !currentPatron.emailAddress) && rawMaterials && rawMaterials.length > 0" analytics-on analytics-category="Borrow" analytics-label="Button" analytics-event="Receipt - Print">
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'borrow.button.receipt' | translate }}
     </button>
   </div>

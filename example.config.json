@@ -71,6 +71,12 @@
     "port": 3050,
     "allowed": [ "127.0.0.1", "::ffff:192.168.50.1" ]
   },
+  "matomo": {
+    "siteId": "1",
+    "url": "192.168.50.193",
+    "userId": "01",
+    "location": "location"
+  },
   "languages": {
     "locales": ["en", "da"],
     "defaultLocale": "da"

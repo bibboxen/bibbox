@@ -5,15 +5,16 @@
         <h2 class="modal-title" id="receiptModalLabel">{{ 'receipt.heading' | translate }}</h2>
       </div>
       <div class="modal-body">
-        <button type="button" class="btn btn-success button" aria-label="Left Align" data-ng-click="receipt('mail')">
+        <button type="button" class="btn btn-success button" aria-label="Left Align" data-ng-click="receipt('mail')" analytics-on>
           <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> {{ 'receipt.button.receipt_mail' | translate }}
         </button>
-        <button type="button" class="btn btn-success button" aria-label="Left Align" data-ng-click="receipt('printer')">
+        <button type="button" class="btn btn-success button" aria-label="Left Align" data-ng-click="receipt('printer')" analytics-on>
           <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'receipt.button.receipt_printer' | translate }}
         </button>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger button" data-ng-click="$hide()">{{ 'receipt.button.close' | translate }}
+        <button type="button" class="btn btn-danger button" data-ng-click="$hide()" analytics-on>
+          {{ 'receipt.button.close' | translate }}
         </button>
       </div>
     </div>

@@ -21,6 +21,7 @@ module.exports = function (options, imports, register) {
   // Load modules required.
   var express = require('express');
   var http = require('http');
+  var exphbs  = require('express-handlebars');
 
   // Start the express app.
   var app = express();
@@ -58,6 +59,18 @@ module.exports = function (options, imports, register) {
   if (options.hasOwnProperty('path')) {
     app.use(express.static(options.path));
   }
+
+  // Set handlebars as rendering engine.
+  let hbs = exphbs.create({});
+  app.engine('handlebars', hbs.engine);
+  app.set('view engine', 'handlebars');
+  app.set('views', './public');
+
+  app.get('/', function (req, res) {
+    res.render('index', {
+      matomo: options.matomo
+    });
+  });
 
   // Start the server.
   server.listen(app.get('port'), function () {

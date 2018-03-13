@@ -59,6 +59,7 @@ var plugins = [
     packagePath: './plugins/server',
     port: config.port,
     path: path.join(__dirname, 'public'),
+    matomo: config.matomo,
     isEventExpired: isEventExpired
   },
   {
