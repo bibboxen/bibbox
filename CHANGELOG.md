@@ -2,6 +2,10 @@
 
 ### In development
 
+* Added support "config.json" under files (location and name)
+
+### v1.4.4
+
 * Added "alt" text and style to mail notifications.
 * Calculate total fine amount based on fine items.
 * Added extra "delayed" network connection test on failure.
