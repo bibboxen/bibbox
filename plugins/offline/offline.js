@@ -28,11 +28,11 @@ var Offline = function Offline(bus, host, port) {
 
   // Set the front-end out-of-order on queue errors (redis errors included).
   this.checkinQueue.on('error', function (err) {
-    self.bus.emit('logger.err', err);
+    self.bus.emit('logger.err', { 'type': 'offline', 'message': err });
     self.bus.emit('frontend.outOfOrder');
   });
   this.checkoutQueue.on('error', function (err) {
-    self.bus.emit('logger.err', err);
+    self.bus.emit('logger.err', { 'type': 'offline', 'message': err });
     self.bus.emit('frontend.outOfOrder');
   });
 
@@ -51,7 +51,7 @@ var Offline = function Offline(bus, host, port) {
       },
       function (err) {
         // If we can't remove the job... not much we can do.
-        self.bus('logger.offline', err.message);
+        self.bus.emit('logger.err', { 'type': 'offline', 'message': err.message });
       });
     }
   });
@@ -67,7 +67,7 @@ var Offline = function Offline(bus, host, port) {
       },
       function (err) {
         // If we can't remove the job... not much we can do.
-        self.bus('logger.offline', err.message);
+        self.bus.emit('logger.err', { 'type': 'offline', 'message': err.message });
       });
     }
   });
@@ -216,7 +216,7 @@ Offline.prototype.pause = function pause(type) {
   var queue = this._findQueue(type);
 
   queue.pause().then(function () {
-    self.bus.emit('logger.offline', 'Queue "' + queue.name + '" is paused.');
+    self.bus.emit('logger.info', { 'type': 'offline', 'message': 'Queue "' + queue.name + '" is paused.' });
   });
 };
 
@@ -230,7 +230,7 @@ Offline.prototype.resume = function resume(type) {
   var queue = this._findQueue(type);
 
   queue.resume().then(function () {
-    self.bus.emit('logger.offline', 'Queue "' + queue.name + '" has resumed.');
+    self.bus.emit('logger.info', { 'type': 'offline', 'message': 'Queue "' + queue.name + '" has resumed.' });
   });
 };
 
@@ -280,7 +280,7 @@ Offline.prototype.checkin = function checkin(job, done) {
 
   self.bus.once(data.busEvent, function (res) {
     if (res.ok === '0') {
-      self.bus.emit('logger.offline', 'error: ' + require('util').inspect(res, true, 10));
+      self.bus.emit('logger.err', { 'type': 'offline', 'message': require('util').inspect(res, true, 10) });
       done(new Error(res.screenMessage));
     }
     else {
@@ -302,7 +302,7 @@ Offline.prototype.checkin = function checkin(job, done) {
 
   self.bus.once(data.errorEvent, function (err) {
     // Log the failure.
-    self.bus.emit('logger.offline', 'error: ' + err.message);
+    self.bus.emit('logger.err', { 'type': 'offline', 'message': err.message });
     done(err);
   });
 
@@ -332,7 +332,7 @@ Offline.prototype.checkout = function checkout(job, done) {
     if (res.ok === '0') {
       // @TODO: Check here screen-message if the user should be changed due to
       //        wrong username or password.
-      self.bus.emit('logger.offline', 'error: ' + require('util').inspect(res, true, 10));
+      self.bus.emit('logger.err', { 'type': 'offline', 'message': require('util').inspect(res, true, 10) });
       done(new Error(res.screenMessage));
     }
     else {
@@ -354,7 +354,7 @@ Offline.prototype.checkout = function checkout(job, done) {
 
   self.bus.once(data.errorEvent, function (err) {
     // Log the failure.
-    self.bus.emit('logger.offline', 'error: ' + err.message);
+    self.bus.emit('logger.err', { 'type': 'offline', 'message': err.message });
     done(err);
   });
 

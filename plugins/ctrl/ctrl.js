@@ -165,7 +165,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, res);
       },
       function (err) {
-        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit('logger.err', { 'type': 'CTRL', 'message': err });
         bus.emit(data.errorEvent, err);
       }
     );
@@ -180,7 +180,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, {translations: translations});
       },
       function (err) {
-        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit('logger.err', { 'type': 'CTRL', 'message': err });
         bus.emit(data.errorEvent, err);
       }
     );
@@ -195,7 +195,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, config);
       },
       function (err) {
-        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit('logger.err', { 'type': 'CTRL', 'message': err });
         bus.emit(data.errorEvent, err);
       }
     );
@@ -210,7 +210,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, config);
       },
       function (err) {
-        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit('logger.err', { 'type': 'CTRL', 'message': err });
         bus.emit(data.errorEvent, err);
       }
     );
@@ -225,7 +225,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, config);
       },
       function (err) {
-        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit('logger.err', { 'type': 'CTRL', 'message': err });
         bus.emit(data.errorEvent, err);
       }
     );
