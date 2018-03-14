@@ -40,13 +40,19 @@
   </ul>
 
   <div class="buttons-bottom">
-    <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()" analytics-on>
+    <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()"
+            analytics-on analytics-category="Reservations" analytics-event="Back"
+            analytics-label="Button Click">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
     </button>
-    <button type="button" class="btn btn-success button align-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0" analytics-on>
+    <button type="button" class="btn btn-success button align-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0"
+            analytics-on analytics-category="Reservations" analytics-event="Receipt - Modal"
+            analytics-label="Button Click">
       <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'reservations.button.receipt' | translate }}
     </button>
-    <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0" analytics-on>
+    <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0"
+            analytics-on analytics-category="Reservations" analytics-event="Receipt - Print"
+            analytics-label="Button Click">
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'reservations.button.receipt' | translate }}
     </button>
   </div>

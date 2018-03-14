@@ -29,7 +29,11 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-info button" data-ng-click="$hide()" analytics-on>{{ 'processing.button.ok' | translate }}</button>
+        <button type="button" class="btn btn-info button" data-ng-click="$hide()"
+                analytics-on analytics-category="Modal Processing" analytics-event="Close"
+                analytics-label="Button Click">
+          {{ 'processing.button.ok' | translate }}
+        </button>
       </div>
     </div>
   </div>

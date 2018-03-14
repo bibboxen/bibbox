@@ -5,9 +5,14 @@
 </div>
 
 <div class="image-help">
-  <img src="img/help1.jpg" />
+  <img src="img/help1.jpg"/>
 </div>
 
-<button type="button" class="btn btn-default button-small" aria-label="Left Align" data-ng-click="useManualLogin(true)" data-ng-if="online" analytics-on>
-  <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> {{ 'login.button.manual_login' | translate }}
+<button type="button" class="btn btn-default button-small"
+        aria-label="Left Align" data-ng-click="useManualLogin(true)"
+        data-ng-if="online"
+        analytics-on analytics-category="Login" analytics-event="Manual Login"
+        analytics-label="Button Click">
+  <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
+  {{ 'login.button.manual_login' | translate }}
 </button>

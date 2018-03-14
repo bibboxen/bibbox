@@ -49,10 +49,12 @@
   </div>
 
   <div class="buttons-bottom">
-    <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()" analytics-on analytics-category="Return" analytics-label="Button" analytics-event="Back">
+    <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()"
+            analytics-on analytics-category="Return" analytics-event="Back" analytics-label="Button Click">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
     </button>
-    <button type="button" class="btn btn-success button align-left" data-ng-disabled="disabledReceiptBtn" data-ng-click="showReceiptModal()" data-ng-if="hasBorrowedMaterial()" analytics-on analytics-category="Return" analytics-label="Button" analytics-event="{{ 'return.button.receipt' | translate }}">
+    <button type="button" class="btn btn-success button align-left" data-ng-disabled="disabledReceiptBtn" data-ng-click="showReceiptModal()" data-ng-if="hasBorrowedMaterial()"
+            analytics-on analytics-category="Return" analytics-event="Receipt - Modal" analytics-label="Button Click">
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'return.button.receipt' | translate }}
     </button>
   </div>
