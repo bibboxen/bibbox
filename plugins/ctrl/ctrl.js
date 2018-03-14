@@ -16,6 +16,33 @@ var CTRL = function CTRL(bus) {
  *
  * @returns {*|promise}
  */
+CTRL.prototype.getConfig = function getConfig() {
+  var deferred = Q.defer();
+  var busEvent = 'ctrl.config.loaded.config' + uniqid();
+
+  this.bus.once(busEvent, function (data) {
+    if (data instanceof Error) {
+      deferred.reject(data);
+    }
+    else {
+      deferred.resolve(data);
+    }
+  });
+
+  this.bus.emit('storage.load', {
+    type: 'config',
+    name: 'config',
+    busEvent: busEvent
+  });
+
+  return deferred.promise;
+};
+
+/**
+ * Get notification configuration.
+ *
+ * @returns {*|promise}
+ */
 CTRL.prototype.getFBSConfig = function getFBSConfig() {
   var deferred = Q.defer();
   var busEvent = 'ctrl.fbs.loaded.config' + uniqid();
@@ -37,7 +64,6 @@ CTRL.prototype.getFBSConfig = function getFBSConfig() {
 
   return deferred.promise;
 };
-
 
 /**
  * Get notification configuration.
@@ -191,6 +217,21 @@ module.exports = function (options, imports, register) {
   });
 
   /**
+   * Handle notification config requests.
+   */
+  bus.on('ctrl.config.config', function (data) {
+    ctrl.getConfig().then(
+      function (config) {
+        bus.emit(data.busEvent, config);
+      },
+      function (err) {
+        bus.emit('logger.err', 'CTRL: ' + err);
+        bus.emit(data.errorEvent, err);
+      }
+    );
+  });
+
+  /**
    * Create bridge to the bus from bootstrap control api.
    *
    * This is done via the process communication with the bootstrap process that
@@ -232,6 +273,16 @@ module.exports = function (options, imports, register) {
           bus.emit('storage.save', {
             type: 'config',
             name: 'notification',
+            obj: data.config.notification,
+            busEvent: 'storage.config.saved' + uniqid()
+          });
+        }
+
+        if (data.config.hasOwnProperty('config')) {
+          // Save notification config.
+          bus.emit('storage.save', {
+            type: 'config',
+            name: 'config',
             obj: data.config.notification,
             busEvent: 'storage.config.saved' + uniqid()
           });
