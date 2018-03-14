@@ -205,16 +205,20 @@ Notification.prototype.renderLibrary = function renderLibrary(html) {
  *   If TRUE HTML is outputted else clean text.
  * @param fines
  *   The fine elements to render.
- * @param total
- *   The total amount for all fines.
  *
  * @returns {*}
  *
  */
-Notification.prototype.renderFines = function renderFines(html, fines, total) {
+Notification.prototype.renderFines = function renderFines(html, fines) {
   var ret = '';
 
   if (fines.length) {
+    // Calculate the correct fine total amount.
+    var total = 0.0;
+    for (var i in fines) {
+      total += parseFloat(fines[i].fineAmount);
+    }
+
     if (html) {
       ret = this.mailFinesTemplate.render({
         items: fines,
@@ -650,7 +654,7 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
       footer: self.renderFooter(mail),
       patrons: [{
         name: patron.hasOwnProperty('personalName') ? patron.personalName : 'Unknown',
-        fines: layout.fines ? self.renderFines(mail, patron.fineItems, patron.feeAmount) : '',
+        fines: layout.fines ? self.renderFines(mail, patron.fineItems) : '',
         loans_new: layout.loans_new ? self.renderNewLoans(mail, 'receipt.loans.new.headline', items) : '',
         loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patron.chargedItems, patron.overdueItems) : '',
         reservations: layout.reservations ? self.renderReservations(mail, patron.unavailableHoldItems) : '',
@@ -768,7 +772,7 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       footer: self.renderFooter(mail),
       patrons: [{
         name: patron.hasOwnProperty('personalName') ? patron.personalName : 'Unknown',
-        fines: layout.fines ? self.renderFines(mail, patron.fineItems, patron.feeAmount) : '',
+        fines: layout.fines ? self.renderFines(mail, patron.fineItems) : '',
         loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patron.chargedItems, patron.overdueItems) : '',
         reservations: layout.reservations ? self.renderReservations(mail, patron.unavailableHoldItems) : '',
         reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, patron.holdItems) : ''

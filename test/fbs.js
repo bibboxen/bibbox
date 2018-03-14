@@ -134,7 +134,6 @@ it('Check the response date parser', function (done) {
   date = '20160920';
   res.parseDate(date).should.equal(1474322400000);
 
-
   done();
 });
 

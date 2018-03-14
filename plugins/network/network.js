@@ -88,7 +88,18 @@ module.exports = function (options, imports, register) {
       },
       function (err) {
         bus.emit('logger.err', err);
-        bus.emit(data.busEvent, false);
+        // Retry to catch network flapping before giving up.
+        setTimeout(function () {
+          network.isOnline(data.url).then(
+            function () {
+              bus.emit(data.busEvent, true);
+            },
+            function (err) {
+              bus.emit('logger.err', err);
+              bus.emit(data.busEvent, false);
+            }
+          );
+        }, 250);
       }
     );
   });
