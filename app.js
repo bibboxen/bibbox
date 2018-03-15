@@ -109,6 +109,10 @@ var plugins = [
     host: config.offline.host,
     port: config.offline.port,
     isEventExpired: isEventExpired
+  },
+  {
+    packagePath: './plugins/matomo',
+    isEventExpired: isEventExpired
   }
 ];
 
