@@ -3,6 +3,7 @@
 ### In development
 
 * Added support "config.json" under files (location and name)
+* Fixed countdown bug that caused counter to remain after it was reset.
 
 ### v1.4.4
 
