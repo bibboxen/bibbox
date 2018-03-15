@@ -51,19 +51,18 @@ var plugins = [
     isEventExpired: isEventExpired
   },
   {
-    packagePath: './plugins/ctrl',
+    packagePath: './plugins/storage',
+    paths: config.paths,
     isEventExpired: isEventExpired
   },
   {
-    packagePath: './plugins/storage',
-    paths: config.paths,
+    packagePath: './plugins/ctrl',
     isEventExpired: isEventExpired
   },
   {
     packagePath: './plugins/server',
     port: config.port,
     path: path.join(__dirname, 'public'),
-    matomo: config.matomo,
     isEventExpired: isEventExpired
   },
   {
