@@ -55,13 +55,13 @@ var plugins = [
     isEventExpired: isEventExpired
   },
   {
-    packagePath: './plugins/server',
-    port: config.port,
-    path: path.join(__dirname, 'public'),
+    packagePath: './plugins/ctrl',
     isEventExpired: isEventExpired
   },
   {
-    packagePath: './plugins/ctrl',
+    packagePath: './plugins/server',
+    port: config.port,
+    path: path.join(__dirname, 'public'),
     isEventExpired: isEventExpired
   },
   {

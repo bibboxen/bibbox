@@ -74,6 +74,8 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
      * Restart the idle service or start it if it's not running.
      */
     $scope.baseResetIdleWatch = function baseResetIdleWatch(secondsAdded) {
+      $scope.countdown = null;
+
       secondsAdded = secondsAdded || 0;
 
       Idle.setIdle(config.timeout.idleTimeout + secondsAdded);
