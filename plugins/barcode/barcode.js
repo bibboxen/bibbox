@@ -240,7 +240,7 @@ module.exports = function (options, imports, register) {
    * @NOTE: Its call err an not error, because nodeJS catches "error" events.
    */
   barcode.on('err', function (err) {
-    bus.emit('logger.err', { 'type': 'BarCode', 'message': err });
+    bus.emit('logger.err', { 'type': 'BarCode', 'message': err.toString() });
     bus.emit('barcode.err', {
       timestamp: new Date().getTime(),
       msg: err.message
