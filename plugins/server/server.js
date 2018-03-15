@@ -61,20 +61,40 @@ module.exports = function (options, imports, register) {
   }
 
   // Set handlebars as rendering engine.
-  let hbs = exphbs.create({});
+  var hbs = exphbs.create({});
   app.engine('handlebars', hbs.engine);
   app.set('view engine', 'handlebars');
   app.set('views', './public');
 
-  app.get('/', function (req, res) {
-    res.render('index', {
-      matomo: options.matomo
+  // When the config has been loaded, start the server.
+  bus.once('server.request_config', function (config) {
+    app.get('/', function (req, res) {
+      var data = {};
+
+      if (config.hasOwnProperty('matomo_site_id') && config.hasOwnProperty('matomo_host')) {
+        data.matomo = {
+          siteId: config.matomo_site_id,
+          url: config.matomo_host
+        }
+      }
+
+      res.render('index', data);
+    });
+
+    // Start the server.
+    server.listen(app.get('port'), function () {
+      bus.emit('logger.info', 'Server is listening on port ' + app.get('port'));
     });
   });
 
-  // Start the server.
-  server.listen(app.get('port'), function () {
-    bus.emit('logger.info', 'Server is listening on port ' + app.get('port'));
+  bus.on('server.request_config.error', function (err) {
+    console.error(err);
+  });
+
+  // Request the config.
+  bus.emit('ctrl.config.config', {
+    busEvent: 'server.request_config',
+    errorEvent: 'server.request_config.error'
   });
 
   // Register exposed function with architect.
