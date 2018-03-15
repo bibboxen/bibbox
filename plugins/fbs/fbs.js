@@ -403,7 +403,10 @@ module.exports = function (options, imports, register) {
       fbs: fbs
     });
   }, function (err) {
-    bus.emit('logger.err', err);
+    if (err instanceof Error) {
+      err = err.toString();
+    }
+    bus.emit('logger.err', { 'type': 'FBS', 'message': err });
     register(null, {
       fbs: null
     });

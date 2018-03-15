@@ -43,7 +43,6 @@ var isEventExpired = function isEventExpired(timestamp, debug, eventName) {
 var plugins = [
   {
     packagePath: './plugins/logger',
-    logs: config.logs,
     isEventExpired: isEventExpired
   },
   {

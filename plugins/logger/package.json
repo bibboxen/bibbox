@@ -5,15 +5,13 @@
   "main": "logger.js",
   "private": true,
   "dependencies": {
-    "winston": "^2.3.1",
-    "winston-daily-rotate-file": "^1.4.4"
+    "logstash-client": "^1.1.1",
+    "uniqid": "^4.1.1"
   },
   "plugin": {
     "consumes": [
       "bus"
     ],
-    "provides": [
-      "logger"
-    ]
+    "provides": []
   }
 }

@@ -38,7 +38,7 @@ module.exports = function (options, imports, register) {
   app.use(morgan('combined', {
     stream: {
       write: function (message) {
-        bus.emit('logger.info', message);
+        bus.emit('logger.info', { 'type': 'Server', 'message': message });
       }
     }
   }));
@@ -83,7 +83,7 @@ module.exports = function (options, imports, register) {
 
     // Start the server.
     server.listen(app.get('port'), function () {
-      bus.emit('logger.info', 'Server is listening on port ' + app.get('port'));
+      bus.emit('logger.info', { 'type': 'Server', 'message': 'Listening on port ' + app.get('port') });
     });
   });
 
@@ -99,8 +99,8 @@ module.exports = function (options, imports, register) {
 
   // Register exposed function with architect.
   register(null, {
-    onDestroy: function (callback) {
-      bus.emit('logger.info', 'Server stopped');
+    'onDestroy': function (callback) {
+      bus.emit('logger.info', { 'type': 'Server', 'message': 'Stopped' });
       server.close(callback);
     },
     app: app,
