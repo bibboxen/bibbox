@@ -60,20 +60,24 @@ module.exports = function (options, imports, register) {
 
       matomo = new MatomoTracker(matomoConfig.siteId, matomoConfig.host);
 
-      // Optional: Respond to tracking errors
+      // Catch tracking errors
       matomo.on('error', function(err) {
-        console.log(err);
         bus.emit('logger.err', { 'type': 'Matomo', 'message': err });
       });
 
+      // Track Online messages.
       bus.on('fbs.online', function () {
-        console.log('fbs.online');
         trackEvent('Connection', 'Online', 'FBS');
       });
 
+      // Track Offline messages.
       bus.on('fbs.offline', function () {
-        console.log('fbs.offline');
         trackEvent('Connection', 'Offline', 'FBS');
+      });
+
+      // Track FBS action results.
+      bus.on('fbs.action.result', function (action, success) {
+        trackEvent('FBS', action + ' - ' + (success ? 'Success' : "Failure"), 'Request');
       });
     }
     else {
