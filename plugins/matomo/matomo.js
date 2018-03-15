@@ -55,7 +55,7 @@ module.exports = function (options, imports, register) {
         host: 'http://' + config.matomo_host + '/piwik.php',
         userId: config.machine_name,
         location: config.location,
-        clientUrl: config.matomo_client_url
+        clientUrl: config.ip
       };
 
       matomo = new MatomoTracker(matomoConfig.siteId, matomoConfig.host);
