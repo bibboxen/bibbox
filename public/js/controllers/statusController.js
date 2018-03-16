@@ -218,8 +218,6 @@ angular.module('BibBox').controller('StatusController', [
         return true;
       }
 
-      console.log($scope.materials || $scope.materials.length !== 0);
-
       return $scope.hasOwnProperty('materials') && $scope.materials.length !== 0;
     };
 
