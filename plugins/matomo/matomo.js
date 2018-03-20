@@ -22,6 +22,7 @@ var matomoConfig = null;
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
+  var onlineStatus = null;
 
   /**
    * Send a track event to Matomo.
@@ -47,6 +48,17 @@ module.exports = function (options, imports, register) {
     });
   }
 
+  /**
+   * Track changes in online status.
+   * @param status
+   */
+  function trackOnlineStatus(status) {
+    if (onlineStatus !== status) {
+      trackEvent('Connection', status, 'FBS');
+      onlineStatus = status;
+    }
+  }
+
   // Config request success event.
   bus.once('matomo.request_config', function (config) {
     if (config.hasOwnProperty('matomo_site_id') && config.hasOwnProperty('matomo_host')) {
@@ -61,18 +73,18 @@ module.exports = function (options, imports, register) {
       matomo = new MatomoTracker(matomoConfig.siteId, matomoConfig.host);
 
       // Catch tracking errors
-      matomo.on('error', function(err) {
-        bus.emit('logger.err', { 'type': 'Matomo', 'message': err });
+      matomo.on('error', function (err) {
+        bus.emit('logger.err', {'type': 'Matomo', 'message': err});
       });
 
       // Track Online messages.
       bus.on('fbs.online', function () {
-        trackEvent('Connection', 'Online', 'FBS');
+        trackOnlineStatus('Online');
       });
 
       // Track Offline messages.
       bus.on('fbs.offline', function () {
-        trackEvent('Connection', 'Offline', 'FBS');
+        trackOnlineStatus('Offline');
       });
 
       // Track FBS action results.
@@ -81,13 +93,16 @@ module.exports = function (options, imports, register) {
       });
     }
     else {
-      bus.emit('logger.warn', { 'type': 'Matomo', 'message': 'Matomo config not set. Not initialized.' });
+      bus.emit('logger.warn', {
+        'type': 'Matomo',
+        'message': 'Matomo config not set. Not initialized.'
+      });
     }
   });
 
   // Config request error event.
   bus.on('matomo.request_config.error', function (err) {
-    bus.emit('logger.err', { 'type': 'Matomo', 'message': err });
+    bus.emit('logger.err', {'type': 'Matomo', 'message': err});
   });
 
   // Request the config.

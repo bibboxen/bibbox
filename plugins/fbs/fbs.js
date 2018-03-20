@@ -81,7 +81,6 @@ FBS.prototype.libraryStatus = function libraryStatus() {
     else {
       deferred.resolve(response);
     }
-    bus.emit('fbs.action.result', 'Library Status', !!err);
   });
 
   return deferred.promise;
