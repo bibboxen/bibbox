@@ -74,7 +74,9 @@ module.exports = function (options, imports, register) {
       if (config.hasOwnProperty('matomo_site_id') && config.hasOwnProperty('matomo_host')) {
         data.matomo = {
           siteId: config.matomo_site_id,
-          url: config.matomo_host
+          url: config.matomo_host,
+          location: config.location,
+          userId: config.ip
         }
       }
 
