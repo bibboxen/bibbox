@@ -76,7 +76,7 @@ module.exports = function (options, imports, register) {
           siteId: config.matomo_site_id,
           url: config.matomo_host,
           location: config.location,
-          userId: config.ip
+          userId: config.machine_name
         }
       }
 
