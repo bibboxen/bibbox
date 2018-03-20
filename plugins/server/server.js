@@ -64,7 +64,7 @@ module.exports = function (options, imports, register) {
   var hbs = exphbs.create({});
   app.engine('handlebars', hbs.engine);
   app.set('view engine', 'handlebars');
-  app.set('views', './public');
+  app.set('views', __dirname + '/../../public');
 
   // When the config has been loaded, start the server.
   bus.once('server.request_config', function (config) {
