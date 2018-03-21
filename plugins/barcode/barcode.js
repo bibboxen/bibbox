@@ -211,7 +211,7 @@ module.exports = function (options, imports, register) {
    * Listen to barcode start event.
    */
   bus.on('barcode.start', function () {
-    bus.emit('logger.debug', { 'type': 'BarCode', 'message': 'Started' });
+    bus.emit('logger.debug', { 'type': 'barcode', 'message': 'Started' });
     barcode.start();
   });
 
@@ -219,7 +219,7 @@ module.exports = function (options, imports, register) {
    * Listen to barcode stop event.
    */
   bus.on('barcode.stop', function () {
-    bus.emit('logger.debug', { 'type': 'BarCode', 'message': 'Stopped' });
+    bus.emit('logger.debug', { 'type': 'barcode', 'message': 'Stopped' });
     barcode.stop();
   });
 
@@ -227,7 +227,7 @@ module.exports = function (options, imports, register) {
    * Listen to barcode read and emit the code into the bus.
    */
   barcode.on('code', function (code) {
-    bus.emit('logger.debug', { 'type': 'BarCode', 'message': 'Scanned - ' + code });
+    bus.emit('logger.debug', { 'type': 'barcode', 'message': 'Scanned - ' + code });
     bus.emit('barcode.data', {
       timestamp: new Date().getTime(),
       code: code
@@ -240,7 +240,7 @@ module.exports = function (options, imports, register) {
    * @NOTE: Its call err an not error, because nodeJS catches "error" events.
    */
   barcode.on('err', function (err) {
-    bus.emit('logger.err', { 'type': 'BarCode', 'message': err });
+    bus.emit('logger.err', { 'type': 'barcode', 'message': err.toString() });
     bus.emit('barcode.err', {
       timestamp: new Date().getTime(),
       msg: err.message

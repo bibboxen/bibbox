@@ -52,12 +52,12 @@
             analytics-event="Back">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
     </button>
-    <button type="button" class="btn btn-success button align-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0"
+    <button type="button" class="btn btn-success button align-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress" data-ng-disabled="!enableReceiptBtn()"
             analytics-on analytics-category="Status" analytics-label="Button Click"
             analytics-event="Receipt - Modal">
       <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
     </button>
-    <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress" data-ng-disabled="!materials || materials.length === 0"
+    <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress" data-ng-disabled="!enableReceiptBtn()"
             analytics-on analytics-category="Status" analytics-label="Button Click"
             analytics-event="Receipt - Print">
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
