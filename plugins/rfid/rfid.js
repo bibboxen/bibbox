@@ -70,7 +70,7 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
       }));
     }
     catch (err) {
-      bus.emit('logger.err', err.message);
+      bus.emit('logger.err', { 'type': 'RFID', 'message': err.message });
       debug(err.message);
     }
   };
@@ -85,7 +85,7 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
       }));
     }
     catch (err) {
-      bus.emit('logger.err', err.message);
+      bus.emit('logger.err', { 'type': 'RFID', 'message': err.message });
       debug(err.message);
     }
   };

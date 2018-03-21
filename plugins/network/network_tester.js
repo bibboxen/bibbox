@@ -23,7 +23,7 @@ socket.connect(port, host);
 socket.on('connect', function () {
   socket.destroy();
   process.send({
-    error: false,
+    error: false
   });
 });
 

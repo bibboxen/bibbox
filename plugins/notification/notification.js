@@ -898,11 +898,11 @@ Notification.prototype.sendMail = function sendMail(to, content) {
   // Send mail with defined transporter.
   self.mailTransporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      self.bus.emit('logger.err', error);
+      self.bus.emit('logger.err', { 'type': 'notification', 'message': error });
       deferred.reject(error);
     }
     else {
-      self.bus.emit('logger.info', 'Mail sent to: ' + to);
+      self.bus.emit('logger.info', { 'type': 'notification', 'message': 'Mail sent to: ' + to });
       deferred.resolve();
     }
   });
@@ -1008,7 +1008,7 @@ module.exports = function (options, imports, register) {
       notification: notification
     });
   }, function (err) {
-    bus.emit('logger.err', err);
+    bus.emit('logger.err', { 'type': 'notification', 'message': err });
     register(null, {
       notification: null
     });
