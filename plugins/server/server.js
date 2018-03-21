@@ -71,10 +71,10 @@ module.exports = function (options, imports, register) {
     app.get('/', function (req, res) {
       var data = {};
 
-      if (config.hasOwnProperty('matomo_site_id') && config.hasOwnProperty('matomo_host')) {
+      if (config.hasOwnProperty('matomo')) {
         data.matomo = {
-          siteId: config.matomo_site_id,
-          url: config.matomo_host,
+          siteId: config.matomo.site_id,
+          url: config.matomo.host,
           location: config.location,
           userId: config.machine_name
         }

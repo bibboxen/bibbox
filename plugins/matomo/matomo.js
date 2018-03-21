@@ -37,7 +37,7 @@ module.exports = function (options, imports, register) {
     }
 
     matomo.track({
-      url: matomoConfig.clientUrl,
+      url: matomoConfig.clientAddress,
       e_c: category,
       e_a: action,
       e_n: name,
@@ -61,16 +61,16 @@ module.exports = function (options, imports, register) {
 
   // Config request success event.
   bus.once('matomo.request_config', function (config) {
-    if (config.hasOwnProperty('matomo_site_id') && config.hasOwnProperty('matomo_host')) {
+    if (config.hasOwnProperty('matomo')) {
       matomoConfig = {
-        siteId: config.matomo_site_id,
-        host: 'http://' + config.matomo_host + '/piwik.php',
+        siteId: config.matomo.site_id,
+        endpoint: config.matomo.endpoint,
         userId: config.machine_name,
         location: config.location,
-        clientUrl: config.ip
+        clientAddress: config.address
       };
 
-      matomo = new MatomoTracker(matomoConfig.siteId, matomoConfig.host);
+      matomo = new MatomoTracker(matomoConfig.siteId, matomoConfig.endpoint);
 
       // Catch tracking errors
       matomo.on('error', function (err) {
