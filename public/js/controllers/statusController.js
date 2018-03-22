@@ -214,7 +214,6 @@ angular.module('BibBox').controller('StatusController', [
      */
     $scope.enableReceiptBtn = function showReceiptBtn() {
       if ($scope.currentPatron !== null && parseInt($scope.currentPatron.feeAmount) > 0) {
-        console.log('fee');
         return true;
       }
 

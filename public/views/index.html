@@ -19,6 +19,10 @@
     </a>
   </div>
 
+  <div data-ng-if="!online" class="index-offline-message">
+    {{ 'index.offline_message' | translate }}
+  </div>
+
   <div class="container container-bottom">
     <button type="button" data-ng-repeat="lang in languages"
             class="btn btn-default button-small" aria-label="Left Align"
