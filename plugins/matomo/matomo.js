@@ -110,4 +110,6 @@ module.exports = function (options, imports, register) {
     busEvent: 'matomo.request_config',
     errorEvent: 'matomo.request_config.error'
   });
+
+  register(null, {});
 };

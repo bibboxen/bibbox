@@ -122,6 +122,9 @@ architect.createApp(appConfig, function (err, app) {
   if (err) {
     console.error(err.stack);
   }
+  else {
+    console.log('Architect plugins successfully bootstrapped.');
+  }
 });
 
 process.on('uncaughtException', function (error) {
