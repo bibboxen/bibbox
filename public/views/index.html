@@ -12,7 +12,7 @@
        class="btn btn-default button" aria-label="Left Align"
        data-ng-href="{{ feature.url }}"
        data-ng-if="!feature.require_online || online"
-       analytics-on analytics-category="Index" analytics-event="Link"
+       analytics-on analytics-category="Index" analytics-label="Link"
        analytics-event="Feature - {{feature.text}}">
       <span class="glyphicon {{ feature.icon }}" aria-hidden="true"></span>
       {{ feature.text | translate }}
