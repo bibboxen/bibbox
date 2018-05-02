@@ -338,9 +338,6 @@ module.exports = function (options, imports, register) {
     offlineTimeout: 30000
   };
 
-  // Service for tests.
-  var fbsService = {};
-
   /**
    * Online checker.
    *
@@ -710,15 +707,16 @@ module.exports = function (options, imports, register) {
 
   // Create FBS object to use in tests.
   FBS.create(bus).then(function (fbs) {
-    fbsService = fbs;
+    register(null, {
+      fbs: fbs
+    });
   }, function (err) {
     if (err instanceof Error) {
       err = err.toString();
     }
-    bus.emit('logger.err', { 'type': 'FBS', 'message': err });
-  });
-
-  register(null, {
-    fbs: fbsService
+    bus.emit('logger.err', {'type': 'FBS', 'message': err});
+    register(null, {
+      fbs: null
+    });
   });
 };
