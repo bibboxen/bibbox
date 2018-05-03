@@ -9,6 +9,7 @@
 
 var path = require('path');
 var architect = require('architect');
+var debug = require('debug')('bibbox:app');
 
 // Load config file.
 var config = require(__dirname + '/config.json');
@@ -123,12 +124,12 @@ architect.createApp(appConfig, function (err, app) {
     console.error(err.stack);
   }
   else {
-    console.log('Architect plugins successfully bootstrapped.');
+    debug('Architect plugins successfully bootstrapped.');
   }
 });
 
 process.on('uncaughtException', function (error) {
-  console.log(error.stack);
+  console.error(error.stack);
 });
 
 // Ensure proper process exit when killed in term.
