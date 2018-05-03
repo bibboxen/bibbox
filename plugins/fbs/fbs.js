@@ -71,6 +71,7 @@ FBS.create = function create(bus) {
  */
 FBS.prototype.libraryStatus = function libraryStatus() {
   var deferred = Q.defer();
+  var bus = this.bus;
 
   var req = new Request(this.bus, this.config);
   req.libraryStatus(function (err, response) {
@@ -98,6 +99,7 @@ FBS.prototype.libraryStatus = function libraryStatus() {
  */
 FBS.prototype.login = function login(username, password) {
   var deferred = Q.defer();
+  var bus = this.bus;
 
   var req = new Request(this.bus, this.config);
   req.patronStatus(username, password, function (err, res) {
@@ -122,6 +124,7 @@ FBS.prototype.login = function login(username, password) {
         deferred.reject(new Error('login.invalid_login_error'));
       }
     }
+    bus.emit('fbs.action.result', 'Login', !!err);
   });
 
   return deferred.promise;
@@ -140,6 +143,7 @@ FBS.prototype.login = function login(username, password) {
  */
 FBS.prototype.patronInformation = function patronInformation(username, password) {
   var deferred = Q.defer();
+  var bus = this.bus;
 
   var req = new Request(this.bus, this.config);
   req.patronInformation(username, password, function (err, res) {
@@ -149,6 +153,7 @@ FBS.prototype.patronInformation = function patronInformation(username, password)
     else {
       deferred.resolve(res);
     }
+    bus.emit('fbs.action.result', 'Patron Information', !!err);
   });
 
   return deferred.promise;
@@ -175,6 +180,7 @@ FBS.prototype.patronInformation = function patronInformation(username, password)
  */
 FBS.prototype.checkout = function checkout(username, password, itemIdentifier, noBlockDueDate, noBlock, transactionDate) {
   var deferred = Q.defer();
+  var bus = this.bus;
 
   var req = new Request(this.bus, this.config);
   req.checkout(username, password, itemIdentifier, noBlockDueDate, noBlock, transactionDate, function (err, res) {
@@ -184,6 +190,7 @@ FBS.prototype.checkout = function checkout(username, password, itemIdentifier, n
     else {
       deferred.resolve(res);
     }
+    bus.emit('fbs.action.result', 'Checkout', !!err);
   });
 
   return deferred.promise;
@@ -204,6 +211,7 @@ FBS.prototype.checkout = function checkout(username, password, itemIdentifier, n
  */
 FBS.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate, noBlock) {
   var deferred = Q.defer();
+  var bus = this.bus;
 
   var req = new Request(this.bus, this.config);
   req.checkIn(itemIdentifier, checkedInDate, noBlock, function (err, res) {
@@ -213,6 +221,7 @@ FBS.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate, noBlock)
     else {
       deferred.resolve(res);
     }
+    bus.emit('fbs.action.result', 'Checkin', !!err);
   });
 
   return deferred.promise;
@@ -233,6 +242,7 @@ FBS.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate, noBlock)
  */
 FBS.prototype.renew = function renew(username, password, itemIdentifier) {
   var deferred = Q.defer();
+  var bus = this.bus;
 
   var req = new Request(this.bus, this.config);
   req.renew(username, password, itemIdentifier, function (err, res) {
@@ -242,6 +252,7 @@ FBS.prototype.renew = function renew(username, password, itemIdentifier) {
     else {
       deferred.resolve(res);
     }
+    bus.emit('fbs.action.result', 'Renew', !!err);
   });
 
   return deferred.promise;
@@ -260,6 +271,7 @@ FBS.prototype.renew = function renew(username, password, itemIdentifier) {
  */
 FBS.prototype.renewAll = function renewAll(username, password) {
   var deferred = Q.defer();
+  var bus = this.bus;
 
   var req = new Request(this.bus, this.config);
   req.renewAll(username, password, function (err, res) {
@@ -269,6 +281,7 @@ FBS.prototype.renewAll = function renewAll(username, password) {
     else {
       deferred.resolve(res);
     }
+    bus.emit('fbs.action.result', 'Renew All', !!err);
   });
 
   return deferred.promise;
@@ -287,6 +300,7 @@ FBS.prototype.renewAll = function renewAll(username, password) {
  */
 FBS.prototype.block = function block(username, reason) {
   var deferred = Q.defer();
+  var bus = this.bus;
 
   var req = new Request(this.bus, this.config);
   req.blockPatron(username, reason, function (err, res) {
@@ -296,6 +310,7 @@ FBS.prototype.block = function block(username, reason) {
     else {
       deferred.resolve(res);
     }
+    bus.emit('fbs.action.result', 'Block', !!err);
   });
 
   return deferred.promise;
@@ -396,21 +411,6 @@ module.exports = function (options, imports, register) {
 
   // Start the online checker.
   checkOnlineState();
-
-    // Create FBS object to use in tests.
-  FBS.create(bus).then(function (fbs) {
-    register(null, {
-      fbs: fbs
-    });
-  }, function (err) {
-    if (err instanceof Error) {
-      err = err.toString();
-    }
-    bus.emit('logger.err', { 'type': 'FBS', 'message': err });
-    register(null, {
-      fbs: null
-    });
-  });
 
   /**
    * Listen to login requests.
@@ -703,5 +703,20 @@ module.exports = function (options, imports, register) {
         bus.emit(data.errorEvent, err);
       }
     );
+  });
+
+  // Create FBS object to use in tests.
+  FBS.create(bus).then(function (fbs) {
+    register(null, {
+      fbs: fbs
+    });
+  }, function (err) {
+    if (err instanceof Error) {
+      err = err.toString();
+    }
+    bus.emit('logger.err', {'type': 'FBS', 'message': err});
+    register(null, {
+      fbs: null
+    });
   });
 };

@@ -24,9 +24,11 @@
         <td class="vert-align">{{ material.newDate | date }}</td>
         <td class="vert-align"><spinner data-ng-if="material.loading"></spinner><div data-ng-if="!material.loading">{{ material.information | translate }}</div></td>
         <td class="vert-align td-right btn-group-xs">
-          <a type="button" class="btn btn-info" aria-label="Left Align" data-ng-click="renew(material)">
+          <button type="button" class="btn btn-info" aria-label="Left Align" data-ng-click="renew(material)"
+                  analytics-on analytics-category="Status" analytics-event="Renew"
+                  analytics-label="Button Click">
             <span class="glyphicon glyphicon-refresh"></span> {{ 'status.button.renew' | translate }}
-          </a>
+          </button>
         </td>
       </tr>
     </table>
@@ -45,20 +47,30 @@
   </ul>
 
   <div class="buttons-bottom">
-    <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()">
+    <button type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="baseLogoutRedirect()"
+            analytics-on analytics-category="Status" analytics-label="Button Click"
+            analytics-event="Back">
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
     </button>
-    <button type="button" class="btn btn-success button align-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress" data-ng-disabled="!enableReceiptBtn()">
+    <button type="button" class="btn btn-success button align-left" data-ng-click="showReceiptModal()" data-ng-if="currentPatron && currentPatron.emailAddress" data-ng-disabled="!enableReceiptBtn()"
+            analytics-on analytics-category="Status" analytics-label="Button Click"
+            analytics-event="Receipt - Modal">
       <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
     </button>
-    <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress" data-ng-disabled="!enableReceiptBtn()">
+    <button type="button" class="btn btn-success button align-left" data-ng-click="receipt('printer')" data-ng-if="currentPatron && !currentPatron.emailAddress" data-ng-disabled="!enableReceiptBtn()"
+            analytics-on analytics-category="Status" analytics-label="Button Click"
+            analytics-event="Receipt - Print">
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{ 'status.button.receipt' | translate }}
     </button>
-    <button type="button" class="btn btn-warning button align-left" data-ng-click="showFinesModal()" data-ng-if="displayFines && currentPatron && currentPatron.feeAmount > 0">
+    <button type="button" class="btn btn-warning button align-left" data-ng-click="showFinesModal()" data-ng-if="displayFines && currentPatron && currentPatron.feeAmount > 0"
+            analytics-on analytics-category="Status" analytics-label="Button Click"
+            analytics-event="Fines Modal">
       <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{ 'status.button.fines' | translate }}
     </button>
 
-    <button type="button" class="btn btn-info button align-right" aria-label="Left Align" data-ng-click="renewAll()" data-ng-if="currentPatron && materials && materials.length > 0">
+    <button type="button" class="btn btn-info button align-right" aria-label="Left Align" data-ng-click="renewAll()" data-ng-if="currentPatron && materials && materials.length > 0"
+            analytics-on analytics-category="Status" analytics-label="Button Click"
+            analytics-event="Renew All">
       <span class="glyphicon glyphicon-refresh"></span> {{ 'status.button.renew_all' | translate }}
     </button>
   </div>

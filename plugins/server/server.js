@@ -21,6 +21,7 @@ module.exports = function (options, imports, register) {
   // Load modules required.
   var express = require('express');
   var http = require('http');
+  var exphbs  = require('express-handlebars');
 
   // Start the express app.
   var app = express();
@@ -59,9 +60,43 @@ module.exports = function (options, imports, register) {
     app.use(express.static(options.path));
   }
 
-  // Start the server.
-  server.listen(app.get('port'), function () {
-    bus.emit('logger.info', { 'type': 'Server', 'message': 'Listening on port ' + app.get('port') });
+  // Set handlebars as rendering engine.
+  var hbs = exphbs.create({});
+  app.engine('handlebars', hbs.engine);
+  app.set('view engine', 'handlebars');
+  app.set('views', __dirname + '/../../public');
+
+  // When the config has been loaded, start the server.
+  bus.once('server.request_config', function (config) {
+    app.get('/', function (req, res) {
+      var data = {};
+
+      if (config.hasOwnProperty('matomo')) {
+        data.matomo = {
+          siteId: config.matomo.site_id,
+          url: config.matomo.host,
+          location: config.location,
+          userId: config.machine_name
+        }
+      }
+
+      res.render('index', data);
+    });
+
+    // Start the server.
+    server.listen(app.get('port'), function () {
+      bus.emit('logger.info', { 'type': 'Server', 'message': 'Listening on port ' + app.get('port') });
+    });
+  });
+
+  bus.on('server.request_config.error', function (err) {
+    console.error(err);
+  });
+
+  // Request the config.
+  bus.emit('ctrl.config.config', {
+    busEvent: 'server.request_config',
+    errorEvent: 'server.request_config.error'
   });
 
   // Register exposed function with architect.
