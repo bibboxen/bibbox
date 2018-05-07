@@ -235,7 +235,7 @@ module.exports = function (options, imports, register) {
     },
     function (err) {
       bus.emit(data.errorEvent, err);
-      bus.emit('logger.err', { 'type': 'storage', 'message': err.message });
+      console.error('Storage', err.message);
     });
   });
 
@@ -248,7 +248,7 @@ module.exports = function (options, imports, register) {
     },
     function (err) {
       bus.emit(data.errorEvent, err);
-      bus.emit('logger.err', { 'type': 'storage', 'message': err.message });
+      console.error('Storage', err.message);
     });
   });
 
@@ -265,7 +265,7 @@ module.exports = function (options, imports, register) {
         function (err) {
           storage.unlock(file);
           bus.emit(data.errorEvent, err);
-          bus.emit('logger.err', { 'type': 'storage', 'message': err.message });
+          console.error('Storage', err.message);
         });
       },
       function (err) {
@@ -276,12 +276,12 @@ module.exports = function (options, imports, register) {
           },
           function (err) {
             bus.emit(data.errorEvent, err);
-            bus.emit('logger.err', { 'type': 'storage', 'message': err.message });
+            console.error('Storage', err.message);
           });
         }
         else {
           bus.emit(data.errorEvent, err);
-          bus.emit('logger.err', { 'type': 'storage', 'message': err.message });
+          console.error('Storage', err.message);
         }
       });
     }
@@ -291,7 +291,7 @@ module.exports = function (options, imports, register) {
       },
       function (err) {
         bus.emit(data.errorEvent, err);
-        bus.emit('logger.err', { 'type': 'storage', 'message': err.message });
+        console.error('Storage', err.message);
       });
     }
   });
@@ -321,7 +321,7 @@ module.exports = function (options, imports, register) {
             function (err) {
               storage.unlock(file);
               bus.emit(data.errorEvent, err);
-              bus.emit('logger.err', { 'type': 'storage', 'message': err.message });
+              console.error('Storage', err.message);
             });
           }
           else {
@@ -332,7 +332,7 @@ module.exports = function (options, imports, register) {
             },
             function (err) {
               bus.emit(data.errorEvent, err);
-              bus.emit('logger.err', { 'type': 'storage', 'message': err.message });
+              console.error('Storage', err.message);
             });
           }
         }
@@ -344,12 +344,12 @@ module.exports = function (options, imports, register) {
       function (err) {
         storage.unlock(file);
         bus.emit(data.errorEvent, err);
-        bus.emit('logger.err', { 'type': 'storage', 'message': err.message });
+        console.error('Storage', err.message);
       });
     },
     function (err) {
       bus.emit(data.errorEvent, err);
-      bus.emit('logger.err', { 'type': 'storage', 'message': err.message });
+      console.error('Storage', err.message);
     });
   });
 
@@ -362,7 +362,7 @@ module.exports = function (options, imports, register) {
     },
     function (err) {
       bus.emit(data.errorEvent, err);
-      bus.emit('logger.err', { 'type': 'storage', 'message': err.message });
+      console.error('Storage', err.message);
     });
   });
 
