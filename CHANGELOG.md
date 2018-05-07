@@ -1,7 +1,16 @@
 # Bibbox Changelog
 
+### v1.5.0
+
+* Added support "config.json" under files (location and name)
+* Fixed countdown bug that caused counter to remain after it was reset.
+* New logger sending message to logstash
+* Matomo tracking added.
+* Added support for print receipt when not having no new loans.
+
 ### v1.4.4
 
+* Added "alt" text and style to mail notifications.
 * Calculate total fine amount based on fine items.
 * Added extra "delayed" network connection test on failure.
 * Changed header configuration for notifications - to use text only.

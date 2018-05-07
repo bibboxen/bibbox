@@ -1,0 +1,16 @@
+{
+  "name": "Matomo",
+  "description": "Plugin to deliver events to Matomo",
+  "version": "0.0.1",
+  "main": "matomo.js",
+  "private": true,
+  "dependencies": {
+    "matomo-tracker": "^2.1.0"
+  },
+  "plugin": {
+    "consumes": [
+      "bus"
+    ],
+    "provides": []
+  }
+}

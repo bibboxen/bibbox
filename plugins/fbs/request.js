@@ -105,7 +105,9 @@ Request.prototype.send = function send(message, firstVar, callback) {
     if (online) {
       // Build XML message.
       var xml = self.buildXML(message);
-      self.bus.emit('logger.fbs', 'FBS send: ' + xml);
+
+      // Log message before sending it.
+      self.bus.emit('logger.info', { 'type': 'FBS', 'message': message, 'xml': xml });
 
       var options = {
         method: 'POST',
@@ -119,24 +121,19 @@ Request.prototype.send = function send(message, firstVar, callback) {
 
       var request = require('request');
       request.post(options, function (error, response, body) {
-        // Log message from FBS.
-        if (body) {
-          self.bus.emit('logger.fbs', 'FBS response: ' + body);
-        }
-
         var res = null;
         if (error || response.statusCode !== 200) {
           if (!error) {
             res = new Response(body, firstVar);
             if (res.hasError()) {
-              error = new Error(res.getError());
+              err = new Error(res.getError());
             }
             else {
-              error = new Error('Unknown error', response.statusCode());
+              err = new Error('Unknown error', response.statusCode());
             }
           }
           // Log error message from FBS.
-          self.bus.emit('logger.fbs', 'FBS error: ' + error);
+          self.bus.emit('logger.err', { 'type': 'FBS', 'message': err });
           callback(error, null);
         }
         else {
@@ -147,10 +144,15 @@ Request.prototype.send = function send(message, firstVar, callback) {
           res = new Response(body, firstVar);
           if (res.hasError()) {
             err = new Error(res.getError());
-            self.bus.emit('logger.fbs', 'FBS error: ' + err);
+            self.bus.emit('logger.err', { 'type': 'FBS', 'message': err });
           }
 
+          // Process the data.
           callback(err, res);
+
+          // Log message from FBS.
+          var sip2 = body.match(/<response>(.*)<\/response>/);
+          self.bus.emit('logger.info', { 'type': 'FBS', 'message': sip2[1], 'xml': body});
         }
       });
     }

@@ -87,7 +87,7 @@ module.exports = function (options, imports, register) {
         bus.emit(data.busEvent, true);
       },
       function (err) {
-        bus.emit('logger.err', err);
+        bus.emit('logger.err', { 'type': 'network', 'message': err });
         // Retry to catch network flapping before giving up.
         setTimeout(function () {
           network.isOnline(data.url).then(
@@ -95,7 +95,7 @@ module.exports = function (options, imports, register) {
               bus.emit(data.busEvent, true);
             },
             function (err) {
-              bus.emit('logger.err', err);
+              bus.emit('logger.err', { 'type': 'network', 'message': err });
               bus.emit(data.busEvent, false);
             }
           );

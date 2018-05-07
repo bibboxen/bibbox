@@ -6,15 +6,6 @@
     "pid": 8710
   },
   "eventTimeout": 500,
-  "logs": {
-    "path": "logs",
-    "info": "info.log",
-    "error": "error.log",
-    "debug": "debug.log",
-    "fbs": "fbs.log",
-    "offline": "offline.log",
-    "frontend": "frontend.log"
-  },
   "proxy": {
     "whitelistedBusEvents": [
       "^rfid.tags.detected$",

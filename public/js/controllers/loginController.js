@@ -1,8 +1,8 @@
 /**
  * Status page controller.
  */
-angular.module('BibBox').controller('LoginController', ['$scope', '$controller', '$http', '$window', '$location', '$routeParams', 'userService', 'barcodeService', 'config', 'loggerService',
-  function ($scope, $controller, $http, $window, $location, $routeParams, userService, barcodeService, config, loggerService) {
+angular.module('BibBox').controller('LoginController', ['$scope', '$controller', '$http', '$window', '$location', '$routeParams', 'userService', 'barcodeService', 'config', 'loggerService', '$analytics',
+  function ($scope, $controller, $http, $window, $location, $routeParams, userService, barcodeService, config, loggerService, $analytics) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -149,6 +149,7 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
       if ($scope.display === 'start') {
         $scope.user.username = data;
         $scope.usernameEntered();
+        $analytics.eventTrack('Barcode Scanned', {  category: 'Login', label: 'Barcode Scanned' });
       }
     };
 

@@ -9,6 +9,7 @@
 
 var path = require('path');
 var architect = require('architect');
+var debug = require('debug')('bibbox:app');
 
 // Load config file.
 var config = require(__dirname + '/config.json');
@@ -43,7 +44,6 @@ var isEventExpired = function isEventExpired(timestamp, debug, eventName) {
 var plugins = [
   {
     packagePath: './plugins/logger',
-    logs: config.logs,
     isEventExpired: isEventExpired
   },
   {
@@ -56,13 +56,13 @@ var plugins = [
     isEventExpired: isEventExpired
   },
   {
-    packagePath: './plugins/server',
-    port: config.port,
-    path: path.join(__dirname, 'public'),
+    packagePath: './plugins/ctrl',
     isEventExpired: isEventExpired
   },
   {
-    packagePath: './plugins/ctrl',
+    packagePath: './plugins/server',
+    port: config.port,
+    path: path.join(__dirname, 'public'),
     isEventExpired: isEventExpired
   },
   {
@@ -110,6 +110,10 @@ var plugins = [
     host: config.offline.host,
     port: config.offline.port,
     isEventExpired: isEventExpired
+  },
+  {
+    packagePath: './plugins/matomo',
+    isEventExpired: isEventExpired
   }
 ];
 
@@ -119,10 +123,13 @@ architect.createApp(appConfig, function (err, app) {
   if (err) {
     console.error(err.stack);
   }
+  else {
+    debug('Architect plugins successfully bootstrapped.');
+  }
 });
 
 process.on('uncaughtException', function (error) {
-  console.log(error.stack);
+  console.error(error.stack);
 });
 
 // Ensure proper process exit when killed in term.

@@ -208,6 +208,19 @@ angular.module('BibBox').controller('StatusController', [
     };
 
     /**
+     * Detect if the receipt button should be enabled.
+     *
+     * @return {boolean}
+     */
+    $scope.enableReceiptBtn = function showReceiptBtn() {
+      if ($scope.currentPatron !== null && parseInt($scope.currentPatron.feeAmount) > 0) {
+        return true;
+      }
+
+      return $scope.hasOwnProperty('materials') && $scope.materials.length !== 0;
+    };
+
+    /**
      * Print receipt.
      *
      * @param type

@@ -6,207 +6,114 @@
 'use strict';
 
 // Node core modules.
-var path = require('path');
 var util = require('util');
 
-// NPM modules.
-var winston = require('winston');
-require('winston-daily-rotate-file');
+var Q = require('q');
+var Logstash = require('logstash-client');
+var uniqid = require('uniqid');
 
-var Logger = function Logger(logs) {
-  var levels = winston.config.syslog.levels;
-  levels.fbs = 8;
-  levels.offline = 9;
-  levels.frontend = 10;
-  winston.setLevels(levels);
+// Static logstash client across loggers.
+var logstashClient = null;
 
-  if (logs.hasOwnProperty('info')) {
-    this.infoLog = new (winston.Logger)({
-      levels: levels,
-      transports: [
-        new winston.transports.DailyRotateFile({
-          filename: logs.info,
-          dirname: path.join(__dirname, '../../' + logs.path),
-          level: 'info',
-          colorize: false,
-          timestamp: true,
-          json: false,
-          keep: 30,
-          compress: false
-        })
-      ],
-      exitOnError: false
-    });
-  }
+var Logger = function Logger(config) {
+  this.config = config;
 
-  if (logs.hasOwnProperty('debug')) {
-    this.debugLog = new (winston.Logger)({
-      levels: levels,
-      transports: [
-        new winston.transports.DailyRotateFile({
-          filename: logs.debug,
-          dirname: path.join(__dirname, '../../' + logs.path),
-          level: 'debug',
-          colorize: false,
-          timestamp: true,
-          json: false,
-          keep: 30,
-          compress: false
-        })
-      ],
-      exitOnError: false
-    });
-  }
-
-  if (logs.hasOwnProperty('error')) {
-    this.errorLog = new (winston.Logger)({
-      levels: levels,
-      transports: [
-        new winston.transports.DailyRotateFile({
-          filename: logs.error,
-          dirname: path.join(__dirname, '../../' + logs.path),
-          level: 'error',
-          colorize: false,
-          timestamp: true,
-          json: false,
-          keep: 30,
-          compress: false
-        })
-      ],
-      exitOnError: false
-    });
-  }
-
-  if (logs.hasOwnProperty('fbs')) {
-    this.fbsLog = new (winston.Logger)({
-      levels: levels,
-      transports: [
-        new winston.transports.DailyRotateFile({
-          name: 'fbs-file',
-          filename: logs.fbs,
-          dirname: path.join(__dirname, '../../' + logs.path),
-          level: 'fbs',
-          colorize: false,
-          datePattern: '.dd-MM-yy',
-          timestamp: true,
-          json: false,
-          maxFiles: 30,
-          localTime: true,
-          zippedArchive: false
-        })
-      ],
-      exitOnError: true
-    });
-  }
-
-  if (logs.hasOwnProperty('offline')) {
-    this.offlineLog = new (winston.Logger)({
-      levels: levels,
-      transports: [
-        new winston.transports.DailyRotateFile({
-          filename: logs.offline,
-          dirname: path.join(__dirname, '../../' + logs.path),
-          level: 'offline',
-          colorize: false,
-          timestamp: true,
-          json: false,
-          keep: 30,
-          compress: false
-        })
-      ],
-      exitOnError: false
-    });
-  }
-
-  if (logs.hasOwnProperty('frontend')) {
-    this.frontendLog = new (winston.Logger)({
-      levels: levels,
-      transports: [
-        new winston.transports.DailyRotateFile({
-          filename: logs.frontend,
-          dirname: path.join(__dirname, '../../' + logs.path),
-          level: 'frontend',
-          colorize: false,
-          timestamp: true,
-          json: false,
-          keep: 30,
-          compress: false
-        })
-      ],
-      exitOnError: false
+  if (logstashClient === null) {
+    logstashClient = new Logstash({
+      type: 'tcp',
+      host: config.logstash.host,
+      port: config.logstash.port
     });
   }
 };
 
 /**
- * Log error message.
+ * Create new FBS object.
  *
- * @param {string} message
- *   The message to send to the logger.
+ * Static factory function to create FBS object with loaded config. This pattern
+ * used to fix race conditions and to ensure that we have an constructor
+ * without side-effects.
+ *
+ * @param bus
+ *   The event bus
+ *
+ * @returns {*|promise}
+ *   Promise that the FBS object is created with configuration.
  */
-Logger.prototype.error = function error(message) {
-  if (this.errorLog !== undefined) {
-    this.errorLog.error(message);
-  }
+Logger.create = function create(bus) {
+  var deferred = Q.defer();
+  var busEvent = 'logger.config.loaded' + uniqid();
+  var errorEvent = 'logger.config.error' + uniqid();
+
+  bus.once(busEvent, function (config) {
+    deferred.resolve(new Logger(config));
+  });
+
+  bus.once(errorEvent, function (err) {
+    deferred.reject(err);
+  });
+
+  bus.emit('ctrl.config.config', {
+    busEvent: busEvent,
+    errorEvent: errorEvent
+  });
+
+  return deferred.promise;
 };
 
 /**
- * Log info message.
+ * Send message to log-stash.
  *
+ * @param {string} level
+ *   Log level for the message.
  * @param {string} message
  *   The message to send to the logger.
  */
-Logger.prototype.info = function info(message) {
-  if (this.infoLog !== undefined) {
-    this.infoLog.info(message);
-  }
-};
+Logger.prototype.send = function send(level, message) {
+  var self = this.config;
+  if (logstashClient !== null) {
+    // This is for to support legacy log messages.
+    var type = 'unknown';
+    if (message.hasOwnProperty('type')) {
+      type = message.type.toLowerCase();
+    }
+    var msg = message;
+    if (message.hasOwnProperty('message')) {
+      msg = message.message;
+    }
 
-/**
- * Log debug message.
- *
- * @param {string} message
- *   The message to send to the logger.
- */
-Logger.prototype.debug = function debug(message) {
-  if (this.debugLog !== undefined) {
-    this.debugLog.debug(message);
-  }
-};
+    // Create best possible logging message for searching in FBS messages.
+    if (type === 'fbs' && level === 'info') {
+      var parts = {
+        'id': msg.slice(0, 2),
+        'raw': msg,
+        'xml': message.hasOwnProperty('xml') ? message.xml : 'No XML data'
+      };
 
-/**
- * Log fbs message.
- *
- * @param {string} message
- *   The message to send to the logger.
- */
-Logger.prototype.fbs = function fbs(message) {
-  if (this.fbsLog !== undefined) {
-    this.fbsLog.fbs(message);
-  }
-};
+      // Find the first field in the messages and split the message into SIP2 parts.
+      var firsts = [ 'AO', 'AP', 'CF', 'CN', 'BW', 'BV'];
+      for (var i in firsts) {
+        var index = msg.indexOf(firsts[i]);
+        if (index !== -1) {
+          msg.slice(index).split('|').forEach(function (val) {
+            if (val) {
+              parts[val.slice(0, 2)] = val.slice(2);
+            }
+          });
+          break;
+        }
+      }
+      msg = parts;
+    }
 
-/**
- * Log off-line message.
- *
- * @param {string} message
- *   The message to send to the logger.
- */
-Logger.prototype.offline = function offline(message) {
-  if (this.offlineLog !== undefined) {
-    this.offlineLog.offline(message);
-  }
-};
-
-/**
- * Log front end message.
- *
- * @param {string} message
- *   The message to send to the logger.
- */
-Logger.prototype.frontend = function frontend(message) {
-  if (this.frontendLog !== undefined) {
-    this.frontendLog.frontend(message);
+    logstashClient.send({
+      '@timestamp': new Date(),
+      'message': msg,
+      'level': level,
+      'type': type,
+      'name': self.machine_name,
+      'location': self.location
+    });
   }
 };
 
@@ -221,72 +128,48 @@ Logger.prototype.frontend = function frontend(message) {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var logger = new Logger(options.logs);
-
-  // Add event listeners to logging events on the bus. For some reason they need
+   // Add event listeners to logging events on the bus. For some reason they need
   // to have a inner function to work!
   var bus = imports.bus;
   bus.on('logger.err', function (message) {
-    try {
-      logger.error(message);
-    }
-    catch (exception) {
-      console.error(exception.stack);
-    }
+    Logger.create(bus).then(function (logger) {
+        logger.send('error', message);
+      },
+      function (err) {
+        bus.emit(data.errorEvent, err);
+      }
+    );
+  });
+
+  bus.on('logger.warn', function (message) {
+    Logger.create(bus).then(function (logger) {
+        logger.send('warn', message);
+      },
+      function (err) {
+        bus.emit(data.errorEvent, err);
+      }
+    );
   });
 
   bus.on('logger.info', function (message) {
-    try {
-      logger.info(message);
-    }
-    catch (exception) {
-      console.error(exception.stack);
-    }
+    Logger.create(bus).then(function (logger) {
+        logger.send('info', message);
+      },
+      function (err) {
+        bus.emit(data.errorEvent, err);
+      }
+    );
   });
 
   bus.on('logger.debug', function (message) {
-    try {
-      logger.debug(message);
-    }
-    catch (exception) {
-      console.error(exception.stack);
-    }
-  });
-
-  bus.on('logger.fbs', function (message) {
-    try {
-      logger.fbs(message);
-    }
-    catch (exception) {
-      console.error(exception.stack);
-    }
-  });
-
-  bus.on('logger.offline', function (message) {
-    try {
-      logger.offline(message);
-    }
-    catch (exception) {
-      console.error(exception.stack);
-    }
-  });
-
-  bus.on('logger.frontend', function (message) {
-    try {
-      if (typeof message === 'object') {
-        logger.frontend('Error: ' + util.inspect(message, false, 10, false));
+    Logger.create(bus).then(function (logger) {
+        logger.send('debug', message);
+      },
+      function (err) {
+        bus.emit(data.errorEvent, err);
       }
-      else {
-        logger.frontend(message);
-      }
-    }
-    catch (exception) {
-      console.error(exception.stack);
-    }
+    );
   });
 
-  // Register the plugin with the system.
-  register(null, {
-    logger: logger
-  });
+  register(null, {});
 };

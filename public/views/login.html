@@ -4,15 +4,21 @@
 
 <div class="container">
   <div class="alert alert-danger" role="alert" data-ng-if="invalidLoginError">
-    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <span class="glyphicon glyphicon-exclamation-sign"
+          aria-hidden="true"></span>
     {{ invalidLoginErrorMessage | translate }}
   </div>
 
-  <div data-ng-include="'views/login-' + display + '.html'" class="login-container"></div>
+  <div data-ng-include="'views/login-' + display + '.html'"
+       class="login-container"></div>
 
   <div class="buttons-bottom">
-    <a type="button" class="btn btn-danger button align-left" aria-label="Left Align" data-ng-click="back()">
-      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> {{ 'common.back' | translate }}
-    </a>
+    <button type="button" class="btn btn-danger button align-left"
+            aria-label="Left Align" data-ng-click="back()"
+            analytics-on analytics-category="Login" analytics-event="Back"
+            analytics-label="Button Click">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+      {{ 'common.back' | translate }}
+    </button>
   </div>
 </div>

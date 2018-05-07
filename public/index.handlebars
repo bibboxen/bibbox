@@ -4,7 +4,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>BibBox</title>
+  <title>Bibbox</title>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="js/lib/jquery-1.11.1.min.js"></script>
@@ -46,10 +46,29 @@
   <script src="js/services/rfidService.js"></script>
   <script src="js/lib/md5.js"></script>
   <script src="js/lib/bootstrap.min.js"></script>
+  <script src="js/lib/angulartics.min.js"></script>
+  <script src="js/lib/angulartics-piwik.min.js"></script>
 
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/bootstrap-theme.min.css">
   <link rel="stylesheet" href="css/style.css">
+
+{{#if matomo}}
+  <script type="text/javascript">
+    var _paq = _paq || [];
+    _paq.push(['enableLinkTracking']);
+    (function() {
+      var u="//{{matomo.url}}/";
+      _paq.push(['setUserId', '{{matomo.userId}}']);
+      _paq.push(['setCustomVariable', '1', 'location', '{{matomo.location}}']);
+      _paq.push(['setTrackerUrl', u+'piwik.php']);
+      _paq.push(['setSiteId', '{{matomo.siteId}}']);
+      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+      g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+    })();
+  </script>
+{{/if}}
+
 </head>
 <body data-ng-app="BibBox">
   <div ng-view></div>
