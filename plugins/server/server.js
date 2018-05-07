@@ -82,15 +82,15 @@ module.exports = function (options, imports, register) {
 
       res.render('index', data);
     });
+  });
 
-    // Start the server.
-    server.listen(app.get('port'), function () {
-      bus.emit('logger.info', { 'type': 'Server', 'message': 'Listening on port ' + app.get('port') });
-    });
+  // Start the server.
+  server.listen(app.get('port'), function () {
+    bus.emit('logger.info', { 'type': 'Server', 'message': 'Listening on port ' + app.get('port') });
   });
 
   bus.on('server.request_config.error', function (err) {
-    console.error(err);
+    console.error('Server', err);
   });
 
   // Request the config.
