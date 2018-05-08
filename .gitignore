@@ -8,8 +8,7 @@ logs/*.*.*
 coverage
 files/**/*.json
 files/config/fbs.json
-!files/locales/ui/example.*
-!files/locales/notifications/example.*
+!files/**/example.*
 *.pem
 *.key
 *.crt
