@@ -1,5 +1,9 @@
 # Bibbox Changelog
 
+### v1.5.1
+
+* Fixed variable name in config push.
+
 ### v1.5.0
 
 * Added support "config.json" under files (location and name)
