@@ -278,7 +278,7 @@ module.exports = function (options, imports, register) {
           bus.emit('storage.save', {
             type: 'config',
             name: 'config',
-            obj: data.config.notification,
+            obj: data.config.config,
             busEvent: 'storage.config.saved' + uniqid()
           });
         }
