@@ -17,7 +17,7 @@
       <tbody>
         <tr data-ng-repeat="material in materials"
             data-ng-if="$index >= (pager.currentPage - 1) * pager.itemsPerPage && $index < pager.currentPage * pager.itemsPerPage">
-          <td class="vert-align">{{ material.bibliographicId }}</td>
+          <td class="vert-align">{{ material.id }}</td>
           <td class="vert-align">{{ material.author }}</td>
           <td class="vert-align">{{ material.title }}</td>
           <td class="vert-align">{{ material.pickupLocation }}</td>
