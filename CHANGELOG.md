@@ -1,5 +1,9 @@
 # Bibbox Changelog
 
+### In develop
+
+* Fixed material id for reservations.
+
 ### v1.5.1
 
 * Fixed variable name in config push.
