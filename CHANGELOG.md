@@ -3,6 +3,7 @@
 ### In develop
 
 * Fixed material id for reservations.
+* Added external numpad support.
 
 ### v1.5.1
 
