@@ -50,6 +50,10 @@
               else if (event.which >= 48 && event.which < 58) {
                 scope.field = scope.field + String.fromCharCode(event.which);
               }
+              // Handle keypad numbers 0-9.
+              else if (event.which >= 96 && event.which < 106) {
+                scope.field = scope.field + String.fromCharCode(event.which);
+              }
               // Ignore all other keys.
             });
           };
