@@ -38,21 +38,14 @@
           // Handler for keyboard presses.
           var keypressHandler = function keypressHandler(event) {
             scope.$apply(function () {
-              // Handle backspace.
-              if (event.which === 8) {
+              if (event.key === 'Backspace') {
                 scope.field = scope.field.slice(0, -1);
               }
-              // Handle enter.
-              else if (event.which === 13) {
+              else if (event.key === 'Enter') {
                 scope.enter();
               }
-              // Handle numbers 0-9.
-              else if (event.which >= 48 && event.which < 58) {
-                scope.field = scope.field + String.fromCharCode(event.which);
-              }
-              // Handle keypad numbers 0-9.
-              else if (event.which >= 96 && event.which < 106) {
-                scope.field = scope.field + String.fromCharCode(event.which);
+              else if (event.key >= 0 && event.key <= 9) {
+                scope.field = scope.field + event.key;
               }
               // Ignore all other keys.
             });
