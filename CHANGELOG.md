@@ -2,6 +2,8 @@
 
 ### In develop
 
+### v1.5.2
+
 * Fixed material id for reservations.
 * Added external numpad support.
 * Added command to clear printer queue.
