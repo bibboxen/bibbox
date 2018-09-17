@@ -153,6 +153,14 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       res.end();
       break;
 
+    case '/clearprinter':
+      spawn('cancel', ['-a', '-x']);
+      res.write(JSON.stringify({
+        status: 'Clear printer queue command sent.'
+      }));
+      res.end();
+      break;
+
     /**
      * Update based on pull from github.
      *

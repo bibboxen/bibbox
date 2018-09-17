@@ -4,6 +4,7 @@
 
 * Fixed material id for reservations.
 * Added external numpad support.
+* Added command to clear printer queue.
 
 ### v1.5.1
 
