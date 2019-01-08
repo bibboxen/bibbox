@@ -1,6 +1,10 @@
 # Bibbox Changelog
 
-### In develop
+### in development
+
+* Added new version of RFID jar where old tags are accepted, regardless of CRC value.
+
+### v1.5.2
 
 * Fixed material id for reservations.
 * Added external numpad support.
