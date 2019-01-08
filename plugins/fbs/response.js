@@ -341,7 +341,15 @@ Response.prototype.parseVariables = function parseVariables() {
 
   var entities = new Entities();
 
-  self.message.substr(self.message.indexOf(self.firstVariableName)).split('|').map(function (str) {
+  // Check that the message contains the first variable.
+  var index = self.message.indexOf(self.firstVariableName);
+  if (index !== -1) {
+    this.error = 'Unknown error - first variable (' + self.firstVariableName + ') not found';
+    return;
+  }
+
+  // Parse message variables.
+  self.message.substr(index).split('|').map(function (str) {
     if (str) {
       var key = str.substr(0, 2);
       var keyTrans = self.variablesResponseTranslation(key);
