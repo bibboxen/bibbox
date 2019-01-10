@@ -343,7 +343,7 @@ Response.prototype.parseVariables = function parseVariables() {
 
   // Check that the message contains the first variable.
   var index = self.message.indexOf(self.firstVariableName);
-  if (index !== -1) {
+  if (index === -1) {
     this.error = 'Unknown error - first variable (' + self.firstVariableName + ') not found';
     return;
   }
