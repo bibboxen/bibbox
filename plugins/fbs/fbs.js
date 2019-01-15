@@ -357,7 +357,7 @@ module.exports = function (options, imports, register) {
         fbs.libraryStatus().then(
           function (res) {
             // Listen to online check event send below.
-            if (res.onlineStatus) {
+            if (res.hasOwnProperty('onlineStatus') && res.onlineStatus) {
               if (onlineState.successfulOnlineChecks >= onlineState.threshold) {
                 // FBS is online and threshold has been reached, so state online.
                 setTimeout(checkOnlineState, onlineState.onlineTimeout);

@@ -1,6 +1,13 @@
 # Bibbox Changelog
 
-### In develop
+### in development
+
+### v1.5.3
+
+* Added new version of RFID jar where old tags are accepted, regardless of CRC value.
+* Better error handling in FBS when parsing SIP2 messages.
+
+### v1.5.2
 
 ### v1.5.2
 
