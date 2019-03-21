@@ -17,7 +17,7 @@
     "node-printer": "^1.0.2",
     "nodemailer": "^2.6.0",
     "q": "^1.4.1",
-    "twig": "^0.9.5",
+    "twig": "^1.13.2",
     "uniqid": "^4.1.0",
     "wkhtmltopdf": "^0.3.3"
   }
