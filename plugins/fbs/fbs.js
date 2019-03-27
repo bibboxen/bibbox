@@ -71,7 +71,6 @@ FBS.create = function create(bus) {
  */
 FBS.prototype.libraryStatus = function libraryStatus() {
   var deferred = Q.defer();
-  var bus = this.bus;
 
   var req = new Request(this.bus, this.config);
   req.libraryStatus(function (err, response) {

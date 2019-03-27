@@ -119,42 +119,48 @@ Request.prototype.send = function send(message, firstVar, callback) {
         body: xml
       };
 
-      var request = require('request');
-      request.post(options, function (error, response, body) {
-        var res = null;
-        if (error || response.statusCode !== 200) {
-          if (!error) {
+      try {
+        var request = require('request');
+        request.post(options, function (error, response, body) {
+          var res = null;
+          if (error || response.statusCode !== 200) {
+            if (!error) {
+              res = new Response(body, firstVar);
+              if (res.hasError()) {
+                err = new Error(res.getError());
+              }
+              else {
+                err = new Error('Unknown error', response.statusCode());
+              }
+            }
+            // Log error message from FBS.
+            self.bus.emit('logger.err', { 'type': 'FBS', 'message': err });
+            callback(error, null);
+          }
+          else {
+            // Send debug message.
+            debug(response.statusCode + ':' + message.substr(0, 2));
+
+            var err = null;
             res = new Response(body, firstVar);
             if (res.hasError()) {
               err = new Error(res.getError());
+              self.bus.emit('logger.err', { 'type': 'FBS', 'message': err });
             }
-            else {
-              err = new Error('Unknown error', response.statusCode());
-            }
+
+            // Process the data.
+            callback(err, res);
+
+            // Log message from FBS.
+            var sip2 = body.match(/<response>(.*)<\/response>/);
+            self.bus.emit('logger.info', { 'type': 'FBS', 'message': sip2[1], 'xml': body});
           }
-          // Log error message from FBS.
-          self.bus.emit('logger.err', { 'type': 'FBS', 'message': err });
-          callback(error, null);
-        }
-        else {
-          // Send debug message.
-          debug(response.statusCode + ':' + message.substr(0, 2));
-
-          var err = null;
-          res = new Response(body, firstVar);
-          if (res.hasError()) {
-            err = new Error(res.getError());
-            self.bus.emit('logger.err', { 'type': 'FBS', 'message': err });
-          }
-
-          // Process the data.
-          callback(err, res);
-
-          // Log message from FBS.
-          var sip2 = body.match(/<response>(.*)<\/response>/);
-          self.bus.emit('logger.info', { 'type': 'FBS', 'message': sip2[1], 'xml': body});
-        }
-      });
+        });
+      }
+      catch (error) {
+        self.bus.emit('logger.info', { 'type': 'FBS', 'message': error.message});
+        callback(new Error('FBS is offline'), null);
+      }
     }
     else {
       callback(new Error('FBS is offline'), null);
