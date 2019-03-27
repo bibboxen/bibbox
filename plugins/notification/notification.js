@@ -925,7 +925,8 @@ Notification.prototype.printReceipt = function printReceipt(content) {
     'margin-right': 0,
     'margin-top': 0,
     'margin-bottom': 10,
-    'page-width': 75
+    'page-width': 75,
+    'page-height': 100000
   });
 
   readableStream.on('data', function (chunk) {
