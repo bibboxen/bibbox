@@ -2,6 +2,10 @@
 
 ### in development
 
+* Upgraded to node 10 (node 6 end-of-life).
+* Changed printer paper size.
+* Added exception handling to online request (99 message error).
+
 ### v1.5.3
 
 * Added new version of RFID jar where old tags are accepted, regardless of CRC value.
