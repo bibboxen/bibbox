@@ -1,8 +1,8 @@
 # Bibbox Changelog
 
-### in development
+### v1.6.0
 
-* Upgraded to node 10 (node 6 end-of-life).
+* Upgraded to node 10 (node 6 is end-of-life).
 * Changed printer paper size.
 * Added exception handling to online request (99 message error).
 
