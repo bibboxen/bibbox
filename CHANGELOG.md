@@ -1,5 +1,9 @@
 # Bibbox Changelog
 
+### In development
+
+
+
 ### v1.6.0
 
 * Upgraded to node 10 (node 6 is end-of-life).
