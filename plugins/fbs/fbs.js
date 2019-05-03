@@ -405,6 +405,15 @@ module.exports = function (options, imports, register) {
           online: onlineState
         });
       }
+    },
+    function (err) {
+      debug(err);
+
+      // Explicit logging to look for in logs.
+      debug('checkOnlineState: FBS.create(bus) promise failed. Retrying in 5 seconds.');
+
+      // Retry in 5 seconds.
+      setTimeout(checkOnlineState, 5000);
     });
   }
 
