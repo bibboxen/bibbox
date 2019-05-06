@@ -346,9 +346,6 @@ module.exports = function (options, imports, register) {
    * State machine that handles the FBS online/offline state.
    */
   function checkOnlineState() {
-    // Explicit logging to look for in logs.
-    debug('checkOnlineState: starting check.');
-
     // Extra timeout to make sure the timeout checker does not stop.
     if (ensureCheckOnlineStateTimeout != null) {
       clearTimeout(ensureCheckOnlineStateTimeout);
@@ -427,8 +424,7 @@ module.exports = function (options, imports, register) {
     function (err) {
       debug(err);
 
-      // Explicit logging to look for in logs.
-      debug('checkOnlineState: FBS.create(bus) promise failed. Retrying in 5 seconds.');
+      bus.emit('logger.info', 'checkOnlineState: FBS.create(bus) promise failed. Retrying in 5 seconds.');
 
       // Retry in 5 seconds.
       checkOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.offlineTimeout);
