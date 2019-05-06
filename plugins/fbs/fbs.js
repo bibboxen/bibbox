@@ -348,6 +348,7 @@ module.exports = function (options, imports, register) {
   function checkOnlineState() {
     // Extra timeout to make sure the timeout checker does not stop.
     if (ensureCheckOnlineStateTimeout != null) {
+      bus.emit('logger.info', 'checkOnlineState: Check to ensure onlineChecker does not stop has been triggered.');
       clearTimeout(ensureCheckOnlineStateTimeout);
       ensureCheckOnlineStateTimeout = setTimeout(checkOnlineState, 60 * 5 * 1000);
     }
