@@ -347,24 +347,24 @@ module.exports = function (options, imports, register) {
    * State machine that handles the FBS online/offline state.
    */
   function checkOnlineState() {
-    fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Started online check', (err) => {
+    fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Started online check.\n', (err) => {
       if (err) console.log(err);
     });
 
     // Extra timeout to make sure the timeout checker does not stop.
     if (ensureCheckOnlineStateTimeout != null) {
-      fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Check to ensure onlineChecker does not stop has been triggered.', (err) => {
+      fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Check to ensure onlineChecker does not stop has been triggered.\n', (err) => {
         if (err) console.log(err);
       });
 
-      bus.emit('logger.info', 'checkOnlineState: Check to ensure onlineChecker does not stop has been triggered.');
+      bus.emit('logger.info', 'checkOnlineState: Check to ensure onlineChecker does not stop has been triggered.\n');
       clearTimeout(ensureCheckOnlineStateTimeout);
       ensureCheckOnlineStateTimeout = setTimeout(checkOnlineState, 60 * 5 * 1000);
     }
 
     // Make sure only one timeout is running.
     if (checkOnlineStateTimeout != null) {
-      fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Make sure only one timeout is running.', (err) => {
+      fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Make sure only one timeout is running.\n', (err) => {
         if (err) console.log(err);
       });
 
@@ -374,7 +374,7 @@ module.exports = function (options, imports, register) {
 
     // Start online checker for FBS servers.
     FBS.create(bus).then(function (fbs) {
-        fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Start online checker for FBS servers.', (err) => {
+        fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Start online checker for FBS servers.\n', (err) => {
           if (err) console.log(err);
         });
 
@@ -391,7 +391,7 @@ module.exports = function (options, imports, register) {
             // Listen to online check event send below.
             if (res.hasOwnProperty('onlineStatus') && res.onlineStatus) {
               if (onlineState.successfulOnlineChecks >= onlineState.threshold) {
-                fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS is online and threshold has been reached, so state online.', (err) => {
+                fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS is online and threshold has been reached, so state online.\n', (err) => {
                   if (err) console.log(err);
                 });
 
@@ -400,7 +400,7 @@ module.exports = function (options, imports, register) {
                 onlineState.online = true;
               }
               else {
-                fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS online but threshold _not_ reached, so state offline.', (err) => {
+                fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS online but threshold _not_ reached, so state offline.\n', (err) => {
                   if (err) console.log(err);
                 });
 
@@ -411,7 +411,7 @@ module.exports = function (options, imports, register) {
               }
             }
             else {
-              fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS is offline, so it the state.', (err) => {
+              fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS is offline, so it the state.\n', (err) => {
                 if (err) console.log(err);
               });
 
@@ -429,7 +429,7 @@ module.exports = function (options, imports, register) {
             });
           },
           function (err) {
-            fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Error connecting to FBS.', (err) => {
+            fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Error connecting to FBS.\n', (err) => {
               if (err) console.log(err);
             });
 
@@ -445,7 +445,7 @@ module.exports = function (options, imports, register) {
         );
       }
       else {
-        fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS not configured, so state offline.', (err) => {
+        fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS not configured, so state offline.\n', (err) => {
           if (err) console.log(err);
         });
 
@@ -460,7 +460,7 @@ module.exports = function (options, imports, register) {
       }
     },
     function (err) {
-      fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS.create(bus) promise failed. Retrying in 5 seconds.', (err) => {
+      fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS.create(bus) promise failed. Retrying in 5 seconds.\n', (err) => {
         if (err) console.log(err);
       });
 
