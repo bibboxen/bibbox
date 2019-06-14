@@ -13,6 +13,7 @@ var uniqid = require('uniqid');
 var debug = require('debug')('bibbox:FBS:main');
 
 var Request = require('./request.js');
+var fs = require("fs");
 
 /**
  * Default constructor.
@@ -339,6 +340,7 @@ module.exports = function (options, imports, register) {
 
   var checkOnlineStateTimeout = null;
   var ensureCheckOnlineStateTimeout = null;
+  var onlineOfflineLogfile = 'online-offline.log';
 
   /**
    * Online checker.
@@ -346,6 +348,10 @@ module.exports = function (options, imports, register) {
    * State machine that handles the FBS online/offline state.
    */
   function checkOnlineState() {
+    fs.appendFile(onlineOfflineLogfile, (new Date()).getTime() + ': Started online check', (err) => {
+      if (err) console.log(err);
+    });
+
     // Extra timeout to make sure the timeout checker does not stop.
     if (ensureCheckOnlineStateTimeout != null) {
       bus.emit('logger.info', 'checkOnlineState: Check to ensure onlineChecker does not stop has been triggered.');
