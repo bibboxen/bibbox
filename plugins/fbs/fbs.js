@@ -340,7 +340,6 @@ module.exports = function (options, imports, register) {
 
   var checkOnlineStateTimeout = null;
   var ensureCheckOnlineStateTimeout = null;
-  var onlineOfflineLogfile = 'online-offline.log';
 
   /**
    * Online checker.
@@ -348,7 +347,7 @@ module.exports = function (options, imports, register) {
    * State machine that handles the FBS online/offline state.
    */
   function checkOnlineState() {
-    fs.appendFile(onlineOfflineLogfile, (new Date()).getTime() + ': Started online check', (err) => {
+    fs.appendFile(__dirname + '/online-offline.log', (new Date()).getTime() + ': Started online check', (err) => {
       if (err) console.log(err);
     });
 
