@@ -361,6 +361,9 @@ module.exports = function (options, imports, register) {
       clearTimeout(ensureCheckOnlineStateTimeout);
       ensureCheckOnlineStateTimeout = setTimeout(checkOnlineState, 60 * 5 * 1000);
     }
+    else {
+      ensureCheckOnlineStateTimeout = setTimeout(checkOnlineState, 60 * 5 * 1000);
+    }
 
     // Make sure only one timeout is running.
     if (checkOnlineStateTimeout != null) {
