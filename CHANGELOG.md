@@ -1,7 +1,7 @@
 # Bibbox Changelog
 
 ### In development
-
+* Added extra timeout-check to make sure online-checker is running.
 
 
 ### v1.6.0
