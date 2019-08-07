@@ -334,8 +334,12 @@ module.exports = function (options, imports, register) {
     threshold: 5,
     successfulOnlineChecks: 5,
     onlineTimeout: 5000,
-    offlineTimeout: 30000
+    offlineTimeout: 30000,
+    ensureOnlineCheckTimeout: 300000
   };
+
+  var checkOnlineStateTimeout = null;
+  var ensureCheckOnlineStateTimeout = null;
 
   /**
    * Online checker.
@@ -343,6 +347,20 @@ module.exports = function (options, imports, register) {
    * State machine that handles the FBS online/offline state.
    */
   function checkOnlineState() {
+    // Clear extra timeout, to make sure only one is running.
+    if (ensureCheckOnlineStateTimeout != null) {
+      clearTimeout(ensureCheckOnlineStateTimeout);
+    }
+
+    // Start extra timeout.
+    ensureCheckOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.onlineTimeout + onlineState.ensureOnlineCheckTimeout);
+
+    // Make sure only one checkOnlineStateTimeout is running.
+    if (checkOnlineStateTimeout != null) {
+      clearTimeout(checkOnlineStateTimeout);
+      checkOnlineStateTimeout = null;
+    }
+
     // Start online checker for FBS servers.
     FBS.create(bus).then(function (fbs) {
       // Update configuration - It's done here to ensure it reflects updated
@@ -359,21 +377,21 @@ module.exports = function (options, imports, register) {
             if (res.hasOwnProperty('onlineStatus') && res.onlineStatus) {
               if (onlineState.successfulOnlineChecks >= onlineState.threshold) {
                 // FBS is online and threshold has been reached, so state online.
-                setTimeout(checkOnlineState, onlineState.onlineTimeout);
+                checkOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.onlineTimeout);
                 onlineState.online = true;
               }
               else {
                 // FBS online but threshold _not_ reached, so state offline.
                 onlineState.successfulOnlineChecks++;
                 onlineState.online = false;
-                setTimeout(checkOnlineState, onlineState.offlineTimeout);
+                checkOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.offlineTimeout);
               }
             }
             else {
               // FBS is offline, so it the state.
               onlineState.successfulOnlineChecks = 0;
               onlineState.online = false;
-              setTimeout(checkOnlineState, onlineState.offlineTimeout);
+              checkOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.offlineTimeout);
             }
 
             // Send state event into the bus.
@@ -387,7 +405,7 @@ module.exports = function (options, imports, register) {
             // Error connecting to FBS.
             onlineState.online = false;
             onlineState.successfulOnlineChecks = 0;
-            setTimeout(checkOnlineState, onlineState.offlineTimeout);
+            checkOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.offlineTimeout);
             bus.emit('fbs.offline', {
               timestamp: new Date().getTime(),
               online: onlineState
@@ -399,12 +417,18 @@ module.exports = function (options, imports, register) {
         // FBS not configured, so state offline.
         onlineState.online = false;
         onlineState.successfulOnlineChecks = 0;
-        setTimeout(checkOnlineState, onlineState.offlineTimeout);
+        checkOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.offlineTimeout);
         bus.emit('fbs.offline', {
           timestamp: new Date().getTime(),
           online: onlineState
         });
       }
+    },
+    function (err) {
+      bus.emit('logger.info', 'checkOnlineState: FBS.create(bus) promise failed. Retrying.');
+
+      // Retry check.
+      checkOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.offlineTimeout);
     });
   }
 
