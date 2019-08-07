@@ -13,7 +13,6 @@ var uniqid = require('uniqid');
 var debug = require('debug')('bibbox:FBS:main');
 
 var Request = require('./request.js');
-var fs = require("fs");
 
 /**
  * Default constructor.
@@ -347,16 +346,8 @@ module.exports = function (options, imports, register) {
    * State machine that handles the FBS online/offline state.
    */
   function checkOnlineState() {
-    fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Started online check.\n', (err) => {
-      if (err) console.log(err);
-    });
-
     // Extra timeout to make sure the timeout checker does not stop.
     if (ensureCheckOnlineStateTimeout != null) {
-      fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Check to ensure onlineChecker does not stop has been triggered.\n', (err) => {
-        if (err) console.log(err);
-      });
-
       bus.emit('logger.info', 'checkOnlineState: Check to ensure onlineChecker does not stop has been triggered.\n');
       clearTimeout(ensureCheckOnlineStateTimeout);
       ensureCheckOnlineStateTimeout = setTimeout(checkOnlineState, 60 * 5 * 1000);
@@ -367,20 +358,12 @@ module.exports = function (options, imports, register) {
 
     // Make sure only one timeout is running.
     if (checkOnlineStateTimeout != null) {
-      fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Make sure only one timeout is running.\n', (err) => {
-        if (err) console.log(err);
-      });
-
       clearTimeout(checkOnlineStateTimeout);
       checkOnlineStateTimeout = null;
     }
 
     // Start online checker for FBS servers.
     FBS.create(bus).then(function (fbs) {
-        fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Start online checker for FBS servers.\n', (err) => {
-          if (err) console.log(err);
-        });
-
       // Update configuration - It's done here to ensure it reflects updated
       // configuration from the admin UI.
       onlineState.threshold = fbs.config.hasOwnProperty('onlineState') ? fbs.config.onlineState.threshold : onlineState.threshold;
@@ -394,19 +377,11 @@ module.exports = function (options, imports, register) {
             // Listen to online check event send below.
             if (res.hasOwnProperty('onlineStatus') && res.onlineStatus) {
               if (onlineState.successfulOnlineChecks >= onlineState.threshold) {
-                fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS is online and threshold has been reached, so state online.\n', (err) => {
-                  if (err) console.log(err);
-                });
-
                 // FBS is online and threshold has been reached, so state online.
                 checkOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.onlineTimeout);
                 onlineState.online = true;
               }
               else {
-                fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS online but threshold _not_ reached, so state offline.\n', (err) => {
-                  if (err) console.log(err);
-                });
-
                 // FBS online but threshold _not_ reached, so state offline.
                 onlineState.successfulOnlineChecks++;
                 onlineState.online = false;
@@ -414,10 +389,6 @@ module.exports = function (options, imports, register) {
               }
             }
             else {
-              fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS is offline, so it the state.\n', (err) => {
-                if (err) console.log(err);
-              });
-
               // FBS is offline, so it the state.
               onlineState.successfulOnlineChecks = 0;
               onlineState.online = false;
@@ -432,10 +403,6 @@ module.exports = function (options, imports, register) {
             });
           },
           function (err) {
-            fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': Error connecting to FBS.\n', (err) => {
-              if (err) console.log(err);
-            });
-
             // Error connecting to FBS.
             onlineState.online = false;
             onlineState.successfulOnlineChecks = 0;
@@ -448,10 +415,6 @@ module.exports = function (options, imports, register) {
         );
       }
       else {
-        fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS not configured, so state offline.\n', (err) => {
-          if (err) console.log(err);
-        });
-
         // FBS not configured, so state offline.
         onlineState.online = false;
         onlineState.successfulOnlineChecks = 0;
@@ -463,12 +426,6 @@ module.exports = function (options, imports, register) {
       }
     },
     function (err) {
-      fs.appendFile(__dirname + '/online-offline.log', (new Date()).toUTCString() + ': FBS.create(bus) promise failed. Retrying in 5 seconds.\n', (err) => {
-        if (err) console.log(err);
-      });
-
-      debug(err);
-
       bus.emit('logger.info', 'checkOnlineState: FBS.create(bus) promise failed. Retrying in 5 seconds.');
 
       // Retry in 5 seconds.
