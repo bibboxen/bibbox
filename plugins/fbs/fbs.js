@@ -334,7 +334,8 @@ module.exports = function (options, imports, register) {
     threshold: 5,
     successfulOnlineChecks: 5,
     onlineTimeout: 5000,
-    offlineTimeout: 30000
+    offlineTimeout: 30000,
+    ensureOnlineCheckTimeout: 300000
   };
 
   var checkOnlineStateTimeout = null;
@@ -346,17 +347,15 @@ module.exports = function (options, imports, register) {
    * State machine that handles the FBS online/offline state.
    */
   function checkOnlineState() {
-    // Extra timeout to make sure the timeout checker does not stop.
+    // Clear extra timeout, to make sure only one is running.
     if (ensureCheckOnlineStateTimeout != null) {
-      bus.emit('logger.info', 'checkOnlineState: Check to ensure onlineChecker does not stop has been triggered.\n');
       clearTimeout(ensureCheckOnlineStateTimeout);
-      ensureCheckOnlineStateTimeout = setTimeout(checkOnlineState, 60 * 5 * 1000);
-    }
-    else {
-      ensureCheckOnlineStateTimeout = setTimeout(checkOnlineState, 60 * 5 * 1000);
     }
 
-    // Make sure only one timeout is running.
+    // Start extra timeout.
+    ensureCheckOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.onlineTimeout + onlineState.ensureOnlineCheckTimeout);
+
+    // Make sure only one checkOnlineStateTimeout is running.
     if (checkOnlineStateTimeout != null) {
       clearTimeout(checkOnlineStateTimeout);
       checkOnlineStateTimeout = null;
@@ -426,9 +425,9 @@ module.exports = function (options, imports, register) {
       }
     },
     function (err) {
-      bus.emit('logger.info', 'checkOnlineState: FBS.create(bus) promise failed. Retrying in 5 seconds.');
+      bus.emit('logger.info', 'checkOnlineState: FBS.create(bus) promise failed. Retrying.');
 
-      // Retry in 5 seconds.
+      // Retry check.
       checkOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.offlineTimeout);
     });
   }
