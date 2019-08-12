@@ -8,9 +8,10 @@ npm install --${1:-production}
 for folder in plugins/*; do
   if [ -d $folder ]; then
     cd $folder
-    npm-check-updates -u
+    echo ${folder}
     rm -rf node_modules
     npm install --${1:-production}
+    npm audit
     cd ../..
   fi
 done
