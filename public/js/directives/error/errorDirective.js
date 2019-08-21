@@ -12,8 +12,8 @@
 (function () {
   'use strict';
 
-  angular.module('BibBox').directive('error', ['$rootScope', 'config',
-    function ($rootScope, config) {
+  angular.module('BibBox').directive('error', ['$rootScope', 'config', 'configService'
+    function ($rootScope, config, configService) {
       return {
         restrict: 'E',
         replace: false,
@@ -25,8 +25,15 @@
 
           if (!$rootScope.hasOwnProperty('outOfOrderLocks')) {
             // Assume 'nodejs' is connected.
-            // Assume we have no translations and config, and that the rfid is not running.
-            $rootScope.outOfOrderLocks = ['rfid', 'config', 'translations'];
+            $rootScope.outOfOrderLocks = ['rfid'];
+
+            if (!config.initialized) {
+              $rootScope.outOfOrderLocks.push('config');
+            }
+
+            if (!config.translationsInitialized) {
+              $rootScope.outOfOrderLocks.push('translations');
+            }
           }
           else {
             scope.outOfOrder = $rootScope.outOfOrderLocks.length > 0;
