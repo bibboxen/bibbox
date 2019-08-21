@@ -27,13 +27,14 @@
     "sinon": "^1.17.5",
     "sinon-chai": "^2.8.0",
     "socket.io-client": "^2.2.0",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "nodemon": "^1.17.5"
   },
   "scripts": {
-    "live": "sudo node bootstrap.js",
-    "fake": "sudo NODE_TLS_REJECT_UNAUTHORIZED=0 RFID_DEBUG=true DEBUG=bibbox:* node bootstrap.js",
-    "debug": "sudo DEBUG=bibbox:* node bootstrap.js",
-    "rfid": "sudo ./start_rfid.sh",
+    "live": "node bootstrap.js",
+    "fake": "NODE_TLS_REJECT_UNAUTHORIZED=0 RFID_DEBUG=true DEBUG=bibbox:* ./node_modules/.bin/nodemon bootstrap.js",
+    "debug": "DEBUG=bibbox:* ./node_modules/.bin/nodemon bootstrap.js",
+    "rfid": "./start_rfid.sh",
     "test": "cd test; ../node_modules/.bin/mocha",
     "test-live": "cd test; LIVE=1 ../node_modules/.bin/mocha"
   }

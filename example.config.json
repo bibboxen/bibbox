@@ -1,6 +1,6 @@
 {
   "port": 3010,
-  "allowed": [ "bibbox.vm:*", "localhost:*" ],
+  "allowed": [ "bibbox.vm:*", "localhost:*", "0.0.0.0:*" ],
   "barcode": {
     "vid": 1529,
     "pid": 8710

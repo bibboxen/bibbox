@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx:latest
+    depends_on:
+      - node
+    ports:
+       - '80'
+    volumes:
+      - ${PWD}/.docker/vhost.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./:/app:delegated
+    labels:
+      - "traefik.frontend.rule=Host:${COMPOSE_PROJECT_NAME}.docker.localhost"
+
+  node:
+    build: .
+    command: npm run fake
+    ports:
+      - '3010'
+      - '3050'
+      - '4443'
+    volumes:
+      - .:/app:delegated
+    working_dir: /app
+
+  redis:
+    image: redis:3
+    ports:
+      - '6379'
+
+  reverse-proxy:
+    image: traefik  # The official Traefik docker image
+    command: --api --docker  # Enables the web UI and tells Traefik to listen to docker
+    ports:
+      - "80"
+      - "8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # So that Traefik can listen to the Docker events
