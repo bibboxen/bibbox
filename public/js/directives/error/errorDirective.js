@@ -12,12 +12,14 @@
 (function () {
   'use strict';
 
-  angular.module('BibBox').directive('error', ['$rootScope',
-    function ($rootScope) {
+  angular.module('BibBox').directive('error', ['$rootScope', 'config',
+    function ($rootScope, config) {
       return {
         restrict: 'E',
         replace: false,
         link: function (scope) {
+          scope.debug = config.debug;
+
           // Assume we are out of order.
           scope.outOfOrder = true;
 
@@ -49,6 +51,8 @@
             // are resolved.
             scope.outOfOrder = $rootScope.outOfOrderLocks.length > 0;
           });
+
+          scope.outOfOrderLocks = $rootScope.outOfOrderLocks;
         },
         template: `
 <div  data-ng-if="outOfOrder" class="error-overlay">
@@ -64,6 +68,9 @@
 
   <div class="error-content">
     <span class="error">{{ 'out_of_order.text' | translate }}</span>
+    <div ng-if="debug" ng-repeat="outOfOrderLock in outOfOrderLocks">
+      <span class="error">{{ outOfOrderLock }}</span>
+    </div>
   </div>
 </div>`
       };
