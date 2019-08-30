@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  angular.module('BibBox').directive('error', ['$rootScope', 'config', 'configService'
+  angular.module('BibBox').directive('error', ['$rootScope', 'config', 'configService',
     function ($rootScope, config, configService) {
       return {
         restrict: 'E',
