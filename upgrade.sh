@@ -15,7 +15,7 @@ for folder in plugins/*; do
     echo ${folder}
     rm -rf node_modules
     npm install --${1:-production}
-    npm audit
+    npm audit fix
     cd ../..
   fi
 done

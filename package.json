@@ -21,14 +21,14 @@
     "karma-ng-html2js-preprocessor": "^1.0.0",
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-sinon-chai": "^1.2.4",
-    "mocha": "^6.0.2",
+    "mocha": "^6.2.0",
     "nock": "^9.1.4",
+    "nodemon": "^1.17.5",
     "should": "^8.2.2",
     "sinon": "^1.17.5",
     "sinon-chai": "^2.8.0",
     "socket.io-client": "^2.2.0",
-    "supertest": "^4.0.2",
-    "nodemon": "^1.17.5"
+    "supertest": "^4.0.2"
   },
   "scripts": {
     "live": "node bootstrap.js",
