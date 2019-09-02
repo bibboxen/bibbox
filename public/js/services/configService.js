@@ -31,6 +31,7 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
       Idle.setTimeout(config.timeout.idleWarn);
 
       $rootScope.$emit('config.updated');
+      $rootScope.$emit('out-of-order.disable', 'config');
     });
 
     /**
@@ -55,12 +56,13 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
       }
 
       // Mark config as initialized, so the application can present the UI.
-      config.initialized = true;
-
-      $rootScope.$emit('config.translations.updated');
+      config.translationsInitialized = true;
 
       // Refresh translations.
       $translate.refresh();
+
+      $rootScope.$emit('config.translations.updated');
+      $rootScope.$emit('out-of-order.disable', 'translations');
     });
 
     /**
@@ -81,6 +83,7 @@ angular.module('BibBox').service('configService', ['$rootScope', '$translate', '
 angular.module('BibBox').value('config', {
   default_lang: "da",
   initialized: false,
+  translationsInitialized: false,
   debug: false,
   translations: {},
   languages: [],

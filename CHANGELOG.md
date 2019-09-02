@@ -1,5 +1,10 @@
 # Bibbox Changelog
 
+### In develop
+* Added debug messages when running frontend in debug mode.
+* Added support for docker development setup
+* Fixed race condition in out-of-order
+
 ### v1.6.1
 * Added extra timeout-check to make sure online-checker is running.
 

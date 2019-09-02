@@ -12,19 +12,28 @@
 (function () {
   'use strict';
 
-  angular.module('BibBox').directive('error', ['$rootScope',
-    function ($rootScope) {
+  angular.module('BibBox').directive('error', ['$rootScope', 'config', 'configService',
+    function ($rootScope, config, configService) {
       return {
         restrict: 'E',
         replace: false,
         link: function (scope) {
+          scope.debug = config.debug;
+
           // Assume we are out of order.
           scope.outOfOrder = true;
 
           if (!$rootScope.hasOwnProperty('outOfOrderLocks')) {
             // Assume 'nodejs' is connected.
-            // Assume we have no translations and config, and that the rfid is not running.
-            $rootScope.outOfOrderLocks = ['rfid', 'config', 'translations'];
+            $rootScope.outOfOrderLocks = ['rfid'];
+
+            if (!config.initialized) {
+              $rootScope.outOfOrderLocks.push('config');
+            }
+
+            if (!config.translationsInitialized) {
+              $rootScope.outOfOrderLocks.push('translations');
+            }
           }
           else {
             scope.outOfOrder = $rootScope.outOfOrderLocks.length > 0;
@@ -49,6 +58,8 @@
             // are resolved.
             scope.outOfOrder = $rootScope.outOfOrderLocks.length > 0;
           });
+
+          scope.outOfOrderLocks = $rootScope.outOfOrderLocks;
         },
         template: `
 <div  data-ng-if="outOfOrder" class="error-overlay">
@@ -64,6 +75,9 @@
 
   <div class="error-content">
     <span class="error">{{ 'out_of_order.text' | translate }}</span>
+    <div ng-if="debug" ng-repeat="outOfOrderLock in outOfOrderLocks">
+      <span class="error">{{ outOfOrderLock }}</span>
+    </div>
   </div>
 </div>`
       };
