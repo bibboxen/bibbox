@@ -1,6 +1,8 @@
 # Bibbox Changelog
 
-### In develop
+### In development
+
+### v1.6.2
 * Added debug messages when running frontend in debug mode.
 * Added support for docker development setup
 * Fixed race condition in out-of-order
