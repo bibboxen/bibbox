@@ -5,7 +5,7 @@
 
 'use strict';
 
-var screenCronJob = require('cron').CronJob;
+var ScreenCronJob = require('cron').CronJob;
 var fork = require('child_process').fork;
 var debug = require('debug')('bibbox:screen');
 var uniqid = require('uniqid');
@@ -20,15 +20,36 @@ var uniqid = require('uniqid');
  */
 var Screen = function Network(bus) {
   this.bus = bus;
+
+  // Load configuration.
+  var busEvent = 'screen.config.loaded' + uniqid();
+  var errorEvent = 'screen.config.error' + uniqid();
+
+  console.error('LOADED SCREEN');
+
+  bus.once(busEvent, function (config) {
+    this.setup(config);
+  });
+
+  bus.once(errorEvent, function (config) {
+    console.error('No config');
+  });
+
+  bus.emit('ctrl.config.config', {
+    busEvent: busEvent,
+    errorEvent: errorEvent
+  });
 };
 
-Screen.prototype.setup = function setup(on, off) {
+Screen.prototype.setup = function setup(config) {
 
-  this.sceenOnjob = new screenCronJob('* * * * * *', function() {
+  console.log(config);
+
+  this.sceenOnjob = new ScreenCronJob('* * * * * *', function() {
     console.log('You will see this message every second');
   }, null, true, 'America/Los_Angeles');
 
-  this.sceenOffjob = new screenCronJob('* * * * * *', function() {
+  this.sceenOffjob = new ScreenCronJob('* * * * * *', function() {
     console.log('You will see this message every second');
   }, null, true, 'America/Los_Angeles');
 };
@@ -49,18 +70,14 @@ module.exports = function (options, imports, register) {
   var screen = new Screen(bus);
 
   /**
-   * Check if a given network address is online.
+   * Handle configuration changes.
    */
   bus.on('storage.saved', function online(data) {
     var busEvent = 'screen.config.loaded' + uniqid();
     var errorEvent = 'screen.config.error' + uniqid();
 
     bus.once(busEvent, function (config) {
-      deferred.resolve(new FBS(bus, config));
-    });
-
-    bus.once(errorEvent, function (err) {
-      deferred.reject(err);
+      screen.setup(config);
     });
 
     bus.emit('ctrl.config.config', {
@@ -70,6 +87,6 @@ module.exports = function (options, imports, register) {
   });
 
   register(null, {
-    network: screen
+    screen: screen
   });
 };

@@ -114,6 +114,10 @@ var plugins = [
   {
     packagePath: './plugins/matomo',
     isEventExpired: isEventExpired
+  },
+  {
+    packagePath: './plugins/screen',
+    isEventExpired: isEventExpired
   }
 ];
 
