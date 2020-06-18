@@ -245,6 +245,7 @@ module.exports = function (options, imports, register) {
   bus.on('storage.save', function (data) {
     storage.save(data.type, data.name, data.obj).then(function (res) {
       bus.emit(data.busEvent, res);
+      bus.emit('storage.saved', { 'name': data.name });
     },
     function (err) {
       bus.emit(data.errorEvent, err);
@@ -261,6 +262,7 @@ module.exports = function (options, imports, register) {
         storage.append(data.type, data.name, data.obj).then(function (res) {
           storage.unlock(file);
           bus.emit(data.busEvent, true);
+          bus.emit('storage.saved', { 'name': data.name });
         },
         function (err) {
           storage.unlock(file);

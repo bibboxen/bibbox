@@ -1,0 +1,22 @@
+{
+  "name": "screen",
+  "description": "Screen on/off scheduler",
+  "version": "0.0.1",
+  "main": "screen.js",
+  "private": true,
+  "plugin": {
+    "consumes": [
+      "bus",
+      "ctrl"
+    ],
+    "provides": [
+      "screen"
+    ]
+  },
+  "dependencies": {
+    "cron": "^1.8.2",
+    "debug": "^2.3.3",
+    "q": "^1.4.1",
+    "uniqid": "^4.1.0"
+  }
+}
