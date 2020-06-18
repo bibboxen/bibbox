@@ -1,8 +1,2 @@
 # Screen plugin
-Turns the screen on/off base on configuration.
-
-# Events
-
-  * On
-
-
+Turns the screen on/off base on a configuration.

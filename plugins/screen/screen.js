@@ -1,6 +1,6 @@
 /**
  * @file
- * Checks if the application has online connection.
+ * Handles screen trun on/off.
  */
 
 'use strict';
@@ -18,10 +18,10 @@ const exec = require('child_process').exec;
  *
  * @constructor
  */
-var Screen = function Network(bus) {
+var Screen = function Screen(bus) {
   this.bus = bus;
-  this.sceenOnjob = null;
-  this.sceenOffjob = null;
+  this.sceenOnJob = null;
+  this.sceenOffJob = null;
 
   // Load configuration.
   var busEvent = 'screen.config.loaded' + uniqid();
@@ -51,11 +51,11 @@ Screen.prototype.setup = function setup(config) {
   this.stop();
 
   // Set new jobs.
-  this.sceenOnjob = new ScreenCronJob(on + ' * * *', function() {
+  this.sceenOnJob = new ScreenCronJob(on + ' * * *', function() {
     self.exec('on');
   }, null, true, 'Europe/Copenhagen');
 
-  this.sceenOffjob = new ScreenCronJob(off + ' * * *', function() {
+  this.sceenOffJob = new ScreenCronJob(off + ' * * *', function() {
     self.exec('off');
   }, null, true, 'Europe/Copenhagen');
 
@@ -83,11 +83,11 @@ Screen.prototype.exec = function exec(state) {
  * Start the jobs if they are defined.
  */
 Screen.prototype.start = function start() {
-  if (this.sceenOnjob != null) {
-    this.sceenOnjob.start();
+  if (this.sceenOnJob != null) {
+    this.sceenOnJob.start();
   }
-  if (this.sceenOffjob != null) {
-    this.sceenOffjob.start();
+  if (this.sceenOffJob != null) {
+    this.sceenOffJob.start();
   }
 }
 
@@ -95,11 +95,11 @@ Screen.prototype.start = function start() {
  * Stop the jobs if they are defined.
  */
 Screen.prototype.stop = function stop() {
-  if (this.sceenOnjob != null) {
-    this.sceenOnjob.stop();
+  if (this.sceenOnJob != null) {
+    this.sceenOnJob.stop();
   }
-  if (this.sceenOffjob != null) {
-    this.sceenOffjob.stop();
+  if (this.sceenOffJob != null) {
+    this.sceenOffJob.stop();
   }
 }
 
