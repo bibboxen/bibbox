@@ -130,12 +130,13 @@ angular.module('BibBox').controller('StatusController', [
           if (data.ok === '1') {
             // Update renewed items.
             if (data.hasOwnProperty('renewedItems')) {
-              for (i = 0; i < data.renewedItems; i++) {
+              for (i = 0; i < data.renewedItems.length; i++) {
                 for (material in $scope.materials) {
                   material = $scope.materials[material];
 
                   if (material.id === data.renewedItems[i].id) {
                     material.loading = false;
+                    material.newDate = data.renewedItems[i].dueDate;
                     material.information = 'status.renew.ok';
                     material.overdue = false;
                     material.renewed = true;
