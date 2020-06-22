@@ -1,5 +1,5 @@
 FROM node:10
-LABEL maintainer "ITK Dev <itkdev@mkb.aarhus.dk>"
+LABEL maintainer="ITK Dev <itkdev@mkb.aarhus.dk>"
 
 # Ensure packages are avaiable.
 RUN apt-get update

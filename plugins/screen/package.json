@@ -1,8 +1,8 @@
 {
-  "name": "fbs",
-  "description": "Communication with FBS",
+  "name": "screen",
+  "description": "Screen on/off scheduler",
   "version": "0.0.1",
-  "main": "fbs.js",
+  "main": "screen.js",
   "private": true,
   "plugin": {
     "consumes": [
@@ -10,15 +10,13 @@
       "ctrl"
     ],
     "provides": [
-      "fbs"
+      "screen"
     ]
   },
   "dependencies": {
-    "debug": "^2.2.0",
-    "handlebars": "^4.7.6",
-    "html-entities": "^1.2.0",
+    "cron": "^1.8.2",
+    "debug": "^2.3.3",
     "q": "^1.4.1",
-    "request": "^2.75.0",
     "uniqid": "^4.1.0"
   }
 }
