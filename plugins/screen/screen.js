@@ -70,7 +70,7 @@ Screen.prototype.setup = function setup(config) {
  *   This is string "on" or "off".
  */
 Screen.prototype.exec = function exec(state) {
-  execProcess('xset -display :0 dpms force ' + state, function (err, stdout, stderr) {
+  execProcess('su -c "xset -display :0 dpms force ' + state + '" bibbox', function (err, stdout, stderr) {
     if (err) {
       debug('Screen error: ' + err.message);
       return;
