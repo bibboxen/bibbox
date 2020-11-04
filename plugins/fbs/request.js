@@ -7,7 +7,6 @@
 
 var handlebars = require('handlebars');
 var fs = require('fs');
-var uniqid = require('uniqid');
 var debug = require('debug')('bibbox:FBS:request');
 
 var Response = require('./response.js');
@@ -98,8 +97,6 @@ Request.prototype.buildXML = function buildXML(message) {
  *   as parameter.
  */
 Request.prototype.send = function send(message, firstVar, callback) {
-  var busEvent = 'fbs.sip2.online' + uniqid();
-
   // Build XML message.
   var xml = this.buildXML(message);
 
