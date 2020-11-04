@@ -66,10 +66,6 @@ var plugins = [
     isEventExpired: isEventExpired
   },
   {
-    packagePath: './plugins/network',
-    isEventExpired: isEventExpired
-  },
-  {
     packagePath: './plugins/barcode',
     pid: config.barcode.pid,
     vid: config.barcode.vid,

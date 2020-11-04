@@ -100,78 +100,65 @@ Request.prototype.buildXML = function buildXML(message) {
 Request.prototype.send = function send(message, firstVar, callback) {
   var busEvent = 'fbs.sip2.online' + uniqid();
 
-  var self = this;
-  self.bus.once(busEvent, function (online) {
-    if (online) {
-      // Build XML message.
-      var xml = self.buildXML(message);
+  // Build XML message.
+  var xml = this.buildXML(message);
 
-      // Log message before sending it.
-      self.bus.emit('logger.info', { 'type': 'FBS', 'message': message, 'xml': xml });
+  // Log message before sending it.
+  this.bus.emit('logger.info', { 'type': 'FBS', 'message': message, 'xml': xml });
 
-      var options = {
-        method: 'POST',
-        url: self.endpoint,
-        headers: {
-          'User-Agent': 'bibbox',
-          'Content-Type': 'application/xml'
-        },
-        body: xml
-      };
+  var options = {
+    method: 'POST',
+    url: this.endpoint,
+    headers: {
+      'User-Agent': 'bibbox',
+      'Content-Type': 'application/xml'
+    },
+    body: xml
+  };
 
-      try {
-        var request = require('request');
-        request.post(options, function (error, response, body) {
-          var res = null;
-          if (error || response.statusCode !== 200) {
-            if (!error) {
-              res = new Response(body, firstVar);
-              if (res.hasError()) {
-                err = new Error(res.getError());
-              }
-              else {
-                err = new Error('Unknown error', response.statusCode());
-              }
-            }
-            // Log error message from FBS.
-            self.bus.emit('logger.err', { 'type': 'FBS', 'message': err });
-            callback(error, null);
+  try {
+    var self = this;
+    var request = require('request');
+    request.post(options, function (error, response, body) {
+      var res = null;
+      if (error || response.statusCode !== 200) {
+        if (!error) {
+          res = new Response(body, firstVar);
+          if (res.hasError()) {
+            err = new Error(res.getError());
           }
           else {
-            // Send debug message.
-            debug(response.statusCode + ':' + message.substr(0, 2));
-
-            var err = null;
-            res = new Response(body, firstVar);
-            if (res.hasError()) {
-              err = new Error(res.getError());
-              self.bus.emit('logger.err', { 'type': 'FBS', 'message': err });
-            }
-
-            // Process the data.
-            callback(err, res);
-
-            // Log message from FBS.
-            var sip2 = body.match(/<response>(.*)<\/response>/);
-            self.bus.emit('logger.info', { 'type': 'FBS', 'message': sip2[1], 'xml': body});
+            err = new Error('Unknown error', response.statusCode());
           }
-        });
+        }
+        // Log error message from FBS.
+        self.bus.emit('logger.err', { 'type': 'FBS', 'message': err });
+        callback(error, null);
       }
-      catch (error) {
-        self.bus.emit('logger.info', { 'type': 'FBS', 'message': error.message});
-        callback(new Error('FBS is offline'), null);
-      }
-    }
-    else {
-      callback(new Error('FBS is offline'), null);
-    }
-  });
+      else {
+        // Send debug message.
+        debug(response.statusCode + ':' + message.substr(0, 2));
 
-  // Check if server is online (FBS).
-  self.bus.emit('network.online', {
-    url: self.endpoint,
-    busEvent: busEvent
-  });
+        var err = null;
+        res = new Response(body, firstVar);
+        if (res.hasError()) {
+          err = new Error(res.getError());
+          self.bus.emit('logger.err', { 'type': 'FBS', 'message': err });
+        }
+
+        // Process the data.
+        callback(err, res);
+
+        // Log message from FBS.
+        var sip2 = body.match(/<response>(.*)<\/response>/);
+        self.bus.emit('logger.info', { 'type': 'FBS', 'message': sip2[1], 'xml': body});
+      }
+    });
+  }
+  catch (error) {
+    this.bus.emit('logger.info', { 'type': 'FBS', 'message': error.message});
+    callback(new Error('FBS is offline'), null);
+  }
 };
 
 /**
