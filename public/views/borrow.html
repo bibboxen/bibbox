@@ -73,7 +73,7 @@
     <button type="button" class="btn btn-success button align-left"
             data-ng-click="receipt('printer')"
             data-ng-if="(!currentPatron || !currentPatron.emailAddress) && rawMaterials && rawMaterials.length > 0"
-            analytics-on analytics-category="Borrow" analytics-event="Receipt - Print"
+            analytics-on analytics-category="Borrow" analytics-event="Receipt - Print (without mail)"
             analytics-label="Button">
       <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {{
       'borrow.button.receipt' | translate }}
