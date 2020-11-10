@@ -20,8 +20,8 @@ RFIDBaseInterface = new Interface( 'RFIDBaseInterface', [
   'tagAFISet'
 ]);
 
-angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controller', 'rfidService', 'loggerService', 'config', '$modal',
-  function ($scope, $controller, rfidService, loggerService, config, $modal) {
+angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controller', 'rfidService', 'loggerService', 'config', '$modal', '$analytics',
+  function ($scope, $controller, rfidService, loggerService, config, $modal, $analytics) {
     'use strict';
 
     // Instantiate/extend base controller.
@@ -55,9 +55,11 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
             // Reset time to double time for users to has time to react.
             $scope.baseResetIdleWatch(config.timeout.idleTimeout);
 
+            $analytics.eventTrack('tagMissing', {  category: 'Missing', label: 'Material not on scanner' });
             $scope.tagMissingModal.show();
           }
           else {
+            $analytics.eventTrack('tagMissing', {  category: 'Missing', label: 'Material replaced on scanner' });
             $scope.tagMissingModal.hide();
           }
         });
