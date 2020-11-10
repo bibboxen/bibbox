@@ -7,6 +7,7 @@
 * Track non-email print actions
 * Track idle timeout
 * Track missing tag modal
+* Update node modules - loaddash, dot-prop
 
 ### v1.7.1
 * Fixed screen on/off command execution
