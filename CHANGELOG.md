@@ -2,6 +2,20 @@
 
 ### In development
 
+### v1.8.0
+* Removed network handshake
+* Track non-email print actions
+* Track idle timeout
+* Track missing tag modal
+
+### v1.7.1
+* Fixed screen on/off command execution
+
+### v1.7.0
+* Fixed index error in renew all
+* Added screen plugin to turn on/off screen (power saver)
+* Security update of node modules
+
 ### v1.6.2
 * Added debug messages when running frontend in debug mode.
 * Added support for docker development setup
