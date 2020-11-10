@@ -3,8 +3,8 @@
  * Borrow page controller.
  */
 
-angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$q', '$window', 'userService', 'Idle', 'config', 'loggerService',
-  function ($scope, $location, $q, $window, userService, Idle, config, loggerService) {
+angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$q', '$window', 'userService', 'Idle', 'config', 'loggerService', '$analytics',
+  function ($scope, $location, $q, $window, userService, Idle, config, loggerService, $analytics) {
     'use strict';
 
     /**
@@ -55,6 +55,7 @@ angular.module('BibBox').controller('BaseController', ['$scope', '$location', '$
      */
     $scope.$on('IdleTimeout', function () {
       $scope.$evalAsync(function () {
+        $analytics.eventTrack('IdleTimeout', {  category: 'Timeout', label: $location.path() });
         $scope.baseLogoutRedirect('/');
       });
     });
