@@ -2,6 +2,9 @@
 
 ### In development
 
+* Index error when logging message from FBS that is an error
+* Ensure that network errors results in "FBS Offline" error and logging of the error is not empty
+
 ### v1.8.0
 * Removed network handshake
 * Track non-email print actions
