@@ -51,13 +51,17 @@ Screen.prototype.setup = function setup(config) {
   this.stop();
 
   // Set new jobs.
-  this.sceenOnJob = new ScreenCronJob(on + ' * * *', function() {
-    self.exec('on');
-  }, null, true, 'Europe/Copenhagen');
+  try {
+    this.sceenOnJob = new ScreenCronJob(on + ' * * *', function() {
+      self.exec('on');
+    }, null, false, 'Europe/Copenhagen');
 
-  this.sceenOffJob = new ScreenCronJob(off + ' * * *', function() {
-    self.exec('off');
-  }, null, true, 'Europe/Copenhagen');
+    this.sceenOffJob = new ScreenCronJob(off + ' * * *', function() {
+      self.exec('off');
+    }, null, false, 'Europe/Copenhagen');
+  } catch(e) {
+    console.error('Cron', e);
+  }
 
   // Start the jobs.
   this.start();
