@@ -243,8 +243,6 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
       var material = $scope.updateMaterialAFI(tag);
 
-      console.log(material);
-
       // If the tag belongs to a material in $scope.materials and processed material (backend have processed it).
       if (material && material.hasOwnProperty('borrowed') && material.borrowed) {
         var allAccepted = $scope.allTagsInSeriesSetCorrect(material.tags, false, material.seriesLength);
