@@ -117,6 +117,7 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                 material.information = 'borrow.is_awaiting_afi';
                 material.dueDate = result.dueDate;
                 material.offline = result.offline;
+                material.borrowed = true;
 
                 // Add to locked materials.
                 $scope.lockedMaterials.push(material);
@@ -143,6 +144,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                 material.loading = false;
                 material.information = result.screenMessage;
                 material.status = 'error';
+                material.borrowed = false;
+
+                // Loan failed, so lets lock the tag again.
+                $scope.setAFI(material.uid, true);
 
                 if (result.itemProperties) {
                   material.title = result.itemProperties.title;
@@ -154,6 +159,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
               material.status = 'error';
               material.information = 'borrow.was_not_successful';
               material.loading = false;
+              material.borrowed = false;
+
+              // Loan failed, so lets lock the tag again.
+              $scope.setAFI(material.uid, true);
             }
           },
           function error(err) {
@@ -165,12 +174,13 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
               if ($scope.materials[i].id === material.id) {
                 material = $scope.materials[i];
 
-                // Loan failed, so lets lock the tag again.
-                $scope.setAFI(material.uid, true);
-
                 material.status = 'error';
                 material.information = 'borrow.was_not_successful';
                 material.loading = false;
+                material.borrowed = false;
+
+                // Loan failed, so lets lock the tag again.
+                $scope.setAFI(material.uid, true);
 
                 break;
               }
@@ -233,11 +243,13 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
       var material = $scope.updateMaterialAFI(tag);
 
-      // If the tag belongs to a material in $scope.materials.
-      if (material) {
+      console.log(material);
+
+      // If the tag belongs to a material in $scope.materials and processed material (backend have processed it).
+      if (material && material.hasOwnProperty('borrowed') && material.borrowed) {
         var allAccepted = $scope.allTagsInSeriesSetCorrect(material.tags, false, material.seriesLength);
 
-        // If all AFIs have been turned on mark the material as returned.
+        // If all AFIs have been turned off mark the material as returned.
         if (allAccepted) {
           // See if material was already added to borrowed materials.
           var found = $scope.borrowedMaterials.find(function (item) {
