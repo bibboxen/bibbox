@@ -107,7 +107,7 @@ FBS.prototype.login = function login(username, password) {
     }
     else {
       // Check that the user is valid.
-      var valid = res.validPatron === 'Y' && res.validPatronPassword === 'Y';
+      var valid = res.hasOwnProperty('validPatron') && res.validPatron === 'Y' && res.validPatronPassword === 'Y';
 
       // If user is valid check for blocking codes.
       if (valid) {
