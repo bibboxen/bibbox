@@ -110,7 +110,8 @@ Request.prototype.send = function send(message, firstVar, callback) {
       'User-Agent': 'bibbox',
       'Content-Type': 'application/xml'
     },
-    body: xml
+    body: xml,
+    timeout: 20000
   };
 
   try {
