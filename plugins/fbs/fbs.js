@@ -479,7 +479,7 @@ module.exports = function (options, imports, register) {
       },
       function (err) {
         bus.emit(data.errorEvent, err);
-      });  
+      });
     }
     else {
       bus.emit(data.errorEvent, new Error('FBS is offline'));
@@ -493,6 +493,19 @@ module.exports = function (options, imports, register) {
     if (onlineState.online) {
       FBS.create(bus).then(function (fbs) {
         fbs.patronInformation(data.username, data.password).then(function (status) {
+            // Sort based on pickup id (which is the placement string).
+            if (status.hasOwnProperty('holdItems')) {
+              status.holdItems.sort(function (a, b) {
+                if ( a.pickupId < b.pickupId ){
+                  return -1;
+                }
+                if ( a.pickupId > b.pickupId ){
+                  return 1;
+                }
+                return 0;
+              });
+            }
+
             bus.emit(data.busEvent, {
               timestamp: new Date().getTime(),
               patron: status
@@ -505,7 +518,7 @@ module.exports = function (options, imports, register) {
       },
       function (err) {
         bus.emit(data.errorEvent, err);
-      });  
+      });
     }
     else {
       bus.emit(data.errorEvent, new Error('FBS is offline'));
@@ -599,7 +612,7 @@ module.exports = function (options, imports, register) {
       function (err) {
         debug(err);
         bus.emit(data.errorEvent, err);
-      });  
+      });
     }
     else {
       // FBS is offline, so create do offline work.
@@ -731,7 +744,7 @@ module.exports = function (options, imports, register) {
       function (err) {
         debug(err);
         bus.emit(data.errorEvent, err);
-      });  
+      });
     }
     else {
       // FBS is offline, so create do offline work.
@@ -802,7 +815,7 @@ module.exports = function (options, imports, register) {
         function (err) {
           bus.emit(data.errorEvent, err);
         }
-      );  
+      );
     }
     else {
       bus.emit(data.errorEvent, new Error('FBS is offline'));
@@ -828,7 +841,7 @@ module.exports = function (options, imports, register) {
         function (err) {
           bus.emit(data.errorEvent, err);
         }
-      );  
+      );
     }
     else {
       bus.emit(data.errorEvent, new Error('FBS is offline'));
@@ -854,7 +867,7 @@ module.exports = function (options, imports, register) {
         function (err) {
           bus.emit(data.errorEvent, err);
         }
-      );  
+      );
     }
     else {
       bus.emit(data.errorEvent, new Error('FBS is offline'));
