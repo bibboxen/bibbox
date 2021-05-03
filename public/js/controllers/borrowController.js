@@ -77,11 +77,13 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
         return;
       }
-
-      // Always un-lock tag, will re-lock if loan fails. The unlock don't always work, so this is kind of an hack. We
-      // want to always unlock to prevent false alarms if the unlock after the loan don't succeed correctly.
-      if (tag.afi !== false) {
-        $scope.setAFI(tag.uid, false);
+      else if (material.status !== 'error') {
+        // Always un-lock tag, will re-lock if loan fails. The unlock don't always work, so this is kind of an hack. We
+        // want to always unlock to prevent false alarms if the unlock after the loan don't succeed correctly.
+        // Do not perform this action when the material has reported error.
+        if (tag.afi !== false) {
+          $scope.setAFI(tag.uid, false);
+        }
       }
 
       // Check if all tags in series have been added.
