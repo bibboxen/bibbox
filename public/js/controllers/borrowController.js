@@ -160,10 +160,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
                 // Loan failed, so lets lock the tags again.
                 for (var i = 0; i < material.tags.length; i++) {
-                  if (material.tags[i].afi !== true) {
-                    console.log('4. setAFI TRUE', material.tags[i].uid);
-                    $scope.setAFI(material.tags[i].uid, true);
-                  }
+                  console.log('4. setAFI TRUE', material.tags[i].uid);
+                  $scope.setAFI(material.tags[i].uid, true);
                 }
 
                 if (result.itemProperties) {
@@ -180,10 +178,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
               // Loan failed, so lets lock the tags again.
               for (var i = 0; i < material.tags.length; i++) {
-                if (material.tags[i].afi !== true) {
-                  console.log('5. setAFI TRUE', material.tags[i].uid);
-                  $scope.setAFI(material.tags[i].uid, true);
-                }
+                console.log('5. setAFI TRUE', material.tags[i].uid);
+                $scope.setAFI(material.tags[i].uid, true);
               }
             }
           },
@@ -203,10 +199,8 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
                 // Loan failed, so lets lock the tags again.
                 for (var i = 0; i < material.tags.length; i++) {
-                  if (material.tags[i].afi !== true) {
-                    console.log('6. setAFI TRUE', material.tags[i].uid);
-                    $scope.setAFI(material.tags[i].uid, true);
-                  }
+                  console.log('6. setAFI TRUE', material.tags[i].uid);
+                  $scope.setAFI(material.tags[i].uid, true);
                 }
 
                 break;
