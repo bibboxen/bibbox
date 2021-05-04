@@ -87,6 +87,13 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
           $scope.setAFI(tag.uid, false);
         }
       }
+      else {
+        // Error case.
+        if (tag.afi !== true) {
+          console.log('7. setAFI TRUE', tag.uid);
+          $scope.setAFI(tag.uid, true);
+        }
+      }
 
       // Check if all tags in series have been added.
       if (!material.invalid && !material.loading && !material.success && $scope.allTagsInSeries(material)) {
