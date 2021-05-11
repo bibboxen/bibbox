@@ -2,6 +2,10 @@
 
 ### In development
 
+* Fixed tag un-lock vs. borrowed state in front end.
+* Fixed type error: Cannot read property 'validPatron' of null
+* Added extra offline checks to FBS to prevent request when offline
+
 ### v1.8.1
 * Index error when logging message from FBS that is an error
 * Ensure that network errors results in "FBS Offline" error and logging of the error is not empty

@@ -133,7 +133,8 @@ angular.module('BibBox').controller('RFIDBaseController', ['$scope', '$controlle
           tags: [],
           title: tag.mid,
           loading: false,
-          invalid: tag.seriesLength === 0 || tag.numberInSeries === 0
+          invalid: tag.seriesLength === 0 || tag.numberInSeries === 0,
+          borrowed: false
         };
         list.push(material);
       }
