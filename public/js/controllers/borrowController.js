@@ -77,11 +77,19 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
 
         return;
       }
-
-      // Always un-lock tag, will re-lock if loan fails. The unlock don't always work, so this is kind of an hack. We
-      // want to always unlock to prevent false alarms if the unlock after the loan don't succeed correctly.
-      if (tag.afi !== false) {
-        $scope.setAFI(tag.uid, false);
+      else if (material.status !== 'error') {
+        // Always un-lock tag, will re-lock if loan fails. The unlock don't always work, so this is kind of an hack. We
+        // want to always unlock to prevent false alarms if the unlock after the loan don't succeed correctly.
+        // Do not perform this action when the material has reported error.
+        if (tag.afi !== false) {
+          $scope.setAFI(tag.uid, false);
+        }
+      }
+      else {
+        // Error case.
+        if (tag.afi !== true) {
+          $scope.setAFI(tag.uid, true);
+        }
       }
 
       // Check if all tags in series have been added.
@@ -146,8 +154,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                 material.status = 'error';
                 material.borrowed = false;
 
-                // Loan failed, so lets lock the tag again.
-                $scope.setAFI(material.uid, true);
+                // Loan failed, so lets lock the tags again.
+                for (var i = 0; i < material.tags.length; i++) {
+                  $scope.setAFI(material.tags[i].uid, true);
+                }
 
                 if (result.itemProperties) {
                   material.title = result.itemProperties.title;
@@ -161,8 +171,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
               material.loading = false;
               material.borrowed = false;
 
-              // Loan failed, so lets lock the tag again.
-              $scope.setAFI(material.uid, true);
+              // Loan failed, so lets lock the tags again.
+              for (var i = 0; i < material.tags.length; i++) {
+                $scope.setAFI(material.tags[i].uid, true);
+              }
             }
           },
           function error(err) {
@@ -179,8 +191,10 @@ angular.module('BibBox').controller('BorrowController', ['$scope', '$controller'
                 material.loading = false;
                 material.borrowed = false;
 
-                // Loan failed, so lets lock the tag again.
-                $scope.setAFI(material.uid, true);
+                // Loan failed, so lets lock the tags again.
+                for (var i = 0; i < material.tags.length; i++) {
+                  $scope.setAFI(material.tags[i].uid, true);
+                }
 
                 break;
               }
