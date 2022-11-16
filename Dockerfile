@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:14
 LABEL maintainer="ITK Dev <itkdev@mkb.aarhus.dk>"
 
 # Ensure packages are avaiable.
