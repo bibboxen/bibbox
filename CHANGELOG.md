@@ -2,6 +2,12 @@
 
 ### In development
 
+* Upgrade to node 14
+
+### v1.8.3
+* Minor release only with changes in default configuration file.
+
+### v1.8.2
 * Fixed tag un-lock vs. borrowed state in front end.
 * Fixed type error: Cannot read property 'validPatron' of null
 * Added extra offline checks to FBS to prevent request when offline
