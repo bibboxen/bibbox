@@ -70,9 +70,6 @@ var Notification = function Notification(bus, config, paths, languages) {
   this.mailTemplate = twig.twig({
     data: fs.readFileSync(__dirname + '/templates/mail/receipt.html', 'utf8')
   });
-  this.printTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/print/receipt.html', 'utf8')
-  });
 
   // Load library header templates.
   this.mailLibraryTemplate = twig.twig({
@@ -560,14 +557,8 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
     }
   }
   else {
-    result = self.printTemplate.render(context);
-
-    // Remove empty lines (from template engine if statements).
-    result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-    result = result.replace(/<\/br>/g, "\n");
-
     // Print it.
-    self.printReceipt(result).then(function () {
+    self.printReceipt(context).then(function () {
       deferred.resolve();
     }, function (err) {
       deferred.reject(err);
@@ -606,14 +597,8 @@ Notification.prototype.checkInOfflineReceipt = function checkInOfflineReceipt(it
     }]
   };
 
-  // Render receipt.
-  var result = self.printTemplate.render(context);
-
-  // Remove empty lines (from template engine if statements).
-  result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-
   // Print it.
-  self.printReceipt(result).then(function () {
+  self.printReceipt(context).then(function () {
     deferred.resolve();
   }, function (err) {
     deferred.reject(err);
@@ -682,10 +667,8 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
       }
     }
     else {
-      result = self.printTemplate.render(context);
-
       // Print it.
-      self.printReceipt(result).then(function () {
+      self.printReceipt(context).then(function () {
         deferred.resolve();
       }, function (err) {
         deferred.reject(err);
@@ -727,10 +710,8 @@ Notification.prototype.checkOutOfflineReceipt = function checkOutOfflineReceipt(
     }]
   };
 
-  var result = self.printTemplate.render(context);
-
   // Print it.
-  self.printReceipt(result).then(function () {
+  self.printReceipt(context).then(function () {
     deferred.resolve();
   }, function (err) {
     deferred.reject(err);
@@ -801,13 +782,8 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       }
     }
     else {
-      result = self.printTemplate.render(context);
-
-      // Remove empty lines (from template engine if statements).
-      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-
       // Print it.
-      self.printReceipt(result).then(function () {
+      self.printReceipt(context).then(function () {
         deferred.resolve();
       }, function (err) {
         deferred.reject(err);
@@ -912,7 +888,7 @@ Notification.prototype.sendMail = function sendMail(to, content) {
 };
 
 /**
- * Convert mm to post script points.
+ * Convert mm to post script points (used in PDFkit for printing).
  */
 Notification.prototype.mmToPostScriptPoints = function mmToPostScriptPoints(mm) {
   return mm * 2.8346456693;
@@ -926,15 +902,19 @@ Notification.prototype.mmToPostScriptPoints = function mmToPostScriptPoints(mm) 
 
 
 
+
 /**
  * Print receipt.
  *
- * @param content
+ * @param data
  */
-Notification.prototype.printReceipt = function printReceipt(content) {
+Notification.prototype.printReceipt = function printReceipt(data) {
   var deferred = Q.defer();
   var self = this;
   var filename = "/tmp/out.pdf";
+  var dashes = '---------------------------------------';
+  var normalFont = 14;
+  var largeFont = 16;
 
   const doc = new PDFDocument({
     font: 'Helvetica', 
@@ -944,14 +924,77 @@ Notification.prototype.printReceipt = function printReceipt(content) {
       left: 10,
       right: 10
     }, 
-    size: [this.mmToPostScriptPoints(72), this.mmToPostScriptPoints(2001)]
+    size: [this.mmToPostScriptPoints(72), this.mmToPostScriptPoints(200)]
   });  
   doc.pipe(fs.createWriteStream(filename));
-  doc.fontSize(14);
-  doc.text(content);
-  doc.end();
+  doc.fontSize(normalFont);
 
-  debug('Test: ' + content);
+  debug(data);
+
+  // Library header.
+  doc.text(twig.twig({
+    data: '{{ library }}'
+  }).render({ library: data.library }));
+  doc.moveDown();
+
+  // Loop over patrons.
+  data.patrons.forEach(function (patron) {
+      // Patron name.
+      doc.font('Helvetica-Bold').text(twig.twig({
+        data: "{{ 'receipt.user'|translate }} "
+      }).render(), {continued: true})
+      .font('Helvetica').text(twig.twig({
+        data: "{{ name }}"
+      }).render({ name: patron.name }));
+
+      // Add check-ins
+      if (patron.hasOwnProperty('check_ins')) {
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(largeFont).text(twig.twig({
+          data: "{{ 'receipt.checkin.headline'|translate }}"
+        }).render())
+        .moveDown()
+        .font('Helvetica').fontSize(normalFont).text(twig.twig({
+          data: "{{ check_ins }}"
+        }).render({ check_ins: patron.check_ins }))
+        .moveUp()
+        .text(dashes);
+      }
+
+
+      // {% if patron.loans %}
+      // {% if patron.loans != false %}
+      // {{ patron.loans }}
+      // --------------------------------------
+      // {% endif %}
+      // {% endif %}
+
+      // {% if patron.reservations_ready %}
+      // {{ patron.reservations_ready }}
+      // --------------------------------------
+      // {% endif %}
+
+      // {% if patron.reservations %}
+      // {{ patron.reservations }}
+      // --------------------------------------
+      // {% endif %}
+
+      // {% if patron.fines %}
+      // {{ patron.fines }}
+      // --------------------------------------
+      // {% endif %}
+
+  });
+
+  // Library footer.
+  doc.moveDown();
+  var footer = data.footer.replace(/<\/br>/g, "\n");
+  doc.text(twig.twig({
+    data: '{{ footer }}\n\n.'
+  }).render({ footer: footer }));
+
+
+  doc.end();
 
   // var lp = spawn('/usr/bin/lp', [ '-o', 'media=Custom.8x500cm', filename ]);
 

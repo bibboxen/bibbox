@@ -1,7 +1,6 @@
-{{ 'receipt.checkin.headline'|translate }}
-
 {% for item in items|sortOnField('transactionDate') %}
-{{ 'receipt.checkin.id'|translate }} {{ item.itemIdentifier }}
+{{ 'receipt.checkin.id'|translate }} 
+{{ item.itemIdentifier }}
 {% if item.itemProperties.title == 'fbs.offline.title' %}
 {{ item.itemProperties.title|translate }}
 {% else %}
@@ -10,6 +9,7 @@
 {% if item.itemProperties.author %}
 {{ item.itemProperties.author }}
 {% endif %}
-{{ 'receipt.checkin.transactionDate'|translate }} {{ (item.transactionDate/1000)|date('d/m/y') }}
+{{ 'receipt.checkin.transactionDate'|translate }} 
+{{ (item.transactionDate/1000)|date('d/m/y') }}
 
 {% endfor %}
