@@ -1,17 +1,13 @@
-<h2>{{ 'receipt.reservations.headline'|translate }}</h2>
+{{ 'receipt.reservations.headline'|translate }}
 
 {% for item in items|sortOnField('interestDate') %}
-<div class="row-item">
-  <p>
-    {% if item.title %}
-    {{ item.title }}<br />
-    {% endif %}
-    {% if item.author %}
-    {{ item.author }}<br />
-    {% endif %}
-    {{ 'receipt.reservations.interestDate'|translate }} {{ (item.interestDate/1000)|date('d/m/y') }}<br />
-    {{ 'receipt.reservations.dk5'|translate }} {{ item.DK5 }}
-  </p>
-</div>
+{% if item.title %}
+{{ item.title }}
+{% endif %}
+{% if item.author %}
+{{ item.author }}
+{% endif %}
+{{ 'receipt.reservations.interestDate'|translate }} {{ (item.interestDate/1000)|date('d/m/y') }}
+{{ 'receipt.reservations.dk5'|translate }} {{ item.DK5 }}
+
 {% endfor %}
-<hr/>

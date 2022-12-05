@@ -8,11 +8,11 @@
 var twig = require('twig');
 var nodemailer = require('nodemailer');
 var i18n = require('i18n');
-var wkhtmltopdf = require('wkhtmltopdf');
 var spawn = require('child_process').spawn;
 var uniqid = require('uniqid');
 var Q = require('q');
 var fs = require('fs');
+const PDFDocument = require('pdfkit');
 
 var debug = require('debug')('bibbox:notification');
 
@@ -508,7 +508,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
         patronIdentifier: patronIdentifier,
         name: patronInformation.hasOwnProperty('personalName') ? patronInformation.personalName : 'Unknown',
         fines: layout.fines ? self.renderFines(mail, patronInformation.fineItems) : '',
-        loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patronInformation.chargedItems, patronInformation.overdueItems) : '',
+        //loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patronInformation.chargedItems, patronInformation.overdueItems) : '',
         reservations: layout.reservations ? self.renderReservations(mail, patronInformation.unavailableHoldItems) : '',
         reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, patronInformation.holdItems) : '',
         check_ins: layout.check_ins ? self.renderCheckIn(mail, items[patronInformation.patronIdentifier]) : ''
@@ -564,6 +564,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
 
     // Remove empty lines (from template engine if statements).
     result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+    result = result.replace(/<\/br>/g, "\n");
 
     // Print it.
     self.printReceipt(result).then(function () {
@@ -911,42 +912,72 @@ Notification.prototype.sendMail = function sendMail(to, content) {
 };
 
 /**
+ * Convert mm to post script points.
+ */
+Notification.prototype.mmToPostScriptPoints = function mmToPostScriptPoints(mm) {
+  return mm * 2.8346456693;
+}
+
+
+
+
+
+
+
+
+
+/**
  * Print receipt.
  *
  * @param content
  */
 Notification.prototype.printReceipt = function printReceipt(content) {
   var deferred = Q.defer();
-  var filename = '/tmp/out.pdf';
+  var self = this;
+  var filename = "/tmp/out.pdf";
 
-  var writableStream = fs.createWriteStream(filename);
-  var readableStream = wkhtmltopdf(content, {
-    'margin-left': 0,
-    'margin-right': 0,
-    'margin-top': 0,
-    'margin-bottom': 10,
-    'page-width': 75,
-    'page-height': 100000
-  });
+  const doc = new PDFDocument({
+    font: 'Helvetica', 
+    margins: {
+      top: 25,
+      bottom: 20,
+      left: 10,
+      right: 10
+    }, 
+    size: [this.mmToPostScriptPoints(72), this.mmToPostScriptPoints(2001)]
+  });  
+  doc.pipe(fs.createWriteStream(filename));
+  doc.fontSize(14);
+  doc.text(content);
+  doc.end();
 
-  readableStream.on('data', function (chunk) {
-    writableStream.write(chunk);
-  });
+  debug('Test: ' + content);
 
-  readableStream.on('end', function () {
-    var lp = spawn('/usr/bin/lp', [ '-o', 'media=Custom.8x500cm', filename ]);
+  // var lp = spawn('/usr/bin/lp', [ '-o', 'media=Custom.8x500cm', filename ]);
 
-    lp.stderr.on('data', function (data) {
-      deferred.reject(data.toString());
-    });
+  // lp.stderr.on('data', function (data) {
+  //   deferred.reject(data.toString());
+  // });
 
-    lp.on('close', function (code) {
-      deferred.resolve(code);
-    });
-  });
+  // lp.on('close', function (code) {
+  //   deferred.resolve(code);
+  // });
+  deferred.resolve();
 
   return deferred.promise;
 };
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Get mail addresses for patrons.

@@ -1,19 +1,15 @@
-<h2>{{ 'receipt.checkin.headline'|translate }}</h2>
+{{ 'receipt.checkin.headline'|translate }}
 
 {% for item in items|sortOnField('transactionDate') %}
-<div class="row-item">
-  <p>
-    {{ 'receipt.checkin.id'|translate }} {{ item.itemIdentifier }}<br/>
-    {% if item.itemProperties.title == 'fbs.offline.title' %}
-    {{ item.itemProperties.title|translate }}<br/>
-    {% else %}
-    {{ item.itemProperties.title }}<br/>
-    {% endif %}
-    {% if item.itemProperties.author %}
-      {{ item.itemProperties.author }}<br/>
-    {% endif %}
-    {{ 'receipt.checkin.transactionDate'|translate }} {{ (item.transactionDate/1000)|date('d/m/y') }}
-  </p>
-</div>
+{{ 'receipt.checkin.id'|translate }} {{ item.itemIdentifier }}
+{% if item.itemProperties.title == 'fbs.offline.title' %}
+{{ item.itemProperties.title|translate }}
+{% else %}
+{{ item.itemProperties.title }}
+{% endif %}
+{% if item.itemProperties.author %}
+{{ item.itemProperties.author }}
+{% endif %}
+{{ 'receipt.checkin.transactionDate'|translate }} {{ (item.transactionDate/1000)|date('d/m/y') }}
+
 {% endfor %}
-<hr/>

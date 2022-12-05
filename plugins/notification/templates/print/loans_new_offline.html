@@ -1,14 +1,10 @@
-<h2>{{ 'receipt.loans.new.headline'|translate }}</h2>
+{{ 'receipt.loans.new.headline'|translate }}
 
 {% for item in items|sortOnField('itemIdentifier') %}
-<div class="row-item">
-  <p>
-    {{ item.itemProperties.title|translate }}<br/>
-    {{ 'receipt.loans.id'|translate }} {{ item.itemIdentifier }}<br/>
-    {% if item.dueDate %}
-    {{ 'receipt.loans.returnDate'|translate }} {{ (item.dueDate/1000)|date('d/m/y') }}
-    {% endif %}
-  </p>
-</div>
+{{ item.itemProperties.title|translate }}
+{{ 'receipt.loans.id'|translate }} {{ item.itemIdentifier }}
+{% if item.dueDate %}
+{{ 'receipt.loans.returnDate'|translate }} {{ (item.dueDate/1000)|date('d/m/y') }}
+{% endif %}
+
 {% endfor %}
-<hr/>

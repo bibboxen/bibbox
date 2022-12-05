@@ -22,7 +22,7 @@ services:
     working_dir: /app
 
   redis:
-    image: redis:3
+    image: redis:4
     networks:
       - app
     ports:
