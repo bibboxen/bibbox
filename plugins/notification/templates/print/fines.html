@@ -1,19 +1,13 @@
-<h2>{{ 'receipt.fines.headline'|translate }}</h2>
+{{ 'receipt.fines.headline'|translate }}
 
 {% for item in items|sortOnField('fineDate') %}
-<div class="row-item">
-  <p>
-    {% if item.id %}
-      {{ 'receipt.fines.id'|translate }} {{ item.id }}<br/>
-    {% endif %}
-    {% if item.title %}
-      {{ item.title }}<br/>
-    {% endif %}
-    {{ 'receipt.fines.date'|translate }} {{ (item.fineDate/1000)|date("d/m/y") }} {{ 'receipt.fines.amount'|translate }} {{ item.fineAmount }}
-  </p>
-</div>
+{% if item.id %}
+{{ 'receipt.fines.id'|translate }} {{ item.id }}
+{% endif %}
+{% if item.title %}
+{{ item.title }}
+{% endif %}
+{{ 'receipt.fines.date'|translate }} {{ (item.fineDate/1000)|date("d/m/y") }} {{ 'receipt.fines.amount'|translate }} {{ item.fineAmount }}
+
 {% endfor %}
-<div class="row-item">
-  <p>{{ 'receipt.fines.total'|translate }} {{ total }}</p>
-</div>
-<hr/>
+{{ 'receipt.fines.total'|translate }} {{ total }}

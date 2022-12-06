@@ -8,11 +8,11 @@
 var twig = require('twig');
 var nodemailer = require('nodemailer');
 var i18n = require('i18n');
-var wkhtmltopdf = require('wkhtmltopdf');
 var spawn = require('child_process').spawn;
 var uniqid = require('uniqid');
 var Q = require('q');
 var fs = require('fs');
+const PDFDocument = require('pdfkit');
 
 var debug = require('debug')('bibbox:notification');
 
@@ -69,9 +69,6 @@ var Notification = function Notification(bus, config, paths, languages) {
   // Load template snippets.
   this.mailTemplate = twig.twig({
     data: fs.readFileSync(__dirname + '/templates/mail/receipt.html', 'utf8')
-  });
-  this.printTemplate = twig.twig({
-    data: fs.readFileSync(__dirname + '/templates/print/receipt.html', 'utf8')
   });
 
   // Load library header templates.
@@ -560,13 +557,8 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
     }
   }
   else {
-    result = self.printTemplate.render(context);
-
-    // Remove empty lines (from template engine if statements).
-    result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-
     // Print it.
-    self.printReceipt(result).then(function () {
+    self.printReceipt(context).then(function () {
       deferred.resolve();
     }, function (err) {
       deferred.reject(err);
@@ -605,14 +597,8 @@ Notification.prototype.checkInOfflineReceipt = function checkInOfflineReceipt(it
     }]
   };
 
-  // Render receipt.
-  var result = self.printTemplate.render(context);
-
-  // Remove empty lines (from template engine if statements).
-  result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-
   // Print it.
-  self.printReceipt(result).then(function () {
+  self.printReceipt(context).then(function () {
     deferred.resolve();
   }, function (err) {
     deferred.reject(err);
@@ -681,10 +667,8 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
       }
     }
     else {
-      result = self.printTemplate.render(context);
-
       // Print it.
-      self.printReceipt(result).then(function () {
+      self.printReceipt(context).then(function () {
         deferred.resolve();
       }, function (err) {
         deferred.reject(err);
@@ -726,10 +710,8 @@ Notification.prototype.checkOutOfflineReceipt = function checkOutOfflineReceipt(
     }]
   };
 
-  var result = self.printTemplate.render(context);
-
   // Print it.
-  self.printReceipt(result).then(function () {
+  self.printReceipt(context).then(function () {
     deferred.resolve();
   }, function (err) {
     deferred.reject(err);
@@ -800,13 +782,8 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       }
     }
     else {
-      result = self.printTemplate.render(context);
-
-      // Remove empty lines (from template engine if statements).
-      result = result.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-
       // Print it.
-      self.printReceipt(result).then(function () {
+      self.printReceipt(context).then(function () {
         deferred.resolve();
       }, function (err) {
         deferred.reject(err);
@@ -911,38 +888,157 @@ Notification.prototype.sendMail = function sendMail(to, content) {
 };
 
 /**
+ * Convert mm to post script points (used in PDFkit for printing).
+ */
+Notification.prototype.mmToPostScriptPoints = function mmToPostScriptPoints(mm) {
+  return mm * 2.8346456693;
+}
+
+/**
  * Print receipt.
  *
- * @param content
+ * @param data
  */
-Notification.prototype.printReceipt = function printReceipt(content) {
+Notification.prototype.printReceipt = function printReceipt(data) {
   var deferred = Q.defer();
-  var filename = '/tmp/out.pdf';
+  var self = this;
+  var filename = "/tmp/out.pdf";
+  var dashes = '---------------------------------------';
+  var normalFont = 14;
+  var largeFont = 16;
 
-  var writableStream = fs.createWriteStream(filename);
-  var readableStream = wkhtmltopdf(content, {
-    'margin-left': 0,
-    'margin-right': 0,
-    'margin-top': 0,
-    'margin-bottom': 10,
-    'page-width': 75,
-    'page-height': 100000
+  const doc = new PDFDocument({
+    font: 'Helvetica', 
+    margins: {
+      top: 25,
+      bottom: 20,
+      left: 10,
+      right: 10
+    }, 
+    size: [this.mmToPostScriptPoints(72), this.mmToPostScriptPoints(200)]
+  });  
+  doc.pipe(fs.createWriteStream(filename));
+  doc.fontSize(normalFont);
+
+  debug(data);
+
+  // Library header.
+  doc.text(twig.twig({
+    data: '{{ library }}'
+  }).render({ library: data.library }));
+  doc.moveDown();
+
+  // Loop over patrons.
+  data.patrons.forEach(function (patron) {
+      // Patron name.
+      doc.font('Helvetica-Bold').text(twig.twig({
+        data: "{{ 'receipt.user'|translate }} "
+      }).render(), {continued: true})
+      .font('Helvetica').text(twig.twig({
+        data: "{{ name }}"
+      }).render({ name: patron.name }));
+
+      // New loans.
+      if (patron.hasOwnProperty('loans_new')) {
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(largeFont).text(twig.twig({
+          data: "{{ 'receipt.loans.new.headline'|translate }}"
+        }).render())
+        .moveDown()
+        .font('Helvetica').fontSize(normalFont).text(twig.twig({
+          data: "{{ check_out }}"
+        }).render({ check_out: patron.loans_new }))
+        .moveUp()
+        .fillColor('grey').text(dashes).fillColor('black');
+      }
+
+      // Add check-ins.
+      if (patron.hasOwnProperty('check_ins')) {
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(largeFont).text(twig.twig({
+          data: "{{ 'receipt.checkin.headline'|translate }}"
+        }).render())
+        .moveDown()
+        .font('Helvetica').fontSize(normalFont).text(twig.twig({
+          data: "{{ check_ins }}"
+        }).render({ check_ins: patron.check_ins }))
+        .moveUp()
+        .fillColor('grey').text(dashes).fillColor('black');
+      }
+
+      // Add check-out (new loans).
+      if (patron.hasOwnProperty('loans') && patron.loans != false) {
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(largeFont).text(twig.twig({
+          data: "{{ 'receipt.loans.headline'|translate }}"
+        }).render())
+        .moveDown()
+        .font('Helvetica').fontSize(normalFont).text(twig.twig({
+          data: "{{ loans }}"
+        }).render({ loans: patron.loans }))
+        .moveUp()
+        .fillColor('grey').text(dashes).fillColor('black');
+      }
+
+      // Add reservations ready.
+      if (patron.hasOwnProperty('reservations_ready') && patron.reservations_ready.length != 0) {
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(largeFont).text(twig.twig({
+          data: "{{ 'receipt.reservations.ready.headline'|translate }}"
+        }).render())
+        .moveDown()
+        .font('Helvetica').fontSize(normalFont).text(twig.twig({
+          data: "{{ ready }}"
+        }).render({ ready: patron.reservations_ready }))
+        .moveUp()
+        .fillColor('grey').text(dashes).fillColor('black');
+      }
+
+      // Add reservations.
+      if (patron.hasOwnProperty('reservations') && patron.reservations.length != 0) {
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(largeFont).text(twig.twig({
+          data: "{{ 'receipt.reservations.headline'|translate }}"
+        }).render())
+        .moveDown()
+        .font('Helvetica').fontSize(normalFont).text(twig.twig({
+          data: "{{ reservations }}"
+        }).render({ reservations: patron.reservations }))
+        .moveUp()
+        .fillColor('grey').text(dashes).fillColor('black');
+      }
+
+      // Add fines.
+      if (patron.hasOwnProperty('fines') && patron.fines.length != 0) {
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(largeFont).text(twig.twig({
+          data: "{{ 'receipt.fines.headline'|translate }}"
+        }).render())
+        .moveDown()
+        .font('Helvetica').fontSize(normalFont).text(twig.twig({
+          data: "{{ fines }}"
+        }).render({ fines: patron.fines }))
+        .moveUp()
+        .fillColor('grey').text(dashes).fillColor('black');
+      }
   });
 
-  readableStream.on('data', function (chunk) {
-    writableStream.write(chunk);
+  // Library footer.
+  doc.moveDown();
+  var footer = data.footer.replace(/<\/br>/g, "\n");
+  doc.text(twig.twig({
+    data: '{{ footer }}\n\n.'
+  }).render({ footer: footer }));
+
+  // Complete the PDF document.
+  doc.end();
+
+  var lp = spawn('/usr/bin/lp', [ '-o', 'media=Custom.8x500cm', filename ]);
+  lp.stderr.on('data', function (data) {
+    deferred.reject(data.toString());
   });
-
-  readableStream.on('end', function () {
-    var lp = spawn('/usr/bin/lp', [ '-o', 'media=Custom.8x500cm', filename ]);
-
-    lp.stderr.on('data', function (data) {
-      deferred.reject(data.toString());
-    });
-
-    lp.on('close', function (code) {
-      deferred.resolve(code);
-    });
+  lp.on('close', function (code) {
+    deferred.resolve(code);
   });
 
   return deferred.promise;

@@ -16,9 +16,9 @@
     "i18n": "^0.8.3",
     "node-printer": "^1.0.2",
     "nodemailer": "^2.6.0",
+    "pdfkit": "^0.13.0",
     "q": "^1.4.1",
     "twig": "^1.13.2",
-    "uniqid": "^4.1.0",
-    "wkhtmltopdf": "^0.3.3"
+    "uniqid": "^4.1.0"
   }
 }
