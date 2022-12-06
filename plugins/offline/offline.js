@@ -380,62 +380,62 @@ Offline.prototype.checkout = function checkout(job, done) {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  // var bus = imports.bus;
-  // var offline = new Offline(bus, options.host, options.port);
+  var bus = imports.bus;
+  var offline = new Offline(bus, options.host, options.port);
 
-  // bus.on('offline.add.checkout', function (obj) {
-  //   var data = JSON.parse(JSON.stringify(obj));
+  bus.on('offline.add.checkout', function (obj) {
+    var data = JSON.parse(JSON.stringify(obj));
 
-  //   // Added event info to job.
-  //   data.busEvent = 'offline.fbs.checkout.success' + data.itemIdentifier;
-  //   data.errorEvent = 'offline.fbs.checkout.error' + data.itemIdentifier;
-  //   data.queued = true;
+    // Added event info to job.
+    data.busEvent = 'offline.fbs.checkout.success' + data.itemIdentifier;
+    data.errorEvent = 'offline.fbs.checkout.error' + data.itemIdentifier;
+    data.queued = true;
 
-  //   offline.add('checkout', data);
-  // });
+    offline.add('checkout', data);
+  });
 
-  // bus.on('offline.add.checkin', function (obj) {
-  //   var data = JSON.parse(JSON.stringify(obj));
+  bus.on('offline.add.checkin', function (obj) {
+    var data = JSON.parse(JSON.stringify(obj));
 
-  //   // Added event info to job.
-  //   data.busEvent = 'offline.fbs.checkin.success' + data.itemIdentifier;
-  //   data.errorEvent = 'offline.fbs.checkin.error' + data.itemIdentifier;
-  //   data.queued = true;
+    // Added event info to job.
+    data.busEvent = 'offline.fbs.checkin.success' + data.itemIdentifier;
+    data.errorEvent = 'offline.fbs.checkin.error' + data.itemIdentifier;
+    data.queued = true;
 
-  //   offline.add('checkin', data);
-  // });
+    offline.add('checkin', data);
+  });
 
-  // bus.on('offline.failed.jobs', function (data) {
-  //   var jobs = {};
-  //   offline.getFailedJobs('checkout').then(function (checkoutJobs) {
-  //     jobs.checkout = checkoutJobs;
-  //     offline.getFailedJobs('checkin').then(function (checkinJobs) {
-  //       jobs.checkin = checkinJobs;
-  //       bus.emit(data.busEvent, jobs);
-  //     }, function (err) {
-  //       bus.emit(data.errorEvent, err);
-  //     });
-  //   }, function (err) {
-  //     bus.emit(data.errorEvent, err);
-  //   });
-  // });
+  bus.on('offline.failed.jobs', function (data) {
+    var jobs = {};
+    offline.getFailedJobs('checkout').then(function (checkoutJobs) {
+      jobs.checkout = checkoutJobs;
+      offline.getFailedJobs('checkin').then(function (checkinJobs) {
+        jobs.checkin = checkinJobs;
+        bus.emit(data.busEvent, jobs);
+      }, function (err) {
+        bus.emit(data.errorEvent, err);
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
+  });
 
-  // bus.on('offline.counts', function (data) {
-  //   var counts = {};
-  //   offline.getQueueCounts('checkout').then(function (checkoutCounts) {
-  //     counts.checkout = checkoutCounts;
-  //     offline.getQueueCounts('checkin').then(function (checkinCounts) {
-  //       counts.checkin = checkinCounts;
-  //       bus.emit(data.busEvent, counts);
-  //     }, function (err) {
-  //       bus.emit(data.errorEvent, err);
-  //     });
-  //   }, function (err) {
-  //     bus.emit(data.errorEvent, err);
-  //   });
-  // });
+  bus.on('offline.counts', function (data) {
+    var counts = {};
+    offline.getQueueCounts('checkout').then(function (checkoutCounts) {
+      counts.checkout = checkoutCounts;
+      offline.getQueueCounts('checkin').then(function (checkinCounts) {
+        counts.checkin = checkinCounts;
+        bus.emit(data.busEvent, counts);
+      }, function (err) {
+        bus.emit(data.errorEvent, err);
+      });
+    }, function (err) {
+      bus.emit(data.errorEvent, err);
+    });
+  });
 
-  // register(null, {
-  //   offline: offline
-  // });
+  register(null, {
+    offline: offline
+  });
 };
