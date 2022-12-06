@@ -3,6 +3,7 @@
 ### In development
 
 * Upgrade to node 14
+* Change receipt generation from wkhtmltopdf to using PDFKit
 
 ### v1.8.3
 * Minor release only with changes in default configuration file.
