@@ -209,7 +209,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
 
         self.downloadFile(query.url, dest).then(function (file) {
           // Try to detect version from the filename.
-          var regEx = /v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?/;
+          var regEx = /v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+)?/;
           if (!regEx.test(path.basename(file))) {
             var msg = 'Version not found in filename: ' + path.basename(file);
             debug('Err: ' + msg);
@@ -223,13 +223,16 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
           var version = regEx.exec(path.basename(file))[0];
           var dir = __dirname.substr(0, __dirname.lastIndexOf('/')) + '/' + version;
 
+          debug('Version to update to: ' + version);
           debug('File downloaded to: ' + file);
+          debug('Destination: ' + dir);
 
-          // Unpack file
+          // Check that new dir exists.
           if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
           }
 
+          // Unpack file
           var tar = spawn('tar', ['-zxf', file, '-C', dir]);
           tar.stderr.on('data', function (data) {
             debug('Err unpacking file: ' + data.toString());
