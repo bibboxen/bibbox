@@ -894,15 +894,6 @@ Notification.prototype.mmToPostScriptPoints = function mmToPostScriptPoints(mm) 
   return mm * 2.8346456693;
 }
 
-
-
-
-
-
-
-
-
-
 /**
  * Print receipt.
  *
@@ -958,7 +949,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
           data: "{{ check_out }}"
         }).render({ check_out: patron.loans_new }))
         .moveUp()
-        .text(dashes);
+        .fillColor('grey').text(dashes).fillColor('black');
       }
 
       // Add check-ins.
@@ -972,7 +963,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
           data: "{{ check_ins }}"
         }).render({ check_ins: patron.check_ins }))
         .moveUp()
-        .text(dashes);
+        .fillColor('grey').text(dashes).fillColor('black');
       }
 
       // Add check-out (new loans).
@@ -986,7 +977,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
           data: "{{ loans }}"
         }).render({ loans: patron.loans }))
         .moveUp()
-        .text(dashes);
+        .fillColor('grey').text(dashes).fillColor('black');
       }
 
       // Add reservations ready.
@@ -1000,7 +991,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
           data: "{{ ready }}"
         }).render({ ready: patron.reservations_ready }))
         .moveUp()
-        .text(dashes);
+        .fillColor('grey').text(dashes).fillColor('black');
       }
 
       // Add reservations.
@@ -1014,7 +1005,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
           data: "{{ reservations }}"
         }).render({ reservations: patron.reservations }))
         .moveUp()
-        .text(dashes);
+        .fillColor('grey').text(dashes).fillColor('black');
       }
 
       // Add fines.
@@ -1028,11 +1019,8 @@ Notification.prototype.printReceipt = function printReceipt(data) {
           data: "{{ fines }}"
         }).render({ fines: patron.fines }))
         .moveUp()
-        .text(dashes);
+        .fillColor('grey').text(dashes).fillColor('black');
       }
-
-
-
   });
 
   // Library footer.
@@ -1042,34 +1030,19 @@ Notification.prototype.printReceipt = function printReceipt(data) {
     data: '{{ footer }}\n\n.'
   }).render({ footer: footer }));
 
-
+  // Complete the PDF document.
   doc.end();
 
-  // var lp = spawn('/usr/bin/lp', [ '-o', 'media=Custom.8x500cm', filename ]);
-
-  // lp.stderr.on('data', function (data) {
-  //   deferred.reject(data.toString());
-  // });
-
-  // lp.on('close', function (code) {
-  //   deferred.resolve(code);
-  // });
-  deferred.resolve();
+  var lp = spawn('/usr/bin/lp', [ '-o', 'media=Custom.8x500cm', filename ]);
+  lp.stderr.on('data', function (data) {
+    deferred.reject(data.toString());
+  });
+  lp.on('close', function (code) {
+    deferred.resolve(code);
+  });
 
   return deferred.promise;
 };
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * Get mail addresses for patrons.

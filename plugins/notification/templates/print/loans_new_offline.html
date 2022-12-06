@@ -1,5 +1,3 @@
-{{ 'receipt.loans.new.headline'|translate }}
-
 {% for item in items|sortOnField('itemIdentifier') %}
 {{ item.itemProperties.title|translate }}
 {{ 'receipt.loans.id'|translate }} {{ item.itemIdentifier }}

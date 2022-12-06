@@ -1,5 +1,3 @@
-{{ 'receipt.checkin.headline'|translate }}
-
 {% for item in items|sortOnField('itemIdentifier') %}
 {{ item.itemProperties.title | translate}}
 {{ 'receipt.checkin.id'|translate }} {{ item.itemIdentifier }}
