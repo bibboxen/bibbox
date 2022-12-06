@@ -1,12 +1,11 @@
-{{ headline|translate }}
-
 {% for item in items|sortOnField('dueDate') %}
 {% if item.itemProperties.title == 'fbs.offline.title' %}
 {{ item.itemProperties.title|translate }}
 {% else %}
 {{ item.itemProperties.title }}
 {% endif %}
-{{ 'receipt.loans.id'|translate }} {{ item.itemIdentifier }}
+{{ 'receipt.loans.id'|translate }}
+{{ item.itemIdentifier }}
 {% if item.itemProperties.author %}
 {{ item.itemProperties.author }}
 {% endif %}

@@ -1,7 +1,6 @@
-{{ headline|translate }}
-
 {% for item in items|sortOnField('returnDate') %}
-{{ 'receipt.loans.id'|translate }} {{ item.id }}
+{{ 'receipt.loans.id'|translate }}
+{{ item.id }}
 {{ item.title }}
 {% if item.author %}
 {{ item.author }}

@@ -947,7 +947,21 @@ Notification.prototype.printReceipt = function printReceipt(data) {
         data: "{{ name }}"
       }).render({ name: patron.name }));
 
-      // Add check-ins
+      // New loans.
+      if (patron.hasOwnProperty('loans_new')) {
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(largeFont).text(twig.twig({
+          data: "{{ 'receipt.loans.new.headline'|translate }}"
+        }).render())
+        .moveDown()
+        .font('Helvetica').fontSize(normalFont).text(twig.twig({
+          data: "{{ check_out }}"
+        }).render({ check_out: patron.loans_new }))
+        .moveUp()
+        .text(dashes);
+      }
+
+      // Add check-ins.
       if (patron.hasOwnProperty('check_ins')) {
         doc.moveDown();
         doc.font('Helvetica-Bold').fontSize(largeFont).text(twig.twig({
@@ -961,28 +975,63 @@ Notification.prototype.printReceipt = function printReceipt(data) {
         .text(dashes);
       }
 
+      // Add check-out (new loans).
+      if (patron.hasOwnProperty('loans') && patron.loans != false) {
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(largeFont).text(twig.twig({
+          data: "{{ 'receipt.loans.headline'|translate }}"
+        }).render())
+        .moveDown()
+        .font('Helvetica').fontSize(normalFont).text(twig.twig({
+          data: "{{ loans }}"
+        }).render({ loans: patron.loans }))
+        .moveUp()
+        .text(dashes);
+      }
 
-      // {% if patron.loans %}
-      // {% if patron.loans != false %}
-      // {{ patron.loans }}
-      // --------------------------------------
-      // {% endif %}
-      // {% endif %}
+      // Add reservations ready.
+      if (patron.hasOwnProperty('reservations_ready') && patron.reservations_ready.length != 0) {
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(largeFont).text(twig.twig({
+          data: "{{ 'receipt.reservations.ready.headline'|translate }}"
+        }).render())
+        .moveDown()
+        .font('Helvetica').fontSize(normalFont).text(twig.twig({
+          data: "{{ ready }}"
+        }).render({ ready: patron.reservations_ready }))
+        .moveUp()
+        .text(dashes);
+      }
 
-      // {% if patron.reservations_ready %}
-      // {{ patron.reservations_ready }}
-      // --------------------------------------
-      // {% endif %}
+      // Add reservations.
+      if (patron.hasOwnProperty('reservations') && patron.reservations.length != 0) {
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(largeFont).text(twig.twig({
+          data: "{{ 'receipt.reservations.headline'|translate }}"
+        }).render())
+        .moveDown()
+        .font('Helvetica').fontSize(normalFont).text(twig.twig({
+          data: "{{ reservations }}"
+        }).render({ reservations: patron.reservations }))
+        .moveUp()
+        .text(dashes);
+      }
 
-      // {% if patron.reservations %}
-      // {{ patron.reservations }}
-      // --------------------------------------
-      // {% endif %}
+      // Add fines.
+      if (patron.hasOwnProperty('fines') && patron.fines.length != 0) {
+        doc.moveDown();
+        doc.font('Helvetica-Bold').fontSize(largeFont).text(twig.twig({
+          data: "{{ 'receipt.fines.headline'|translate }}"
+        }).render())
+        .moveDown()
+        .font('Helvetica').fontSize(normalFont).text(twig.twig({
+          data: "{{ fines }}"
+        }).render({ fines: patron.fines }))
+        .moveUp()
+        .text(dashes);
+      }
 
-      // {% if patron.fines %}
-      // {{ patron.fines }}
-      // --------------------------------------
-      // {% endif %}
+
 
   });
 
