@@ -1,16 +1,11 @@
-<h2>{{ 'receipt.reservations.ready.headline'|translate }}</h2>
-
 {% for item in items|sortOnField('pickupDate') %}
-<div class="row-item">
-  <p>
-    {{ 'receipt.reservations.ready.pickupLocation'|translate }} {{ item.pickupLocation }}<br/>
-    {{ 'receipt.reservations.ready.pickupDate'|translate }} {{ (item.pickupDate/1000)|date('d/m/y') }}<br/>
-    {{ 'receipt.reservations.ready.pickupId'|translate }} {{ item.pickupId }}<br/>
-    {{ 'receipt.reservations.ready.id'|translate }} {{ item.id }}<br/>
-    {{ item.DK5 }}<br/>
-    {{ item.title }}<br/>
-    {{ item.author }}
-  </p>
-</div>
+{{ 'receipt.reservations.ready.pickupLocation'|translate }} {{ item.pickupLocation }}
+{{ 'receipt.reservations.ready.pickupDate'|translate }} {{ (item.pickupDate/1000)|date('d/m/y') }}
+{{ 'receipt.reservations.ready.pickupId'|translate }}
+{{ item.pickupId }}
+{{ 'receipt.reservations.ready.id'|translate }} {{ item.id }}
+{{ item.DK5 }}
+{{ item.title }}
+{{ item.author }}
+
 {% endfor %}
-<hr/>

@@ -1,21 +1,16 @@
-<h2>{{ headline|translate }}</h2>
-
 {% for item in items|sortOnField('dueDate') %}
-<div class="row-item">
-  <p>
-    {% if item.itemProperties.title == 'fbs.offline.title' %}
-    {{ item.itemProperties.title|translate }}<br/>
-    {% else %}
-    {{ item.itemProperties.title }}<br/>
-    {% endif %}
-    {{ 'receipt.loans.id'|translate }} {{ item.itemIdentifier }}<br/>
-    {% if item.itemProperties.author %}
-    {{ item.itemProperties.author }}<br/>
-    {% endif %}
-    {% if item.dueDate %}
-    {{ 'receipt.loans.returnDate'|translate }} {{ (item.dueDate/1000)|date('d/m/y') }}
-    {% endif %}
-  </p>
-</div>
+{% if item.itemProperties.title == 'fbs.offline.title' %}
+{{ item.itemProperties.title|translate }}
+{% else %}
+{{ item.itemProperties.title }}
+{% endif %}
+{{ 'receipt.loans.id'|translate }}
+{{ item.itemIdentifier }}
+{% if item.itemProperties.author %}
+{{ item.itemProperties.author }}
+{% endif %}
+{% if item.dueDate %}
+{{ 'receipt.loans.returnDate'|translate }} {{ (item.dueDate/1000)|date('d/m/y') }}
+{% endif %}
+
 {% endfor %}
-<hr/>
