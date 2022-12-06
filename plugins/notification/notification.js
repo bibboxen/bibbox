@@ -505,7 +505,7 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
         patronIdentifier: patronIdentifier,
         name: patronInformation.hasOwnProperty('personalName') ? patronInformation.personalName : 'Unknown',
         fines: layout.fines ? self.renderFines(mail, patronInformation.fineItems) : '',
-        //loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patronInformation.chargedItems, patronInformation.overdueItems) : '',
+        loans: layout.loans ? self.renderLoans(mail, 'receipt.loans.headline', patronInformation.chargedItems, patronInformation.overdueItems) : '',
         reservations: layout.reservations ? self.renderReservations(mail, patronInformation.unavailableHoldItems) : '',
         reservations_ready: layout.reservations_ready ? self.renderReadyReservations(mail, patronInformation.holdItems) : '',
         check_ins: layout.check_ins ? self.renderCheckIn(mail, items[patronInformation.patronIdentifier]) : ''
