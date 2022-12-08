@@ -915,7 +915,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
       left: 10,
       right: 10
     }, 
-    size: [this.mmToPostScriptPoints(72), this.mmToPostScriptPoints(200)]
+    size: [this.mmToPostScriptPoints(80), this.mmToPostScriptPoints(200)]
   });  
   doc.pipe(fs.createWriteStream(filename));
   doc.fontSize(normalFont);
@@ -949,7 +949,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
           data: "{{ check_out }}"
         }).render({ check_out: patron.loans_new }))
         .moveUp()
-        .fillColor('grey').text(dashes).fillColor('black');
+        .text(dashes);
       }
 
       // Add check-ins.
@@ -963,7 +963,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
           data: "{{ check_ins }}"
         }).render({ check_ins: patron.check_ins }))
         .moveUp()
-        .fillColor('grey').text(dashes).fillColor('black');
+        .text(dashes);
       }
 
       // Add check-out (new loans).
@@ -977,7 +977,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
           data: "{{ loans }}"
         }).render({ loans: patron.loans }))
         .moveUp()
-        .fillColor('grey').text(dashes).fillColor('black');
+        .text(dashes);
       }
 
       // Add reservations ready.
@@ -991,7 +991,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
           data: "{{ ready }}"
         }).render({ ready: patron.reservations_ready }))
         .moveUp()
-        .fillColor('grey').text(dashes).fillColor('black');
+        .text(dashes);
       }
 
       // Add reservations.
@@ -1005,7 +1005,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
           data: "{{ reservations }}"
         }).render({ reservations: patron.reservations }))
         .moveUp()
-        .fillColor('grey').text(dashes).fillColor('black');
+        .text(dashes);
       }
 
       // Add fines.
@@ -1019,7 +1019,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
           data: "{{ fines }}"
         }).render({ fines: patron.fines }))
         .moveUp()
-        .fillColor('grey').text(dashes).fillColor('black');
+        .text(dashes);
       }
   });
 
@@ -1033,7 +1033,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
   // Complete the PDF document.
   doc.end();
 
-  var lp = spawn('/usr/bin/lp', [ '-o', 'media=Custom.8x500cm', filename ]);
+  var lp = spawn('/usr/bin/lp', [ '-o', 'TmxPaperReduction=both', filename ]);
   lp.stderr.on('data', function (data) {
     deferred.reject(data.toString());
   });
