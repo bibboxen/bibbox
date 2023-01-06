@@ -37,7 +37,7 @@ util.inherits(FBS, eventEmitter);
  *
  * Static factory function to create FBS object with loaded config. This pattern
  * used to fix race conditions and to ensure that we have an constructor
- * without side-effects.
+ * without side effects.
  *
  * @param bus
  *   The event bus
@@ -135,7 +135,7 @@ FBS.prototype.login = function login(username, password) {
  * @param username
  *   Username for the patron (card or CPR number).
  * @param password
- *   The patrons password.
+ *   The patron's password.
  *
  * @return {*|promise}
  *   JSON object with information or FALSE on failure.
@@ -164,9 +164,9 @@ FBS.prototype.patronInformation = function patronInformation(username, password)
  * @param username
  *   Username for the patron (card or CPR number).
  * @param password
- *   The patrons password.
+ *   The patron's password.
  * @param itemIdentifier
- *   The item to checkout.
+ *   The item to check out.
  * @param noBlockDueDate
  *   Timestamp for the time the book should be returned (when noBlock is true).
  * @param {bool} noBlock
@@ -199,7 +199,7 @@ FBS.prototype.checkout = function checkout(username, password, itemIdentifier, n
  * Check-in (return) item.
  *
  * @param itemIdentifier
- *   The item to checkout.
+ *   The item to check out.
  * @param checkedInDate
  *   Timestamp for the time that the item was returned.
  * @param {bool} noBlock
@@ -232,7 +232,7 @@ FBS.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate, noBlock)
  * @param username
  *   Username for the patron (card or CPR number).
  * @param password
- *   The patrons password.
+ *   The patron's password.
  * @param itemIdentifier
  *   The item to renew.
  *
@@ -263,7 +263,7 @@ FBS.prototype.renew = function renew(username, password, itemIdentifier) {
  * @param username
  *   Username for the patron (card or CPR number).
  * @param password
- *   The patrons password.
+ *   The patron's password.
  *
  * @return {*|promise}
  *   JSON object with information or error message on failure.
@@ -681,8 +681,7 @@ module.exports = function (options, imports, register) {
     if (onlineState.online) {
       FBS.create(bus).then(function (fbs) {
         // Ensure that the noBlock parameter to FBS is set to 'N' as default.
-        // NoBlock have been added in a later release an may not the be in all
-        // request.
+        // NoBlock have been added in a later release a may not be in all requests.
         var noBlock = data.hasOwnProperty('noBlock') ? data.noBlock : false;
 
         // Perform the checking request.
