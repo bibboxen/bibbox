@@ -13,7 +13,9 @@ var uniqid = require('uniqid');
 var self = null;
 
 /**
- *
+ * @param bus
+ * @param host
+ * @param port
  * @constructor
  */
 var Offline = function Offline(bus, host, port) {
@@ -22,7 +24,7 @@ var Offline = function Offline(bus, host, port) {
   // Set the modules global self.
   self = this;
 
-  // Create the queues, if they exists in redis they will just reconnect.
+  // Create the queues, if they exist in redis they will just reconnect.
   this.checkinQueue = Queue('Check-in', port, host);
   this.checkoutQueue = Queue('Check-out', port, host);
 
@@ -284,7 +286,7 @@ Offline.prototype.checkin = function checkin(job, done) {
       done(new Error(res.screenMessage));
     }
     else {
-      // Remove item form backup files. We don't listen to if it success or
+      // Remove item from backup files. We don't listen to it if success or
       // fails the remove as we won't mark the job as failed as it has been
       // completed at FBS.
       self.bus.emit('storage.remove.item', {

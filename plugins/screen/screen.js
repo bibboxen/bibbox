@@ -1,6 +1,6 @@
 /**
  * @file
- * Handles screen trun on/off.
+ * Handles screen turn on/off.
  */
 
 'use strict';

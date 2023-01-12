@@ -31,8 +31,8 @@ var Logger = function Logger(config) {
  * Create new FBS object.
  *
  * Static factory function to create FBS object with loaded config. This pattern
- * used to fix race conditions and to ensure that we have an constructor
- * without side-effects.
+ * used to fix race conditions and to ensure that we have a constructor without
+ * side effects.
  *
  * @param bus
  *   The event bus
@@ -82,7 +82,7 @@ Logger.prototype.send = function send(level, message) {
       msg = message.message;
     }
 
-    // Create best possible logging message for searching in FBS messages.
+    // Create the best possible logging message for searching in FBS messages.
     if (type === 'fbs' && level === 'info') {
       var parts = {
         'id': msg.slice(0, 2),

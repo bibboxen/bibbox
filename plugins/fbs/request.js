@@ -244,7 +244,7 @@ Request.prototype.checkout = function checkout(patronId, patronPassword, itemIde
  * Check in item.
  *
  * @param itemIdentifier
- *   The item to checkout.
+ *   The item to check out.
  * @param checkedInDate
  *   Timestamp for the time that the item was returned.
  * @param noBlock
