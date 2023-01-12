@@ -2,6 +2,7 @@
 
 ### In development
 
+### v2.0.0
 * Upgrade to node 14
 * Change receipt generation from wkhtmltopdf to using PDFKit
 
