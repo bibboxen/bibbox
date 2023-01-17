@@ -9,20 +9,18 @@ var Queue = require('bull');
 var Q = require('q');
 var uniqid = require('uniqid');
 
-// Global self is used in queued jobs to get access to the bus and crypt plugins.
+// Global self is used in queued jobs to get access to the bus plugin.
 var self = null;
 
 /**
  * @param bus
- * @param crypt
  * @param host
  * @param port
  *
  * @constructor
  */
-var Offline = function Offline(bus, crypt, host, port) {
+var Offline = function Offline(bus, host, port) {
   this.bus = bus;
-  this.crypt = crypt;
 
   // Set the modules global self.
   self = this;
@@ -295,7 +293,6 @@ Offline.prototype.checkin = function checkin(job, done) {
       self.bus.emit('storage.remove.item', {
         type: 'offline',
         name: data.file,
-        //itemIdentifier: self.crypt.decrypt(data.itemIdentifier),
         itemIdentifier: data.itemIdentifier,
         busEvent: 'offline.remove.item.checkin' + uniqid(),
         errorEvent: 'offline.remove.item.checkin.error' + uniqid()
@@ -348,7 +345,6 @@ Offline.prototype.checkout = function checkout(job, done) {
       self.bus.emit('storage.remove.item', {
         type: 'offline',
         name: data.file,
-        // itemIdentifier: self.crypt.decrypt(data.itemIdentifier),
         itemIdentifier: data.itemIdentifier,
         busEvent: 'offline.remove.item.checkin' + uniqid(),
         errorEvent: 'offline.remove.item.checkin.error' + uniqid()
@@ -388,8 +384,7 @@ Offline.prototype.checkout = function checkout(job, done) {
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
-  var crypt = imports.crypt;
-  var offline = new Offline(bus, crypt, options.host, options.port);
+  var offline = new Offline(bus, options.host, options.port);
 
   bus.on('offline.add.checkout', function (obj) {
     var data = JSON.parse(JSON.stringify(obj));
