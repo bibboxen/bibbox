@@ -1,0 +1,12 @@
+{
+  "name": "crypt",
+  "description": "Helper plugin to encrypt and decrypt data",
+  "version": "0.0.1",
+  "main": "crypt.js",
+  "private": true,
+  "plugin": {
+    "provides": [
+      "crypt"
+    ]
+  }
+}

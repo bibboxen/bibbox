@@ -62,7 +62,7 @@ Request.prototype.encodeTime = function encodeTime(timestamp) {
   if (!timestamp) {
     timestamp = new Date().getTime();
   }
-  var d = new Date(timestamp);
+  var d = new Date(Number(timestamp));
 
   return '' + d.getFullYear() + this.zeroPad(d.getMonth() + 1) + this.zeroPad(d.getDate()) + '    ' + this.zeroPad(d.getHours()) + this.zeroPad(d.getMinutes()) + this.zeroPad(d.getSeconds());
 };

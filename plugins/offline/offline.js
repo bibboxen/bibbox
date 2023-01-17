@@ -183,7 +183,6 @@ Offline.prototype.getQueueCounts = function getQueueCounts(type) {
   var deferred = Q.defer();
 
   var queue = this._findQueue(type);
-  var counts = {};
 
   Q.all([
     queue.getCompletedCount(),
@@ -389,8 +388,8 @@ module.exports = function (options, imports, register) {
     var data = JSON.parse(JSON.stringify(obj));
 
     // Added event info to job.
-    data.busEvent = 'offline.fbs.checkout.success' + data.itemIdentifier;
-    data.errorEvent = 'offline.fbs.checkout.error' + data.itemIdentifier;
+    data.busEvent = 'offline.fbs.checkout.success' + uniqid();
+    data.errorEvent = 'offline.fbs.checkout.error' + uniqid();
     data.queued = true;
 
     offline.add('checkout', data);
@@ -400,8 +399,8 @@ module.exports = function (options, imports, register) {
     var data = JSON.parse(JSON.stringify(obj));
 
     // Added event info to job.
-    data.busEvent = 'offline.fbs.checkin.success' + data.itemIdentifier;
-    data.errorEvent = 'offline.fbs.checkin.error' + data.itemIdentifier;
+    data.busEvent = 'offline.fbs.checkin.success' + uniqid();
+    data.errorEvent = 'offline.fbs.checkin.error' + uniqid();
     data.queued = true;
 
     offline.add('checkin', data);
