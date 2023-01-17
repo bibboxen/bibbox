@@ -14,13 +14,15 @@ var self = null;
 
 /**
  * @param bus
+ * @param crypt
  * @param host
  * @param port
  *
  * @constructor
  */
-var Offline = function Offline(bus, host, port) {
+var Offline = function Offline(bus, crypt, host, port) {
   this.bus = bus;
+  this.crypt = crypt;
 
   // Set the modules global self.
   self = this;
@@ -293,7 +295,7 @@ Offline.prototype.checkin = function checkin(job, done) {
       self.bus.emit('storage.remove.item', {
         type: 'offline',
         name: data.file,
-        itemIdentifier: data.itemIdentifier,
+        itemIdentifier: self.crypt.encrypt(data.itemIdentifier),
         busEvent: 'offline.remove.item.checkin' + uniqid(),
         errorEvent: 'offline.remove.item.checkin.error' + uniqid()
       });
@@ -345,7 +347,7 @@ Offline.prototype.checkout = function checkout(job, done) {
       self.bus.emit('storage.remove.item', {
         type: 'offline',
         name: data.file,
-        itemIdentifier: data.itemIdentifier,
+        itemIdentifier: self.crypt.encrypt(data.itemIdentifier),
         busEvent: 'offline.remove.item.checkin' + uniqid(),
         errorEvent: 'offline.remove.item.checkin.error' + uniqid()
       });
@@ -384,7 +386,8 @@ Offline.prototype.checkout = function checkout(job, done) {
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
-  var offline = new Offline(bus, options.host, options.port);
+  var crypt = imports.crypt;
+  var offline = new Offline(bus, crypt, options.host, options.port);
 
   bus.on('offline.add.checkout', function (obj) {
     var data = JSON.parse(JSON.stringify(obj));

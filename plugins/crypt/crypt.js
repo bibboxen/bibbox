@@ -29,7 +29,6 @@ var Crypt = function Crypt(bus) {
     if (config.hasOwnProperty('keys')) {
       self.config['public'] = config.keys.public;
       self.config['url'] = config.keys.url;
-      console.log(self.config);
     }
   });
 
