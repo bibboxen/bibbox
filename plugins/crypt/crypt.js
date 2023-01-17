@@ -5,12 +5,19 @@
 'use strict';
 
 var crypto = require('crypto');
-var fs = require('fs');
 var uniqid = require('uniqid');
 
+/**
+ * Default constructor.
+ *
+ * @param bus
+ *
+ * @constructor
+ */
 var Crypt = function Crypt(bus) {
   this.config = {
-    "public": ''
+    "public": "",
+    "url": ""
   }
 
   // Load configuration.
@@ -21,6 +28,7 @@ var Crypt = function Crypt(bus) {
   bus.once(busEvent, function (config) {
     if (config.hasOwnProperty('keys')) {
       self.config['public'] = config.keys.public;
+      self.config['url'] = config.keys.url;
       console.log(self.config);
     }
   });
@@ -32,6 +40,28 @@ var Crypt = function Crypt(bus) {
 
 };
 
+/**
+ * Helper function to get private decrypt key.
+ *
+ * @return {string}
+ *  The decrypt key.
+ */
+Crypt.prototype.getPrivateKey = function getPrivateKey() {
+  const request = require('sync-request');
+  const res = request('GET', this.config.url);
+
+  return res.getBody().toString();
+}
+
+/**
+ * Encrypt text with the configured public key.
+ *
+ * @param text
+ *   Text to encrypt.
+ *
+ * @return {string}
+ *   Encrypted text.
+ */
 Crypt.prototype.encrypt = function encrypt(text) {
   var self = this;
   return crypto.publicEncrypt({
@@ -43,7 +73,17 @@ Crypt.prototype.encrypt = function encrypt(text) {
   ).toString('base64');
 };
 
-Crypt.prototype.decrypt = function decrypt(encryptedText, key) {
+/**
+ * Decrypt text with download key.
+ *
+ * @param encryptedText
+ *   The encrypted text.
+ *
+ * @return {string}
+ *   Decrypted text.
+ */
+Crypt.prototype.decrypt = function decrypt(encryptedText) {
+  var key = this.getPrivateKey();
   return crypto.privateDecrypt(
     {
       key: key,
