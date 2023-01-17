@@ -1,9 +1,13 @@
 # Bibbox Changelog
 
 ### In development
+* Added encryption of offline data using private/public keys (requires new configuration in administration)
+* Removed redundant local offline storage in the file system (only use redis and queue system).
+* Ensured completed jobs in queue is automatically removed.
 
-* Upgrade to node 14
-* Change receipt generation from wkhtmltopdf to using PDFKit
+### v2.0.0
+* Upgrade to node 14.
+* Change receipt generation from wkhtmltopdf to using PDFKit.
 
 ### v1.8.3
 * Minor release only with changes in default configuration file.
