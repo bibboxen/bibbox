@@ -11,8 +11,7 @@
   },
   "plugin": {
     "consumes": [
-      "bus",
-      "crypt"
+      "bus"
     ],
     "provides": [
       "offline"

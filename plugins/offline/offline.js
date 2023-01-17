@@ -14,15 +14,13 @@ var self = null;
 
 /**
  * @param bus
- * @param crypt
  * @param host
  * @param port
  *
  * @constructor
  */
-var Offline = function Offline(bus, crypt, host, port) {
+var Offline = function Offline(bus, host, port) {
   this.bus = bus;
-  this.crypt = crypt;
 
   // Set the modules global self.
   self = this;
@@ -364,8 +362,7 @@ Offline.prototype.checkout = function checkout(job, done) {
  */
 module.exports = function (options, imports, register) {
   var bus = imports.bus;
-  var crypt = imports.crypt;
-  var offline = new Offline(bus, crypt, options.host, options.port);
+  var offline = new Offline(bus, options.host, options.port);
 
   bus.on('offline.add.checkout', function (obj) {
     var data = JSON.parse(JSON.stringify(obj));
