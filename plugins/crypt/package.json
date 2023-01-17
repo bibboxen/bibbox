@@ -5,8 +5,15 @@
   "main": "crypt.js",
   "private": true,
   "plugin": {
+    "consumes": [
+      "bus",
+      "ctrl"
+    ],
     "provides": [
       "crypt"
     ]
+  },
+  "dependencies": {
+    "uniqid": "^4.1.0"
   }
 }

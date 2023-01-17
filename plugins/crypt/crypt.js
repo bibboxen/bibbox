@@ -6,14 +6,36 @@
 
 var crypto = require('crypto');
 var fs = require('fs');
+var uniqid = require('uniqid');
 
-var Crypt = function Crypt() {
-  // @TODO: Add keys from configuration.
+var Crypt = function Crypt(bus) {
+  this.config = {
+    "public": ''
+  }
+
+  // Load configuration.
+  var busEvent = 'crypt.config.loaded' + uniqid();
+  var errorEvent = 'crypt.config.error' + uniqid();
+
+  var self = this;
+  bus.once(busEvent, function (config) {
+    if (config.hasOwnProperty('keys')) {
+      self.config['public'] = config.keys.public;
+      console.log(self.config);
+    }
+  });
+
+  bus.emit('ctrl.config.config', {
+    busEvent: busEvent,
+    errorEvent: errorEvent
+  });
+
 };
 
 Crypt.prototype.encrypt = function encrypt(text) {
+  var self = this;
   return crypto.publicEncrypt({
-      key: fs.readFileSync(__dirname + '/pub.pem', 'utf8'),
+      key: self.config.public,
       padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
       oaepHash: 'sha256'
     },
@@ -21,10 +43,10 @@ Crypt.prototype.encrypt = function encrypt(text) {
   ).toString('base64');
 };
 
-Crypt.prototype.decrypt = function decrypt(encryptedText) {
+Crypt.prototype.decrypt = function decrypt(encryptedText, key) {
   return crypto.privateDecrypt(
     {
-      key: fs.readFileSync(__dirname + '/priv.pem', 'utf8'),
+      key: key,
       padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
       oaepHash: 'sha256'
     },
@@ -43,7 +65,7 @@ Crypt.prototype.decrypt = function decrypt(encryptedText) {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var crypt = new Crypt();
+  var crypt = new Crypt(imports.bus);
 
   register(null, {
     crypt: crypt
