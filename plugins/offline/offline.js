@@ -289,17 +289,6 @@ Offline.prototype.checkin = function checkin(job, done) {
       done(new Error(res.screenMessage));
     }
     else {
-      // Remove item from backup files. We don't listen to it if success or
-      // fails the remove as we won't mark the job as failed as it has been
-      // completed at FBS.
-      self.bus.emit('storage.remove.item', {
-        type: 'offline',
-        name: data.file,
-        itemIdentifier: self.crypt.encrypt(data.itemIdentifier),
-        busEvent: 'offline.remove.item.checkin' + uniqid(),
-        errorEvent: 'offline.remove.item.checkin.error' + uniqid()
-      });
-
       // Success the item have been checked-in.
       done(null, res);
     }
@@ -341,17 +330,6 @@ Offline.prototype.checkout = function checkout(job, done) {
       done(new Error(res.screenMessage));
     }
     else {
-      // Remove item form backup files. We don't listen to if it success or
-      // fails the remove as we won't mark the job as failed as it has been
-      // completed at FBS.
-      self.bus.emit('storage.remove.item', {
-        type: 'offline',
-        name: data.file,
-        itemIdentifier: self.crypt.encrypt(data.itemIdentifier),
-        busEvent: 'offline.remove.item.checkin' + uniqid(),
-        errorEvent: 'offline.remove.item.checkin.error' + uniqid()
-      });
-
       // Success the item have been checked-out.
       done(null, res);
     }

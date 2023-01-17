@@ -579,36 +579,10 @@ module.exports = function (options, imports, register) {
                 dueDate: data.noBlockDueDate
               };
 
-              bus.once('fbs.checkout.offline.stored' + data.itemIdentifier, function (res) {
-                bus.emit(data.busEvent, {
-                  timestamp: new Date().getTime(),
-                  result: material
-                });
+              bus.emit(data.busEvent, {
+                timestamp: new Date().getTime(),
+                result: material
               });
-
-              bus.once('fbs.checkout.offline.error' + data.itemIdentifier, function (err) {
-                bus.emit(data.errorEvent, err);
-              });
-
-              // Store for later processing.
-              var file = data.transactionDate;
-              bus.emit('storage.append', {
-                type: 'offline',
-                name: file,
-                obj: {
-                  date: crypt.encrypt(data.checkedInDate),
-                  action: 'checkout',
-                  username: crypt.encrypt(data.username),
-                  password: crypt.encrypt(data.password),
-                  itemIdentifier: crypt.encrypt(data.itemIdentifier)
-                },
-                lockFile: true,
-                busEvent: 'fbs.checkout.offline.stored' + data.itemIdentifier,
-                errorEvent: 'fbs.checkout.offline.error' + data.itemIdentifier
-              });
-
-              // Add offline backup filename.
-              data.file = file;
 
               // Add to job queue (clone data object first to ensure no-side-effect and encrypt).
               var jobData = JSON.parse(JSON.stringify(data));
@@ -644,36 +618,10 @@ module.exports = function (options, imports, register) {
           dueDate: data.noBlockDueDate
         };
 
-        bus.once('fbs.checkout.offline.stored' + data.itemIdentifier, function (res) {
-          bus.emit(data.busEvent, {
-            timestamp: new Date().getTime(),
-            result: material
-          });
+        bus.emit(data.busEvent, {
+          timestamp: new Date().getTime(),
+          result: material
         });
-
-        bus.once('fbs.checkout.offline.error' + data.itemIdentifier, function (err) {
-          bus.emit(data.errorEvent, err);
-        });
-
-        // Store for later processing.
-        var file = data.transactionDate;
-        bus.emit('storage.append', {
-          type: 'offline',
-          name: file,
-          obj: {
-            date: crypt.encrypt(data.checkedInDate),
-            action: 'checkout',
-            username: crypt.encrypt(data.username),
-            password: crypt.encrypt(data.password),
-            itemIdentifier: crypt.encrypt(data.itemIdentifier)
-          },
-          lockFile: true,
-          busEvent: 'fbs.checkout.offline.stored' + data.itemIdentifier,
-          errorEvent: 'fbs.checkout.offline.error' + data.itemIdentifier
-        });
-
-        // Add offline backup filename.
-        data.file = file;
 
         // Add to job queue (clone data object first to ensure no-side-effect and encrypt).
         var jobData = JSON.parse(JSON.stringify(data));
@@ -732,34 +680,10 @@ module.exports = function (options, imports, register) {
                 }
               };
 
-              bus.once('fbs.checkin.offline.stored' + data.itemIdentifier, function (res) {
-                bus.emit(data.busEvent, {
-                  timestamp: new Date().getTime(),
-                  result: material
-                });
+              bus.emit(data.busEvent, {
+                timestamp: new Date().getTime(),
+                result: material
               });
-
-              bus.once('fbs.checkin.offline.error' + data.itemIdentifier, function (err) {
-                bus.emit(data.errorEvent, err);
-              });
-
-              // Store for later processing.
-              var file = data.transaction;
-              bus.emit('storage.append', {
-                type: 'offline',
-                name: file,
-                obj: {
-                  action: 'checkin',
-                  date: crypt.encrypt(data.checkedInDate),
-                  itemIdentifier: crypt.encrypt(data.itemIdentifier)
-                },
-                lockFile: true,
-                busEvent: 'fbs.checkin.offline.stored' + data.itemIdentifier,
-                errorEvent: 'fbs.checkin.offline.error' + data.itemIdentifier
-              });
-
-              // Add offline backup filename.
-              data.file = file;
 
               // Add to job queue (clone data object first to ensure no-side-effect and encrypt).
               var jobData = JSON.parse(JSON.stringify(data));
@@ -792,34 +716,10 @@ module.exports = function (options, imports, register) {
           }
         };
 
-        bus.once('fbs.checkin.offline.stored' + data.itemIdentifier, function (res) {
-          bus.emit(data.busEvent, {
-            timestamp: new Date().getTime(),
-            result: material
-          });
+        bus.emit(data.busEvent, {
+          timestamp: new Date().getTime(),
+          result: material
         });
-
-        bus.once('fbs.checkin.offline.error' + data.itemIdentifier, function (err) {
-          bus.emit(data.errorEvent, err);
-        });
-
-        // Store for later processing.
-        var file = data.transaction;
-        bus.emit('storage.append', {
-          type: 'offline',
-          name: file,
-          obj: {
-            action: 'checkin',
-            date: crypt.encrypt(data.checkedInDate),
-            itemIdentifier: crypt.encrypt(data.itemIdentifier)
-          },
-          lockFile: true,
-          busEvent: 'fbs.checkin.offline.stored' + data.itemIdentifier,
-          errorEvent: 'fbs.checkin.offline.error' + data.itemIdentifier
-        });
-
-        // Add offline backup filename.
-        data.file = file;
 
         // Add to job queue (clone data object first to ensure no-side-effect and encrypt).
         var jobData = JSON.parse(JSON.stringify(data));
