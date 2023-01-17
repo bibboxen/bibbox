@@ -100,8 +100,6 @@ Request.prototype.send = function send(message, firstVar, callback) {
   // Build XML message.
   var xml = this.buildXML(message);
 
-  console.log(message);
-
   // Log message before sending it.
   this.bus.emit('logger.info', { 'type': 'FBS', 'message': message, 'xml': xml });
 
