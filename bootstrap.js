@@ -267,8 +267,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
                 res.end();
               }
               else {
-                // Move files folder with config, translation and offline
-                // backup storage.
+                // Move files folder with config and translation.
                 var src = __dirname + '/files';
                 debug('Copy files from: ' + src + ' to: ' + dir);
 
@@ -293,7 +292,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
                     // application. The timeout is to allow the "res" transmission
                     // to be completed before restart.
                     setTimeout(function () {
-                      // Trigger shoutdown process with right signal, so clean up is executed.
+                      // Trigger shutdown process with right signal, so clean up is executed.
                       process.kill(process.pid, 'SIGTERM');
                     }, 500);
                   }

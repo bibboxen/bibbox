@@ -32,7 +32,7 @@
   },
   "scripts": {
     "live": "node bootstrap.js",
-    "fake": "NODE_TLS_REJECT_UNAUTHORIZED=0 RFID_DEBUG=true DEBUG=bibbox:* ./node_modules/.bin/nodemon bootstrap.js",
+    "fake": "NODE_TLS_REJECT_UNAUTHORIZED=0 RFID_DEBUG=true DEBUG=bibbox:* node bootstrap.js",
     "debug": "DEBUG=bibbox:* ./node_modules/.bin/nodemon bootstrap.js",
     "rfid": "./start_rfid.sh",
     "test": "cd test; ../node_modules/.bin/mocha",

@@ -47,6 +47,9 @@ var plugins = [
     isEventExpired: isEventExpired
   },
   {
+    packagePath: './plugins/crypt'
+  },
+  {
     packagePath: './plugins/bus',
     isEventExpired: isEventExpired
   },
