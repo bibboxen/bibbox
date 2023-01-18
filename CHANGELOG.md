@@ -1,6 +1,8 @@
 # Bibbox Changelog
 
 ### In development
+
+### v2.1.0
 * Added encryption of offline data using private/public keys (requires new configuration in administration)
 * Removed redundant local offline storage in the file system (only use redis and queue system).
 * Ensured completed jobs in queue is automatically removed.
