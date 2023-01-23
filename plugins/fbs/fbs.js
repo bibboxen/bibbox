@@ -535,7 +535,7 @@ module.exports = function (options, imports, register) {
 
     // Decrypt date if it has been in a queue.
     if (true === data.queued) {
-      data.date = crypt.decrypt(data.checkedInDate);
+      data.date = crypt.decrypt(data.transactionDate);
       data.username = crypt.decrypt(data.username);
       data.password = crypt.decrypt(data.password);
       data.itemIdentifier = crypt.decrypt(data.itemIdentifier);
@@ -586,10 +586,10 @@ module.exports = function (options, imports, register) {
 
               // Add to job queue (clone data object first to ensure no-side-effect and encrypt).
               var jobData = JSON.parse(JSON.stringify(data));
-              jobData.date = crypt.encrypt(data.checkedInDate);
-              jobData.username = crypt.encrypt(data.username);
-              jobData.password = crypt.encrypt(data.password);
-              jobData.itemIdentifier = crypt.encrypt(data.itemIdentifier);
+              jobData.date = crypt.encrypt(jobData.transactionDate);
+              jobData.username = crypt.encrypt(jobData.username);
+              jobData.password = crypt.encrypt(jobData.password);
+              jobData.itemIdentifier = crypt.encrypt(jobData.itemIdentifier);
               bus.emit('offline.add.checkout', jobData);
             }
             else {
@@ -625,10 +625,10 @@ module.exports = function (options, imports, register) {
 
         // Add to job queue (clone data object first to ensure no-side-effect and encrypt).
         var jobData = JSON.parse(JSON.stringify(data));
-        jobData.date = crypt.encrypt(data.checkedInDate);
-        jobData.username = crypt.encrypt(data.username);
-        jobData.password = crypt.encrypt(data.password);
-        jobData.itemIdentifier = crypt.encrypt(data.itemIdentifier);
+        jobData.date = crypt.encrypt(jobData.transactionDate);
+        jobData.username = crypt.encrypt(jobData.username);
+        jobData.password = crypt.encrypt(jobData.password);
+        jobData.itemIdentifier = crypt.encrypt(jobData.itemIdentifier);
         bus.emit('offline.add.checkout', jobData);
       }
       else {
