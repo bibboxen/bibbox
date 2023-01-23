@@ -13,6 +13,7 @@ services:
     command: npm run fake
     networks:
       - app
+      - frontend
     ports:
       - '3010'
       - '3050'

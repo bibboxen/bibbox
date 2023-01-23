@@ -9,13 +9,14 @@ var Queue = require('bull');
 var Q = require('q');
 var uniqid = require('uniqid');
 
-// Global self is used be queued jobs to get access to the bus.
+// Global self is used in queued jobs to get access to the bus plugin.
 var self = null;
 
 /**
  * @param bus
  * @param host
  * @param port
+ *
  * @constructor
  */
 var Offline = function Offline(bus, host, port) {
@@ -141,7 +142,7 @@ Offline.prototype.getFailedJobs = function getFailedJobs(type) {
     for (var i in failedJobs) {
       var job = failedJobs[i];
 
-      // Clean internal book keeping information from the jobs data.
+      // Clean internal bookkeeping information from the job's data.
       var data = job.data;
       delete data.busEvent;
       delete data.errorEvent;
@@ -183,7 +184,6 @@ Offline.prototype.getQueueCounts = function getQueueCounts(type) {
   var deferred = Q.defer();
 
   var queue = this._findQueue(type);
-  var counts = {};
 
   Q.all([
     queue.getCompletedCount(),
@@ -256,7 +256,8 @@ Offline.prototype.add = function add(type, data) {
     backoff: {
       type: 'exponential',
       delay: 10000
-    }
+    },
+    removeOnComplete: true,
   };
 
   queue.add(data, opts).then(function (job) {
@@ -286,17 +287,6 @@ Offline.prototype.checkin = function checkin(job, done) {
       done(new Error(res.screenMessage));
     }
     else {
-      // Remove item from backup files. We don't listen to it if success or
-      // fails the remove as we won't mark the job as failed as it has been
-      // completed at FBS.
-      self.bus.emit('storage.remove.item', {
-        type: 'offline',
-        name: data.file,
-        itemIdentifier: data.itemIdentifier,
-        busEvent: 'offline.remove.item.checkin' + uniqid(),
-        errorEvent: 'offline.remove.item.checkin.error' + uniqid()
-      });
-
       // Success the item have been checked-in.
       done(null, res);
     }
@@ -338,17 +328,6 @@ Offline.prototype.checkout = function checkout(job, done) {
       done(new Error(res.screenMessage));
     }
     else {
-      // Remove item form backup files. We don't listen to if it success or
-      // fails the remove as we won't mark the job as failed as it has been
-      // completed at FBS.
-      self.bus.emit('storage.remove.item', {
-        type: 'offline',
-        name: data.file,
-        itemIdentifier: data.itemIdentifier,
-        busEvent: 'offline.remove.item.checkin' + uniqid(),
-        errorEvent: 'offline.remove.item.checkin.error' + uniqid()
-      });
-
       // Success the item have been checked-out.
       done(null, res);
     }
@@ -389,8 +368,8 @@ module.exports = function (options, imports, register) {
     var data = JSON.parse(JSON.stringify(obj));
 
     // Added event info to job.
-    data.busEvent = 'offline.fbs.checkout.success' + data.itemIdentifier;
-    data.errorEvent = 'offline.fbs.checkout.error' + data.itemIdentifier;
+    data.busEvent = 'offline.fbs.checkout.success' + uniqid();
+    data.errorEvent = 'offline.fbs.checkout.error' + uniqid();
     data.queued = true;
 
     offline.add('checkout', data);
@@ -400,8 +379,8 @@ module.exports = function (options, imports, register) {
     var data = JSON.parse(JSON.stringify(obj));
 
     // Added event info to job.
-    data.busEvent = 'offline.fbs.checkin.success' + data.itemIdentifier;
-    data.errorEvent = 'offline.fbs.checkin.error' + data.itemIdentifier;
+    data.busEvent = 'offline.fbs.checkin.success' + uniqid();
+    data.errorEvent = 'offline.fbs.checkin.error' + uniqid();
     data.queued = true;
 
     offline.add('checkin', data);

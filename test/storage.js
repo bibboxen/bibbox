@@ -47,30 +47,6 @@ it('Save fictive config file and load it', function (done) {
   }, done);
 });
 
-it('Save data to offline storage and append more data to it', function (done) {
-  setup().then(function (app) {
-    app.services.storage.append('offline', 'test', { test1: 'test' }).then(function (res) {
-      app.services.storage.append('offline', 'test', { test2: 'test' }).then(function (res) {
-        app.services.storage.load('offline', 'test').then(function (data) {
-          try {
-            data.should.be.a.Array();
-            data.should.have.length(2);
-            data[0].should.have.property('test1');
-            data[0].test1.should.equal('test');
-            data[1].should.have.property('test2');
-            data[1].test2.should.equal('test');
-
-            done();
-          }
-          catch (err) {
-            done(err);
-          }
-        }, done);
-      }, done);
-    }, done);
-  }, done);
-});
-
 var file;
 it('Should lock off-line storage', function (done) {
   setup().then(function (app) {

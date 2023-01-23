@@ -2,9 +2,17 @@
 
 ### In development
 
+### v2.1.1
+* Fixed date on offline checkout
+
+### v2.1.0
+* Added encryption of offline data using private/public keys (requires new configuration in administration)
+* Removed redundant local offline storage in the file system (only use redis and queue system).
+* Ensured completed jobs in queue is automatically removed.
+
 ### v2.0.0
-* Upgrade to node 14
-* Change receipt generation from wkhtmltopdf to using PDFKit
+* Upgrade to node 14.
+* Change receipt generation from wkhtmltopdf to using PDFKit.
 
 ### v1.8.3
 * Minor release only with changes in default configuration file.
