@@ -1,6 +1,8 @@
 # Bibbox Changelog
 
 ### In development
+
+### v2.1.1
 * Fixed date on offline checkout
 
 ### v2.1.0
