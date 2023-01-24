@@ -20,7 +20,8 @@ angular.module('BibBox').controller('LoginController', ['$scope', '$controller',
     var usernameRegExp = /^\d+$/;
     var passwordRegExp = /^\d+$/;
 
-    // Check if FBS is online.
+    // Check if FBS is online. If manual login is required during local debug of
+    // checkout in offline mode "!" this statement.
     $scope.online = userService.isOnline();
 
     /**

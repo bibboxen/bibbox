@@ -535,7 +535,7 @@ module.exports = function (options, imports, register) {
 
     // Decrypt date if it has been in a queue.
     if (true === data.queued) {
-      data.date = crypt.decrypt(data.transactionDate);
+      data.transactionDate = crypt.decrypt(data.transactionDate);
       data.username = crypt.decrypt(data.username);
       data.password = crypt.decrypt(data.password);
       data.itemIdentifier = crypt.decrypt(data.itemIdentifier);
@@ -586,7 +586,7 @@ module.exports = function (options, imports, register) {
 
               // Add to job queue (clone data object first to ensure no-side-effect and encrypt).
               var jobData = JSON.parse(JSON.stringify(data));
-              jobData.date = crypt.encrypt(jobData.transactionDate);
+              jobData.transactionDate = crypt.encrypt(jobData.transactionDate);
               jobData.username = crypt.encrypt(jobData.username);
               jobData.password = crypt.encrypt(jobData.password);
               jobData.itemIdentifier = crypt.encrypt(jobData.itemIdentifier);
@@ -625,7 +625,7 @@ module.exports = function (options, imports, register) {
 
         // Add to job queue (clone data object first to ensure no-side-effect and encrypt).
         var jobData = JSON.parse(JSON.stringify(data));
-        jobData.date = crypt.encrypt(jobData.transactionDate);
+        jobData.transactionDate = crypt.encrypt(jobData.transactionDate);
         jobData.username = crypt.encrypt(jobData.username);
         jobData.password = crypt.encrypt(jobData.password);
         jobData.itemIdentifier = crypt.encrypt(jobData.itemIdentifier);
