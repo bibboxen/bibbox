@@ -1,6 +1,8 @@
 # Bibbox Changelog
 
 ### In development
+
+### v2.1.2
 * Better debug of missing private key and fixed decrypt error.
 
 ### v2.1.1
