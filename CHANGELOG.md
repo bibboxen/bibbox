@@ -1,9 +1,10 @@
 # Bibbox Changelog
 
 ### In development
+* Better debug of missing private key and fixed decrypt error.
 
 ### v2.1.1
-* Fixed date on offline checkout
+* Fixed date on offline checkout.
 
 ### v2.1.0
 * Added encryption of offline data using private/public keys (requires new configuration in administration)

@@ -6,6 +6,7 @@
 
 var crypto = require('crypto');
 var uniqid = require('uniqid');
+var debug = require('debug')('bibbox:crypt');
 
 /**
  * Default constructor.
@@ -48,6 +49,10 @@ var Crypt = function Crypt(bus) {
 Crypt.prototype.getPrivateKey = function getPrivateKey() {
   const request = require('sync-request');
   const res = request('GET', this.config.url);
+
+  if (res.statusCode !== 200) {
+    debug(res);
+  }
 
   return res.getBody().toString();
 }
