@@ -902,10 +902,12 @@ Notification.prototype.mmToPostScriptPoints = function mmToPostScriptPoints(mm) 
 Notification.prototype.printReceipt = function printReceipt(data) {
   var deferred = Q.defer();
   var self = this;
-  var filename = "/tmp/out.pdf";
+  var filename = __dirname + "/../../files/out.pdf";
   var dashes = '---------------------------------------';
   var normalFont = 14;
   var largeFont = 16;
+
+  debug(filename);
 
   const doc = new PDFDocument({
     font: 'Helvetica', 
@@ -1025,7 +1027,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
 
   // Library footer.
   doc.moveDown();
-  var footer = data.footer.replace(/<\/br>/g, "\n");
+  var footer = data.footer.replace(/<\/br>/g, "\n").replace(/\r/g, "\n");
   doc.text(twig.twig({
     data: '{{ footer }}\n\n.'
   }).render({ footer: footer }));
