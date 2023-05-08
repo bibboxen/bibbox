@@ -4,6 +4,7 @@
  */
 'use strict';
 
+var fs = require('fs');
 var crypto = require('crypto');
 var uniqid = require('uniqid');
 var debug = require('debug')('bibbox:crypt');
@@ -18,8 +19,12 @@ var debug = require('debug')('bibbox:crypt');
 var Crypt = function Crypt(bus) {
   this.config = {
     "public": "",
+    "private": false,
     "url": ""
   }
+
+  this.debug_certs = process.env.CERTS_DEBUG || false;
+  debug('Local certificates requested loaded from: ' + this.debug_certs);
 
   // Load configuration.
   var busEvent = 'crypt.config.loaded' + uniqid();
@@ -30,6 +35,14 @@ var Crypt = function Crypt(bus) {
     if (config.hasOwnProperty('keys')) {
       self.config['public'] = config.keys.public;
       self.config['url'] = config.keys.url;
+
+      if (false !== self.debug_certs) {
+        debug('Load public key form local: ' + self.debug_certs + '/public.pem');
+        self.config['public'] = fs.readFileSync(self.debug_certs + '/public.pem', { encoding: 'utf8', flag: 'r' });
+        debug('Load private key form local: ' + self.debug_certs + '/private.pem');
+        self.config['private'] = fs.readFileSync(self.debug_certs + '/private.pem', { encoding: 'utf8', flag: 'r' });
+      }
+
     }
   });
 
@@ -47,6 +60,11 @@ var Crypt = function Crypt(bus) {
  *  The decrypt key.
  */
 Crypt.prototype.getPrivateKey = function getPrivateKey() {
+  // If in debug mode, return local private certificate.
+  if (false !== this.config['private']) {
+    return this.config.private;
+  }
+
   const request = require('sync-request');
   const res = request('GET', this.config.url);
 

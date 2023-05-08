@@ -13,3 +13,4 @@ files/config/fbs.json
 *.key
 *.crt
 files/out.pdf
+certs
