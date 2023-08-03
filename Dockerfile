@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:18
 LABEL maintainer="ITK Dev <itkdev@mkb.aarhus.dk>"
 
 ENV TZ="Europe/Copenhagen"

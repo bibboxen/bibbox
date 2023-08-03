@@ -5,8 +5,8 @@
   "main": "server.js",
   "private": true,
   "dependencies": {
-    "body-parser": "^1.15.2",
-    "express": "^4.16.4",
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
     "express-handlebars": "^3.0.0",
     "hjs": "0.0.6",
     "morgan": "^1.7.0",

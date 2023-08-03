@@ -1,7 +1,6 @@
 {
   "name": "bibbox",
   "description": "Library box - automatic borrower",
-  "version": "1.4.2",
   "private": true,
   "dependencies": {
     "architect": "0.1.11",
