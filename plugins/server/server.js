@@ -69,7 +69,8 @@ module.exports = function (options, imports, register) {
   // When the config has been loaded, start the server.
   bus.once('server.request_config', function (config) {
     app.get('/', function (req, res) {
-      var data = {};
+      // Disable the usage of handlebars layouts.
+      let data = { layout: false };
 
       if (config.hasOwnProperty('matomo')) {
         data.matomo = {
