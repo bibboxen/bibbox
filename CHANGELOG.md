@@ -1,12 +1,11 @@
 # Bibbox Changelog
 
 ### In development
+* Fixed strange chars on printed "bon's" - https://github.com/foliojs/pdfkit/issues/1425
+* Moved PDF output folder.
 
 ### v2.1.2
 * Better debug of missing private key and fixed decrypt error.
-
-* Fixed strange chars on printed "bon's" - https://github.com/foliojs/pdfkit/issues/1425
-* Moved PDF output folder.
 
 ### v2.1.1
 * Fixed date on offline checkout.
