@@ -1,6 +1,8 @@
 # Bibbox Changelog
 
 ### In development
+
+### v2.1.2
 * Better debug of missing private key and fixed decrypt error.
 
 * Fixed strange chars on printed "bon's" - https://github.com/foliojs/pdfkit/issues/1425
