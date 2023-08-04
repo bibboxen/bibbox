@@ -6,7 +6,7 @@
 'use strict';
 
 // Get event emitter: https://github.com/asyncly/EventEmitter2
-var EventEmitter2 = require('eventemitter2').EventEmitter2;
+let EventEmitter2 = require('eventemitter2').EventEmitter2;
 
 /**
  * The Bus object.
@@ -14,7 +14,7 @@ var EventEmitter2 = require('eventemitter2').EventEmitter2;
  * @constructor
  */
 var Bus = function Bus() {
-  var emitter = new EventEmitter2({
+  let emitter = new EventEmitter2({
     wildcard: true,
     delimiter: '.',
     newListener: false,
@@ -26,21 +26,21 @@ var Bus = function Bus() {
    *
    * @type {Object}
    */
-  var events = {};
+  let events = {};
 
-  var self = this;
+  let self = this;
 
   /**
-   * Remove events from book keeping.
+   * Remove events from bookkeeping.
    *
    * @param {string} type
    *   Event type to remove.
    */
   this.removeEvent = function removeEvent(type) {
     if (events.hasOwnProperty(type)) {
-      var eventName = events[type];
+      let eventName = events[type];
 
-      // Clean up book keeping books.
+      // Clean up bookkeeping books.
       delete events[type];
       delete events[eventName];
 
@@ -63,17 +63,17 @@ var Bus = function Bus() {
     if (Object.prototype.toString.call(data) === '[object Object]') {
       if (data.hasOwnProperty('busEvent') && data.hasOwnProperty('errorEvent')) {
         // We use the same pattern to send events into the bus. So we do some
-        // book keeping to be able to remove the unused event handler and free
+        // bookkeeping to be able to remove the unused event handler and free
         // memory.
         // The reason we swap bus/errorEvent is that these entries are used with
         // once listeners. When an busEvent once handler is invoked, the
-        // errorEvent once handler will need to be remove.
+        // errorEvent once handler will need to be removed.
         events[data.busEvent] = data.errorEvent;
         events[data.errorEvent] = data.busEvent;
       }
     }
 
-    // Send the event on the the normal handler.
+    // Send the event on the normal handler.
     emitter.emit.apply(this, arguments);
   };
 
@@ -86,7 +86,7 @@ var Bus = function Bus() {
   emitter.removeListenerBibboxWrapper = function(type) {
     self.removeEvent(type);
 
-    // Send the event on the the normal handler.
+    // Send the event on the normal handler.
     emitter.removeListener.apply(this, arguments);
   };
 
@@ -99,12 +99,12 @@ var Bus = function Bus() {
   emitter.removeAllListenersBibboxWrapper = function(type) {
     self.removeEvent(type);
 
-    // Send the event on the the normal handler.
+    // Send the event on the normal handler.
     emitter.removeAllListeners.apply(this, arguments);
   };
 
   /**
-   * Expose event emitter 2 functions an wrappers on the object.
+   * Expose event emitter 2 functions a wrappers on the object.
    */
   this.emit = emitter.emitBibboxWrapper;
   this.onAny = emitter.onAny;
@@ -128,7 +128,7 @@ var Bus = function Bus() {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var bus = new Bus();
+  let bus = new Bus();
 
   /**
    * Listen to all events.

@@ -26,8 +26,8 @@ var Offline = function Offline(bus, host, port) {
   self = this;
 
   // Create the queues, if they exist in redis they will just reconnect.
-  this.checkinQueue = Queue('Check-in', port, host);
-  this.checkoutQueue = Queue('Check-out', port, host);
+  this.checkinQueue = Queue('Check-in', { redis: { port: port, host: host }});
+  this.checkoutQueue = Queue('Check-out', { redis: { port: port, host: host }});
 
   // Set the front-end out-of-order on queue errors (redis errors included).
   this.checkinQueue.on('error', function (err) {
