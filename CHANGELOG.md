@@ -3,6 +3,8 @@
 ### In development
 * Fixed strange chars on printed "bon's" - https://github.com/foliojs/pdfkit/issues/1425
 * Moved PDF output folder.
+* Upgrade to node 18
+* Upgrade node modules and code style clean up
 
 ### v2.1.2
 * Better debug of missing private key and fixed decrypt error.
