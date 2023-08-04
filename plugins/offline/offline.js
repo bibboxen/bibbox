@@ -5,12 +5,12 @@
 
 'use strict';
 
-var Queue = require('bull');
-var Q = require('q');
-var uniqid = require('uniqid');
+const Queue = require('bull');
+const Q = require('q');
+const uniqid = require('uniqid');
 
 // Global self is used in queued jobs to get access to the bus plugin.
-var self = null;
+let self = null;
 
 /**
  * @param bus
@@ -19,23 +19,23 @@ var self = null;
  *
  * @constructor
  */
-var Offline = function Offline(bus, host, port) {
+const Offline = function Offline(bus, host, port) {
   this.bus = bus;
 
   // Set the modules global self.
   self = this;
 
   // Create the queues, if they exist in redis they will just reconnect.
-  this.checkinQueue = Queue('Check-in', { redis: { port: port, host: host }});
-  this.checkoutQueue = Queue('Check-out', { redis: { port: port, host: host }});
+  this.checkinQueue = Queue('Check-in', {redis: {port: port, host: host}});
+  this.checkoutQueue = Queue('Check-out', {redis: {port: port, host: host}});
 
   // Set the front-end out-of-order on queue errors (redis errors included).
   this.checkinQueue.on('error', function (err) {
-    self.bus.emit('logger.err', { 'type': 'offline', 'message': err });
+    self.bus.emit('logger.err', {'type': 'offline', 'message': err});
     self.bus.emit('frontend.outOfOrder');
   });
   this.checkoutQueue.on('error', function (err) {
-    self.bus.emit('logger.err', { 'type': 'offline', 'message': err });
+    self.bus.emit('logger.err', {'type': 'offline', 'message': err});
     self.bus.emit('frontend.outOfOrder');
   });
 
@@ -49,13 +49,13 @@ var Offline = function Offline(bus, host, port) {
   this.checkinQueue.on('failed', function (job, err) {
     if (err.message === 'FBS is offline') {
       job.remove().then(function () {
-        // Job remove to re-add it as a new job.
-        self.add('checkin', job.data);
-      },
-      function (err) {
-        // If we can't remove the job... not much we can do.
-        self.bus.emit('logger.err', { 'type': 'offline', 'message': err.message });
-      });
+          // Job remove to re-add it as a new job.
+          self.add('checkin', job.data);
+        },
+        function (err) {
+          // If we can't remove the job... not much we can do.
+          self.bus.emit('logger.err', {'type': 'offline', 'message': err.message});
+        });
     }
   });
 
@@ -65,13 +65,13 @@ var Offline = function Offline(bus, host, port) {
   this.checkoutQueue.on('failed', function (job, err) {
     if (err.message === 'FBS is offline') {
       job.remove().then(function () {
-        // Job remove to re-add it as a new job.
-        self.add('checkout', job.data);
-      },
-      function (err) {
-        // If we can't remove the job... not much we can do.
-        self.bus.emit('logger.err', { 'type': 'offline', 'message': err.message });
-      });
+          // Job remove to re-add it as a new job.
+          self.add('checkout', job.data);
+        },
+        function (err) {
+          // If we can't remove the job... not much we can do.
+          self.bus.emit('logger.err', {'type': 'offline', 'message': err.message});
+        });
     }
   });
 
@@ -108,7 +108,7 @@ var Offline = function Offline(bus, host, port) {
  * @private
  */
 Offline.prototype._findQueue = function _findQueue(type) {
-  var queue = null;
+  let queue = null;
 
   switch (type) {
     case 'checkin':
@@ -133,17 +133,17 @@ Offline.prototype._findQueue = function _findQueue(type) {
  *   Promise that will resolve with job count and the failed jobs.
  */
 Offline.prototype.getFailedJobs = function getFailedJobs(type) {
-  var deferred = Q.defer();
+  let deferred = Q.defer();
 
-  var queue = this._findQueue(type);
+  let queue = this._findQueue(type);
 
   queue.getFailed().then(function (failedJobs) {
-    var jobs = [];
-    for (var i in failedJobs) {
-      var job = failedJobs[i];
+    let jobs = [];
+    for (let i in failedJobs) {
+      let job = failedJobs[i];
 
       // Clean internal bookkeeping information from the job's data.
-      var data = job.data;
+      let data = job.data;
       delete data.busEvent;
       delete data.errorEvent;
       delete data.queued;
@@ -181,9 +181,9 @@ Offline.prototype.getFailedJobs = function getFailedJobs(type) {
  *   Promise that will resolve with job counts.
  */
 Offline.prototype.getQueueCounts = function getQueueCounts(type) {
-  var deferred = Q.defer();
+  let deferred = Q.defer();
 
-  var queue = this._findQueue(type);
+  let queue = this._findQueue(type);
 
   Q.all([
     queue.getCompletedCount(),
@@ -215,7 +215,7 @@ Offline.prototype.getQueueCounts = function getQueueCounts(type) {
  *  The type of queue (checkin or checkout).
  */
 Offline.prototype.pause = function pause(type) {
-  var queue = this._findQueue(type);
+  let queue = this._findQueue(type);
 
   queue.pause().then(function () {
     self.bus.emit('logger.info', { 'type': 'offline', 'message': 'Queue "' + queue.name + '" is paused.' });
@@ -229,7 +229,7 @@ Offline.prototype.pause = function pause(type) {
  *  The type of queue (checkin or checkout).
  */
 Offline.prototype.resume = function resume(type) {
-  var queue = this._findQueue(type);
+  let queue = this._findQueue(type);
 
   queue.resume().then(function () {
     self.bus.emit('logger.info', { 'type': 'offline', 'message': 'Queue "' + queue.name + '" has resumed.' });
@@ -248,10 +248,10 @@ Offline.prototype.resume = function resume(type) {
  *   Promise that resolves to jobId if added else error.
  */
 Offline.prototype.add = function add(type, data) {
-  var deferred = Q.defer();
-  var queue = this._findQueue(type);
+  let deferred = Q.defer();
+  let queue = this._findQueue(type);
 
-  var opts = {
+  const opts = {
     attempts: 5,
     backoff: {
       type: 'exponential',
@@ -279,7 +279,7 @@ Offline.prototype.add = function add(type, data) {
  *   Callback when done processing.
  */
 Offline.prototype.checkin = function checkin(job, done) {
-  var data = job.data;
+  let data = job.data;
 
   self.bus.once(data.busEvent, function (res) {
     if (res.ok === '0') {
@@ -318,7 +318,7 @@ Offline.prototype.checkin = function checkin(job, done) {
  *   Callback when done processing.
  */
 Offline.prototype.checkout = function checkout(job, done) {
-  var data = job.data;
+  let data = job.data;
 
   self.bus.once(data.busEvent, function (res) {
     if (res.ok === '0') {
@@ -361,11 +361,11 @@ Offline.prototype.checkout = function checkout(job, done) {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var bus = imports.bus;
-  var offline = new Offline(bus, options.host, options.port);
+  const bus = imports.bus;
+  const offline = new Offline(bus, options.host, options.port);
 
   bus.on('offline.add.checkout', function (obj) {
-    var data = JSON.parse(JSON.stringify(obj));
+    let data = JSON.parse(JSON.stringify(obj));
 
     // Added event info to job.
     data.busEvent = 'offline.fbs.checkout.success' + uniqid();
@@ -376,7 +376,7 @@ module.exports = function (options, imports, register) {
   });
 
   bus.on('offline.add.checkin', function (obj) {
-    var data = JSON.parse(JSON.stringify(obj));
+    let data = JSON.parse(JSON.stringify(obj));
 
     // Added event info to job.
     data.busEvent = 'offline.fbs.checkin.success' + uniqid();
@@ -387,7 +387,7 @@ module.exports = function (options, imports, register) {
   });
 
   bus.on('offline.failed.jobs', function (data) {
-    var jobs = {};
+    let jobs = {};
     offline.getFailedJobs('checkout').then(function (checkoutJobs) {
       jobs.checkout = checkoutJobs;
       offline.getFailedJobs('checkin').then(function (checkinJobs) {
@@ -402,7 +402,7 @@ module.exports = function (options, imports, register) {
   });
 
   bus.on('offline.counts', function (data) {
-    var counts = {};
+    let counts = {};
     offline.getQueueCounts('checkout').then(function (checkoutCounts) {
       counts.checkout = checkoutCounts;
       offline.getQueueCounts('checkin').then(function (checkinCounts) {

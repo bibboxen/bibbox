@@ -16,23 +16,23 @@
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var bus = imports.bus;
+  const bus = imports.bus;
 
   // Load modules required.
-  var express = require('express');
-  var http = require('http');
-  var exphbs  = require('express-handlebars');
+  const express = require('express');
+  const http = require('http');
+  const exphbs = require('express-handlebars');
 
   // Start the express app.
-  var app = express();
+  const app = express();
 
   // Connect middleware extension.
-  var bodyParser = require('body-parser');
-  var favicon = require('serve-favicon');
-  var morgan = require('morgan');
+  const bodyParser = require('body-parser');
+  const favicon = require('serve-favicon');
+  const morgan = require('morgan');
 
   // Start the http server.
-  var server = http.createServer(app);
+  const server = http.createServer(app);
 
   // Log express requests.
   app.use(morgan('combined', {
@@ -50,7 +50,7 @@ module.exports = function (options, imports, register) {
   app.use(bodyParser.json());
 
   // Enable route.
-  var route = options.route || false;
+  const route = options.route || false;
   if (route) {
     app.use(app.router);
   }
@@ -61,7 +61,7 @@ module.exports = function (options, imports, register) {
   }
 
   // Set handlebars as rendering engine.
-  var hbs = exphbs.create({});
+  const hbs = exphbs.create({});
   app.engine('handlebars', hbs.engine);
   app.set('view engine', 'handlebars');
   app.set('views', __dirname + '/../../public');

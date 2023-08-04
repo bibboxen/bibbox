@@ -5,7 +5,7 @@
 
 'use strict';
 
-var debug = require('debug')('bibbox:rfid');
+const debug = require('debug')('bibbox:rfid');
 
 /**
  * This object encapsulates the connector to RFID.
@@ -23,18 +23,18 @@ var debug = require('debug')('bibbox:rfid');
  *
  * @constructor
  */
-var RFID = function (bus, port, afi, allowed, isEventExpired) {
-  var WebSocketServer = require('ws').Server;
+const RFID = function (bus, port, afi, allowed, isEventExpired) {
+  const WebSocketServer = require('ws').Server;
 
   // Check if we are in RFID debug mode. Will return basic fake Id's to emulate
   // an RFID reader during development and testing.
-  var rfid_debug = process.env.RFID_DEBUG || false;
+  const rfid_debug = process.env.RFID_DEBUG || false;
 
   // Create web-socket server on localhost (127.0.0.1).
-  var server = new WebSocketServer({ port: port });
+  const server = new WebSocketServer({port: port});
 
   // When client connects to RFID web-socket this will be set.
-  var currentWebSocket = null;
+  let currentWebSocket = null;
 
   /**
    * Is the client address allowed?
@@ -42,8 +42,8 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
    * @param address
    * @return {boolean} allowed?
    */
-  var allowedAccess = function allowedAccess(address) {
-    var allow = false;
+  const allowedAccess = function allowedAccess(address) {
+    let allow = false;
 
     for (var i = 0; i < allowed.length; i++) {
       // Disconnect client if connecting from other address than allowed addresses.
@@ -59,7 +59,7 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
   /**
    * Handler for setAFI bus calls.
    */
-  var setAFI = function setAFI(data) {
+  const setAFI = function setAFI(data) {
     try {
       currentWebSocket.send(JSON.stringify({
         event: 'setAFI',
@@ -68,9 +68,8 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
           afi: data.afi ? afi.on : afi.off
         }
       }));
-    }
-    catch (err) {
-      bus.emit('logger.err', { 'type': 'RFID', 'message': err.message });
+    } catch (err) {
+      bus.emit('logger.err', {'type': 'RFID', 'message': err.message});
       debug(err.message);
     }
   };
@@ -78,20 +77,19 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
   /**
    * Handler for requestTags bus calls.
    */
-  var requestTags = function requestTags() {
+  const requestTags = function requestTags() {
     try {
       currentWebSocket.send(JSON.stringify({
         event: 'detectTags'
       }));
-    }
-    catch (err) {
-      bus.emit('logger.err', { 'type': 'RFID', 'message': err.message });
+    } catch (err) {
+      bus.emit('logger.err', {'type': 'RFID', 'message': err.message});
       debug(err.message);
     }
   };
 
   if (rfid_debug) {
-    var fakeTags = require('./fakeTags.json');
+    const fakeTags = require('./fakeTags.json');
 
     // Fake connect to get online.
     bus.emit('rfid.connected');
@@ -112,7 +110,7 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
      */
     bus.on('rfid.tags.request', function () {
       // Enrich tags with timestamps.
-      for (var i in fakeTags) {
+      for (let i in fakeTags) {
         fakeTags[i].timestamp = new Date().getTime() - i;
       }
 
@@ -127,7 +125,7 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
      */
     bus.on('rfid.tag.set_afi', function (data) {
       // Check if tag exists in fakeTags and return index.
-      var index = fakeTags.findIndex(function (tag, index) {
+      let index = fakeTags.findIndex(function (tag, index) {
         if (tag.uid === data.uid) {
           // Tag found change afi.
           fakeTags[index].afi = data.afi ? afi.on : afi.off;
@@ -188,7 +186,7 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
 
       currentWebSocket.on('message', function incoming(message) {
         try {
-          var data = JSON.parse(message);
+          let data = JSON.parse(message);
 
           if (!data.event) {
             bus.emit('rfid.error', 'Event not set.');
@@ -211,7 +209,7 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
             case 'rfid.tags.detected':
               if (!isEventExpired(data.timestamp, debug)) {
                 // Change from actual afi value to boolean.
-                for (var i = 0; i < data.tags.length; i++) {
+                for (let i = 0; i < data.tags.length; i++) {
                   data.tags[i].afi = data.tags[i].afi === afi.on;
                 }
 
@@ -267,8 +265,7 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
               bus.emit('rfid.error', 'Event not recognized!');
               debug('Event not recognized!');
           }
-        }
-        catch (err) {
+        } catch (err) {
           bus.emit('rfid.error', 'JSON parse error: ' + err);
           debug('JSON parse error: ' + err);
         }
@@ -288,7 +285,7 @@ var RFID = function (bus, port, afi, allowed, isEventExpired) {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var rfid = new RFID(imports.bus, options.port, options.afi, options.allowed, options.isEventExpired);
+  const rfid = new RFID(imports.bus, options.port, options.afi, options.allowed, options.isEventExpired);
 
   register(null, {
     rfid: rfid
