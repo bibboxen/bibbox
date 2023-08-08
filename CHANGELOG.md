@@ -5,6 +5,7 @@
 * Moved PDF output folder.
 * Upgrade to node 18
 * Upgrade node modules and code style clean up
+* Added IPv6 to config example for communication with RFID reader (::ffff:127.0.0.1)
 
 ### v2.1.2
 * Better debug of missing private key and fixed decrypt error.

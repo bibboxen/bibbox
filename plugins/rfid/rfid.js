@@ -31,7 +31,7 @@ const RFID = function (bus, port, afi, allowed, isEventExpired) {
   const rfid_debug = process.env.RFID_DEBUG || false;
 
   // Create web-socket server on localhost (127.0.0.1).
-  const server = new WebSocketServer({port: port});
+  const wss = new WebSocketServer({port: port});
 
   // When client connects to RFID web-socket this will be set.
   let currentWebSocket = null;
@@ -155,12 +155,14 @@ const RFID = function (bus, port, afi, allowed, isEventExpired) {
   }
   else {
     // Connection set up.
-    server.on('connection', function connection(ws) {
+    wss.on('connection', function connection(ws, req) {
       // Check if client has access to use RFID.
-      if (!allowedAccess(ws.upgradeReq.connection.remoteAddress)) {
+      if (!allowedAccess(req.socket.remoteAddress)) {
+        debug('Access NOT allowed');
         ws.close();
         return;
       }
+      debug('Access allowed');
 
       currentWebSocket = ws;
 
