@@ -4,9 +4,10 @@
  */
 'use strict';
 
-var crypto = require('crypto');
-var uniqid = require('uniqid');
-var debug = require('debug')('bibbox:crypt');
+const fs = require('fs');
+const crypto = require('crypto');
+const uniqid = require('uniqid');
+const debug = require('debug')('bibbox:crypt');
 
 /**
  * Default constructor.
@@ -15,21 +16,33 @@ var debug = require('debug')('bibbox:crypt');
  *
  * @constructor
  */
-var Crypt = function Crypt(bus) {
+const Crypt = function Crypt(bus) {
   this.config = {
-    "public": "",
-    "url": ""
-  }
+    'public': '',
+    'private': false,
+    'url': ''
+  };
+
+  this.debug_certs = process.env.CERTS_DEBUG || false;
+  debug('Local certificates requested loaded from: ' + this.debug_certs);
 
   // Load configuration.
-  var busEvent = 'crypt.config.loaded' + uniqid();
-  var errorEvent = 'crypt.config.error' + uniqid();
+  let busEvent = 'crypt.config.loaded' + uniqid();
+  let errorEvent = 'crypt.config.error' + uniqid();
 
-  var self = this;
+  let self = this;
   bus.once(busEvent, function (config) {
     if (config.hasOwnProperty('keys')) {
       self.config['public'] = config.keys.public;
       self.config['url'] = config.keys.url;
+
+      if (false !== self.debug_certs) {
+        debug('Load public key form local: ' + self.debug_certs + '/public.pem');
+        self.config['public'] = fs.readFileSync(self.debug_certs + '/public.pem', {encoding: 'utf8', flag: 'r'});
+        debug('Load private key form local: ' + self.debug_certs + '/private.pem');
+        self.config['private'] = fs.readFileSync(self.debug_certs + '/private.pem', {encoding: 'utf8', flag: 'r'});
+      }
+
     }
   });
 
@@ -47,6 +60,11 @@ var Crypt = function Crypt(bus) {
  *  The decrypt key.
  */
 Crypt.prototype.getPrivateKey = function getPrivateKey() {
+  // If in debug mode, return local private certificate.
+  if (false !== this.config['private']) {
+    return this.config.private;
+  }
+
   const request = require('sync-request');
   const res = request('GET', this.config.url);
 
@@ -67,7 +85,7 @@ Crypt.prototype.getPrivateKey = function getPrivateKey() {
  *   Encrypted text.
  */
 Crypt.prototype.encrypt = function encrypt(text) {
-  var self = this;
+  let self = this;
   return crypto.publicEncrypt({
       key: self.config.public,
       padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
@@ -87,7 +105,7 @@ Crypt.prototype.encrypt = function encrypt(text) {
  *   Decrypted text.
  */
 Crypt.prototype.decrypt = function decrypt(encryptedText) {
-  var key = this.getPrivateKey();
+  let key = this.getPrivateKey();
   return crypto.privateDecrypt(
     {
       key: key,
@@ -109,7 +127,7 @@ Crypt.prototype.decrypt = function decrypt(encryptedText) {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var crypt = new Crypt(imports.bus);
+  const crypt = new Crypt(imports.bus);
 
   register(null, {
     crypt: crypt

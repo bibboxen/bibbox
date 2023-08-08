@@ -5,7 +5,7 @@
   "main": "matomo.js",
   "private": true,
   "dependencies": {
-    "matomo-tracker": "^2.1.0"
+    "matomo-tracker": "^2.2.4"
   },
   "plugin": {
     "consumes": [

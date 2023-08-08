@@ -5,19 +5,19 @@
 
 'use strict';
 
-var twig = require('twig');
-var nodemailer = require('nodemailer');
-var i18n = require('i18n');
-var spawn = require('child_process').spawn;
-var uniqid = require('uniqid');
-var Q = require('q');
-var fs = require('fs');
+const twig = require('twig');
+const nodemailer = require('nodemailer');
+const i18n = require('i18n');
+const spawn = require('child_process').spawn;
+const uniqid = require('uniqid');
+const Q = require('q');
+const fs = require('fs');
 const PDFDocument = require('pdfkit');
 
-var debug = require('debug')('bibbox:notification');
+const debug = require('debug')('bibbox:notification');
 
-var Notification = function Notification(bus, config, paths, languages) {
-  var self = this;
+const Notification = function Notification(bus, config, paths, languages) {
+  let self = this;
   this.bus = bus;
 
   // Set object config variables.
@@ -52,7 +52,7 @@ var Notification = function Notification(bus, config, paths, languages) {
 
   // Extend twig with a better sort method.
   twig.extendFilter('sortOnField', function (items, param) {
-    var field = param.shift();
+    let field = param.shift();
 
     return items.sort(function (a, b) {
       if (a[field] < b[field]) {
@@ -159,9 +159,9 @@ var Notification = function Notification(bus, config, paths, languages) {
  *   Promise that the Notification object is created with configuration.
  */
 Notification.create = function create(bus, paths, languages) {
-  var deferred = Q.defer();
-  var busEvent = 'notification.loaded.config' + uniqid();
-  var errorEvent = 'notification.error.config' + uniqid();
+  let deferred = Q.defer();
+  let busEvent = 'notification.loaded.config' + uniqid();
+  let errorEvent = 'notification.error.config' + uniqid();
 
   bus.once(busEvent, function (config) {
     deferred.resolve(new Notification(bus, config, paths, languages));
@@ -207,11 +207,11 @@ Notification.prototype.renderLibrary = function renderLibrary(html) {
  *
  */
 Notification.prototype.renderFines = function renderFines(html, fines) {
-  var ret = '';
+  let ret = '';
 
   if (fines.length) {
     // Calculate the correct fine total amount.
-    var total = 0.0;
+    let total = 0.0;
     for (var i in fines) {
       total += parseFloat(fines[i].fineAmount);
     }
@@ -248,7 +248,7 @@ Notification.prototype.renderFines = function renderFines(html, fines) {
  * @returns {*}
  */
 Notification.prototype.renderLoans = function renderLoans(html, headline, loans, overdue) {
-  var ret = '';
+  let ret = '';
 
   // Merge information about overdue loans into loans objects.
   overdue.map(function (overdueLoan) {
@@ -290,7 +290,7 @@ Notification.prototype.renderLoans = function renderLoans(html, headline, loans,
  * @returns {*}
  */
 Notification.prototype.renderNewLoans = function renderNewLoans(html, headline, items) {
-  var ret = '';
+  let ret = '';
 
   if (items.length) {
     if (html) {
@@ -319,7 +319,7 @@ Notification.prototype.renderNewLoans = function renderNewLoans(html, headline, 
  * @returns {*}
  */
 Notification.prototype.renderNewLoansOffline = function renderNewLoansOffline(items) {
-  var ret = '';
+  let ret = '';
 
   if (items.length) {
     ret = this.printLoansNewOfflineTemplate.render({
@@ -341,7 +341,7 @@ Notification.prototype.renderNewLoansOffline = function renderNewLoansOffline(it
  * @returns {*}
  */
 Notification.prototype.renderReadyReservations = function renderReadyReservations(html, reservations) {
-  var ret = '';
+  let ret = '';
 
   if (reservations.length) {
     if (html) {
@@ -371,7 +371,7 @@ Notification.prototype.renderReadyReservations = function renderReadyReservation
  *
  */
 Notification.prototype.renderReservations = function renderReservations(html, reservations) {
-  var ret = '';
+  let ret = '';
 
   if (reservations.length) {
     if (html) {
@@ -400,7 +400,7 @@ Notification.prototype.renderReservations = function renderReservations(html, re
  * @returns {*}
  */
 Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
-  var ret = '';
+  let ret = '';
 
   if (items.length) {
     if (html) {
@@ -427,7 +427,7 @@ Notification.prototype.renderCheckIn = function renderCheckIn(html, items) {
  * @returns {*}
  */
 Notification.prototype.renderCheckInOffline = function renderCheckInOffline(items) {
-  var ret = '';
+  let ret = '';
 
   if (items.length) {
     ret = this.printCheckInOfflineTemplate.render({
@@ -447,7 +447,7 @@ Notification.prototype.renderCheckInOffline = function renderCheckInOffline(item
  * @returns {*}
  */
 Notification.prototype.renderFooter = function renderFooter(html) {
-  var ret = '';
+  let ret = '';
 
   if (html) {
     ret = this.mailFooterTemplate.render({
@@ -477,29 +477,29 @@ Notification.prototype.renderFooter = function renderFooter(html) {
  *   Resolved or error message on failure.
  */
 Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lang) {
-  var self = this;
-  var deferred = Q.defer();
-  var layout = self.layouts.checkIn;
+  let self = this;
+  let deferred = Q.defer();
+  let layout = self.layouts.checkIn;
 
   // Set current language.
   i18n.setLocale(lang ? lang : self.config.default_lang);
 
   // Build outer context.
-  var context = {
+  const context = {
     header: self.headerConfig,
     library: self.renderLibrary(mail),
     footer: self.renderFooter(mail),
     patrons: []
   };
 
-  // Make an copy of the object and remove it from the data structure as the
+  // Make a copy of the object and remove it from the data structure as the
   // receipt builder loops over the items.
-  var patronsInformation = items.patronsInformation;
+  let patronsInformation = items.patronsInformation;
   delete items.patronsInformation;
 
-  var content;
-  for (var patronIdentifier in patronsInformation) {
-    var patronInformation = patronsInformation[patronIdentifier];
+  let content;
+  for (let patronIdentifier in patronsInformation) {
+    let patronInformation = patronsInformation[patronIdentifier];
     if (patronInformation) {
       content = {
         patronIdentifier: patronIdentifier,
@@ -529,19 +529,19 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
   }
 
   // Render receipt.
-  var result = '';
+  let result = '';
   if (mail) {
     // The context is optimized for print receipt, so we need to change it to
     // send a mail to each patron and not one big to one mail patron.
-    var patrons = JSON.parse(JSON.stringify(context.patrons));
+    let patrons = JSON.parse(JSON.stringify(context.patrons));
     context.patrons = [];
 
-    for (var i in patrons) {
-      var patron = patrons[i];
+    for (let i in patrons) {
+      let patron = patrons[i];
 
       // Copy made as to ensure that the reader process don't change the context
       // object as it's used for every mail sent.
-      var data = JSON.parse(JSON.stringify(context));
+      let data = JSON.parse(JSON.stringify(context));
       data.patrons.push(patron);
 
       result = self.mailTemplate.render(data);
@@ -580,14 +580,14 @@ Notification.prototype.checkInReceipt = function checkInReceipt(mail, items, lan
  *   Resolved or error message on failure.
  */
 Notification.prototype.checkInOfflineReceipt = function checkInOfflineReceipt(items, lang) {
-  var self = this;
-  var deferred = Q.defer();
+  let self = this;
+  let deferred = Q.defer();
 
   // Set current language.
   i18n.setLocale(lang ? lang : self.config.default_lang);
 
   // Build outer context.
-  var context = {
+  const context = {
     header: self.headerConfig,
     library: self.renderLibrary(false),
     footer: self.renderFooter(false),
@@ -625,16 +625,16 @@ Notification.prototype.checkInOfflineReceipt = function checkInOfflineReceipt(it
  *   Resolved or error message on failure.
  */
 Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, username, password, lang) {
-  var self = this;
-  var deferred = Q.defer();
-  var layout = self.layouts.checkOut;
+  let self = this;
+  let deferred = Q.defer();
+  let layout = self.layouts.checkOut;
 
   // Set current language.
   i18n.setLocale(lang ? lang : self.config.default_lang);
 
   self.getPatronInformation(username, password).then(function (data) {
-    var patron = data.patron;
-    var context = {
+    let patron = data.patron;
+    const context = {
       header: self.headerConfig,
       library: self.renderLibrary(mail),
       footer: self.renderFooter(mail),
@@ -648,7 +648,7 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
       }]
     };
 
-    var result = '';
+    let result = '';
     if (mail) {
       if (patron.hasOwnProperty('emailAddress') && patron.emailAddress !== undefined) {
         result = self.mailTemplate.render(context);
@@ -693,14 +693,14 @@ Notification.prototype.checkOutReceipt = function checkOutReceipt(mail, items, u
  *   Resolved or error message on failure.
  */
 Notification.prototype.checkOutOfflineReceipt = function checkOutOfflineReceipt(items, lang) {
-  var self = this;
-  var deferred = Q.defer();
+  let self = this;
+  let deferred = Q.defer();
 
   // Set current language.
   i18n.setLocale(lang ? lang : self.config.default_lang);
 
   // Build outer context.
-  var context = {
+  const context = {
     header: self.headerConfig,
     library: self.renderLibrary(false),
     footer: self.renderFooter(false),
@@ -738,17 +738,17 @@ Notification.prototype.checkOutOfflineReceipt = function checkOutOfflineReceipt(
  *   Resolved or error message on failure.
  */
 Notification.prototype.patronReceipt = function patronReceipt(type, mail, username, password, lang) {
-  var self = this;
-  var deferred = Q.defer();
-  var layout = self.layouts[type];
+  let self = this;
+  let deferred = Q.defer();
+  let layout = self.layouts[type];
 
   // Set current language.
   i18n.setLocale(lang ? lang : self.config.default_lang);
 
   // Listen for status notification message.
   this.getPatronInformation(username, password).then(function (data) {
-    var patron = data.patron;
-    var context = {
+    let patron = data.patron;
+    const context = {
       header: self.headerConfig,
       library: self.renderLibrary(mail),
       footer: self.renderFooter(mail),
@@ -766,7 +766,7 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
       context.username = patron.personalName;
     }
 
-    var result = '';
+    let result = '';
     if (mail) {
       if (patron.hasOwnProperty('emailAddress') && patron.emailAddress !== undefined) {
         result = self.mailTemplate.render(context);
@@ -797,21 +797,21 @@ Notification.prototype.patronReceipt = function patronReceipt(type, mail, userna
 };
 
 /**
- * Get an patrons information from FBS.
+ * Get a patrons information from FBS.
  *
  * @param username
  *   The ID of the patron to fetch.
  * @param password
- *   Optional: the patrons password.
+ *   Optional: the patron's password.
  *
  * @returns {*|promise}
  *   Resolves with the patrons information or rejected with error object.
  */
 Notification.prototype.getPatronInformation = function getPatronInformation(username, password) {
-  var deferred = Q.defer();
-  var self = this;
-  var busEvent = 'notification.getPatronInformation' + username;
-  var errorEvent = 'notification.getPatronInformation.error' + username;
+  let deferred = Q.defer();
+  let self = this;
+  let busEvent = 'notification.getPatronInformation' + username;
+  let errorEvent = 'notification.getPatronInformation.error' + username;
 
   // Check if password was given (defaults to empty string as this still will
   // give use the users information).
@@ -862,10 +862,10 @@ Notification.prototype.getPatronInformation = function getPatronInformation(user
  *   The html content to send.
  */
 Notification.prototype.sendMail = function sendMail(to, content) {
-  var deferred = Q.defer();
+  let deferred = Q.defer();
 
-  var self = this;
-  var mailOptions = {
+  let self = this;
+  const mailOptions = {
     from: self.mailConfig.from,
     to: to,
     subject: self.mailConfig.subject,
@@ -900,12 +900,13 @@ Notification.prototype.mmToPostScriptPoints = function mmToPostScriptPoints(mm) 
  * @param data
  */
 Notification.prototype.printReceipt = function printReceipt(data) {
-  var deferred = Q.defer();
-  var self = this;
-  var filename = "/tmp/out.pdf";
-  var dashes = '---------------------------------------';
-  var normalFont = 14;
-  var largeFont = 16;
+  let deferred = Q.defer();
+  const filename = __dirname + "/../../files/out.pdf";
+  const dashes = '---------------------------------------';
+  const normalFont = 14;
+  const largeFont = 16;
+
+  debug(filename);
 
   const doc = new PDFDocument({
     font: 'Helvetica', 
@@ -1025,7 +1026,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
 
   // Library footer.
   doc.moveDown();
-  var footer = data.footer.replace(/<\/br>/g, "\n");
+  const footer = data.footer.replace(/<\/br>/g, '\n').replace(/\r/g, '\n');
   doc.text(twig.twig({
     data: '{{ footer }}\n\n.'
   }).render({ footer: footer }));
@@ -1033,7 +1034,7 @@ Notification.prototype.printReceipt = function printReceipt(data) {
   // Complete the PDF document.
   doc.end();
 
-  var lp = spawn('/usr/bin/lp', [ '-o', 'TmxPaperReduction=both', filename ]);
+  const lp = spawn('/usr/bin/lp', ['-o', 'TmxPaperReduction=both', filename]);
   lp.stderr.on('data', function (data) {
     deferred.reject(data.toString());
   });
@@ -1051,23 +1052,23 @@ Notification.prototype.printReceipt = function printReceipt(data) {
  *   The patrons identifications numbers.
  */
 Notification.prototype.getPatronsInformation = function getPatronsInformation(patronIdentifiers) {
-  var deferred = Q.defer();
+  let deferred = Q.defer();
 
   // Build promise with patron information.
-  var patrons = [];
-  for (var index in patronIdentifiers) {
-    var promise = this.getPatronInformation(patronIdentifiers[index]);
+  let patrons = [];
+  for (let index in patronIdentifiers) {
+    let promise = this.getPatronInformation(patronIdentifiers[index]);
     patrons.push(promise);
   }
 
   Q.allSettled(patrons).then(function (results) {
-    var patronsInformation = {};
+    let patronsInformation = {};
     results.forEach(function (result) {
       if (result.state === 'fulfilled') {
-        var patron = result.value.patron;
+        let patron = result.value.patron;
 
-        // Check if patron has an mail address and it's set. If not set the mail
-        // to false. This will indicates that the user exists but don't have an
+        // Check if patron has a mail address and it's set. If not set the mail
+        // to false. This will indicate that the user exists but don't have an
         // mail.
         patronsInformation[patron.patronIdentifier] = patron;
         if (!patron.hasOwnProperty('emailAddress') || patron.emailAddress === undefined) {
@@ -1097,7 +1098,7 @@ Notification.prototype.getPatronsInformation = function getPatronsInformation(pa
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var bus = imports.bus;
+  const bus = imports.bus;
 
   // Create FBS object to use in tests.
   Notification.create(bus, options.paths, options.languages).then(function (notification) {

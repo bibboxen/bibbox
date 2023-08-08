@@ -5,9 +5,9 @@
   "main": "offline.js",
   "private": true,
   "dependencies": {
-    "bull": "^1.0.0",
-    "q": "^1.4.1",
-    "uniqid": "^4.1.0"
+    "bull": "^4.10.4",
+    "q": "^1.5.1",
+    "uniqid": "^5.4.0"
   },
   "plugin": {
     "consumes": [

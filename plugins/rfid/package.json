@@ -5,8 +5,8 @@
   "main": "rfid.js",
   "private": true,
   "dependencies": {
-    "debug": "^2.3.2",
-    "ws": "^1.1.1"
+    "debug": "^4.3.4",
+    "ws": "^8.13.0"
   },
   "plugin": {
     "consumes": [

@@ -5,9 +5,9 @@
 
 'use strict';
 
-var util = require('util');
-var eventEmitter = require('events').EventEmitter;
-var usb = require('usb');
+const util = require('util');
+const eventEmitter = require('events').EventEmitter;
+const usb = require('usb');
 
 /**
  * Barcode object.
@@ -19,7 +19,7 @@ var usb = require('usb');
  *
  * @constructor
  */
-var Barcode = function Barcode(VID, PID) {
+const Barcode = function Barcode(VID, PID) {
   this.VID = VID;
   this.PID = PID;
 
@@ -41,28 +41,28 @@ util.inherits(Barcode, eventEmitter);
  * containing the data received.
  */
 Barcode.prototype.connect = function connect() {
-  var self = this;
+  let self = this;
 
   try {
     // Get the device.
-    var term = usb.findByIds(self.VID, self.PID);
+    let term = usb.findByIds(self.VID, self.PID);
     term.open();
 
     // Open the interface an connect.
-    var iface = term.interfaces.shift();
+    let iface = term.interfaces.shift();
     if (iface.isKernelDriverActive()) {
       iface.detachKernelDriver();
     }
     iface.claim();
 
     // Get end-point an start data event.
-    var inEndpoint = iface.endpoints[0];
+    let inEndpoint = iface.endpoints[0];
     inEndpoint.startPoll();
 
     // Register listener for data events.
     inEndpoint.on('data', function (data) {
       if (self.emitCode) {
-        var key = self.parseBuffer(data);
+        let key = self.parseBuffer(data);
         if (key !== "\n") {
           if (key !== -1) {
             self.code.push(key);
@@ -97,7 +97,7 @@ Barcode.prototype.connect = function connect() {
  *   The buffers numeric value. If no value -1 and "\n" at end-of-number.
  */
 Barcode.prototype.parseBuffer = function parseBuffer(data) {
-  var keyCode;
+  let keyCode;
 
   data = data.toJSON();
 
@@ -192,12 +192,12 @@ Barcode.prototype.stop = function stop() {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var bus = imports.bus;
+  const bus = imports.bus;
 
   /**
    * @TODO: make the VID and PID configurable.
    */
-  var barcode = new Barcode(options.vid, options.pid);
+  const barcode = new Barcode(options.vid, options.pid);
   barcode.connect();
 
   /**

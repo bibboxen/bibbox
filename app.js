@@ -7,12 +7,12 @@
  */
 'use strict';
 
-var path = require('path');
-var architect = require('architect');
-var debug = require('debug')('bibbox:app');
+const path = require('path');
+const architect = require('architect');
+const debug = require('debug')('bibbox:app');
 
 // Load config file.
-var config = require(__dirname + '/config.json');
+const config = require(__dirname + '/config.json');
 
 /**
  * Check if a given event message has expired.
@@ -27,8 +27,8 @@ var config = require(__dirname + '/config.json');
  * @returns {boolean}
  *   If expire true else false.
  */
-var isEventExpired = function isEventExpired(timestamp, debug, eventName) {
-  var current = new Date().getTime();
+const isEventExpired = function isEventExpired(timestamp, debug, eventName) {
+  const current = new Date().getTime();
   eventName = eventName || 'Unknown';
 
   if (Number(timestamp) + config.eventTimeout < current) {
@@ -41,7 +41,7 @@ var isEventExpired = function isEventExpired(timestamp, debug, eventName) {
 };
 
 // Configure the plugins.
-var plugins = [
+const plugins = [
   {
     packagePath: './plugins/logger',
     isEventExpired: isEventExpired
@@ -121,7 +121,7 @@ var plugins = [
 ];
 
 // User the configuration to start the application.
-var appConfig = architect.resolveConfig(plugins, __dirname);
+const appConfig = architect.resolveConfig(plugins, __dirname);
 architect.createApp(appConfig, function (err, app) {
   if (err) {
     console.error(err.stack);

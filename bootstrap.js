@@ -5,36 +5,36 @@
 
 'use strict';
 
-var debug = require('debug')('bibbox:bootstrap');
-var fork = require('child_process').fork;
-var spawn = require('child_process').spawn;
-var UrlParser = require('url');
-var queryString = require('querystring');
+const debug = require('debug')('bibbox:bootstrap');
+const fork = require('child_process').fork;
+const spawn = require('child_process').spawn;
+const UrlParser = require('url');
+const queryString = require('querystring');
 
-var config = require(__dirname + '/config.json');
-var Q = require('q');
+const config = require(__dirname + '/config.json');
+const Q = require('q');
 
-var fs = require('fs');
-var https = require('https');
+const fs = require('fs');
+const https = require('https');
 
-var rfid_debug = process.env.RFID_DEBUG || false;
+const rfid_debug = process.env.RFID_DEBUG || false;
 
-var shutdown = false;
+let shutdown = false;
 
-var Bootstrap = function Bootstrap() {
-  var self = this;
+const Bootstrap = function Bootstrap() {
+  let self = this;
   this.bibbox = null;
   this.rfidApp = null;
   this.alive = 0;
 
-  var options = {
+  const options = {
     key: fs.readFileSync(__dirname + '/' + config.bootstrap.ssl.key),
     cert: fs.readFileSync(__dirname + '/' + config.bootstrap.ssl.cert)
   };
 
   https.createServer(options, function (req, res) {
-    var ip = self.getRemoteIp(req);
-    var url = req.url;
+    let ip = self.getRemoteIp(req);
+    let url = req.url;
     if (config.bootstrap.allowed.indexOf(ip) > -1) {
       debug('Requested url: "' + url + '" from: "' + ip + '" allowed');
       res.setHeader('Content-Type', 'application/json');
@@ -69,8 +69,8 @@ var Bootstrap = function Bootstrap() {
 };
 
 // Extend the object with event emitter.
-var eventEmitter = require('events').EventEmitter;
-var util = require('util');
+const eventEmitter = require('events').EventEmitter;
+const util = require('util');
 util.inherits(Bootstrap, eventEmitter);
 
 /**
@@ -89,12 +89,13 @@ util.inherits(Bootstrap, eventEmitter);
  *   The body pay-load as JSON, if post request else undefined.
  */
 Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) {
-  var self = this;
+  let self = this;
+  let query = null;
 
   body = body || false;
 
   /**
-   * Restart NodeJS application.
+   * Restart Node.js application.
    */
   switch (url.pathname) {
     case '/restart/application':
@@ -162,13 +163,13 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
       break;
 
     /**
-     * Update based on pull from github.
+     * Update based on pull from GitHub.
      *
      * @query version
      *   String with the tag to checkout.
      */
     case '/update/pull':
-      var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
+      query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
       if (query.hasOwnProperty('version')) {
         self.updateApp(query.version).then(function () {
           res.write(JSON.stringify({
@@ -201,17 +202,17 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
      *   String with URL to release file on github.
      */
     case '/update/download':
-      var query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
+      query = JSON.parse(JSON.stringify(queryString.parse(url.query)));
       if (query.hasOwnProperty('url')) {
-        var urlParser = require('url');
-        var path = require('path');
-        var dest = __dirname + '/../' + path.basename(urlParser.parse(query.url).pathname);
+        const urlParser = require('url');
+        const path = require('path');
+        const dest = __dirname + '/../' + path.basename(urlParser.parse(query.url).pathname);
 
         self.downloadFile(query.url, dest).then(function (file) {
           // Try to detect version from the filename.
-          var regEx = /v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+)?/;
-          if (!regEx.test(path.basename(file))) {
-            var msg = 'Version not found in filename: ' + path.basename(file);
+            const regEx = /v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+)?/;
+            if (!regEx.test(path.basename(file))) {
+            let msg = 'Version not found in filename: ' + path.basename(file);
             debug('Err: ' + msg);
             res.write(JSON.stringify({
               error: msg
@@ -220,8 +221,8 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
             return;
           }
 
-          var version = regEx.exec(path.basename(file))[0];
-          var dir = __dirname.substr(0, __dirname.lastIndexOf('/')) + '/' + version;
+          let version = regEx.exec(path.basename(file))[0];
+          let dir = __dirname.substr(0, __dirname.lastIndexOf('/')) + '/' + version;
 
           debug('Version to update to: ' + version);
           debug('File downloaded to: ' + file);
@@ -233,14 +234,13 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
           }
 
           // Unpack file
-          var tar = spawn('tar', ['-zxf', file, '-C', dir]);
+          const tar = spawn('tar', ['-zxf', file, '-C', dir]);
           tar.stderr.on('data', function (data) {
             debug('Err unpacking file: ' + data.toString());
             res.write(JSON.stringify({
               error: data.toString()
             }));
             res.end();
-            return;
           });
 
           tar.on('exit', function (code) {
@@ -255,7 +255,7 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
             // File unpacked, so clean up.
             fs.unlinkSync(file);
 
-            var target = __dirname;
+            let target = __dirname;
             target = target.substr(0, target.lastIndexOf('/')) + '/bibbox';
 
             fs.unlinkSync(target);
@@ -268,17 +268,16 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
               }
               else {
                 // Move files folder with config and translation.
-                var src = __dirname + '/files';
+                const src = __dirname + '/files';
                 debug('Copy files from: ' + src + ' to: ' + dir);
 
-                var cp = spawn('cp', ['-rfp', src, dir]);
+                let cp = spawn('cp', ['-rfp', src, dir]);
                 cp.stderr.on('data', function (data) {
                   debug('Err copying file: ' + data.toString());
                   res.write(JSON.stringify({
                     error: data.toString()
                   }));
                   res.end();
-                  return;
                 });
 
                 cp.on('exit', function (code) {
@@ -452,9 +451,9 @@ Bootstrap.prototype.handleRequest = function handleRequest(req, res, url, body) 
  *   Resolves if file is downloaded correctly.
  */
 Bootstrap.prototype.downloadFile = function downloadFile(url, destination) {
-  var deferred = Q.defer();
-  var file = fs.createWriteStream(destination);
-  var request = require('request');
+  const request = require('request');
+  let deferred = Q.defer();
+  let file = fs.createWriteStream(destination);
 
   file.on('finish', function () {
     file.close();
@@ -483,9 +482,9 @@ Bootstrap.prototype.downloadFile = function downloadFile(url, destination) {
  *   Resolved if parsed else rejected.
  */
 Bootstrap.prototype.parseBody = function parseBody(req) {
-  var deferred = Q.defer();
+  let deferred = Q.defer();
 
-  var body = '';
+  let body = '';
 
   req.on('data', function (data) {
     body += data;
@@ -522,7 +521,7 @@ Bootstrap.prototype.parseBody = function parseBody(req) {
  *   The IP as an string.
  */
 Bootstrap.prototype.getRemoteIp = function getRemoteIp(req) {
-  var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress;
+  let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress;
 
   // Take the first ip if this is a proxy list.
   if (ip.indexOf(',') !== -1) {
@@ -539,18 +538,18 @@ Bootstrap.prototype.getRemoteIp = function getRemoteIp(req) {
  *   Resolve with version or reject with git output.
  */
 Bootstrap.prototype.getVersion = function getVersion() {
-  var deferred = Q.defer();
-  var env = process.env;
-  var git = spawn('git', ['describe', '--exact-match', '--tags'], {env: env});
+  let deferred = Q.defer();
+  let env = process.env;
+  let git = spawn('git', ['describe', '--exact-match', '--tags'], {env: env});
 
   git.stdout.on('data', function (data) {
-    var version = data.toString().replace("\n", '');
+    let version = data.toString().replace("\n", '');
     debug('Version: ' + version);
     deferred.resolve(version);
   });
 
   git.stderr.on('data', function (data) {
-    var err = data.toString().replace("\n", '');
+    let err = data.toString().replace("\n", '');
     debug('Version error: ' + err);
     deferred.reject(err);
   });
@@ -565,8 +564,8 @@ Bootstrap.prototype.getVersion = function getVersion() {
  *   Resolves if app have been re-started.
  */
 Bootstrap.prototype.restartApp = function restartApp() {
-  var self = this;
-  var deferred = Q.defer();
+  let self = this;
+  let deferred = Q.defer();
 
   debug('Restart called.');
 
@@ -591,15 +590,15 @@ Bootstrap.prototype.restartApp = function restartApp() {
  *   Resolves if app have been started and the old one closed.
  */
 Bootstrap.prototype.startApp = function startApp() {
-  var deferred = Q.defer();
-  var self = this;
+  let deferred = Q.defer();
+  let self = this;
 
   if (shutdown) {
     debug('App not started - in shutdown');
     deferred.resolve();
   }
   else {
-    var app = fork(__dirname + '/app.js', [], { silent: true });
+    let app = fork(__dirname + '/app.js', [], { silent: true });
     debug('Started new application with pid: ' + app.pid);
 
     // Event handler for startup errors.
@@ -649,16 +648,16 @@ Bootstrap.prototype.startApp = function startApp() {
  *   Resolves if stated.
  */
 Bootstrap.prototype.startRFID = function startRFID() {
-  var deferred = Q.defer();
+  let deferred = Q.defer();
 
   if (shutdown) {
     debug('RFID not started - in shutdown');
     deferred.resolve();
   }
   else if (!rfid_debug) {
-    var env = process.env;
+    let env = process.env;
     env.LD_LIBRARY_PATH = '/opt/feig';
-    var app = spawn('java', ['-jar', __dirname + '/plugins/rfid/device/rfid.jar'], {env: env});
+    let app = spawn('java', ['-jar', __dirname + '/plugins/rfid/device/rfid.jar'], {env: env});
     debug('Started new rfid application with pid: ' + app.pid);
 
     // Store ref. to the application.
@@ -683,8 +682,8 @@ Bootstrap.prototype.startRFID = function startRFID() {
  *   Resolves if app have been closed.
  */
 Bootstrap.prototype.stopApp = function stopApp() {
-  var deferred = Q.defer();
-  var self = this;
+  let deferred = Q.defer();
+  let self = this;
 
   debug('Stop BibBox');
 
@@ -721,8 +720,8 @@ Bootstrap.prototype.stopApp = function stopApp() {
  *   Resolves if app have been closed.
  */
 Bootstrap.prototype.stopRFID = function stopRFID() {
-  var deferred = Q.defer();
-  var self = this;
+  let deferred = Q.defer();
+  let self = this;
 
   debug('Stop RFID');
 
@@ -765,8 +764,8 @@ Bootstrap.prototype.stopRFID = function stopRFID() {
  *   Resolves it the app is updated.
  */
 Bootstrap.prototype.updateApp = function updateApp(version) {
-  var self = this;
-  var deferred = Q.defer();
+  let self = this;
+  let deferred = Q.defer();
 
   debug('Update called.');
 
@@ -790,7 +789,7 @@ Bootstrap.prototype.updateApp = function updateApp(version) {
 };
 
 // Get the show on the road.
-var bootstrap = new Bootstrap();
+const bootstrap = new Bootstrap();
 bootstrap.startApp();
 bootstrap.startRFID();
 

@@ -18,16 +18,16 @@ const execProcess = require('child_process').exec;
  *
  * @constructor
  */
-var Screen = function Screen(bus) {
+const Screen = function Screen(bus) {
   this.bus = bus;
   this.sceenOnJob = null;
   this.sceenOffJob = null;
 
   // Load configuration.
-  var busEvent = 'screen.config.loaded' + uniqid();
-  var errorEvent = 'screen.config.error' + uniqid();
+  let busEvent = 'screen.config.loaded' + uniqid();
+  let errorEvent = 'screen.config.error' + uniqid();
 
-  var self = this;
+  let self = this;
   bus.once(busEvent, function (config) {
     if (config.hasOwnProperty('screen')) {
       self.setup(config.screen);
@@ -41,11 +41,11 @@ var Screen = function Screen(bus) {
 };
 
 Screen.prototype.setup = function setup(config) {
-  var self = this;
+  let self = this;
 
   // Build time in cron format from configuration format.
-  var on = config.on.split(':').reverse().join(' ');
-  var off = config.off.split(':').reverse().join(' ');
+  let on = config.on.split(':').reverse().join(' ');
+  let off = config.off.split(':').reverse().join(' ');
 
   // Stop jobs if they are running.
   this.stop();
@@ -118,15 +118,15 @@ Screen.prototype.stop = function stop() {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var bus = imports.bus;
-  var screen = new Screen(bus);
+  const bus = imports.bus;
+  const screen = new Screen(bus);
 
   /**
    * Handle configuration changes.
    */
   bus.on('storage.saved', function online(data) {
-    var busEvent = 'screen.config.loaded' + uniqid();
-    var errorEvent = 'screen.config.error' + uniqid();
+    let busEvent = 'screen.config.loaded' + uniqid();
+    let errorEvent = 'screen.config.error' + uniqid();
 
     bus.once(busEvent, function (config) {
       if (config.hasOwnProperty('screen')) {

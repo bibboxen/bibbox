@@ -5,10 +5,10 @@
 
 'use strict';
 
-var MatomoTracker = require('matomo-tracker');
+const MatomoTracker = require('matomo-tracker');
 
-var matomo = null;
-var matomoConfig = null;
+let matomo = null;
+let matomoConfig = null;
 
 /**
  * Register the plugin with architect.
@@ -21,8 +21,8 @@ var matomoConfig = null;
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var bus = imports.bus;
-  var onlineStatus = null;
+  let bus = imports.bus;
+  let onlineStatus = null;
 
   /**
    * Send a track event to Matomo.

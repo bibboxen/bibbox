@@ -12,3 +12,5 @@ files/config/fbs.json
 *.pem
 *.key
 *.crt
+files/out.pdf
+certs

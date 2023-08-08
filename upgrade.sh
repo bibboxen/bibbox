@@ -2,7 +2,7 @@
 
 # Install main modules
 rm -rf node_modules
-npm install --${1:-production}
+npm install --${1:-omit=dev}
 npm audit fix
 
 # Install plugin dependencies.
@@ -15,7 +15,7 @@ for folder in plugins/*; do
     cd $folder
     echo ${folder}
     rm -rf node_modules
-    npm install --${1:-production}
+    npm install --${1:-omit=dev}
     npm audit fix
     cd ../..
   fi
