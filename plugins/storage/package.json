@@ -5,9 +5,9 @@
   "main": "storage.js",
   "private": true,
   "dependencies": {
-    "jsonfile": "^2.4.0",
-    "proper-lockfile": "^2.0.0",
-    "q": "^1.4.1"
+    "jsonfile": "^6.1.0",
+    "proper-lockfile": "^4.1.2",
+    "q": "^1.5.1"
   },
   "plugin": {
     "consumes": [

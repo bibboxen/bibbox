@@ -7,8 +7,8 @@
 
 'use strict';
 
-var i18n = require('i18n');
-var fs = require('fs');
+const i18n = require('i18n');
+const fs = require('fs');
 
 /**
  * This object encapsulates translation.
@@ -20,11 +20,11 @@ var fs = require('fs');
  * @param {array} languages
  *   The supported languages.
  */
-var Translation = function (bus, paths, languages) {
-  var self = this;
+const Translation = function (bus, paths, languages) {
+  let self = this;
 
   // Configure I18N with supported languages.
-  var directory = __dirname + '/../../' + paths.base + '/' + paths.translations + '/ui';
+  const directory = __dirname + '/../../' + paths.base + '/' + paths.translations + '/ui';
   i18n.configure({
     locales: languages.locales,
     defaultLocale: languages.defaultLocale,
@@ -38,8 +38,8 @@ var Translation = function (bus, paths, languages) {
   // @TODO: Avoid more than one push when multiple language files are changed.
   fs.watch(directory, function (event, filename) {
     process.nextTick(function () {
-      var langCode = filename.split('.json')[0];
-      var translations = {};
+      let langCode = filename.split('.json')[0];
+      let translations = {};
       translations[langCode] = self.getTranslationsLang(langCode);
 
       bus.emit('config.ui.translations.update', {
@@ -83,8 +83,8 @@ Translation.prototype.getTranslationsLang = function getTranslationsLang(lang) {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var bus = imports.bus;
-  var translation = new Translation(bus, options.paths, options.languages);
+  const bus = imports.bus;
+  const translation = new Translation(bus, options.paths, options.languages);
 
   /**
    * Handler for 'translations.request' event.

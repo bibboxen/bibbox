@@ -16,6 +16,6 @@
   "dependencies": {
     "debug": "^4.3.4",
     "sync-request": "^6.1.0",
-    "uniqid": "^4.1.0"
+    "uniqid": "^5.4.0"
   }
 }

@@ -6,16 +6,16 @@
 'use strict';
 
 // Node core modules.
-var util = require('util');
+const util = require('util');
 
-var Q = require('q');
-var Logstash = require('logstash-client');
-var uniqid = require('uniqid');
+const Q = require('q');
+const Logstash = require('logstash-client');
+const uniqid = require('uniqid');
 
 // Static logstash client across loggers.
-var logstashClient = null;
+let logstashClient = null;
 
-var Logger = function Logger(config) {
+const Logger = function Logger(config) {
   this.config = config;
 
   if (logstashClient === null) {
@@ -41,9 +41,9 @@ var Logger = function Logger(config) {
  *   Promise that the FBS object is created with configuration.
  */
 Logger.create = function create(bus) {
-  var deferred = Q.defer();
-  var busEvent = 'logger.config.loaded' + uniqid();
-  var errorEvent = 'logger.config.error' + uniqid();
+  let deferred = Q.defer();
+  let busEvent = 'logger.config.loaded' + uniqid();
+  let errorEvent = 'logger.config.error' + uniqid();
 
   bus.once(busEvent, function (config) {
     deferred.resolve(new Logger(config));
@@ -70,30 +70,30 @@ Logger.create = function create(bus) {
  *   The message to send to the logger.
  */
 Logger.prototype.send = function send(level, message) {
-  var self = this.config;
+  let self = this.config;
   if (logstashClient !== null) {
     // This is for to support legacy log messages.
-    var type = 'unknown';
+    let type = 'unknown';
     if (message.hasOwnProperty('type')) {
       type = message.type.toLowerCase();
     }
-    var msg = message;
+    let msg = message;
     if (message.hasOwnProperty('message')) {
       msg = message.message;
     }
 
     // Create the best possible logging message for searching in FBS messages.
     if (type === 'fbs' && level === 'info') {
-      var parts = {
+      let parts = {
         'id': msg.slice(0, 2),
         'raw': msg,
         'xml': message.hasOwnProperty('xml') ? message.xml : 'No XML data'
       };
 
       // Find the first field in the messages and split the message into SIP2 parts.
-      var firsts = [ 'AO', 'AP', 'CF', 'CN', 'BW', 'BV'];
-      for (var i in firsts) {
-        var index = msg.indexOf(firsts[i]);
+      let firsts = [ 'AO', 'AP', 'CF', 'CN', 'BW', 'BV'];
+      for (let i in firsts) {
+        let index = msg.indexOf(firsts[i]);
         if (index !== -1) {
           msg.slice(index).split('|').forEach(function (val) {
             if (val) {
@@ -130,7 +130,7 @@ Logger.prototype.send = function send(level, message) {
 module.exports = function (options, imports, register) {
    // Add event listeners to logging events on the bus. For some reason they need
   // to have a inner function to work!
-  var bus = imports.bus;
+  let bus = imports.bus;
   bus.on('logger.err', function (message) {
     Logger.create(bus).then(function (logger) {
         logger.send('error', message);

@@ -10,7 +10,7 @@ var eventEmitter = require('events').EventEmitter;
 
 var debug = require('debug')('bibbox:FBS:response');
 
-var Entities = require('html-entities').AllHtmlEntities;
+var Entities = require('html-entities');
 
 /**
  * Response object.
@@ -339,7 +339,7 @@ Response.prototype.variablesResponseTranslation = function variablesResponseTran
 Response.prototype.parseVariables = function parseVariables() {
   var self = this;
 
-  var entities = new Entities();
+  var decode = Entities.decode;
 
   // Check that the message contains the first variable.
   var index = self.message.indexOf(self.firstVariableName);
@@ -365,7 +365,7 @@ Response.prototype.parseVariables = function parseVariables() {
         case 'BD':
           val = val.split('%');
           self[keyTrans] = {
-            street: entities.decode(val.shift()),
+            street: decode(val.shift()),
             postalCode: val.shift(),
             city: val.shift(),
             country: val.shift()
@@ -379,8 +379,8 @@ Response.prototype.parseVariables = function parseVariables() {
             self[keyTrans].push({
               id: val.shift(),
               dueDate: self.parseDate(val.shift()),
-              title: entities.decode(val.shift()),
-              author: entities.decode(val.shift()),
+              title: decode(val.shift()),
+              author: decode(val.shift()),
               GMB: val.shift(),
               SMB: val.shift(),
               DK5: val.shift()
@@ -388,16 +388,16 @@ Response.prototype.parseVariables = function parseVariables() {
           }
           break;
 
-        // Unrenewed items.
+        // Un-renewed items.
         case 'BN':
           val = val.split('%');
           if (val.length > 1) {
             self[keyTrans].push({
               id: val.shift(),
-              reason: entities.decode(val.shift()),
+              reason: decode(val.shift()),
               dueDate: self.parseDate(val.shift()),
-              title: entities.decode(val.shift()),
-              author: entities.decode(val.shift()),
+              title: decode(val.shift()),
+              author: decode(val.shift()),
               GMB: val.shift(),
               SMB: val.shift(),
               DK5: val.shift()
@@ -421,8 +421,8 @@ Response.prototype.parseVariables = function parseVariables() {
               pickupId: val.shift(),
               pickupDate: self.parseDate(val.shift()),
               pickupLocation: val.shift().match(/\w{2,3}-\d{6}\s-\s(.*)/)[1],
-              title: entities.decode(val.shift()),
-              author: entities.decode(val.shift()),
+              title: decode(val.shift()),
+              author: decode(val.shift()),
               GMB: val.shift(),
               SMB: val.shift(),
               DK5: val.shift()
@@ -437,8 +437,8 @@ Response.prototype.parseVariables = function parseVariables() {
             self[keyTrans].push({
               id: val.shift(),
               dueDate: self.parseDate(val.shift()),
-              title: entities.decode(val.shift()),
-              author: entities.decode(val.shift()),
+              title: decode(val.shift()),
+              author: decode(val.shift()),
               GMB: val.shift(),
               SMB: val.shift(),
               DK5: val.shift()
@@ -455,8 +455,8 @@ Response.prototype.parseVariables = function parseVariables() {
               fineId: val.shift(),
               fineDate: self.parseDate(val.shift()),
               fineAmount: val.shift(),
-              title: entities.decode(val.shift()),
-              author: entities.decode(val.shift()),
+              title: decode(val.shift()),
+              author: decode(val.shift()),
               GMB: val.shift(),
               SMB: val.shift(),
               DK5: val.shift()
@@ -488,8 +488,8 @@ Response.prototype.parseVariables = function parseVariables() {
               bibliographicId: val.shift(),
               id: val.shift(),
               interestDate: self.parseDate(val.shift()),
-              title: entities.decode(val.shift()),
-              author: entities.decode(val.shift()),
+              title: decode(val.shift()),
+              author: decode(val.shift()),
               GMB: val.shift(),
               SMB: val.shift(),
               DK5: val.shift()
@@ -504,8 +504,8 @@ Response.prototype.parseVariables = function parseVariables() {
             self[keyTrans].push({
               id: val.shift(),
               returnDate: self.parseDate(val.shift()),
-              title: entities.decode(val.shift()),
-              author: entities.decode(val.shift()),
+              title: decode(val.shift()),
+              author: decode(val.shift()),
               GMB: val.shift(),
               SMB: val.shift()
             });
@@ -517,8 +517,8 @@ Response.prototype.parseVariables = function parseVariables() {
           val = val.split('%');
           if (val.length > 1) {
             self[keyTrans] = {
-              title: entities.decode(val.shift()),
-              author: entities.decode(val.shift()),
+              title: decode(val.shift()),
+              author: decode(val.shift()),
               GMB: val.shift(),
               SMB: val.shift(),
               DK5: val.shift()

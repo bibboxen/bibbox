@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:18
 LABEL maintainer="ITK Dev <itkdev@mkb.aarhus.dk>"
 
 ENV TZ="Europe/Copenhagen"
@@ -15,6 +15,9 @@ RUN DEBIAN_FRONTEND=noninteractive \
 
 RUN ln -fs /usr/share/zoneinfo/Europe/Copenhagen /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata
+
+# Install upgrader helper (https://chektek.com/code/update-all-node-packages-to-latest/)
+RUN npm install -g npm-check-updates
 
 
 WORKDIR /app

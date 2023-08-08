@@ -7,12 +7,12 @@
 
 'use strict';
 
-var jsonfile = require('jsonfile');
-var fs = require('fs');
-var lockfile = require('proper-lockfile');
-var Q = require('q');
+const jsonfile = require('jsonfile');
+const fs = require('fs');
+const lockfile = require('proper-lockfile');
+const Q = require('q');
 
-var Storage = function Storage(bus, paths) {
+const Storage = function Storage(bus, paths) {
   this.path = __dirname + '/../../' + paths.base + '/';
 
   this.retries = {
@@ -35,9 +35,9 @@ var Storage = function Storage(bus, paths) {
  * @returns {*|promise}
  */
 Storage.prototype.lock = function lock(type, name) {
-  var deferred = Q.defer();
+  let deferred = Q.defer();
 
-  var file = this.path + type + '/' + name + '.json';
+  let file = this.path + type + '/' + name + '.json';
   lockfile.lock(file, { retries: this.retries }, function (err) {
     if (err) {
       deferred.reject(err);
@@ -71,9 +71,9 @@ Storage.prototype.unlock = function unlock(file) {
  * @returns {*|promise}
  */
 Storage.prototype.isLocked = function isLocked(type, name) {
-  var deferred = Q.defer();
+  let deferred = Q.defer();
 
-  var file = this.path + type + '/' + name + '.json';
+  let file = this.path + type + '/' + name + '.json';
   lockfile.check(file, function (err, isLocked) {
     if (err) {
       deferred.reject(err);
@@ -92,16 +92,16 @@ Storage.prototype.isLocked = function isLocked(type, name) {
  * @param type
  *   The type (config, translation or offline).
  * @param name
- *   Name of the modules config.
+ *   Name of the module's config.
  * @returns {*}
  *   JSON object with the config.
  */
 Storage.prototype.load = function load(type, name) {
-  var deferred = Q.defer();
+  let deferred = Q.defer();
 
-  var file = this.path + type + '/' + name + '.json';
+  let file = this.path + type + '/' + name + '.json';
   try {
-    var data = jsonfile.readFileSync(file);
+    let data = jsonfile.readFileSync(file);
     deferred.resolve(data);
   }
   catch (err) {
@@ -124,9 +124,9 @@ Storage.prototype.load = function load(type, name) {
  * @returns {*}
  */
 Storage.prototype.save = function save(type, name, obj) {
-  var deferred = Q.defer();
+  let deferred = Q.defer();
 
-  var file = this.path + type + '/' + name + '.json';
+  let file = this.path + type + '/' + name + '.json';
   try {
     var res = jsonfile.writeFileSync(file, obj, {
       spaces: 2
@@ -152,9 +152,9 @@ Storage.prototype.save = function save(type, name, obj) {
  * @returns {*}
  */
 Storage.prototype.remove = function append(type, name) {
-  var deferred = Q.defer();
+  let deferred = Q.defer();
 
-  var file = this.path + type + '/' + name + '.json';
+  let file = this.path + type + '/' + name + '.json';
   try {
     fs.unlinkSync(file);
     deferred.resolve();
@@ -177,8 +177,8 @@ Storage.prototype.remove = function append(type, name) {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var bus = imports.bus;
-  var storage = new Storage(bus, options.paths);
+  const bus = imports.bus;
+  const storage = new Storage(bus, options.paths);
 
   /**
    * Listen to load requests.

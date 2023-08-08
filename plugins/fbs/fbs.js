@@ -5,14 +5,14 @@
 
 'use strict';
 
-var util = require('util');
-var eventEmitter = require('events').EventEmitter;
-var Q = require('q');
-var uniqid = require('uniqid');
+const util = require('util');
+const eventEmitter = require('events').EventEmitter;
+const Q = require('q');
+const uniqid = require('uniqid');
 
-var debug = require('debug')('bibbox:FBS:main');
+const debug = require('debug')('bibbox:FBS:main');
 
-var Request = require('./request.js');
+const Request = require('./request.js');
 
 /**
  * Default constructor.
@@ -24,7 +24,7 @@ var Request = require('./request.js');
  *
  * @constructor
  */
-var FBS = function FBS(bus, config) {
+const FBS = function FBS(bus, config) {
   this.bus = bus;
   this.config = config;
 };
@@ -46,9 +46,9 @@ util.inherits(FBS, eventEmitter);
  *   Promise that the FBS object is created with configuration.
  */
 FBS.create = function create(bus) {
-  var deferred = Q.defer();
-  var busEvent = 'fbs.config.loaded' + uniqid();
-  var errorEvent = 'fbs.config.error' + uniqid();
+  let deferred = Q.defer();
+  let busEvent = 'fbs.config.loaded' + uniqid();
+  let errorEvent = 'fbs.config.error' + uniqid();
 
   bus.once(busEvent, function (config) {
     deferred.resolve(new FBS(bus, config));
@@ -70,9 +70,9 @@ FBS.create = function create(bus) {
  * Send status message to FBS.
  */
 FBS.prototype.libraryStatus = function libraryStatus() {
-  var deferred = Q.defer();
+  let deferred = Q.defer();
 
-  var req = new Request(this.bus, this.config);
+  let req = new Request(this.bus, this.config);
   req.libraryStatus(function (err, response) {
     if (err) {
       deferred.reject(err);
@@ -97,17 +97,17 @@ FBS.prototype.libraryStatus = function libraryStatus() {
  *   TRUE if valid else FALSE.
  */
 FBS.prototype.login = function login(username, password) {
-  var deferred = Q.defer();
-  var bus = this.bus;
+  let deferred = Q.defer();
+  let bus = this.bus;
 
-  var req = new Request(this.bus, this.config);
+  let req = new Request(this.bus, this.config);
   req.patronStatus(username, password, function (err, res) {
     if (err) {
       deferred.reject(err);
     }
     else {
       // Check that the user is valid.
-      var valid = res.hasOwnProperty('validPatron') && res.validPatron === 'Y' && res.validPatronPassword === 'Y';
+      let valid = res.hasOwnProperty('validPatron') && res.validPatron === 'Y' && res.validPatronPassword === 'Y';
 
       // If user is valid check for blocking codes.
       if (valid) {
@@ -141,10 +141,10 @@ FBS.prototype.login = function login(username, password) {
  *   JSON object with information or FALSE on failure.
  */
 FBS.prototype.patronInformation = function patronInformation(username, password) {
-  var deferred = Q.defer();
-  var bus = this.bus;
+  let deferred = Q.defer();
+  let bus = this.bus;
 
-  var req = new Request(this.bus, this.config);
+  let req = new Request(this.bus, this.config);
   req.patronInformation(username, password, function (err, res) {
     if (err) {
       deferred.reject(err);
@@ -178,10 +178,10 @@ FBS.prototype.patronInformation = function patronInformation(username, password)
  *   JSON object with information or error message on failure.
  */
 FBS.prototype.checkout = function checkout(username, password, itemIdentifier, noBlockDueDate, noBlock, transactionDate) {
-  var deferred = Q.defer();
-  var bus = this.bus;
+  let deferred = Q.defer();
+  let bus = this.bus;
 
-  var req = new Request(this.bus, this.config);
+  let req = new Request(this.bus, this.config);
   req.checkout(username, password, itemIdentifier, noBlockDueDate, noBlock, transactionDate, function (err, res) {
     if (err) {
       deferred.reject(err);
@@ -209,10 +209,10 @@ FBS.prototype.checkout = function checkout(username, password, itemIdentifier, n
  *   JSON object with information or error message on failure.
  */
 FBS.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate, noBlock) {
-  var deferred = Q.defer();
-  var bus = this.bus;
+  let deferred = Q.defer();
+  let bus = this.bus;
 
-  var req = new Request(this.bus, this.config);
+  let req = new Request(this.bus, this.config);
   req.checkIn(itemIdentifier, checkedInDate, noBlock, function (err, res) {
     if (err) {
       deferred.reject(err);
@@ -240,10 +240,10 @@ FBS.prototype.checkIn = function checkIn(itemIdentifier, checkedInDate, noBlock)
  *   JSON object with information or error message on failure.
  */
 FBS.prototype.renew = function renew(username, password, itemIdentifier) {
-  var deferred = Q.defer();
-  var bus = this.bus;
+  let deferred = Q.defer();
+  let bus = this.bus;
 
-  var req = new Request(this.bus, this.config);
+  let req = new Request(this.bus, this.config);
   req.renew(username, password, itemIdentifier, function (err, res) {
     if (err) {
       deferred.reject(err);
@@ -269,10 +269,10 @@ FBS.prototype.renew = function renew(username, password, itemIdentifier) {
  *   JSON object with information or error message on failure.
  */
 FBS.prototype.renewAll = function renewAll(username, password) {
-  var deferred = Q.defer();
-  var bus = this.bus;
+  let deferred = Q.defer();
+  let bus = this.bus;
 
-  var req = new Request(this.bus, this.config);
+  let req = new Request(this.bus, this.config);
   req.renewAll(username, password, function (err, res) {
     if (err) {
       deferred.reject(err);
@@ -298,10 +298,10 @@ FBS.prototype.renewAll = function renewAll(username, password) {
  *   JSON object with information or error message on failure.
  */
 FBS.prototype.block = function block(username, reason) {
-  var deferred = Q.defer();
-  var bus = this.bus;
+  let deferred = Q.defer();
+  let bus = this.bus;
 
-  var req = new Request(this.bus, this.config);
+  let req = new Request(this.bus, this.config);
   req.blockPatron(username, reason, function (err, res) {
     if (err) {
       deferred.reject(err);
@@ -326,11 +326,11 @@ FBS.prototype.block = function block(username, reason) {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var bus = imports.bus;
-  var crypt = imports.crypt;
+  const bus = imports.bus;
+  const crypt = imports.crypt;
 
   // Defines the configuration for the online checker below.
-  var onlineState = {
+  let onlineState = {
     online: true,
     threshold: 5,
     successfulOnlineChecks: 5,
@@ -339,8 +339,8 @@ module.exports = function (options, imports, register) {
     ensureOnlineCheckTimeout: 300000
   };
 
-  var checkOnlineStateTimeout = null;
-  var ensureCheckOnlineStateTimeout = null;
+  let checkOnlineStateTimeout = null;
+  let ensureCheckOnlineStateTimeout = null;
 
   /**
    * Online checker.
@@ -396,7 +396,7 @@ module.exports = function (options, imports, register) {
             }
 
             // Send state event into the bus.
-            var eventName = onlineState.online ? 'fbs.online' : 'fbs.offline';
+            let eventName = onlineState.online ? 'fbs.online' : 'fbs.offline';
             bus.emit(eventName, {
               timestamp: new Date().getTime(),
               online: onlineState
@@ -551,7 +551,7 @@ module.exports = function (options, imports, register) {
     // Ensure that the noBlock parameter to FBS is set to 'N' as default.
     // NoBlock have been added in a later release a may not be in all
     // request.
-    var noBlock = data.hasOwnProperty('noBlock') ? data.noBlock : false;
+    let noBlock = data.hasOwnProperty('noBlock') ? data.noBlock : false;
 
     // Set transaction date if not set already (offline queued item will have
     // the date already).
@@ -568,7 +568,7 @@ module.exports = function (options, imports, register) {
           },
           function (err) {
             if (err.message === 'FBS is offline' && data.queued === false) {
-              var material = {
+              let material = {
                 itemIdentifier: data.itemIdentifier,
                 offline: true,
                 ok: '1',
@@ -585,7 +585,7 @@ module.exports = function (options, imports, register) {
               });
 
               // Add to job queue (clone data object first to ensure no-side-effect and encrypt).
-              var jobData = JSON.parse(JSON.stringify(data));
+              let jobData = JSON.parse(JSON.stringify(data));
               jobData.transactionDate = crypt.encrypt(jobData.transactionDate);
               jobData.username = crypt.encrypt(jobData.username);
               jobData.password = crypt.encrypt(jobData.password);
@@ -607,7 +607,7 @@ module.exports = function (options, imports, register) {
     else {
       // FBS is offline, so create do offline work.
       if (data.queued === false) {
-        var material = {
+        let material = {
           itemIdentifier: data.itemIdentifier,
           offline: true,
           ok: '1',
@@ -624,7 +624,7 @@ module.exports = function (options, imports, register) {
         });
 
         // Add to job queue (clone data object first to ensure no-side-effect and encrypt).
-        var jobData = JSON.parse(JSON.stringify(data));
+        let jobData = JSON.parse(JSON.stringify(data));
         jobData.transactionDate = crypt.encrypt(jobData.transactionDate);
         jobData.username = crypt.encrypt(jobData.username);
         jobData.password = crypt.encrypt(jobData.password);
@@ -632,8 +632,8 @@ module.exports = function (options, imports, register) {
         bus.emit('offline.add.checkout', jobData);
       }
       else {
-        debug(err);
-        bus.emit(data.errorEvent, err);
+        debug('error');
+        bus.emit(data.errorEvent, {'error': 'Unknown error'});
       }
     }
   });
@@ -659,7 +659,7 @@ module.exports = function (options, imports, register) {
       FBS.create(bus).then(function (fbs) {
         // Ensure that the noBlock parameter to FBS is set to 'N' as default.
         // NoBlock have been added in a later release a may not be in all requests.
-        var noBlock = data.hasOwnProperty('noBlock') ? data.noBlock : false;
+        let noBlock = data.hasOwnProperty('noBlock') ? data.noBlock : false;
 
         // Perform the checking request.
         fbs.checkIn(data.itemIdentifier, data.checkedInDate, noBlock).then(function (res) {
@@ -670,7 +670,7 @@ module.exports = function (options, imports, register) {
           },
           function (err) {
             if (err.message === 'FBS is offline' && false === data.queued) {
-              var material = {
+              let material = {
                 itemIdentifier: data.itemIdentifier,
                 offline: true,
                 ok: '1',
@@ -686,7 +686,7 @@ module.exports = function (options, imports, register) {
               });
 
               // Add to job queue (clone data object first to ensure no-side-effect and encrypt).
-              var jobData = JSON.parse(JSON.stringify(data));
+              let jobData = JSON.parse(JSON.stringify(data));
               jobData.checkedInDate = crypt.encrypt(jobData.checkedInDate);
               jobData.itemIdentifier = crypt.encrypt(jobData.itemIdentifier);
               bus.emit('offline.add.checkin', jobData);
@@ -706,7 +706,7 @@ module.exports = function (options, imports, register) {
     else {
       // FBS is offline, so create do offline work.
       if (data.queued === false) {
-        var material = {
+        let material = {
           itemIdentifier: data.itemIdentifier,
           offline: true,
           ok: '1',
@@ -722,7 +722,7 @@ module.exports = function (options, imports, register) {
         });
 
         // Add to job queue (clone data object first to ensure no-side-effect and encrypt).
-        var jobData = JSON.parse(JSON.stringify(data));
+        let jobData = JSON.parse(JSON.stringify(data));
         jobData.checkedInDate = crypt.encrypt(jobData.checkedInDate);
         jobData.itemIdentifier = crypt.encrypt(jobData.itemIdentifier);
         bus.emit('offline.add.checkin', jobData);

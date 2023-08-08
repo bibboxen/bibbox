@@ -4,10 +4,10 @@
  */
 'use strict';
 
-var Q = require('q');
-var uniqid = require('uniqid');
+const Q = require('q');
+const uniqid = require('uniqid');
 
-var CTRL = function CTRL(bus) {
+const CTRL = function CTRL(bus) {
   this.bus = bus;
 };
 
@@ -17,8 +17,8 @@ var CTRL = function CTRL(bus) {
  * @returns {*|promise}
  */
 CTRL.prototype.getConfig = function getConfig() {
-  var deferred = Q.defer();
-  var busEvent = 'ctrl.config.loaded.config' + uniqid();
+  let deferred = Q.defer();
+  let busEvent = 'ctrl.config.loaded.config' + uniqid();
 
   this.bus.once(busEvent, function (data) {
     if (data instanceof Error) {
@@ -44,8 +44,8 @@ CTRL.prototype.getConfig = function getConfig() {
  * @returns {*|promise}
  */
 CTRL.prototype.getFBSConfig = function getFBSConfig() {
-  var deferred = Q.defer();
-  var busEvent = 'ctrl.fbs.loaded.config' + uniqid();
+  let deferred = Q.defer();
+  let busEvent = 'ctrl.fbs.loaded.config' + uniqid();
 
   this.bus.once(busEvent, function (data) {
     if (data instanceof Error) {
@@ -71,8 +71,8 @@ CTRL.prototype.getFBSConfig = function getFBSConfig() {
  * @returns {*|promise}
  */
 CTRL.prototype.getNotificationConfig = function getNotificationConfig() {
-  var deferred = Q.defer();
-  var busEvent = 'ctrl.notification.loaded.config' + uniqid();
+  let deferred = Q.defer();
+  let busEvent = 'ctrl.notification.loaded.config' + uniqid();
 
   this.bus.once(busEvent, function (data) {
     if (data instanceof Error) {
@@ -98,8 +98,8 @@ CTRL.prototype.getNotificationConfig = function getNotificationConfig() {
  *       code stream lined.
  */
 CTRL.prototype.getUiConfig = function getUiConfig() {
-  var deferred = Q.defer();
-  var busEvent = 'ctrl.loaded.ui.config' + uniqid();
+  let deferred = Q.defer();
+  let busEvent = 'ctrl.loaded.ui.config' + uniqid();
 
   this.bus.once(busEvent, function (data) {
     if (data instanceof Error) {
@@ -124,8 +124,8 @@ CTRL.prototype.getUiConfig = function getUiConfig() {
  * @returns {*|promise}
  */
 CTRL.prototype.getTranslations = function getTranslations() {
-  var deferred = Q.defer();
-  var busEvent = 'translations.request.languages' + uniqid();
+  let deferred = Q.defer();
+  let busEvent = 'translations.request.languages' + uniqid();
 
   this.bus.once(busEvent, function (data) {
     if (data instanceof Error) {
@@ -153,8 +153,8 @@ CTRL.prototype.getTranslations = function getTranslations() {
  *   Callback function used to register this plugin.
  */
 module.exports = function (options, imports, register) {
-  var bus = imports.bus;
-  var ctrl = new CTRL(bus);
+  let bus = imports.bus;
+  let ctrl = new CTRL(bus);
 
   /**
    * Handle front-end (UI) configuration requests.
@@ -287,7 +287,7 @@ module.exports = function (options, imports, register) {
       case 'translations':
         // Save ui translation strings.
         if (data.translations.hasOwnProperty('ui')) {
-          for (var key in data.translations.ui) {
+          for (let key in data.translations.ui) {
             bus.emit('storage.save', {
               type: 'locales',
               name: 'ui/' + key,
@@ -299,7 +299,7 @@ module.exports = function (options, imports, register) {
 
         // Save notification translation strings.
         if (data.translations.hasOwnProperty('notification')) {
-          for (var key in data.translations.notification) {
+          for (let key in data.translations.notification) {
             bus.emit('storage.save', {
               type: 'locales',
               name: 'notifications/' + key,
@@ -311,8 +311,8 @@ module.exports = function (options, imports, register) {
         break;
 
       case 'offlineFailedJobs':
-        var busEvent = 'offline.failed.jobs' + uniqid();
-        var errorEvent = 'offline.failed.jobs.error' + uniqid();
+        let busEvent = 'offline.failed.jobs' + uniqid();
+        let errorEvent = 'offline.failed.jobs.error' + uniqid();
 
         bus.once(busEvent, function (data) {
           process.send({
@@ -333,24 +333,24 @@ module.exports = function (options, imports, register) {
         break;
 
       case 'offlineCounts':
-        var busEvent = 'offline.counts' + uniqid();
-        var errorEvent = 'offline.counts.error' + uniqid();
+        let busEventCounts = 'offline.counts' + uniqid();
+        let errorEventCounts = 'offline.counts.error' + uniqid();
 
-        bus.once(busEvent, function (data) {
+        bus.once(busEventCounts, function (data) {
           process.send({
             offlineCounts: data
           });
         });
 
-        bus.once(errorEvent, function (err) {
+        bus.once(errorEventCounts, function (err) {
           process.send({
             offlineCountsError: err.message
           });
         });
 
         bus.emit('offline.counts', {
-          busEvent: busEvent,
-          errorEvent: errorEvent
+          busEvent: busEventCounts,
+          errorEvent: errorEventCounts
         });
         break;
     }
