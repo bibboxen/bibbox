@@ -30,21 +30,21 @@ var setup = function setup() {
 
 it('Test info event (@TODO: validate)', function () {
   return setup().then(function (app) {
-    app.services.bus.emit('logger.info', 'Info message');
+    app.services.bus.emit('logger.info', { 'type': 'Server', 'message': 'Info message' });
     assert(true);
   });
 });
 
 it('Test debug event (@TODO: validate)', function () {
   return setup().then(function (app) {
-    app.services.bus.emit('logger.info', 'Debug message');
+    app.services.bus.emit('logger.debug', { 'type': 'Server', 'message': 'Debug message' });
     assert(true);
   });
 });
 
 it('Test error event (@TODO: validate)', function () {
   return setup().then(function (app) {
-    app.services.bus.emit('logger.info', 'Error message');
+    app.services.bus.emit('logger.error', { 'type': 'Server', 'message': 'Error message' });
     assert(true);
   });
 });
