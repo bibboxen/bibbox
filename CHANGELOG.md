@@ -1,6 +1,8 @@
 # Bibbox Changelog
 
 ### In development
+
+### v3.0.0
 * Fixed strange chars on printed "bon's" - https://github.com/foliojs/pdfkit/issues/1425
 * Moved PDF output folder.
 * Upgrade to node 18
