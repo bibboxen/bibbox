@@ -352,7 +352,6 @@ module.exports = function (options, imports, register) {
     if (ensureCheckOnlineStateTimeout != null) {
       clearTimeout(ensureCheckOnlineStateTimeout);
     }
-
     // Start extra timeout.
     ensureCheckOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.onlineTimeout + onlineState.ensureOnlineCheckTimeout);
 
@@ -389,7 +388,7 @@ module.exports = function (options, imports, register) {
               }
             }
             else {
-              // FBS is offline, so it the state.
+              // FBS is offline.
               onlineState.successfulOnlineChecks = 0;
               onlineState.online = false;
               checkOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.offlineTimeout);
@@ -401,6 +400,7 @@ module.exports = function (options, imports, register) {
               timestamp: new Date().getTime(),
               online: onlineState
             });
+            bus.emit('logger.info', {'type': 'checkOnlineState', 'message': 'FBS state: ' + eventName + ' (' + onlineState.successfulOnlineChecks + '/' + onlineState.threshold + ')'});
           },
           function (err) {
             // Error connecting to FBS.
@@ -411,6 +411,7 @@ module.exports = function (options, imports, register) {
               timestamp: new Date().getTime(),
               online: onlineState
             });
+            bus.emit('logger.info', {'type': 'checkOnlineState', 'message': 'FBS connection error'});
           }
         );
       }
@@ -423,10 +424,11 @@ module.exports = function (options, imports, register) {
           timestamp: new Date().getTime(),
           online: onlineState
         });
+        bus.emit('logger.info', {'type': 'checkOnlineState', 'message': 'Missing configuration'});
       }
     },
     function (err) {
-      bus.emit('logger.info', 'checkOnlineState: FBS.create(bus) promise failed. Retrying.');
+      bus.emit('logger.info', {'type': 'checkOnlineState', 'message': 'FBS.create(bus) promise failed'});
 
       // Retry check.
       checkOnlineStateTimeout = setTimeout(checkOnlineState, onlineState.offlineTimeout);

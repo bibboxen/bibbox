@@ -19,6 +19,8 @@ Log events to log files.
 ```javascript
 var ip = '127.0.0.1';
 bus.emit('logger.info', 'User logged in from ' + ip);
+app.services.bus.emit('logger.info', 'Error message');
+
 ```
 ### Debug message
 ```javascript
