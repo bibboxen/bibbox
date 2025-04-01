@@ -2,41 +2,58 @@
 
 ### In development
 
+### v3.0.2
+
+* Updated node modules in the plugins
+
+### v3.0.1
+
+* Added better code to debug offline state
+
 ### v3.0.0
+
 * Fixed strange chars on printed "bon's" - https://github.com/foliojs/pdfkit/issues/1425
-* Moved PDF output folder.
+* Moved PDF output folder
 * Upgrade to node 18
 * Upgrade node modules and code style clean up
 * Added IPv6 to config example for communication with RFID reader (::ffff:127.0.0.1)
 
 ### v2.1.2
+
 * Better debug of missing private key and fixed decrypt error.
 
 ### v2.1.1
+
 * Fixed date on offline checkout.
 
 ### v2.1.0
+
 * Added encryption of offline data using private/public keys (requires new configuration in administration)
 * Removed redundant local offline storage in the file system (only use redis and queue system).
 * Ensured completed jobs in queue is automatically removed.
 
 ### v2.0.0
+
 * Upgrade to node 14.
 * Change receipt generation from wkhtmltopdf to using PDFKit.
 
 ### v1.8.3
+
 * Minor release only with changes in default configuration file.
 
 ### v1.8.2
+
 * Fixed tag un-lock vs. borrowed state in front end.
 * Fixed type error: Cannot read property 'validPatron' of null
 * Added extra offline checks to FBS to prevent request when offline
 
 ### v1.8.1
+
 * Index error when logging message from FBS that is an error
 * Ensure that network errors results in "FBS Offline" error and logging of the error is not empty
 
 ### v1.8.0
+
 * Removed network handshake
 * Track non-email print actions
 * Track idle timeout
@@ -44,19 +61,23 @@
 * Update node modules - loaddash, dot-prop
 
 ### v1.7.1
+
 * Fixed screen on/off command execution
 
 ### v1.7.0
+
 * Fixed index error in renew all
 * Added screen plugin to turn on/off screen (power saver)
 * Security update of node modules
 
 ### v1.6.2
+
 * Added debug messages when running frontend in debug mode.
 * Added support for docker development setup
 * Fixed race condition in out-of-order
 
 ### v1.6.1
+
 * Added extra timeout-check to make sure online-checker is running.
 
 ### v1.6.0
@@ -194,6 +215,5 @@
 * Fixed error where a material was stuck in loading if the material was removed before it was unlocked/locked.
 
 ### v1.0.0
-https://github.com/bibboxen/bibbox/tree/v1.0.0
 
 * First release
